@@ -1,0 +1,15 @@
+{if ( !isset($data.cra1.show_contact_cards) || $data.cra1.show_contact_cards == 1 ) }
+        <section class="container-page py-12 md:py-16" data-reveal aria-label="联系方式卡片">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {foreach $data.cra1.contact_cards as $card}
+                <div class="feature-item glass-card rounded-xl p-6 cui-card">
+                    {if ( !empty($card.icon_img) ) }<span class="inline-flex h-10 w-10 items-center justify-center rounded-xl" data-cra1-icon-label="{$card.name|htmlspecialchars}" {$card.icon_style_attrs|default=''|raw}>
+                    {if ( $card.icon_png == 1 ) }<img src="{$card.icon_img}" alt="" class="h-6 w-6">{else /}<span class="icon-img h-6 w-6" style="--icon:url('{$card.icon_img}')" aria-hidden="true"></span>{/if}
+                    </span>{/if}
+                    <h3 class="mt-3 font-semibold text-ink">{$card.name}</h3>
+                    <p class="mt-2 text-sm leading-6 text-body">{$card.desc}</p>
+                </div>
+                {/foreach}
+            </div>
+        </section>
+        {/if}

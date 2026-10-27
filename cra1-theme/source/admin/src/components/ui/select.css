@@ -1,0 +1,16 @@
+.admin-menu-select { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0; height:40px; padding:0 12px; border:1px solid var(--border,#e4e4e7); border-radius:8px; background:#fff; color:#35383c; font:inherit; font-size:13px; text-align:left; cursor:pointer; transition:border-color 140ms,box-shadow 140ms; }
+.admin-menu-select__value { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.admin-menu-select__chevron { flex:none; width:15px; height:15px; color:#71717a; transition:transform 140ms; }
+.admin-menu-select[data-state=open] .admin-menu-select__chevron { transform:rotate(180deg); }
+.admin-menu-select:focus-visible,.admin-menu-select[data-state=open] { outline:none; border-color:#9ba4b2; box-shadow:0 0 0 3px #76859d18; }
+.admin-menu-select:disabled { background:#f4f4f5; color:#8c8c94; cursor:not-allowed; }
+.admin-menu-select__popup { z-index:180; min-width:var(--radix-select-trigger-width); max-width:calc(100vw - 24px); max-height:min(340px,var(--radix-select-content-available-height)); overflow:hidden; border:1px solid #dfe2e7; border-radius:10px; background:#fff; color:#35383c; box-shadow:0 8px 28px #21232716,0 1px 4px #21232708; font:13px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; }
+.admin-menu-select__viewport { padding:5px; }
+.admin-menu-select__option { position:relative; display:flex; align-items:center; min-height:36px; padding:8px 32px 8px 10px; border-radius:6px; cursor:pointer; outline:none; overflow-wrap:anywhere; }
+.admin-menu-select__option[data-highlighted] { background:#f0f2f5; }
+.admin-menu-select__option[data-state=checked] { color:#3f4a59; font-weight:500; background:#edf0f5; }
+.admin-menu-select__option[data-disabled] { opacity:.45; cursor:not-allowed; }
+.admin-menu-select__check { position:absolute; right:10px; display:grid; place-items:center; color:#6a7380; }
+.admin-menu-select__scroll { display:flex; align-items:center; justify-content:center; height:22px; background:#fff; color:#71717a; }
+@media(max-width:767px),(pointer:coarse) { .admin-menu-select { min-height:44px; }.admin-menu-select__option { min-height:44px; } }
+@media(prefers-reduced-motion:reduce) { .admin-menu-select,.admin-menu-select__chevron { transition:none; } }

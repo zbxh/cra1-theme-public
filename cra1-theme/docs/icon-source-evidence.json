@@ -1,0 +1,648 @@
+{
+  "format": 1,
+  "scope": "Drawing-source and redistribution-license evidence; no trademark authorization or site-asset rights inferred",
+  "modifications": "SVG viewport/container resizing, drawing order, paint and attribute serialization; exact-coordinate matches also allow path whitespace, close-command case and grouping at absolute move commands. Sanitized copies remove unsafe elements/attributes and normalize monochrome color. No approximate or visual match is approved.",
+  "sources": [
+    {
+      "group": "bx",
+      "version": "1.2.3",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/box-icons/boxicons/blob/main/LICENSE"
+      },
+      "authors": {
+        "name": "Boxicons",
+        "url": "https://github.com/box-icons/boxicons"
+      },
+      "license_files": [
+        {
+          "name": "bx-LICENSE.txt",
+          "url": "https://github.com/box-icons/boxicons/blob/main/LICENSE",
+          "sha256": "dca215a1be0e0c7ea96fe338a869bcd313313049d8bdc3da9f2822fa293193e4"
+        }
+      ],
+      "package": "@iconify-json/bx",
+      "package_url": "https://registry.npmjs.org/@iconify-json/bx/-/bx-1.2.3.tgz",
+      "package_sha256": "1628cd7f4c2b787e2162181ea1b6fe012ebf6f02c0aeaa48b5cc197fbc6ee9ec",
+      "npm_integrity": "sha512-ihvX+2d688otgW7MAvUEdKVln+fZ28BJTlygazKUU/+RCODWT+2KObjAHe8+KPs4VhC8V6Tgoy1qrX0Myn/upA==",
+      "upstream_license_api": "https://api.github.com/repos/box-icons/boxicons/contents/LICENSE?ref=main",
+      "upstream_license_blob": "cd4116079131217addfecae33413f56fe04ffa45"
+    },
+    {
+      "group": "fa6-solid",
+      "version": "1.2.2",
+      "license": {
+        "title": "CC BY 4.0",
+        "spdx": "CC-BY-4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "authors": {
+        "name": "Dave Gandy",
+        "url": "https://github.com/FortAwesome/Font-Awesome"
+      },
+      "license_files": [
+        {
+          "name": "fa6-solid-LICENSE.txt",
+          "url": "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+          "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+        }
+      ],
+      "package": "@iconify-json/fa6-solid",
+      "package_url": "https://registry.npmjs.org/@iconify-json/fa6-solid/-/fa6-solid-1.2.2.tgz",
+      "package_sha256": "e76c390e4d128ea2771032dbf8e0c3db338cb9d2c98ee7018b16f67a7e56b688",
+      "npm_integrity": "sha512-R419Oa+Tdq1AZjInDKylqfIWWIRykMwFCYr6xEEy/+mS583hV0mNYs95owMcb3GKeW92lpn9vGFckrioG1hqgQ=="
+    },
+    {
+      "group": "fa6-solid",
+      "version": "1.2.4",
+      "license": {
+        "title": "CC BY 4.0",
+        "spdx": "CC-BY-4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "authors": {
+        "name": "Dave Gandy",
+        "url": "https://github.com/FortAwesome/Font-Awesome"
+      },
+      "license_files": [
+        {
+          "name": "fa6-solid-LICENSE.txt",
+          "url": "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+          "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+        }
+      ],
+      "package": "@iconify-json/fa6-solid",
+      "package_url": "https://registry.npmjs.org/@iconify-json/fa6-solid/-/fa6-solid-1.2.4.tgz",
+      "package_sha256": "082c792eaad4751626438773fa7360cb23f495b687cf2dd01b2b0fccc7f6af8b",
+      "npm_integrity": "sha512-LmDNNdJVyvF5mPm1yxWvL8KjCc/E8LzoqnF1LNTVpyY2ZJRUlGOWuPIThdbuFBF2IovgttkIyumhyqfmlHdwKg=="
+    },
+    {
+      "group": "feather",
+      "version": "1.2.1",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/feathericons/feather/blob/master/LICENSE"
+      },
+      "authors": {
+        "name": "Cole Bemis",
+        "url": "https://github.com/feathericons/feather"
+      },
+      "license_files": [
+        {
+          "name": "feather-LICENSE.txt",
+          "url": "https://raw.githubusercontent.com/feathericons/feather/master/LICENSE",
+          "sha256": "308028e93fcf84972523cdf6e616f73168546b4953895f516d01287f16fe7bee"
+        }
+      ],
+      "package": "@iconify-json/feather",
+      "package_url": "https://registry.npmjs.org/@iconify-json/feather/-/feather-1.2.1.tgz",
+      "package_sha256": "5a343c089795a131ace427cb7467ccd32fdd8400abbbfe28d59e418e04598348",
+      "npm_integrity": "sha512-gURNg2TJYuO1U7DoOGCylm9TwkMfzjOH2BHdWsE0IXLXj/MNkFIJu56Wu1xRws27M8hzDzUDt/biGUa/LfAjdg=="
+    },
+    {
+      "group": "feather-original",
+      "version": "4.29.2",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/feathericons/feather/blob/v4.29.2/LICENSE"
+      },
+      "authors": {
+        "name": "Cole Bemis",
+        "url": "https://github.com/feathericons/feather"
+      },
+      "license_files": [
+        {
+          "name": "feather-original-LICENSE.txt",
+          "url": "https://registry.npmjs.org/feather-icons/-/feather-icons-4.29.2.tgz#package/LICENSE",
+          "sha256": "308028e93fcf84972523cdf6e616f73168546b4953895f516d01287f16fe7bee"
+        }
+      ],
+      "package": "feather-icons",
+      "package_url": "https://registry.npmjs.org/feather-icons/-/feather-icons-4.29.2.tgz",
+      "package_sha256": "28b6cad56600feee25c53051d65326621f2675d30d6f3d9bd3175f6117f84476",
+      "npm_integrity": "sha512-0TaCFTnBTVCz6U+baY2UJNKne5ifGh7sMG4ZC2LoBWCZdIyPa+y6UiR4lEYGws1JOFWdee8KAsAIvu0VcXqiqA==",
+      "asset_format": "svg-directory",
+      "svg_prefix": "package/dist/icons/"
+    },
+    {
+      "group": "heroicons",
+      "version": "1.2.3",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/tailwindlabs/heroicons/blob/master/LICENSE"
+      },
+      "authors": {
+        "name": "Refactoring UI Inc",
+        "url": "https://github.com/tailwindlabs/heroicons"
+      },
+      "license_files": [
+        {
+          "name": "heroicons-LICENSE.txt",
+          "url": "https://github.com/tailwindlabs/heroicons/blob/master/LICENSE",
+          "sha256": "60e0b68c0f35c078eef3a5d29419d0b03ff84ec1df9c3f9d6e39a519a5ae7985"
+        }
+      ],
+      "package": "@iconify-json/heroicons",
+      "package_url": "https://registry.npmjs.org/@iconify-json/heroicons/-/heroicons-1.2.3.tgz",
+      "package_sha256": "5d9e7a61b36fb8f2444727807aca55bf613924bbb7d47fea408b7a9ea90ce2fb",
+      "npm_integrity": "sha512-n+vmCEgTesRsOpp5AB5ILB6srsgsYK+bieoQBNlafvoEhjVXLq8nIGN4B0v/s4DUfa0dOrjwE/cKJgIKdJXOEg==",
+      "upstream_license_api": "https://api.github.com/repos/tailwindlabs/heroicons/contents/LICENSE?ref=master",
+      "upstream_license_blob": "d6a82290738a9f78946cbcb4594535d6984086dd"
+    },
+    {
+      "group": "iconoir",
+      "version": "1.2.11",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/iconoir-icons/iconoir/blob/main/LICENSE"
+      },
+      "authors": {
+        "name": "Luca Burgio",
+        "url": "https://github.com/iconoir-icons/iconoir"
+      },
+      "license_files": [
+        {
+          "name": "iconoir-LICENSE.txt",
+          "url": "https://github.com/iconoir-icons/iconoir/blob/main/LICENSE",
+          "sha256": "869b60da1ada5b896d1f285c3c24ca193d612e308d1710a77a58f2f572eb4fa2"
+        }
+      ],
+      "package": "@iconify-json/iconoir",
+      "package_url": "https://registry.npmjs.org/@iconify-json/iconoir/-/iconoir-1.2.11.tgz",
+      "package_sha256": "8e5d3bfbd55aa8ef3878f0c2f248cf71fe99822172fd07990e32ab7fe7a68b1e",
+      "npm_integrity": "sha512-clBrCsZPkmdksYOkufVp7aoAU1j1hFQPrLUooWWmoYIMvKskUHQ+IDnwV7agTR+tGYHbud7OP2SRfYEpnqFDNw==",
+      "upstream_license_api": "https://api.github.com/repos/iconoir-icons/iconoir/contents/LICENSE?ref=main",
+      "upstream_license_blob": "29a34a856af9e0622a8f2728662b94ef08133744"
+    },
+    {
+      "group": "iconoir",
+      "version": "1.2.12",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/iconoir-icons/iconoir/blob/main/LICENSE"
+      },
+      "authors": {
+        "name": "Luca Burgio",
+        "url": "https://github.com/iconoir-icons/iconoir"
+      },
+      "license_files": [
+        {
+          "name": "iconoir-LICENSE.txt",
+          "url": "https://github.com/iconoir-icons/iconoir/blob/main/LICENSE",
+          "sha256": "869b60da1ada5b896d1f285c3c24ca193d612e308d1710a77a58f2f572eb4fa2"
+        }
+      ],
+      "package": "@iconify-json/iconoir",
+      "package_url": "https://registry.npmjs.org/@iconify-json/iconoir/-/iconoir-1.2.12.tgz",
+      "package_sha256": "2b1c1e2be4c9402ceaacb28844b46870e666cdc30383fc1337d446e46f7966cb",
+      "npm_integrity": "sha512-9l6OtKntemFvgCbQ14AheNiUpm9eicNCwPuCmAVjmYORqhGFMEf33Yfo1S1pRFh9XIA3s7tiVmly6hm+dYNgEw==",
+      "upstream_license_api": "https://api.github.com/repos/iconoir-icons/iconoir/contents/LICENSE?ref=main",
+      "upstream_license_blob": "29a34a856af9e0622a8f2728662b94ef08133744"
+    },
+    {
+      "group": "jam",
+      "version": "1.2.3",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/cyberalien/jam-backup/blob/main/LICENSE"
+      },
+      "authors": {
+        "name": "Michael Amprimo",
+        "url": "https://github.com/michaelampr"
+      },
+      "license_files": [
+        {
+          "name": "jam-LICENSE.txt",
+          "url": "https://github.com/cyberalien/jam-backup/blob/main/LICENSE",
+          "sha256": "1565774e403479729ed23c38b7e71a204646bf613f5b91965c366ea9d61aad5c"
+        }
+      ],
+      "package": "@iconify-json/jam",
+      "package_url": "https://registry.npmjs.org/@iconify-json/jam/-/jam-1.2.3.tgz",
+      "package_sha256": "fb174e7358cca8e070ad5ca7a8462713f1cd7b45e894a18e13dcefddeeb04022",
+      "npm_integrity": "sha512-Kp+OxTzB8xvbaMyIoqEqB96Ik4zv7uo5y1yavjAee0N1K/6u+PCOBwEi+Djn3WJ2trCrNZk+qYw1BJUsZC41Eg==",
+      "upstream_license_api": "https://api.github.com/repos/cyberalien/jam-backup/contents/LICENSE?ref=main",
+      "upstream_license_blob": "5ae607a99a998ea0478cbb4c76d5f4cf439fea95"
+    },
+    {
+      "group": "lucide",
+      "version": "1.2.146",
+      "license": {
+        "title": "ISC",
+        "spdx": "ISC",
+        "url": "https://github.com/lucide-icons/lucide/blob/main/LICENSE"
+      },
+      "authors": {
+        "name": "Lucide Contributors",
+        "url": "https://github.com/lucide-icons/lucide"
+      },
+      "license_files": [
+        {
+          "name": "lucide-LICENSE.txt",
+          "url": "https://github.com/lucide-icons/lucide/blob/main/LICENSE",
+          "sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57"
+        }
+      ],
+      "package": "@iconify-json/lucide",
+      "package_url": "https://registry.npmjs.org/@iconify-json/lucide/-/lucide-1.2.146.tgz",
+      "package_sha256": "4fdaeb61668800fb4b6e1a1d1b2c261faec8e5c8f85d02581b20eaf6d4a57732",
+      "npm_integrity": "sha512-T7qetsZJ682CCVT2X8C5uYEF6G/mtSoPl8F87wvu1LbfeVt4RxdP03NtaAs4RrrAXbWHBLjKrb8cmMtDucoI5g==",
+      "upstream_license_api": "https://api.github.com/repos/lucide-icons/lucide/contents/LICENSE?ref=main",
+      "upstream_license_blob": "718bb3f0e44153809972abed31839375804bf652"
+    },
+    {
+      "group": "lucide",
+      "version": "1.2.68",
+      "license": {
+        "title": "ISC",
+        "spdx": "ISC",
+        "url": "https://github.com/lucide-icons/lucide/blob/main/LICENSE"
+      },
+      "authors": {
+        "name": "Lucide Contributors",
+        "url": "https://github.com/lucide-icons/lucide"
+      },
+      "license_files": [
+        {
+          "name": "lucide-LICENSE.txt",
+          "url": "https://github.com/lucide-icons/lucide/blob/main/LICENSE",
+          "sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57"
+        }
+      ],
+      "package": "@iconify-json/lucide",
+      "package_url": "https://registry.npmjs.org/@iconify-json/lucide/-/lucide-1.2.68.tgz",
+      "package_sha256": "8513010c7864bf087df182943f879395187054dde239b3f4176de5e129aa7fa2",
+      "npm_integrity": "sha512-lR5xNJdn2CT0iR7lM25G4SewBO4G2hbr3fTWOc3AE9BspflEcneh02E3l9TBaCU/JOHozTJevWLrxBGypD7Tng==",
+      "upstream_license_api": "https://api.github.com/repos/lucide-icons/lucide/contents/LICENSE?ref=main",
+      "upstream_license_blob": "718bb3f0e44153809972abed31839375804bf652"
+    },
+    {
+      "group": "lucide-static",
+      "version": "0.544.0",
+      "license": {
+        "title": "ISC",
+        "spdx": "ISC",
+        "url": "https://github.com/lucide-icons/lucide/blob/0.544.0/LICENSE"
+      },
+      "authors": {
+        "name": "Lucide Contributors and Feather contributors",
+        "url": "https://github.com/lucide-icons/lucide"
+      },
+      "license_files": [
+        {
+          "name": "lucide-static-LICENSE.txt",
+          "url": "https://registry.npmjs.org/lucide-static/-/lucide-static-0.544.0.tgz#package/LICENSE",
+          "sha256": "3c57143f22dac950efebf84002e360bba5458c7b90fe583b0667aaaef1a7256e"
+        }
+      ],
+      "package": "lucide-static",
+      "package_url": "https://registry.npmjs.org/lucide-static/-/lucide-static-0.544.0.tgz",
+      "package_sha256": "d9a02c0c521db920136414cdc916f365dd01db426c371735091eab61af9c94af",
+      "npm_integrity": "sha512-2PkMTYcjQkIzYbd5u2g7UtRaNDP7dLQT107MmYBdvnZZCO3Vj0nqH6HA5AkUS2Era8D1ITb/UxrOkfdH/qN2Ag==",
+      "asset_format": "svg-directory",
+      "svg_prefix": "package/icons/"
+    },
+    {
+      "group": "material-symbols",
+      "version": "1.2.31",
+      "license": {
+        "title": "Apache 2.0",
+        "spdx": "Apache-2.0",
+        "url": "https://github.com/google/material-design-icons/blob/master/LICENSE"
+      },
+      "authors": {
+        "name": "Google",
+        "url": "https://github.com/google/material-design-icons"
+      },
+      "license_files": [
+        {
+          "name": "material-symbols-LICENSE.txt",
+          "url": "https://github.com/google/material-design-icons/blob/master/LICENSE",
+          "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+        }
+      ],
+      "package": "@iconify-json/material-symbols",
+      "package_url": "https://registry.npmjs.org/@iconify-json/material-symbols/-/material-symbols-1.2.31.tgz",
+      "package_sha256": "33c8052842d3f3a64be8d1176c8ecdefde1122c7872f2e0a15f72fadcc8ea08a",
+      "npm_integrity": "sha512-O3xGdrPXiFNX1qJHssAbvW42OS6wcdrFqJMGfwz+CBZzSjpMGBQG8k0Urxb5FNt6nIz7asX5xqkg68IRA4ackA==",
+      "upstream_license_api": "https://api.github.com/repos/google/material-design-icons/contents/LICENSE?ref=master",
+      "upstream_license_blob": "7a4a3ea2424c09fbe48d455aed1eaa94d9124835"
+    },
+    {
+      "group": "material-symbols",
+      "version": "1.2.95",
+      "license": {
+        "title": "Apache 2.0",
+        "spdx": "Apache-2.0",
+        "url": "https://github.com/google/material-design-icons/blob/master/LICENSE"
+      },
+      "authors": {
+        "name": "Google",
+        "url": "https://github.com/google/material-design-icons"
+      },
+      "license_files": [
+        {
+          "name": "material-symbols-LICENSE.txt",
+          "url": "https://github.com/google/material-design-icons/blob/master/LICENSE",
+          "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+        }
+      ],
+      "package": "@iconify-json/material-symbols",
+      "package_url": "https://registry.npmjs.org/@iconify-json/material-symbols/-/material-symbols-1.2.95.tgz",
+      "package_sha256": "d001c3c1a39dcaeb99066327d1357e7e03bd1ea5ec393c1d4f525a0a32eacb05",
+      "npm_integrity": "sha512-n34GNbwe8We3LPXK2N8JuQewEQkITJiRsmX/0UYJsOyKzviVl22mNfLUiGGtXLKDPqxZa17q1Hg57zdA3BYa0w==",
+      "upstream_license_api": "https://api.github.com/repos/google/material-design-icons/contents/LICENSE?ref=master",
+      "upstream_license_blob": "7a4a3ea2424c09fbe48d455aed1eaa94d9124835"
+    },
+    {
+      "group": "mdi",
+      "version": "1.2.3",
+      "license": {
+        "title": "Apache 2.0",
+        "spdx": "Apache-2.0",
+        "url": "https://github.com/Templarian/MaterialDesign/blob/master/LICENSE"
+      },
+      "authors": {
+        "name": "Pictogrammers",
+        "url": "https://github.com/Templarian/MaterialDesign"
+      },
+      "license_files": [
+        {
+          "name": "mdi-LICENSE.txt",
+          "url": "https://github.com/Templarian/MaterialDesign/blob/master/LICENSE",
+          "sha256": "3bae6305bcaa6d10219b999f65c342034c2d40b1c0e8567fa08605e73ccba829"
+        }
+      ],
+      "package": "@iconify-json/mdi",
+      "package_url": "https://registry.npmjs.org/@iconify-json/mdi/-/mdi-1.2.3.tgz",
+      "package_sha256": "ddd817a7213f91de51147943915c0cda8c8b818a53c92b5c068cfa9883c6d7ac",
+      "npm_integrity": "sha512-O3cLwbDOK7NNDf2ihaQOH5F9JglnulNDFV7WprU2dSoZu3h3cWH//h74uQAB87brHmvFVxIOkuBX2sZSzYhScg==",
+      "upstream_license_api": "https://api.github.com/repos/Templarian/MaterialDesign/contents/LICENSE?ref=master",
+      "upstream_license_blob": "382f8a138afaaefe9ca2cfa80d33317f7814d997"
+    },
+    {
+      "group": "octicon",
+      "version": "1.2.36",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/primer/octicons/blob/main/LICENSE"
+      },
+      "authors": {
+        "name": "GitHub",
+        "url": "https://github.com/primer/octicons/"
+      },
+      "license_files": [
+        {
+          "name": "octicon-LICENSE.txt",
+          "url": "https://github.com/primer/octicons/blob/main/LICENSE",
+          "sha256": "da259c8bd0de62713ccdcf88910aebca810644f98c2c912bad814fc79ea778df"
+        }
+      ],
+      "package": "@iconify-json/octicon",
+      "package_url": "https://registry.npmjs.org/@iconify-json/octicon/-/octicon-1.2.36.tgz",
+      "package_sha256": "dc4228eb904ed1d16f7b00de3148bc9f3a5c70fad201e64dd1c01d68a82351d5",
+      "npm_integrity": "sha512-YHlJokjC+uBj1kSd7+YTRMNIN85TvAGr4ZJVOHCTzj0nyH64ImXRIZmh4P6Nbv0RGDd7hS7+UwEDGchFgGxxVw==",
+      "upstream_license_api": "https://api.github.com/repos/primer/octicons/contents/LICENSE?ref=main",
+      "upstream_license_blob": "aa1fa80ed83cf856fb31c22ba56557c42ca84488"
+    },
+    {
+      "group": "octicon",
+      "version": "1.2.39",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/primer/octicons/blob/main/LICENSE"
+      },
+      "authors": {
+        "name": "GitHub",
+        "url": "https://github.com/primer/octicons/"
+      },
+      "license_files": [
+        {
+          "name": "octicon-LICENSE.txt",
+          "url": "https://github.com/primer/octicons/blob/main/LICENSE",
+          "sha256": "da259c8bd0de62713ccdcf88910aebca810644f98c2c912bad814fc79ea778df"
+        }
+      ],
+      "package": "@iconify-json/octicon",
+      "package_url": "https://registry.npmjs.org/@iconify-json/octicon/-/octicon-1.2.39.tgz",
+      "package_sha256": "9d2d4bf082531505f0ac82eef1676ee2bdf0cb16c088811de8d0dc7b630b5b26",
+      "npm_integrity": "sha512-pdl21yK10sNHQdIbGM+4Or7PJbAW5L7kfHkkwb58Gt2OOzrV0WZUMdFdmv6yNtnxDzpdfkCPRTSHDBD1GI8zmw==",
+      "upstream_license_api": "https://api.github.com/repos/primer/octicons/contents/LICENSE?ref=main",
+      "upstream_license_blob": "aa1fa80ed83cf856fb31c22ba56557c42ca84488"
+    },
+    {
+      "group": "ph",
+      "version": "1.2.2",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/phosphor-icons/core/blob/main/LICENSE"
+      },
+      "authors": {
+        "name": "Phosphor Icons",
+        "url": "https://github.com/phosphor-icons/core"
+      },
+      "license_files": [
+        {
+          "name": "ph-LICENSE.txt",
+          "url": "https://github.com/phosphor-icons/core/blob/main/LICENSE",
+          "sha256": "b5b1f1da112d18ea2147decfd48ddc1bf2b5aeb6c265381579340e95b15a2bb2"
+        }
+      ],
+      "package": "@iconify-json/ph",
+      "package_url": "https://registry.npmjs.org/@iconify-json/ph/-/ph-1.2.2.tgz",
+      "package_sha256": "e3a582a047d9829fc7e8842c660d8065e598d1b68bb58cb68e75a1f1e5a614cc",
+      "npm_integrity": "sha512-PgkEZNtqa8hBGjHXQa4pMwZa93hmfu8FUSjs/nv4oUU6yLsgv+gh9nu28Kqi8Fz9CCVu4hj1MZs9/60J57IzFw==",
+      "upstream_license_api": "https://api.github.com/repos/phosphor-icons/core/contents/LICENSE?ref=main",
+      "upstream_license_blob": "78c9810819776e135d314adc0ff26eda7bec8b38"
+    },
+    {
+      "group": "ri",
+      "version": "1.2.10",
+      "license": {
+        "title": "Apache 2.0",
+        "spdx": "Apache-2.0",
+        "url": "https://github.com/cyberalien/RemixIcon/blob/master/License"
+      },
+      "authors": {
+        "name": "Remix Design",
+        "url": "https://github.com/cyberalien/RemixIcon"
+      },
+      "license_files": [
+        {
+          "name": "ri-LICENSE.txt",
+          "url": "https://github.com/cyberalien/RemixIcon/blob/master/License",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ],
+      "package": "@iconify-json/ri",
+      "package_url": "https://registry.npmjs.org/@iconify-json/ri/-/ri-1.2.10.tgz",
+      "package_sha256": "f7ab45281b250fb0bfa5c5438fc334f010cbf695f5ac851b90b296ef4674fb07",
+      "npm_integrity": "sha512-WWMhoncVVM+Xmu9T5fgu2lhYRrKTEWhKk3Com0KiM111EeEsRLiASjpsFKnC/SrB6covhUp95r2mH8tGxhgd5Q==",
+      "upstream_license_api": "https://api.github.com/repos/cyberalien/RemixIcon/contents/License?ref=master",
+      "upstream_license_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
+    },
+    {
+      "group": "simple-icons",
+      "version": "1.2.100",
+      "license": {
+        "title": "CC0 1.0",
+        "spdx": "CC0-1.0",
+        "url": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+      },
+      "authors": {
+        "name": "Simple Icons Collaborators",
+        "url": "https://github.com/simple-icons/simple-icons"
+      },
+      "license_files": [
+        {
+          "name": "simple-icons-LICENSE.txt",
+          "url": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md",
+          "sha256": "9046848b63a5c92bff14e4accca80bd987e0623b74adf9226ce5198d312b79d5"
+        }
+      ],
+      "package": "@iconify-json/simple-icons",
+      "package_url": "https://registry.npmjs.org/@iconify-json/simple-icons/-/simple-icons-1.2.100.tgz",
+      "package_sha256": "d288ec18c1a3215babc2e02d8812d8646a15f1bc59dcce04b7709aa8ddb63c2b",
+      "npm_integrity": "sha512-536pN2RCEQyy5bYwzayrs4e9egr8cmtVcbdSHLaQl/ULUsihzn1eZ0+Hhn50zgz9cbEotiynKsKQSEjFJ7qKmw==",
+      "upstream_license_api": "https://api.github.com/repos/simple-icons/simple-icons/contents/LICENSE.md?ref=develop",
+      "upstream_license_blob": "70d4a7b6740c5d9b594ff2fc27d3ea7e89413185"
+    },
+    {
+      "group": "simple-icons",
+      "version": "1.2.30",
+      "license": {
+        "title": "CC0 1.0",
+        "spdx": "CC0-1.0",
+        "url": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md"
+      },
+      "authors": {
+        "name": "Simple Icons Collaborators",
+        "url": "https://github.com/simple-icons/simple-icons"
+      },
+      "license_files": [
+        {
+          "name": "simple-icons-LICENSE.txt",
+          "url": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md",
+          "sha256": "9046848b63a5c92bff14e4accca80bd987e0623b74adf9226ce5198d312b79d5"
+        }
+      ],
+      "package": "@iconify-json/simple-icons",
+      "package_url": "https://registry.npmjs.org/@iconify-json/simple-icons/-/simple-icons-1.2.30.tgz",
+      "package_sha256": "f5e0d51294fbf47bd8134fc0c65275af3f29c54da456a33f6403e27d1b4a84d6",
+      "npm_integrity": "sha512-KiVViMvnohpS5Q9WMP+4ksOhF3Dnq73Ba9hxBhUIIhp1r6RJ6edMZ8QGKZcFZp/B0/PZC4jAIhXcKKq73WZckQ==",
+      "upstream_license_api": "https://api.github.com/repos/simple-icons/simple-icons/contents/LICENSE.md?ref=develop",
+      "upstream_license_blob": "70d4a7b6740c5d9b594ff2fc27d3ea7e89413185"
+    },
+    {
+      "group": "solar",
+      "version": "1.2.13",
+      "license": {
+        "title": "CC BY 4.0",
+        "spdx": "CC-BY-4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "authors": {
+        "name": "480 Design",
+        "url": "https://www.figma.com/community/file/1166831539721848736"
+      },
+      "license_files": [
+        {
+          "name": "solar-LICENSE.txt",
+          "url": "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+          "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+        }
+      ],
+      "package": "@iconify-json/solar",
+      "package_url": "https://registry.npmjs.org/@iconify-json/solar/-/solar-1.2.13.tgz",
+      "package_sha256": "9efec9045e9188c5dd5cf9de52f8ad968ffabee565026480a6c74bfe63b3bbc2",
+      "npm_integrity": "sha512-/ZWb6xRib6pzxD/qTkKWYhuzSU2yu0bY+EN0spgtz1NM3d5f4eYueQZpL3PfCdsg5uVfm4Ldtt3cAyQL+YI8/Q=="
+    },
+    {
+      "group": "solar",
+      "version": "1.2.2",
+      "license": {
+        "title": "CC BY 4.0",
+        "spdx": "CC-BY-4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "authors": {
+        "name": "480 Design",
+        "url": "https://www.figma.com/community/file/1166831539721848736"
+      },
+      "license_files": [
+        {
+          "name": "solar-LICENSE.txt",
+          "url": "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+          "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+        }
+      ],
+      "package": "@iconify-json/solar",
+      "package_url": "https://registry.npmjs.org/@iconify-json/solar/-/solar-1.2.2.tgz",
+      "package_sha256": "424b480c088a3e9eea76bf7886584c64327d3130e790cb74daab65c7fe648eb8",
+      "npm_integrity": "sha512-lcTb6DWL4HZObiY1W3fHfuxxuQHUc6CFHFeywKEx7Ry0k+dU6POZCMC7oVLr0F8vuf+KgaQ3oOoGO/yFzOwrNg=="
+    },
+    {
+      "group": "tabler",
+      "version": "1.2.20",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/tabler/tabler-icons/blob/master/LICENSE"
+      },
+      "authors": {
+        "name": "Paweł Kuna",
+        "url": "https://github.com/tabler/tabler-icons"
+      },
+      "license_files": [
+        {
+          "name": "tabler-LICENSE.txt",
+          "url": "https://github.com/tabler/tabler-icons/blob/main/LICENSE",
+          "sha256": "b740a1d46122672da62833e97f7e7c8a13fa85cbc7445b584b297cc00dde93db"
+        }
+      ],
+      "package": "@iconify-json/tabler",
+      "package_url": "https://registry.npmjs.org/@iconify-json/tabler/-/tabler-1.2.20.tgz",
+      "package_sha256": "ca7c48c8eb919b863db181988a83fe02a8e419d4c3c9b4c262c898ac325a100a",
+      "npm_integrity": "sha512-xnM7QO42USWGFM9ahH94uXhRxDOrN6nTNZ+glNHNjeyj6SB2YDeENr9AqrI1hWDacMK1FnjeFc4TI1oyF40Gcw==",
+      "upstream_license_api": "https://api.github.com/repos/tabler/tabler-icons/contents/LICENSE",
+      "upstream_license_blob": "3e82379dab3fe93d9ee22251949604ed63ddea39"
+    },
+    {
+      "group": "tabler",
+      "version": "1.2.42",
+      "license": {
+        "title": "MIT",
+        "spdx": "MIT",
+        "url": "https://github.com/tabler/tabler-icons/blob/master/LICENSE"
+      },
+      "authors": {
+        "name": "Paweł Kuna",
+        "url": "https://github.com/tabler/tabler-icons"
+      },
+      "license_files": [
+        {
+          "name": "tabler-LICENSE.txt",
+          "url": "https://github.com/tabler/tabler-icons/blob/main/LICENSE",
+          "sha256": "b740a1d46122672da62833e97f7e7c8a13fa85cbc7445b584b297cc00dde93db"
+        }
+      ],
+      "package": "@iconify-json/tabler",
+      "package_url": "https://registry.npmjs.org/@iconify-json/tabler/-/tabler-1.2.42.tgz",
+      "package_sha256": "a34593ca89b860c561f3127b53e1734e72e800bd89d15951bad016f5eda33dfe",
+      "npm_integrity": "sha512-fObaBh/H2zJphk3lS1dWPUf/buuGaCHQXnB4UYgKOPXQub5Ac1qEu0AHRj/0+E2FEl8pWfgM2xQWzfz7ffcY+A==",
+      "upstream_license_api": "https://api.github.com/repos/tabler/tabler-icons/contents/LICENSE",
+      "upstream_license_blob": "3e82379dab3fe93d9ee22251949604ed63ddea39"
+    }
+  ],
+  "verified_files": 1910
+}

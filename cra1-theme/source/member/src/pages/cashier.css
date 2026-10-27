@@ -1,0 +1,106 @@
+.cra1-checkout-page{--cp-edge:#dfe1e4;--cp-ink:#292c32;--cp-muted:#737780;--cp-gold:#aa9169;display:grid;gap:20px;max-width:1360px;margin:0 auto;color:var(--cp-ink);font-size:14px;line-height:1.55}
+.cra1-checkout-steps{display:flex;align-items:center;justify-content:center;gap:14px;color:var(--cp-muted);font-size:12px;padding:0 0 6px}
+.cra1-checkout-steps i{width:50px;height:1px;background:linear-gradient(90deg,#dbdce0,#b4a184,#dbdce0)}
+.cra1-checkout-steps [aria-current]{color:var(--cp-ink);font-weight:600}
+.cra1-cashier-layout{display:grid;grid-template-columns:minmax(0,1fr) 336px;gap:22px;align-items:start}
+.cra1-cashier-main{min-width:0;display:grid;gap:16px}
+.cra1-checkout-page .cra1-cashier-surface,.cra1-cashier-summary,.cra1-cashier-state{min-width:0;border:1px solid var(--cp-edge);border-radius:16px;background:linear-gradient(135deg,#fff 55%,#f8f9fa);box-shadow:inset 0 1px 0 #fff,0 5px 22px #22283207;overflow-wrap:anywhere}
+.cra1-checkout-page .cra1-cashier-surface{padding:24px;font-size:14px;line-height:1.55}
+.cra1-cashier-surface .pay-title{display:flex;align-items:center;justify-content:space-between;padding:0 0 18px;border-bottom:1px solid #e9e9ec;font-size:16px;font-weight:600}
+.cra1-cashier-surface .pay-content{padding-top:18px;min-width:0}
+.cra1-cashier-surface .pay-order-top{display:flex;justify-content:space-between;gap:18px;margin-bottom:20px;padding:16px;border:1px solid #e5e5e6;border-radius:10px;background:linear-gradient(120deg,#f6f7f8,#fdfcf9)}
+.cra1-cashier-surface .pay-order-top-left{display:flex;align-items:center;gap:10px;min-width:0}
+.cra1-cashier-surface .pay-order-icon{font-size:26px;color:#8b7c65}
+.cra1-cashier-surface .pay-order-tip-text{font-size:12px;color:#62666d}
+.cra1-cashier-surface .pay-order-tip-text>span{display:block;margin-top:3px;color:#8a7654}
+.cra1-cashier-surface .pay-order-id{font-size:12px;color:#7a7e85;margin-top:4px}
+.cra1-cashier-surface .pay-order-top-right{font-size:12px;line-height:1.6;text-align:right;flex-shrink:0}
+.cra1-cashier-surface .pay-order-price{font-size:25px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.6px}
+.cra1-cashier-surface .pay-order-total-price{color:#737780}
+.cra1-cashier-surface .pay-order-des{font-size:13px;padding:12px 14px;background:#f8f7f4;border-radius:8px;margin-bottom:16px}
+.cra1-cashier-surface .pay-order-check{display:grid;gap:12px;margin:18px 0;font-size:13px}
+.cra1-cashier-surface .pay-order-check>div{flex-wrap:wrap;gap:4px;line-height:1.7}
+.cra1-cashier-surface .pay-order-coin-detail{color:#8c7754;cursor:pointer;text-decoration:underline}
+.cra1-cashier-surface .credit-tip{font-size:12px;color:#7b715e;margin-bottom:12px}
+.cra1-cashier-surface .pay-method-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;min-width:0}
+.cra1-cashier-surface button.pay-method-item{position:relative;display:flex;align-items:center;gap:12px;min-width:0;min-height:68px;padding:14px;border:1px solid #dedfe2;border-radius:11px;background:linear-gradient(125deg,#fff,#f8f9fa);font:inherit;text-align:left;color:#333840;cursor:pointer;box-shadow:inset 0 1px 0 #fff;transition:border-color .18s,box-shadow .18s,background .18s}
+.cra1-cashier-surface button.pay-method-item:hover{border-color:#b8aa91;box-shadow:inset 0 1px 0 #fff,0 0 0 3px #b4a18412,0 4px 15px #292c3210}
+.cra1-cashier-surface button.pay-method-item.active{border-color:#9a8a70;background:linear-gradient(125deg,#f7f6f3,#fff);box-shadow:inset 0 1px 0 #fff,0 0 0 1px #b5a58627}
+.cra1-cashier-surface button.pay-method-item:disabled{cursor:wait;opacity:.7}
+.cra1-cashier-surface .pay-method-item-img,.cra1-payment-logo{width:28px!important;height:28px!important;object-fit:contain;flex-shrink:0;filter:none!important;max-width:28px}
+.cra1-cashier-surface .pay-method-fallback{font-size:26px;width:28px;flex-shrink:0;color:#747c86}
+.cra1-cashier-surface .pay-method-item-text{min-width:0;flex:1;font-size:13px;line-height:1.5}
+.cra1-cashier-surface .pay-method-item-text>div:first-child{font-weight:550}
+.cra1-cashier-surface .type-dec{font-size:12px;color:#777c84}
+.cra1-cashier-surface .el-icon-check{color:#927d5b;font-size:15px}
+.cra1-more-gateways{display:none}
+@media(max-width:768px){.cra1-cashier-surface button.is-mobile-hidden{display:none}}
+.cra1-cashier-surface .pay-method-box{margin-top:24px;border-top:1px solid #e9e9eb;padding-top:22px;min-width:0}
+.cra1-cashier-surface .pay-method-qr .pay-qr-content{width:100%;min-height:180px;display:grid;place-items:center}
+.cra1-cashier-surface .qr-content{max-width:100%;min-width:0;font-size:14px;line-height:1.7}
+.cra1-cashier-surface .qr-content img,.cra1-cashier-surface .qr-content canvas,.cra1-cashier-surface .qr-content iframe{max-width:100%}
+.cra1-cashier-surface .qr-content form{max-width:100%}
+.cra1-cashier-surface .qr-content input:not([type=hidden]){max-width:100%;box-sizing:border-box}
+.cra1-cashier-surface .pay-method-offline .custom-text-title{font-weight:600;margin-bottom:12px}
+.cra1-cashier-surface .custom-text-content{padding:16px;border:1px solid #e5e5e7;border-radius:10px;background:#f8f9fa;position:relative}
+.cra1-cashier-surface .custom-offline-step,.cra1-cashier-surface .custom-step{margin:24px 0;font-size:12px}
+.cra1-cashier-surface .el-step__title{font-size:12px;line-height:1.5}
+.cra1-cashier-surface .pay-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid #e8e9eb;margin-top:24px;padding-top:20px;min-width:0}
+.cra1-cashier-surface .pay-footer-left,.cra1-cashier-surface .pay-footer-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.cra1-cashier-surface .pay-footer-left:empty{display:none}
+.cra1-cashier-surface .pay-footer-right{margin-left:auto}
+.cra1-cashier-surface .el-select{max-width:100%}
+.cra1-cashier-surface .el-button{height:auto;min-height:34px;padding:8px 14px;font-size:13px;border-radius:8px;line-height:1.3;white-space:normal}
+.cra1-cashier-surface .el-button--primary{background:linear-gradient(160deg,#4a5059,#282d35 70%);border-color:#373d47;color:#fff;box-shadow:inset 0 1px 0 #ffffff30,0 2px 5px #22252b18}
+.cra1-cashier-surface .el-button--primary:hover{background:linear-gradient(160deg,#525965,#2e3440);box-shadow:inset 0 1px 0 #ffffff40,0 0 0 3px #ad987b20,0 4px 14px #30343a24}
+.cra1-cashier-surface .el-input__inner{height:36px;line-height:36px;font-size:13px;padding:0 12px;border-radius:8px}
+.cra1-cashier-surface .el-checkbox__label{font-size:13px}
+.cra1-cashier-surface .pay-order-check .el-checkbox{display:inline-flex;align-items:flex-start;white-space:normal;line-height:1.7;margin:0}.cra1-cashier-surface .pay-order-check .el-checkbox__input{margin-top:4px}.cra1-cashier-surface .pay-order-check .el-checkbox__label{white-space:normal;line-height:1.7;padding-left:8px}
+.cra1-cashier-surface .el-checkbox__input.is-checked .el-checkbox__inner{background:#414750;border-color:#414750}
+.cra1-cashier-surface .el-checkbox__input.is-checked+.el-checkbox__label{color:#535a63}
+.cra1-cashier-surface :focus-visible{outline:2px solid #b8a17a;outline-offset:3px}
+.cra1-cashier-summary{position:sticky;top:20px;padding:22px}
+.cra1-cashier-summary header{display:flex;align-items:center;gap:9px;font-size:14px}
+.cra1-cashier-summary header>svg{width:17px;color:#8a7c63}
+.cra1-cashier-summary h2{font-size:14px;font-weight:600}
+.cra1-cashier-summary header>span{margin-left:auto;color:#7d8188;font-size:12px}
+.cra1-cashier-amount{display:grid;gap:4px;padding:22px 0;color:#767a83;font-size:12px}
+.cra1-cashier-amount strong{color:#2d3139;font-size:31px;font-weight:650;letter-spacing:-.9px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;line-height:1.25}
+.cra1-cashier-items{border-top:1px solid #e8e8ea;padding-top:16px}
+.cra1-cashier-items summary{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;cursor:pointer;list-style:none}
+.cra1-cashier-items summary::-webkit-details-marker{display:none}
+.cra1-cashier-items summary>span{color:#7b8089}
+.cra1-cashier-items ul{display:grid;gap:16px;margin:16px 0 0;padding:0;list-style:none}
+.cra1-cashier-items li{display:flex;gap:12px;justify-content:space-between;align-items:start;font-size:12px}
+.cra1-cashier-items li>div{min-width:0;flex:1}
+.cra1-cashier-items b{display:block;font-weight:500;overflow-wrap:anywhere}
+.cra1-cashier-items small{display:block;color:#81858c;line-height:1.7;margin-top:3px}
+.cra1-cashier-items li>span{font-variant-numeric:tabular-nums;max-width:48%;text-align:right;overflow-wrap:anywhere}
+.cra1-cashier-totals{display:grid;gap:10px;margin-top:20px;padding-top:18px;border-top:1px dashed #e0e0e3;font-size:12px}
+.cra1-cashier-totals>div{display:flex;justify-content:space-between;gap:12px}
+.cra1-cashier-totals dt{color:#7b8088}
+.cra1-cashier-totals dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.cra1-cashier-assurance{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;padding-top:16px;border-top:1px solid #ececef;color:#88847c;font-size:11px}
+.cra1-cashier-assurance svg{width:14px;height:14px;flex-shrink:0}
+.cra1-cashier-loading{padding:28px;color:#737780;font-size:13px;border:1px dashed #d8dbe0;border-radius:12px}
+.cra1-cashier-state{display:flex;align-items:start;gap:16px;padding:30px}
+.cra1-cashier-state>svg{flex-shrink:0;width:30px;height:30px;color:#9b8561}
+.cra1-cashier-state.is-paid>svg{color:#39836a}
+.cra1-cashier-state h2{font-size:18px;font-weight:600;margin:0 0 7px}
+.cra1-cashier-state p{font-size:13px;color:#777c84;line-height:1.7}
+.cra1-cashier-result-actions{display:flex;gap:10px;flex-wrap:wrap}
+.cra1-cashier-proof .dia-title{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:14px;font-weight:600;padding-bottom:20px;border-bottom:1px solid #e6e7e9}
+.cra1-cashier-proof .dia-title .close{display:none}
+.cra1-cashier-proof .dia-content{padding-top:18px}
+.cra1-cashier-proof .pay-top{display:none}
+.cra1-cashier-proof .qr-money,.cra1-cashier-proof .des{font-size:13px;margin-bottom:12px}
+.cra1-cashier-proof .custom-text{padding:16px;background:#f8f9fa;border:1px solid #e3e5e8;border-radius:10px}
+.cra1-cashier-proof .el-upload,.cra1-cashier-proof .el-upload-dragger{width:100%;max-width:100%;height:auto;min-height:120px;font-size:13px;padding:20px 12px}
+.cra1-cashier-proof .el-upload__text{font-size:13px;line-height:1.7}
+.cra1-cashier-proof .dia-fotter{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:20px}
+.cra1-cashier-proof .font-26{font-size:20px}
+@media(min-width:769px){.cra1-cashier-surface .pay-method-list{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.cra1-cashier-surface .pay-method-item{display:flex!important}}
+@media(max-width:1100px){.cra1-cashier-layout{grid-template-columns:minmax(0,1fr) 290px;gap:16px}.cra1-checkout-page .cra1-cashier-surface{padding:20px}.cra1-cashier-summary{padding:20px}}
+@media(max-width:768px){.cra1-checkout-page{gap:14px}.cra1-checkout-steps{gap:9px;font-size:11px}.cra1-checkout-steps i{width:28px}.cra1-cashier-layout{grid-template-columns:minmax(0,1fr);gap:16px}.cra1-cashier-summary{grid-row:1;position:static;padding:16px 18px}.cra1-cashier-summary header{font-size:12px}.cra1-cashier-amount{padding:14px 0}.cra1-cashier-amount strong{font-size:28px}.cra1-cashier-totals,.cra1-cashier-assurance{margin-top:14px;padding-top:12px}.cra1-cashier-surface .pay-order-top{padding:12px;flex-wrap:wrap;gap:12px;margin-bottom:16px}.cra1-cashier-surface .pay-order-top-right{margin-left:auto}.cra1-checkout-page .cra1-cashier-surface{padding:18px}.cra1-cashier-surface .pay-method-list{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.cra1-cashier-surface button.pay-method-item{gap:9px;padding:12px 10px;min-height:64px}.cra1-cashier-surface .pay-method-item-text{font-size:12px}.cra1-cashier-surface .pay-method-item-text .type-dec{font-size:11px}.cra1-more-gateways{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:12px;padding:7px;background:transparent;border:0;color:#7a746a;font-size:12px;cursor:pointer}.cra1-cashier-surface .pay-footer{margin-top:20px}.cra1-cashier-surface .pay-footer-right{width:100%;justify-content:flex-end}.cra1-cashier-surface .pay-footer-left{width:100%}.cra1-cashier-surface .pay-footer-left .el-select{flex:1;min-width:120px}.cra1-cashier-state{padding:22px}.cra1-cashier-state h2{font-size:16px}}
+@media(max-width:359px){.cra1-checkout-page .cra1-cashier-surface{padding:14px}.cra1-cashier-surface .pay-method-list{grid-template-columns:minmax(0,1fr)}.cra1-cashier-surface .pay-order-top-left{width:100%}.cra1-cashier-summary{padding:15px}.cra1-cashier-result-actions>*{flex:1 1 auto}}
+@media(max-width:768px){.cra1-cashier-summary header{font-size:12px}.cra1-cashier-summary h2{font-size:12px}.cra1-cashier-amount{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}.cra1-cashier-items{padding-top:10px}.cra1-cashier-assurance{display:none}.cra1-cashier-surface .pay-order-top-right,.cra1-cashier-surface .pay-order-id{display:none}.cra1-cashier-surface .pay-order-top{margin-bottom:12px;padding:10px 12px}.cra1-cashier-surface .pay-order-icon{font-size:22px}.cra1-cashier-surface .pay-order-check{margin:12px 0}.cra1-cashier-surface .pay-title{font-size:14px;padding-bottom:12px}.cra1-cashier-surface .pay-content{padding-top:12px}}

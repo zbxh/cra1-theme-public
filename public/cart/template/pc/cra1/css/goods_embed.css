@@ -1,0 +1,663 @@
+/* ==========================================================================
+   goods_embed — 融合页配置薄壳样式
+   ========================================================================== */
+
+/* 模块 CSS 走 rem 体系，需要与 goods_iframe 相同的 html 基准字号 */
+html {
+  font-size: 100px !important;
+  /* v6：外壳把 iframe 文档的 html 染成灰底（#F2F3F5），配置区因此像"嵌套模块"——
+     画布必须透明，让配置内容与父页玻璃底连续 */
+  background: transparent !important;
+}
+
+body {
+  margin: 0;
+  background: transparent;
+}
+
+/* 模块配置内容直接铺满，不套页面卡片（父页已有卡片容器） */
+.cart-embed .config-box {
+  min-height: 120px;
+}
+
+/* 父页配置头已展示商品名与价格：隐藏模块自身的 H1 标题避免重复 */
+.cart-embed .config-box .content .template > .tit,
+.cart-embed .common-config .pro-tit {
+  display: none;
+}
+
+.cart-embed .config-box .content {
+  padding-top: 8px;
+  box-sizing: border-box;
+}
+
+/* 配置失败时的占位（父页也会展示重试，这里保证壳内不留白屏） */
+.cart-embed .embed-error {
+  padding: 24px 16px;
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+/* 隐藏 loading 蒙层过早闪烁 */
+.cart-embed #mainLoading {
+  background: transparent;
+}
+
+/* ---- 配置选配 tabs（快速配置/自定义配置等）----
+   v6.5：标题/卡片样式**仅限主 tabs**（.top-tab 直接子级）——
+   模块内还有镜像类型 tabs（.image-tabs）与国家 tabs，旧选择器命中全部后代导致"产品配置"标题泄漏到镜像区；
+   标题文本走 CSS 变量 --tabs-title（goods_embed.js 注入，后台可自定义） */
+.cart-embed .top-tab > .el-tabs__header { margin-bottom: 16px; }
+.cart-embed .top-tab > .el-tabs__header::before {
+  content: var(--tabs-title, '选配方式');
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  border-left: 3px solid var(--primary);
+  border-radius: 2px;
+  padding-left: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.cart-embed .top-tab .el-tabs__nav-wrap::after { display: none !important; }
+.cart-embed .top-tab .el-tabs__active-bar { display: none !important; height: 0 !important; }
+/* 模块自绘激活下划线（mf_cloud .el-tabs__item::after）一并隐藏（仅主 tabs 范围） */
+.cart-embed .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item::after { display: none !important; }
+/* 鼠标点击激活卡后残留的 focus 外框（键盘 focus-visible 环保留） */
+.cart-embed .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item:focus:not(:focus-visible) { outline: none !important; }
+/* 卡片式切换：仅主 tabs 直接项（Element 结构 header > nav-wrap > nav-scroll > nav > item） */
+.cart-embed .top-tab .el-tabs__nav-wrap > .el-tabs__nav-scroll > .el-tabs__nav > .el-tabs__item {
+  height: 40px;
+  line-height: 38px;
+  padding: 0 22px;
+  margin-right: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--background);
+  box-sizing: border-box;
+  font-size: 14px;
+  color: var(--muted-foreground);
+  transition: color var(--duration-fast) ease,
+              border-color var(--duration-fast) ease,
+              background-color var(--duration-fast) ease;
+}
+.cart-embed .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item:hover { color: var(--primary); border-color: rgba(23, 105, 224, 0.45); }
+.cart-embed .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item.is-active {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--primary-soft, rgba(23, 105, 224, 0.06));
+  font-weight: 600;
+}
+
+/* ---- v6 配置分区标题统一"产品型号"观感（蓝条 + 15px/600 深色） ----
+   mf_cloud/mf_dcim 为 p.com-tit（自带 2px 竖条），idcsmart_common 为 p.config-tit。
+   px 覆盖模块 rem 值（html 基准 100px，0.18rem=18px 太大）。
+   v6.5：竖条改**流内渲染**——模块 ::before 是 position:absolute（top:50%+translateY），
+   在 flex 容器内导致竖条被裁（截图只见左缘一丝蓝）；static 后由 flex 布局居中，完整显示。 */
+.cart-embed .com-tit,
+.cart-embed .config-tit {
+  display: flex;
+  align-items: center;
+  padding-left: 0 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  line-height: 22px;
+  color: var(--ink) !important;
+  margin-bottom: 14px !important;
+}
+
+.cart-embed .com-tit::before,
+.cart-embed .config-tit::before {
+  position: static !important;
+  transform: none !important;
+  top: auto !important;
+  left: auto !important;
+  display: inline-block !important;
+  width: 3px !important;
+  height: 16px !important;
+  border-radius: 2px;
+  margin-right: 10px !important;
+  background: var(--primary) !important;
+}
+
+/* v6.4：配置内容列与父页标题左对齐——模块 .con 自带 0.3rem(30px) 左右内边距，
+   使分区标题被推到 x=86（父页蓝条在 x=56）；清零后与"产品型号"同列 */
+.cart-embed .mf-cloud .con,
+.cart-embed .mf-dcim .con,
+.cart-embed .template .con {
+  padding: 0 !important;
+}
+
+/* v6.3：iframe 内模态遮罩不渲染（当时模块加购对话框的遮罩罩住配置区形成"深色独立模块"）
+   v8：≤768 下拉抽屉化后遮罩恢复（点击可关闭抽屉，Element 自带交互）；
+   模块对话框（cartDialog）场景仍由壳侧 JS 即关，遮罩瞬时存在无碍 */
+.cart-embed .v-modal {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .cart-embed .v-modal {
+    display: block !important;
+    opacity: 0.6;
+  }
+}
+
+/* ---- 模块底条 → 右侧摘要栏（mf_cloud / mf_dcim；CSS-only 不改模块模板） ----
+   v6.2：原生侧栏**默认隐藏**（模块 HTML 注入即生效，加载等待期不再闪现旧 f-order）；
+   仅壳侧桥接超时降级（body.rail-fallback）时以 v5 卡片形态显示。 */
+.cart-embed .f-order,
+.cart-embed .order-right {
+  display: none !important;
+}
+
+.cart-embed .template {
+  display: block;
+}
+
+.cart-embed .common-config .common-box {
+  display: block;
+}
+
+body.rail-fallback .f-order,
+body.rail-fallback .order-right {
+  display: block !important;
+}
+
+body.rail-fallback .template {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+body.rail-fallback .common-config .common-box {
+  display: flex;
+}
+
+.cart-embed .template > .main-card {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ---- v4 配置去卡化：配置内容与父页卡片融为一体，无独立白卡 ---- */
+/* 左栏主配置卡（mf_cloud .mf-cloud / mf_dcim .mf-dcim 白底大卡） */
+.cart-embed .template > .main-card,
+.cart-embed .mf-cloud,
+.cart-embed .mf-dcim {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 自定义配置 tab 的 idcsmart_common 内容（.common-config 白卡） */
+.cart-embed .common-config,
+.cart-embed .common-config .main-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 模块 CSS 以 fixed 定位渲染底条（font-size 0.14rem 体系），这里整体接管为右栏；
+   !important 对抗模块 .f-order 的 fixed/height/left/bottom 声明 */
+.cart-embed .f-order {
+  position: sticky !important;
+  top: 8px;
+  left: auto;
+  bottom: auto;
+  width: 300px !important;
+  flex: 0 0 300px;
+  height: auto !important;
+  display: block;
+  z-index: auto;
+}
+
+.cart-embed .f-order .l-empty { display: none !important; }
+
+/* 右栏 = 独立侧边栏卡片模块（v5：白底+边框+圆角+阴影，与透明主体分离） */
+.cart-embed .f-order .el-main {
+  height: auto;
+  padding: 16px !important;
+  box-sizing: border-box;
+  background: var(--background) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+.cart-embed .f-order .main-card {
+  flex-direction: column;
+  align-items: stretch;
+  height: auto;
+  gap: 14px;
+}
+
+/* 订购时长 / 订购数量 纵排全宽 */
+.cart-embed .f-order .left {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.cart-embed .f-order .time {
+  margin-right: 0;
+  margin-bottom: 12px;
+}
+
+.cart-embed .f-order .time .l-txt,
+.cart-embed .f-order .num .l-txt {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.cart-embed .f-order .duration-select { width: 100%; }
+.cart-embed .f-order .el-input-number { width: 100%; }
+
+/* 配置费用大字 + 明细链接纵排 */
+.cart-embed .f-order .mid {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.cart-embed .f-order .mid .line-empty { display: none; }
+
+.cart-embed .f-order .bot-price .new {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* 加购图标 + 全宽立即购买 */
+.cart-embed .f-order .right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---- idcsmart_common（商标注册等）：order-right 固定白卡 → 与 f-order 同款独立侧边栏卡片 ---- */
+.cart-embed .common-config .order-right {
+  position: sticky !important;
+  top: 8px;
+  right: auto;
+  width: 300px !important;
+  flex: 0 0 300px;
+  height: auto !important;
+  background: var(--background) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-card) !important;
+  padding: 16px !important;
+  box-sizing: border-box;
+}
+
+/* 内容列不再为 fixed 右栏预留边距 */
+.cart-embed .common-config .l-config {
+  margin-right: 0;
+}
+
+.cart-embed .common-config .common-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.cart-embed .common-config .common-box .l-config {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cart-embed .f-order .right .add-cart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--duration-fast) ease;
+}
+
+.cart-embed .f-order .right .add-cart:hover { border-color: var(--primary); }
+
+.cart-embed .f-order .right .buy {
+  flex: 1;
+  width: auto;
+  height: 42px;
+  line-height: 42px;
+  text-align: center;
+  font-size: 15px;
+  border-radius: var(--radius-sm);
+}
+
+/* ≤768px（iframe 视口）：摘要栏回退到表单下方全宽 */
+@media (max-width: 768px) {
+  .cart-embed .template { flex-direction: column; }
+  .cart-embed .f-order { width: 100%; flex: 1 1 auto; }
+  .cart-embed .f-order .right .buy { height: 44px; line-height: 44px; }
+  .cart-embed .common-config .common-box { flex-direction: column; }
+  .cart-embed .common-config .order-right { width: 100% !important; flex: 1 1 auto; }
+}
+
+/* ==========================================================================
+   v7 手机适配（iframe 内，按 iframe 实宽求值）
+   背景：html font-size 恒 100px，模块 rem 固定值（双 select 540px、slider 810px、
+   镜像卡 190px 等）在 ~358px iframe 内必然溢出；mf_dcim/common 模块自身零适配。
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* ---- 表单上下结构：label 置顶，控件区全宽（取代 100px 左结构挤压） ---- */
+  .cart-embed .el-form-item__label {
+    float: none !important;
+    display: block !important;
+    width: auto !important;
+    text-align: left !important;
+    padding: 0 0 6px !important;
+    line-height: 20px !important;
+  }
+
+  .cart-embed .el-form-item__content {
+    margin-left: 0 !important;
+    line-height: inherit;
+  }
+
+  .cart-embed .el-form-item {
+    margin-bottom: 16px;
+  }
+
+  /* ---- 固定 rem 宽控件 → 流式 ---- */
+  .cart-embed .mf-cloud .el-slider,
+  .cart-embed .mf-dcim .el-slider,
+  .cart-embed .slider-box,
+  .cart-embed .el-slider__runway {
+    width: 100% !important;
+  }
+
+  .cart-embed .el-input-number {
+    width: 100% !important;
+  }
+
+  /* 固定 rem 宽的输入框/下拉（如 dcim 实例名 360px）→ 不超出视宽 */
+  .cart-embed .el-input,
+  .cart-embed .el-textarea,
+  .cart-embed .el-select,
+  .cart-embed .el-cascader {
+    max-width: 100% !important;
+  }
+
+  /* dcim 区域/可用区双 select（.top-select 2×260px）→ 两列换行 */
+  .cart-embed .top-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .cart-embed .top-select .el-select {
+    width: calc(50% - 4px) !important;
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  /* 超窄屏（≤360）：双列 select 降单列，避免长选项截断 */
+  @media (max-width: 360px) {
+    .cart-embed .top-select .el-select {
+      width: 100% !important;
+      flex: 1 1 100%;
+    }
+  }
+
+  /* ---- 卡片类选择区：换行网格，**不横滑** ----
+     模块原生即 flex-wrap: wrap（v7 曾改成 nowrap+横滑，实测被判为"要左右滑"的体验缺陷）。
+     结构为 .image-box > .image-ul > .image-item（三层，三模块一致）。
+     只让**直接装卡片的 .image-ul** 做两列网格；.image-box 仅作单列容器——
+     两层都设网格会把卡片宽度二次对折（实测 390 档压到 66px，文字全挤）。
+     卡片取消模块定宽 1.9rem 与左外边距，改由网格列宽 + gap 控制。 ---- */
+  .cart-embed .image-box {
+    display: block !important;
+    max-width: 100% !important;
+    overflow-x: visible;
+  }
+
+  .cart-embed .image-ul {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: visible;
+  }
+
+  .cart-embed .image-item,
+  .cart-embed .empty-image {
+    width: 100% !important;
+    min-width: 0;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    box-sizing: border-box;
+  }
+
+  /* 卡内文字随宽度收敛：名称/版本单行省略，图标不压缩 */
+  .cart-embed .image-item .name,
+  .cart-embed .image-item .version {
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cart-embed .image-item .r-info {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .cart-embed .image-item .icon {
+    flex-shrink: 0;
+  }
+
+  /* dcim 机型表格：头/体同步锁宽 560px + 容器横滑（el-table 内联宽度需 !important 覆盖） */
+  .cart-embed .mf-dcim .el-table {
+    width: 100%;
+  }
+
+  .cart-embed .mf-dcim .el-table__header-wrapper .el-table__header,
+  .cart-embed .mf-dcim .el-table__body-wrapper .el-table__body {
+    width: 560px !important;
+    min-width: 560px !important;
+  }
+
+  .cart-embed .mf-dcim .el-table .el-table__body-wrapper {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cart-embed .mf-dcim .el-table .el-table__body-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 选配方式 tabs：≤480 两卡收紧放下（隐藏 Element 溢出箭头，触摸横滑兜底） */
+  .cart-embed .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item {
+    padding: 0 14px;
+  }
+
+  .cart-embed .top-tab .el-tabs__nav-prev,
+  .cart-embed .top-tab .el-tabs__nav-next {
+    display: none !important;
+  }
+
+  /* ---- 模块 ≤750 媒体查询把字号放大到 0.26–0.28rem（rem 恒 100px → 26–28px 过大），
+     iframe 内统一压回移动端合理值（label 14px 已由 Element 默认给出） ---- */
+  .cart-embed .mf-cloud .s-tip,
+  .cart-embed .mf-dcim .s-tip,
+  .cart-embed .common-config .s-tip {
+    font-size: 12px !important;
+    line-height: 18px !important;
+  }
+
+  .cart-embed .mf-cloud .store,
+  .cart-embed .store-item .el-input-number {
+    font-size: 14px !important;
+  }
+
+  .cart-embed .f-order .bot-price,
+  .cart-embed .f-order .bot-price .new span,
+  .cart-embed .f-order .bot-price .total-icon {
+    font-size: 24px !important;
+  }
+
+  /* ==========================================================================
+     v8 配置选型组件大厂化（≤768，纯 CSS）
+     ========================================================================== */
+
+  /* ---- 表单项整行卡片：浅底圆角卡 + label 置顶（v7 已置顶，这里加卡片观感） ---- */
+  .cart-embed .el-form-item {
+    background: var(--muted, #f5f5f5) !important;
+    border-radius: 10px;
+    padding: 10px 12px 14px !important;
+  }
+
+  .cart-embed .el-form-item__label {
+    font-size: 13px !important;
+    color: var(--muted-foreground, #737373) !important;
+    padding-bottom: 8px !important;
+  }
+
+  .cart-embed .el-form-item__content {
+    background: var(--background, #fff);
+    border-radius: 8px;
+  }
+
+  /* el-form-item 内直接是控件集合（非裸 input）时内容区保持透明，控件自带底色 */
+  .cart-embed .el-form-item__content > .el-select,
+  .cart-embed .el-form-item__content > .el-input,
+  .cart-embed .el-form-item__content > .el-cascader,
+  .cart-embed .el-form-item__content > .image-box,
+  .cart-embed .el-form-item__content > .cra1-box,
+  .cart-embed .el-form-item__content > .el-table,
+  .cart-embed .el-form-item__content > .el-radio-group,
+  .cart-embed .el-form-item__content > .el-checkbox-group,
+  .cart-embed .el-form-item__content > .slider-box,
+  .cart-embed .el-form-item__content > .top-select,
+  .cart-embed .el-form-item__content > .el-input-number,
+  .cart-embed .el-form-item__content > .el-slider,
+  .cart-embed .el-form-item__content > p,
+  .cart-embed .el-form-item__content > .cycle {
+    background: transparent;
+  }
+
+  /* ---- el-select 下拉底部抽屉化（对标大厂：选项从底部滑出） ----
+     注意：部分模块（mf_dcim）的弹层 append 到 body 直下（不在 .cart-embed 内），
+     选择器必须不带 .cart-embed 前缀——goods_embed.css 本就只在 iframe 文档内生效 */
+  .el-select-dropdown {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 180px !important;
+    transform: none !important;
+    border-radius: 14px 14px 0 0 !important;
+    max-height: 45vh !important;
+    box-shadow: 0 -8px 30px -10px rgba(15, 60, 120, 0.3) !important;
+    z-index: 3000 !important;
+    animation: cl-drawer-up 0.22s ease;
+    box-sizing: border-box;
+    padding-top: 8px;
+    /* 底部安全区：iPhone 底部黑条不遮挡末项 */
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .el-select-dropdown .el-scrollbar__wrap {
+    max-height: 44vh !important;
+  }
+
+  .el-select-dropdown .popper__arrow {
+    display: none !important;
+  }
+
+  .el-select-dropdown .el-select-dropdown__item {
+    height: 44px;
+    line-height: 44px;
+    font-size: 15px;
+  }
+
+  @keyframes cl-drawer-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* 抽屉顶部的 popper 定位可能带 margin 偏移，清掉 */
+  .el-select-dropdown[x-placement] {
+    margin: 0 !important;
+  }
+
+  /* ---- radio 按钮组：换行排布，**不横滑** ----
+     v7 曾改 nowrap + 横滑；实测选项超出容器时（如 3 个按钮 432px > 容器 286px）
+     被判为"要左右滑"的体验缺陷，此处恢复换行（选项多时折行，全部可见可点）。 */
+  .cart-embed .el-radio-group {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    overflow-x: visible;
+    gap: 8px 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .cart-embed .el-radio-group .el-radio-button__inner,
+  .cart-embed .el-radio-group .el-radio {
+    flex: 0 0 auto;
+    max-width: 100%;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .cart-embed .el-radio-group .el-radio {
+    margin-right: 10px;
+  }
+
+  /* radio-button 长文案在窄屏内截断而非撑破容器 */
+  .cart-embed .el-radio-group .el-radio-button__inner {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* 统一兜底：iframe 内所有横向滚动条不渲染（滑动不展示底部滚动条） */
+  .cart-embed ::-webkit-scrollbar:horizontal {
+    display: none;
+    height: 0;
+  }
+}
+
+/* ==========================================================================
+   v11 手机独立组件（cart/mobile/cra1）融合页适配
+   手机 UA 时 iframe 内渲染「整行字段 + 底部抽屉」形态的独立手机组件；
+   价格与加购/购买由父页 dock 承担 → 隐藏组件自带吸底价格栏。
+   ========================================================================== */
+.cart-embed .m-cloud-m .botton-buy-btn {
+  display: none !important;
+}
+
+.cart-embed .m-cloud-m .buy-box {
+  padding-bottom: 8px;
+}
+
+/* 购物车弹窗（桥接检测 .cartDialog 并自动关闭） */
+.cart-embed .cartDialog {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* 手机组件在 iframe 内的根容器留白与透明底（与父页卡片连续） */
+.cart-embed .m-cloud-m {
+  background: transparent;
+}

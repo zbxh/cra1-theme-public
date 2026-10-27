@@ -1,0 +1,36 @@
+{include file="header"}
+</head>
+
+<body>
+    <!-- 跳转到主内容：必须是 body 内第一个可聚焦元素（header 在 DOM 中先于 main，
+         若放在 main 前会让键盘用户先 Tab 过整条导航）。固定定位使其视觉上仍浮在顶部。 -->
+    <a href="#main-content" class="skip-link">跳转到主内容</a>
+    <header>{include file="public/header"}</header>
+
+    <main id="main-content">
+        <section class="page-hero" data-reveal>
+            <div class="container-page flex items-center py-10 md:py-14">
+                <div class="max-w-2xl">
+                    <nav class="breadcrumb text-sm text-muted" aria-label="面包屑">
+                        <a href="/" class="hover:text-primary">首页</a><span>/</span><span aria-current="page">页面未找到</span>
+                    </nav>
+                    <div class="mt-7" data-reveal>
+                        <div class="text-6xl font-extrabold leading-none text-gradient md:text-8xl" aria-hidden="true">404</div>
+                        <h1 class="mt-4 text-3xl font-bold tracking-tight text-ink md:text-4xl">{if ( cra1_content_explicit($data.cra1, 'page_hero_title') || (( isset($data.cra1.page_hero_title) && $data.cra1.page_hero_title )) ) }{$data.cra1.page_hero_title}{else /}页面未找到{/if}</h1>
+
+                        <p class="mt-3 max-w-xl leading-7 text-body">{if ( cra1_content_explicit($data.cra1, 'page404_copy.desc') || (( isset($data.cra1.page404_copy['desc']) && $data.cra1.page404_copy['desc'] )) ) }{$data.cra1.page404_copy['desc']}{else /}您访问的页面不存在或已被移除。可以从下方入口返回首页、查看文档，或直接联系我们的技术支持。{/if}</p>
+                        <div class="mt-6 flex flex-wrap gap-3">
+                            {if ( cra1_content_explicit($data.cra1, 'page404_copy.btn1') || (( isset($data.cra1.page404_copy['btn1']) && $data.cra1.page404_copy['btn1'] )) ) }{if ( cra1_content_value($data.cra1, 'page404_copy.url1', '/') != '' && isset($data.cra1.page404_copy['btn1']) && $data.cra1.page404_copy['btn1'] != '' ) }<a href="{:cra1_content_value($data.cra1, 'page404_copy.url1', '/')}" class="btn-gradient btn px-7 cui-button cui-button--primary">{$data.cra1.page404_copy['btn1']}<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a>{/if}{else /}<a href="/" class="btn-gradient btn px-7 cui-button cui-button--primary">返回首页<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a>{/if}
+                            {if ( cra1_content_explicit($data.cra1, 'page404_copy.btn2') || (( isset($data.cra1.page404_copy['btn2']) && $data.cra1.page404_copy['btn2'] )) ) }{if ( cra1_content_value($data.cra1, 'page404_copy.url2', '/document.html') != '' && isset($data.cra1.page404_copy['btn2']) && $data.cra1.page404_copy['btn2'] != '' ) }<a href="{:cra1_content_value($data.cra1, 'page404_copy.url2', '/document.html')}" class="btn btn-outline btn-primary px-7 cui-button cui-button--outline">{$data.cra1.page404_copy['btn2']}<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>{/if}{else /}<a href="/document.html" class="btn btn-outline btn-primary px-7 cui-button cui-button--outline">查看文档<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>{/if}
+                            <a href="/contact.html" class="btn btn-outline btn-primary px-7 cui-button cui-button--outline">联系我们<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    {$data.cra1.page_modules_html|raw}
+
+    </main>
+
+    {include file="footer"}

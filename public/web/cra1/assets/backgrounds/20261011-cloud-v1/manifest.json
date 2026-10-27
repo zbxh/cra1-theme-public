@@ -1,0 +1,22 @@
+{
+  "version": "20261011-cloud-v1",
+  "publishedAt": "2026-10-11T03:42:31.909857+00:00",
+  "previousVersion": "20261011-gallery-v2",
+  "backgrounds": 12,
+  "assets": [
+    {
+      "path": "public/web/cra1/assets/backgrounds/20261011-cloud-v1/component-backgrounds.js",
+      "sha256": "7179106bf96729973c668f1a69ac5f10e84dfa8e628390398ad630b4274d1a75",
+      "bytes": 62551,
+      "gzipBytes": 19393
+    },
+    {
+      "path": "public/web/cra1/assets/backgrounds/20261011-cloud-v1/component-backgrounds.css",
+      "sha256": "763be4863ee7ababc3f270a47a7acf426dab6a5a94437255efe5057191758fed",
+      "bytes": 3579,
+      "gzipBytes": 1166
+    }
+  ],
+  "stagedChecks": 58,
+  "protectedFiles": 37
+}

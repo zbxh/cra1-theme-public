@@ -1,0 +1,32 @@
+{if ( isset($data.cra1.show_step_ribbon) && $data.cra1.show_step_ribbon == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'step_ribbon_rows') || (( isset($data.cra1.step_ribbon_rows) && count($data.cra1.step_ribbon_rows) > 0 )) ) }
+<!-- 布局 I：编号进度带——一条横向主线穿起编号圆点，桌面端连成进度线（与纵向时间轴正交） -->
+<section class="relative overflow-hidden bg-white py-14 md:py-20">
+    <div class="container-page">
+        <div class="section-heading" data-reveal>
+            <div class="section-heading-copy">
+                <h2 class="section-title">{$data.cra1.step_ribbon_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'step_ribbon_desc') || (( isset($data.cra1.step_ribbon_desc) && $data.cra1.step_ribbon_desc )) ) }
+                <p class="section-desc">{$data.cra1.step_ribbon_desc}</p>
+                {/if}
+            </div>
+            {if ( isset($data.cra1.step_ribbon_link) && $data.cra1.step_ribbon_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'step_ribbon_more_text', '开始使用') != '' ) }<a href="{$data.cra1.step_ribbon_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'step_ribbon_more_text', '开始使用')} →</a>{/if}
+            {/if}
+        </div>
+        <div class="relative mt-10">
+            <span class="absolute left-0 right-0 top-[15px] hidden h-px bg-line lg:block" aria-hidden="true"></span>
+            <ol class="grid gap-7 sm:grid-cols-2 lg:grid-cols-5 lg:gap-6">
+                {foreach $data.cra1.step_ribbon_rows as $sr => $srw}
+                <li class="relative min-w-0" data-reveal>
+                    <span class="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-brand/25 bg-white text-xs font-semibold tabular-nums text-brand">{:str_pad($sr + 1, 2, '0', STR_PAD_LEFT)}</span>
+                    <h3 class="mt-3.5 text-sm font-semibold text-ink md:text-base">{$srw['name']}</h3>
+                    {if $srw['desc']}<p class="mt-1.5 text-xs leading-5 text-body">{$srw['desc']}</p>{/if}
+                </li>
+                {/foreach}
+            </ol>
+        </div>
+    </div>
+</section>
+{/if}
+{/if}

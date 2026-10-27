@@ -1,0 +1,16 @@
+{
+  "format": 1,
+  "sources": [
+    {
+      "package": "react-remove-scroll-bar",
+      "version": "2.3.8",
+      "declared_license": "MIT",
+      "repository": "https://github.com/theKashey/react-remove-scroll-bar",
+      "path": "cra1-theme/licenses/dependencies/react-remove-scroll-bar-2.3.8-UPSTREAM-LICENSE.txt",
+      "sha256": "a79aae0c0f21990d9d963bb3c5a79cdcea9a46f8523ba55c58d7fe776b6ebc84",
+      "upstream_license_api": "https://api.github.com/repos/theKashey/react-remove-scroll-bar/license",
+      "upstream_blob_sha": "7c08c3990396ecefd90f99ff5d9a34f26f5b5616",
+      "scope": "Project license from the package author repository; package metadata declares MIT. Not a source tag or exact npm gitHead verification."
+    }
+  ]
+}

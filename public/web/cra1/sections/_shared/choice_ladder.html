@@ -1,0 +1,37 @@
+{if ( isset($data.cra1.show_choice_ladder) && $data.cra1.show_choice_ladder == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'choice_ladder_rows') || (( isset($data.cra1.choice_ladder_rows) && count($data.cra1.choice_ladder_rows) > 0 )) ) }
+<!-- 布局 K：阶梯选择——横向三档卡片，标签为「推荐」的一档抬高并描边强调（不做四等分，§8.1） -->
+<section class="relative overflow-hidden bg-gradient-to-b from-surface-alt to-white py-14 md:py-20">
+    <div class="container-page">
+        <div class="section-heading" data-reveal>
+            <div class="section-heading-copy">
+                <h2 class="section-title">{$data.cra1.choice_ladder_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'choice_ladder_desc') || (( isset($data.cra1.choice_ladder_desc) && $data.cra1.choice_ladder_desc )) ) }
+                <p class="section-desc">{$data.cra1.choice_ladder_desc}</p>
+                {/if}
+            </div>
+            {if ( isset($data.cra1.choice_ladder_link) && $data.cra1.choice_ladder_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'choice_ladder_more_text', '对比全部配置') != '' ) }<a href="{$data.cra1.choice_ladder_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'choice_ladder_more_text', '对比全部配置')} →</a>{/if}
+            {/if}
+        </div>
+        <div class="mt-9 grid gap-5 md:grid-cols-3 md:items-stretch">
+            {foreach $data.cra1.choice_ladder_rows as $cl => $clr}
+            <article class="cascade-item flex min-w-0 flex-col border bg-white p-6 lift-card {if $clr['tag'] == '推荐'}border-brand/40 shadow-card{else /}border-line{/if}"
+                     style="--cascade-delay:{:min($cl, 5) * 90}">
+                <div class="flex items-center justify-between gap-3">
+                    <h3 class="text-sm font-semibold text-ink">{$clr['icon_tile']|default=''|raw}{$clr['name']}</h3>
+                    {if $clr['tag']}<span class="badge-soft !px-2 !py-0.5 !text-[10px]">{$clr['tag']}</span>{/if}
+                </div>
+                {if $clr['value']}
+                <p class="mt-4 flex items-baseline gap-1"><span class="text-xs text-muted">￥</span><span class="text-3xl font-semibold leading-none tabular-nums text-ink">{$clr['value']}</span>{if $clr['period']}<span class="text-xs text-muted">{$clr['period']}</span>{/if}</p>
+                <p class="price-note">{if !$clr['period']}计费周期以选购页为准{/if}</p>
+                {/if}
+                {if $clr['desc']}<p class="mt-3 text-sm leading-6 text-body">{$clr['desc']}</p>{/if}
+                <a href="{$clr['url']|default='/cart/goodsList.htm'}" class="btn {if $clr['tag'] == '推荐'}btn-primary{else /}btn-outline btn-primary{/if} btn-sm mt-6 w-full justify-center">{$clr['action']}<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>
+            </article>
+            {/foreach}
+        </div>
+    </div>
+</section>
+{/if}
+{/if}

@@ -1,0 +1,33 @@
+{if ( isset($data.cra1.show_link_tiles) && $data.cra1.show_link_tiles == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'link_tiles_rows') || (( isset($data.cra1.link_tiles_rows) && count($data.cra1.link_tiles_rows) > 0 )) ) }
+<!-- 布局 L：磁贴墙——密集小磁贴铺满一行（图标 + 短名），用于「全部入口」类导览 -->
+<section class="relative overflow-hidden bg-surface-alt py-12 md:py-16">
+    <div class="container-page">
+        <div class="flex flex-wrap items-baseline justify-between gap-3" data-reveal>
+            <h2 class="text-lg font-semibold text-ink md:text-2xl">{$data.cra1.link_tiles_title}</h2>
+            {if ( isset($data.cra1.link_tiles_link) && $data.cra1.link_tiles_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'link_tiles_more_text', '全部产品') != '' ) }<a href="{$data.cra1.link_tiles_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'link_tiles_more_text', '全部产品')} →</a>{/if}
+            {/if}
+        </div>
+        <ul class="mt-7 grid grid-cols-2 gap-px overflow-hidden border border-line bg-line sm:grid-cols-3 lg:[grid-template-columns:repeat(auto-fit,minmax(11rem,1fr))]">
+            {foreach $data.cra1.link_tiles_rows as $lt => $ltr}
+            <li data-reveal>
+                {if $ltr['url']}<a href="{$ltr['url']}" class="group flex h-full min-h-[6.5rem] flex-col justify-between bg-white px-4 py-4 transition-colors duration-150 hover:bg-brand/5">{else /}<div class="group flex h-full min-h-[6.5rem] flex-col justify-between bg-white px-4 py-4">{/if}
+                    <span class="flex h-8 w-8 items-center justify-center rounded-md" data-cra1-icon-label="{$ltr['name']|htmlspecialchars}" {$ltr['icon_style_attrs']|default=''|raw}>
+                        <!-- 图标三态与页脚/悬浮导航一致：PNG 用 img；SVG 用遮罩随文字变色；无图标回退方块 -->
+                        {if $ltr['icon_png'] == 1}<img src="{$ltr['icon_img']}" alt="" style="width:1.125rem;height:1.125rem">
+                        {elseif $ltr['icon_img']}<span class="icon-img" style="--icon:url('{$ltr['icon_img']}');width:1.125rem;height:1.125rem" aria-hidden="true"></span>
+                        {else /}<svg style="width:1.125rem;height:1.125rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path></svg>{/if}
+                    </span>
+                    <span class="mt-4 min-w-0">
+                        <span class="block truncate text-sm font-medium text-ink group-hover:text-brand">{$ltr['name']}</span>
+                        {if $ltr['tag']}<span class="mt-1 block truncate text-[11px] text-muted">{$ltr['tag']}</span>{/if}
+                    </span>
+                {if $ltr['url']}</a>{else /}</div>{/if}
+            </li>
+            {/foreach}
+        </ul>
+    </div>
+</section>
+{/if}
+{/if}

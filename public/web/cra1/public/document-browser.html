@@ -1,0 +1,14 @@
+<section class="document-browser container-page" data-reveal>
+    <p class="document-status" role="status" aria-live="polite"><span x-show="loading">正在加载文档…</span><span x-show="!loading && !loadFailed"><span x-show="searchedKeyword">“<span x-text="searchedKeyword"></span>” · </span><span x-text="searchedKeyword ? '找到' : '共'"></span> <b x-text="resultCount()"></b> 篇文档</span></p>
+    <div class="document-layout" x-cloak x-show="!loading && groups.length">
+        <aside class="document-categories" aria-label="文档分类">
+            <button type="button" :aria-pressed="activeGroup === ''" :class="activeGroup === '' ? 'is-active' : ''" @click="activeGroup = ''">全部文档 <span x-text="resultCount()"></span></button>
+            <template x-for="group in groups" :key="group.id"><button type="button" :aria-pressed="String(activeGroup) === String(group.id)" :class="String(activeGroup) === String(group.id) ? 'is-active' : ''" @click="activeGroup = String(group.id)"><span x-text="group.name"></span><span x-text="(group.helps || []).length"></span></button></template>
+        </aside>
+        <label class="document-category-select">选择分类<select class="cui-input" x-model="activeGroup"><option value="">全部文档</option><template x-for="group in groups" :key="group.id"><option :value="String(group.id)" x-text="group.name + '（' + (group.helps || []).length + '）'"></option></template></select></label>
+        <div class="document-groups" x-ref="listBody">
+            <template x-for="group in groups" :key="group.id"><section x-show="activeGroup === '' || String(activeGroup) === String(group.id)"><h2 class="document-group-title" x-text="group.name"></h2><ul class="document-rows"><template x-for="doc in group.helps" :key="doc.id"><li><a :href="'/document-details.html?id=' + doc.id"><span><template x-for="(part, pi) in titleParts(doc.title)" :key="pi"><span :class="part.match ? 'search-match' : ''" x-text="part.text"></span></template></span><span aria-hidden="true">↗</span></a></li></template></ul></section></template>
+        </div>
+    </div>
+    <div class="content-empty" x-cloak x-show="!loading && !groups.length"><p x-text="loadFailed ? '文档暂时没有加载成功，请重试。' : (searchedKeyword ? '没有找到相关文档，试试更简短的关键词。' : '暂无可查看的文档。')"></p><button type="button" class="empty-link" x-show="loadFailed" @click="load()">重新加载</button><button type="button" class="empty-link" x-show="!loadFailed && searchedKeyword" @click="keyword = ''; search()">查看全部文档 →</button></div>
+</section>

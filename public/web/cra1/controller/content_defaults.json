@@ -1,0 +1,820 @@
+{
+  "schema": 1,
+  "copy": {
+    "public": {
+      "solutions": {},
+      "news": {},
+      "pricing": {},
+      "nodes": {},
+      "about_company": {},
+      "contact_form": {},
+      "method": {},
+      "process": {},
+      "workload": {},
+      "page404": {
+        "url1": "/",
+        "url2": "/document.html"
+      },
+      "core_results": {},
+      "core_intro": {},
+      "core_form": {},
+      "core_activities": {},
+      "cta_activities": {},
+      "cta_guarantee": {},
+      "document_band": {},
+      "support_cards": {},
+      "partner_cps_program": {},
+      "partner_cps_cta": {
+        "url": "/contact.html"
+      },
+      "partner_agent_program": {},
+      "partner_agent_cta": {
+        "url": "/contact.html"
+      },
+      "header": {
+        "ph_search": "搜索产品、新闻、公告、文档",
+        "searching": "正在搜索…",
+        "noresult": "没有找到相关内容，请换个关键词",
+        "tab_basic": "基本资料",
+        "tab_security": "安全设置",
+        "sec_title": "安全中心",
+        "fin_title": "财务信息"
+      },
+      "footer": {},
+      "core_listing": {
+        "document_search_hint": "输入产品名称、问题或错误信息"
+      },
+      "overview": {},
+      "scenarios": {},
+      "cta": {},
+      "core_article": {
+        "txt3": "← 返回文档中心",
+        "txt4": "文档不存在或已删除，可返回文档中心查找其他内容。"
+      }
+    },
+    "home": {
+      "solutions": {},
+      "news": {},
+      "pricing": {},
+      "nodes": {}
+    },
+    "about": {
+      "about_company": {}
+    },
+    "contact": {
+      "contact_form": {}
+    },
+    "solution": {
+      "method": {},
+      "process": {},
+      "workload": {},
+      "cta": {}
+    },
+    "404": {
+      "page404": {
+        "url1": "/",
+        "url2": "/document.html"
+      }
+    },
+    "document": {
+      "core_listing": {}
+    },
+    "document-result": {
+      "core_results": {}
+    },
+    "news-classify": {
+      "core_listing": {}
+    },
+    "recruit": {
+      "core_intro": {}
+    },
+    "feedback": {
+      "core_form": {}
+    },
+    "activities": {
+      "core_activities": {},
+      "cta_activities": {}
+    },
+    "service-guarantee": {
+      "cta_guarantee": {},
+      "document_band": {},
+      "support_cards": {}
+    },
+    "news": {
+      "core_listing": {}
+    },
+    "announce": {
+      "core_listing": {}
+    },
+    "news-details": {
+      "core_article": {}
+    },
+    "announce-details": {
+      "core_article": {}
+    },
+    "document-details": {
+      "core_article": {
+        "txt3": "← 返回文档中心",
+        "txt4": "文档不存在或已删除，可返回文档中心查找其他内容。"
+      }
+    },
+    "document-view": {
+      "core_article": {
+        "txt3": "← 返回文档中心",
+        "txt4": "文档不存在或已删除，可返回文档中心查找其他内容。"
+      }
+    },
+    "partner/cps": {
+      "partner_cps_program": {},
+      "partner_cps_cta": {
+        "url": "/contact.html"
+      },
+      "cta": {}
+    },
+    "partner/agent": {
+      "partner_agent_program": {},
+      "partner_agent_cta": {
+        "url": "/contact.html"
+      },
+      "cta": {}
+    },
+    "cloud": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "dedicated": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "domain": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "domain_buy": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "domain_register": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "domain_shop": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "ssl": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "sms": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "rent": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "trusteeship": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "trademark": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "icp": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    },
+    "model": {
+      "overview": {},
+      "scenarios": {},
+      "cta": {}
+    }
+  },
+  "hero": {
+    "home": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": []
+    },
+    "about": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "contact": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "solution": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": []
+    },
+    "404": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title"
+      ]
+    },
+    "document": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "document-result": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title"
+      ]
+    },
+    "news-classify": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "recruit": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "feedback": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "activities": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "service-guarantee": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "news": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "announce": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "news-details": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "announce-details": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc"
+      ]
+    },
+    "document-details": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title"
+      ]
+    },
+    "document-view": {
+      "defaults": {},
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title"
+      ]
+    },
+    "partner/cps": {
+      "defaults": {
+        "url1": "/contact.html",
+        "url2": "/partner/agent.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "partner/agent": {
+      "defaults": {
+        "url1": "/contact.html",
+        "url2": "/partner/cps.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "solution/ecommerce": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html",
+        "title": "电商零售解决方案",
+        "desc": "有效应对大促带来的业务高并发问题，助力电商客户快速实现营销创新与业务增收。",
+        "btn1": "立即上云",
+        "btn2": "咨询方案"
+      },
+      "legacyKeys": {
+        "title": "sol_ind_ecommerce_hero_title",
+        "desc": "sol_ind_ecommerce_hero_desc"
+      },
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "solution/finance": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html",
+        "title": "金融科技解决方案",
+        "desc": "助力金融机构打造面向垂直场景的创新方案，实现金融机构与用户之间的高效触达。",
+        "btn1": "立即上云",
+        "btn2": "咨询方案"
+      },
+      "legacyKeys": {
+        "title": "sol_ind_finance_hero_title",
+        "desc": "sol_ind_finance_hero_desc"
+      },
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "solution/game": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html",
+        "title": "游戏娱乐解决方案",
+        "desc": "构建高质量、全方位、深度体验的游戏云平台，提升研发效率，增强交互体验。",
+        "btn1": "立即上云",
+        "btn2": "咨询方案"
+      },
+      "legacyKeys": {
+        "title": "sol_ind_game_hero_title",
+        "desc": "sol_ind_game_hero_desc"
+      },
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "solution/auto": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html",
+        "title": "汽车出行解决方案",
+        "desc": "面向汽车行业提供全场景信息化解决方案，助力车企打造更开放的新型连接生态。",
+        "btn1": "立即上云",
+        "btn2": "咨询方案"
+      },
+      "legacyKeys": {
+        "title": "sol_ind_auto_hero_title",
+        "desc": "sol_ind_auto_hero_desc"
+      },
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "solution/travel": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html",
+        "title": "文化旅游解决方案",
+        "desc": "通过\"科技+文化旅游\"的融合创新及落地应用，推动文旅行业智慧化发展。",
+        "btn1": "立即上云",
+        "btn2": "咨询方案"
+      },
+      "legacyKeys": {
+        "title": "sol_ind_travel_hero_title",
+        "desc": "sol_ind_travel_hero_desc"
+      },
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "solution/education": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html",
+        "title": "在线教育解决方案",
+        "desc": "实现数据互联、可视化、高交互的云上教育环境，打造云时代教育治理新模式。",
+        "btn1": "立即上云",
+        "btn2": "咨询方案"
+      },
+      "legacyKeys": {
+        "title": "sol_ind_education_hero_title",
+        "desc": "sol_ind_education_hero_desc"
+      },
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "solution/medical": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html",
+        "title": "智慧医疗解决方案",
+        "desc": "协助医疗机构打造资源共享、再利用的数据生态循环，提高资源配置效率。",
+        "btn1": "立即上云",
+        "btn2": "咨询方案"
+      },
+      "legacyKeys": {
+        "title": "sol_ind_medical_hero_title",
+        "desc": "sol_ind_medical_hero_desc"
+      },
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "solution/agriculture": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html",
+        "title": "智慧农业解决方案",
+        "desc": "助力农企构建智慧农业生产服务体系，提升农业精细化种植与管理水平。",
+        "btn1": "立即上云",
+        "btn2": "咨询方案"
+      },
+      "legacyKeys": {
+        "title": "sol_ind_agriculture_hero_title",
+        "desc": "sol_ind_agriculture_hero_desc"
+      },
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "cloud": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "dedicated": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "domain": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "domain_buy": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "domain_register": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1"
+      ]
+    },
+    "domain_shop": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "ssl": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "sms": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "rent": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "trusteeship": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "trademark": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "icp": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    },
+    "model": {
+      "defaults": {
+        "url1": "/cart/goodsList.htm",
+        "url2": "/contact.html"
+      },
+      "legacyKeys": {},
+      "visibleColumns": [
+        "title",
+        "desc",
+        "btn1",
+        "url1",
+        "btn2",
+        "url2"
+      ]
+    }
+  },
+  "aliases": {
+    "home": {
+      "pricing": {
+        "load_more": "txt1",
+        "empty_intro": "txt1"
+      }
+    },
+    "recruit": {
+      "core_intro": {
+        "contact_button": "txt1"
+      }
+    },
+    "feedback": {
+      "core_form": {
+        "contact_label": "txt1"
+      }
+    },
+    "news-classify": {
+      "core_listing": {
+        "loading_label": "txt2",
+        "news_read_more": "txt1"
+      }
+    },
+    "solution": {
+      "workload": {
+        "card_title1": "txt1",
+        "card_desc1": "txt1",
+        "card_button1": "txt2",
+        "card_title2": "txt3",
+        "card_desc2": "txt2",
+        "card_button2": "txt4",
+        "card_title3": "txt3",
+        "card_desc3": "txt4",
+        "card_button3": "txt5"
+      }
+    },
+    "document": {
+      "core_listing": {
+        "document_search_hint": "txt1",
+        "document_empty": "txt8"
+      }
+    },
+    "public": {
+      "core_listing": {
+        "document_search_hint": "txt1",
+        "document_empty": "txt8",
+        "news_read_more": "txt1",
+        "news_empty": "txt8",
+        "announce_empty": "txt8"
+      },
+      "core_article": {
+        "txt3": "txt5",
+        "txt4": "txt6"
+      }
+    },
+    "news": {
+      "core_listing": {
+        "news_read_more": "txt1",
+        "news_empty": "txt8"
+      }
+    },
+    "announce": {
+      "core_listing": {
+        "announce_empty": "txt8"
+      }
+    },
+    "document-details": {
+      "core_article": {
+        "txt3": "txt5",
+        "txt4": "txt6"
+      }
+    },
+    "document-view": {
+      "core_article": {
+        "txt3": "txt5",
+        "txt4": "txt6"
+      }
+    }
+  }
+}

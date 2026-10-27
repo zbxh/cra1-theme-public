@@ -1,0 +1,33 @@
+{if ( isset($data.cra1.show_compare_split) && $data.cra1.show_compare_split == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'compare_split_rows') || (( isset($data.cra1.compare_split_rows) && count($data.cra1.compare_split_rows) > 0 )) ) }
+<!-- 布局 C：左右对照表——两栏逐行比对（左侧现状、右侧我方可选），中间一列分隔 -->
+<section class="relative overflow-hidden bg-surface-alt py-14 md:py-20">
+    <div class="container-page">
+        <div class="section-heading" data-reveal>
+            <div class="section-heading-copy">
+                <h2 class="section-title">{$data.cra1.compare_split_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'compare_split_desc') || (( isset($data.cra1.compare_split_desc) && $data.cra1.compare_split_desc )) ) }
+                <p class="section-desc">{$data.cra1.compare_split_desc}</p>
+                {/if}
+            </div>
+        </div>
+        <div class="mt-9 overflow-hidden border border-line bg-white" data-reveal>
+            <div class="grid grid-cols-2 divide-x divide-line border-b border-line bg-surface-alt/70">
+                <p class="px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-muted md:px-7">{:cra1_content_value($data.cra1, 'compare_split_left', '常见做法')}</p>
+                <p class="px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-brand md:px-7">{:cra1_content_value($data.cra1, 'compare_split_right', '我们的做法')}</p>
+            </div>
+            {foreach $data.cra1.compare_split_rows as $cs => $cr}
+            <!-- cmp-row / cmp-cell-left / cmp-cell-right：交给 shear 机制。
+                 左栏自上方落入、右栏自下方升起，两栏在分隔线处相向合拢——
+                 方向成对相反，与 grid/flow（全体同向）不同。
+                 不用 data-reveal，否则两栏会退回"整块同时淡入"。 -->
+            <div class="cmp-row grid grid-cols-2 divide-x divide-line border-b border-line last:border-b-0" style="--cmp-delay:{:min($cs, 5) * 110}">
+                <p class="cmp-cell cmp-cell-left px-5 py-4 text-sm leading-6 text-muted md:px-7 md:py-5">{$cr['name']}</p>
+                <p class="cmp-cell cmp-cell-right px-5 py-4 text-sm leading-6 text-ink md:px-7 md:py-5">{$cr['desc']}{if $cr['value']}<span class="mt-1 block text-xs text-muted">{$cr['value']}</span>{/if}</p>
+            </div>
+            {/foreach}
+        </div>
+    </div>
+</section>
+{/if}
+{/if}

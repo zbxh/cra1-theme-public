@@ -1,0 +1,10 @@
+{if isset($data.cra1.show_timeline_road) && $data.cra1.show_timeline_road == 1 && count($data.cra1.timeline_road_rows) > 0}
+<section class="history-section bg-white py-14 md:py-20"><div class="container-page">
+    <div class="section-heading" data-reveal><div class="section-heading-copy"><h2 class="section-title">{$data.cra1.timeline_road_title}</h2>{if $data.cra1.timeline_road_desc}<p class="section-desc">{$data.cra1.timeline_road_desc}</p>{/if}</div>{if $data.cra1.timeline_road_link && cra1_content_value($data.cra1, 'timeline_road_more_text', '查看企业信息') != ''}<a href="{$data.cra1.timeline_road_link}" class="text-sm text-brand">{:cra1_content_value($data.cra1, 'timeline_road_more_text', '查看企业信息')} →</a>{/if}</div>
+    <ol class="history-timeline">
+        {foreach $data.cra1.timeline_road_rows as $row}
+        <li><span class="history-year">{$row['value']}</span><div>{if $row['name'] != $row['value']}<h3>{$row['name']}</h3>{/if}{if $row['desc']}<p>{$row['desc']}</p>{/if}</div></li>
+        {/foreach}
+    </ol>
+</div></section>
+{/if}

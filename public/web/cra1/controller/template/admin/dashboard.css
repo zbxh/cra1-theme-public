@@ -1,0 +1,85 @@
+/* 酷锐A1主题独立管理台布局 */
+.cd-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 4px 0 24px;
+}
+
+.cd-nav {
+  flex: none;
+  width: 200px;
+  border: 1px solid var(--td-component-stroke, #e7e7e7);
+  border-radius: 9px;
+  background: #fff;
+  padding: 10px;
+  position: sticky;
+  top: 16px;
+}
+
+.cd-nav-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--td-text-color-primary, #000);
+  padding: 8px 10px 10px;
+}
+
+.cd-nav-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  padding: 9px 10px;
+  font-size: 13px;
+  color: var(--td-text-color-secondary, #555);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.cd-nav-item:hover {
+  background: var(--td-bg-color-container-hover, #f3f3f3);
+  color: var(--td-brand-color, #0052d9);
+}
+
+.cd-nav-item.active {
+  background: var(--td-brand-color-light, #ecf2fe);
+  color: var(--td-brand-color, #0052d9);
+  font-weight: 600;
+}
+
+.cd-panel {
+  flex: 1;
+  min-width: 0;
+}
+
+.cd-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--td-text-color-primary, #000);
+  margin: 4px 0 14px;
+}
+
+@media (max-width: 900px) {
+  .cd-layout {
+    flex-direction: column;
+  }
+
+  .cd-nav {
+    width: 100%;
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .cd-nav-title {
+    width: 100%;
+    padding-bottom: 4px;
+  }
+
+  .cd-nav-item {
+    width: auto;
+  }
+}

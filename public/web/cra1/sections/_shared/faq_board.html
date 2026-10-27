@@ -1,0 +1,28 @@
+{if ( isset($data.cra1.show_faq_board) && $data.cra1.show_faq_board == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'faq_board_rows') || (( isset($data.cra1.faq_board_rows) && count($data.cra1.faq_board_rows) > 0 )) ) }
+<!-- 布局 H：问答双栏折叠板——左栏固定标题+出口，右栏可折叠问答（与列表页 FAQ 形态区分） -->
+<section class="relative overflow-hidden bg-surface-alt py-14 md:py-20">
+    <div class="container-page">
+        <div class="grid gap-8 lg:grid-cols-[20rem_minmax(0,1fr)] lg:gap-14">
+            <div class="lg:sticky lg:top-24 lg:self-start" data-reveal>
+                <h2 class="text-xl font-semibold leading-tight text-ink md:text-3xl">{$data.cra1.faq_board_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'faq_board_desc') || (( isset($data.cra1.faq_board_desc) && $data.cra1.faq_board_desc )) ) }
+                <p class="mt-3 text-sm leading-7 text-body">{$data.cra1.faq_board_desc}</p>
+                {/if}
+                {if ( isset($data.cra1.faq_board_link) && $data.cra1.faq_board_link != '' ) }
+                {if ( cra1_content_value($data.cra1, 'faq_board_more_text', '联系技术支持') != '' ) }<a href="{$data.cra1.faq_board_link}" class="mt-6 inline-flex items-center gap-1.5 border border-brand/25 bg-white px-4 py-2 text-sm font-medium text-brand transition-colors duration-150 hover:border-brand/50">{:cra1_content_value($data.cra1, 'faq_board_more_text', '联系技术支持')}</a>{/if}
+                {/if}
+            </div>
+            <div class="min-w-0">
+                {foreach $data.cra1.faq_board_rows as $fq => $fqr}
+                <details class="faq-item border-b border-line first:border-t first:border-t-line" data-reveal>
+                    <summary>{$fqr['name']}</summary>
+                    <div class="faq-answer">{$fqr['desc']}</div>
+                </details>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+</section>
+{/if}
+{/if}

@@ -1,0 +1,12 @@
+{if ( !isset($data.cra1.show_contact_service) || $data.cra1.show_contact_service == 1 ) }
+        <section class="band border-y border-white/60 bg-white/50 py-12 md:py-16" data-reveal aria-label="服务与响应">
+            <div class="container-page">
+                <h2 class="section-title">服务与响应</h2>
+                <div class="mt-8 grid gap-4 md:grid-cols-3">
+                    {foreach $data.cra1.contact_service as $row}
+                    <div class="feature-item glass-card rounded-xl p-6 cui-card"><h3 class="font-semibold text-ink">{$row.name}</h3><p class="mt-2 text-sm leading-6 text-body">{$row.desc}</p></div>
+                    {/foreach}
+                </div>
+            </div>
+        </section>
+        {/if}

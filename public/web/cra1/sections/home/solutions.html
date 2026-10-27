@@ -1,0 +1,81 @@
+    {if ( isset($data.cra1.show_solutions) && $data.cra1.show_solutions == 1 ) }
+    <section class="bg-surface-alt py-16 md:py-24" x-data="scrollRail">
+        <div class="container-page">
+            <div class="flex flex-wrap items-end justify-between gap-4" data-reveal>
+                <div class="max-w-xl">
+                    <h2 class="section-title">{if ( cra1_content_explicit($data.cra1, 'sol_title') || (( isset($data.cra1.sol_title) && $data.cra1.sol_title )) ) }{$data.cra1.sol_title}{else /}围绕业务场景设计上云路径{/if}</h2>
+                    {if ( cra1_content_explicit($data.cra1, 'sol_desc') || (( isset($data.cra1.sol_desc) && $data.cra1.sol_desc )) ) }
+                    <p class="section-desc">{$data.cra1.sol_desc}</p>
+                    {/if}
+                </div>
+                {if ( cra1_content_value($data.cra1, 'sol_link', '/solution.html') != '' ) }<a href="{:cra1_content_value($data.cra1, 'sol_link', '/solution.html')}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'sol_more_text', '查看全部方案')} →</a>{/if}
+            </div>
+            <!-- 滑轨控件：仅小屏（md 起下面容器变 Bento 网格） -->
+            <div class="mt-6 flex items-center justify-between gap-3 md:hidden">
+                <div class="flex items-center gap-1.5" aria-label="浏览位置">
+                    <template x-for="i in pageCount" :key="'sd' + i">
+                        <button type="button" class="rail-dot" :aria-label="'浏览第 ' + i + ' 组'" :aria-current="pageIndex === (i - 1) ? 'true' : null" :class="pageIndex === (i - 1) ? 'rail-dot-active' : ''"
+                                @click="goPage(i - 1)"><span aria-hidden="true"></span></button>
+                    </template>
+                </div>
+                <div class="flex shrink-0 items-center gap-2">
+                    <button type="button" class="rail-nav-btn" aria-label="向前浏览" :disabled="atStart" @click="step(-1)">
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+                    </button>
+                    <button type="button" class="rail-nav-btn" aria-label="向后浏览" :disabled="atEnd" @click="step(1)">
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 手机端：左右滑动轮播（卡片两侧露出相邻边缘）；md+ 保持 Bento 网格。
+             容器在 .container-page 之外以保留移动端贴边的滑动暗示。 -->
+        <div x-ref="rail" class="scrollbar-none mt-6 flex snap-x gap-4 overflow-x-auto px-5 pb-2 md:container-page md:mt-10 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-8 md:pb-0">
+                {if ( cra1_content_value($data.cra1, 'sol_link', '/solution.html') != '' ) }<a href="{:cra1_content_value($data.cra1, 'sol_link', '/solution.html')}" class="bento-featured group spotlight-hover flex w-[82%] shrink-0 snap-center flex-col p-7 md:w-auto md:p-8 cui-card cui-card--featured">
+                    <span class="text-xs font-semibold uppercase tracking-[0.16em] text-brand">全部方案</span>
+                    <h3 class="mt-4 text-xl font-semibold leading-snug text-ink md:text-2xl">{if ( cra1_content_explicit($data.cra1, 'sol_title') || (( isset($data.cra1.sol_title) && $data.cra1.sol_title )) ) }{$data.cra1.sol_title}{else /}围绕业务场景设计上云路径{/if}</h3>
+                    <p class="mt-3 text-sm leading-6 text-body">{if ( cra1_content_explicit($data.cra1, 'sol_desc') || (( isset($data.cra1.sol_desc) && $data.cra1.sol_desc )) ) }{$data.cra1.sol_desc}{else /}从行业场景到工作负载，找到可执行的产品组合。{/if}</p>
+                    <span class="mt-auto inline-flex items-center gap-1 pt-6 text-sm font-medium text-brand">{:cra1_content_value($data.cra1, 'sol_more_text', '查看全部方案')} <svg class="card-arrow h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
+                </a>{/if}
+                <!-- 方案卡片：可增删（v2.42）。配置化行数据优先；为空时回退旧 4 键（历史配置兼容）。
+                     移动端横滑（contents + w-[82%]），md 起并入 Bento 网格自适应行列。 -->
+                <div class="contents md:col-span-2 md:grid md:auto-rows-fr md:grid-cols-2 md:gap-4">
+                    {if ( cra1_content_explicit($data.cra1, 'sol_home_cards') || (( count($data.cra1.sol_home_cards) > 0 )) ) }
+                    {foreach $data.cra1.sol_home_cards as $sc}
+                    <a href="{$sc.url}" class="bento-card group spotlight-hover w-[82%] shrink-0 snap-center md:w-auto cui-card">
+                        <span class="block text-base font-semibold text-ink">{$sc.name}</span>
+                        <span class="mt-2 line-clamp-3 block text-sm leading-6 text-body">{$sc.desc}</span>
+                        <span class="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-brand opacity-0 transition-opacity duration-200 group-hover:opacity-100">{:cra1_content_value($data.cra1, 'sol_card_more_text', '查看方案 →')}</span>
+                    </a>
+                    {/foreach}
+                    {else /}
+                    <a href="{$data.cra1.sol1_url}" class="bento-card group spotlight-hover w-[82%] shrink-0 snap-center md:w-auto cui-card">
+                        <span class="block text-base font-semibold text-ink">{$data.cra1.sol1_title}</span>
+                        <span class="mt-2 line-clamp-3 block text-sm leading-6 text-body">{$data.cra1.sol1_desc}</span>
+                        <span class="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-brand opacity-0 transition-opacity duration-200 group-hover:opacity-100">{:cra1_content_value($data.cra1, 'sol_card_more_text', '查看方案 →')}</span>
+                    </a>
+                    <a href="{$data.cra1.sol2_url}" class="bento-card group spotlight-hover w-[82%] shrink-0 snap-center md:w-auto cui-card">
+                        <span class="block text-base font-semibold text-ink">{$data.cra1.sol2_title}</span>
+                        <span class="mt-2 line-clamp-3 block text-sm leading-6 text-body">{$data.cra1.sol2_desc}</span>
+                        <span class="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-brand opacity-0 transition-opacity duration-200 group-hover:opacity-100">{:cra1_content_value($data.cra1, 'sol_card_more_text', '查看方案 →')}</span>
+                    </a>
+                    <a href="{$data.cra1.sol3_url}" class="bento-card group spotlight-hover w-[82%] shrink-0 snap-center md:w-auto cui-card">
+                        <span class="block text-base font-semibold text-ink">{$data.cra1.sol3_title}</span>
+                        <span class="mt-1.5 line-clamp-2 block text-sm leading-6 text-body">{$data.cra1.sol3_desc}</span>
+                        <span class="mt-auto inline-flex items-center gap-1 pt-3 text-sm font-medium text-brand opacity-0 transition-opacity duration-200 group-hover:opacity-100">{:cra1_content_value($data.cra1, 'sol_card_more_text', '查看方案 →')}</span>
+                    </a>
+                    <a href="{$data.cra1.sol4_url}" class="bento-card group spotlight-hover w-[82%] shrink-0 snap-center md:w-auto cui-card">
+                        <span class="block text-base font-semibold text-ink">{$data.cra1.sol4_title}</span>
+                        <span class="mt-1.5 line-clamp-2 block text-sm leading-6 text-body">{$data.cra1.sol4_desc}</span>
+                        <span class="mt-auto inline-flex items-center gap-1 pt-3 text-sm font-medium text-brand opacity-0 transition-opacity duration-200 group-hover:opacity-100">{:cra1_content_value($data.cra1, 'sol_card_more_text', '查看方案 →')}</span>
+                    </a>
+                    {/if}
+                    <a href="/contact.html" class="bento-card bento-cta group w-[82%] shrink-0 snap-center md:w-auto cui-card cui-card--featured">
+                        <span class="block text-base font-semibold text-white">定制方案</span>
+                        <span class="mt-1.5 line-clamp-2 block text-sm leading-6 text-white/75">{if ( cra1_content_explicit($data.cra1, 'solutions_copy.txt1') || (( isset($data.cra1.solutions_copy['txt1']) && $data.cra1.solutions_copy['txt1'] )) ) }{$data.cra1.solutions_copy['txt1']}{else /}描述业务场景，获取专属架构建议{/if}</span>
+                        <span class="mt-auto inline-flex items-center gap-1 pt-3 text-sm font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">咨询 →</span>
+                    </a>
+                </div>
+            </div>
+    </section>
+    {/if}

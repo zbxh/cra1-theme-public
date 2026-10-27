@@ -1,0 +1,5 @@
+<form class="document-search" role="search" @submit.prevent="search()">
+    <label class="sr-only" for="document-keyword">搜索帮助文档</label>
+    <input id="document-keyword" type="search" maxlength="100" x-model="keyword" @compositionstart="composing = true" @compositionend="composing = false" class="cui-input" placeholder="{:cra1_content_value($data.cra1, 'core_listing_copy.document_search_hint', '输入产品名称、问题或错误信息')}" autocomplete="off">
+    <button type="submit" class="btn-gradient btn cui-button cui-button--primary" :disabled="loading || composing">搜索<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></button>
+</form>

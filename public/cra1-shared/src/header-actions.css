@@ -1,0 +1,66 @@
+/* One set of hit areas/icons for the website, member centre and cart. */
+html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) { gap:8px; }
+html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-header__icon-btn,
+html[data-cra1-theme] .cra1-header-support__trigger {
+  display:inline-flex;position:relative;align-items:center;justify-content:center;flex:0 0 auto;
+  width:30px;height:30px;min-width:0;min-height:0;padding:0;border:0;border-radius:4px;
+  color:var(--cui-ink);background:transparent;box-shadow:none;transform:none;cursor:pointer;
+  transition:color 150ms ease,background-color 150ms ease;
+}
+html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-header__icon-btn svg,
+html[data-cra1-theme] .cra1-header-support__trigger svg {width:18px;height:18px;flex-shrink:0;}
+html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-header__icon-btn:hover,
+html[data-cra1-theme] .cra1-header-support__trigger:hover {color:var(--cui-titanium);background:var(--cui-accent);box-shadow:none;transform:none;}
+html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-header__icon-btn:focus-visible {outline:2px solid var(--cui-gold);outline-offset:2px;}
+.cra1-header-glyph {display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;}
+.cra1-header-glyph svg {width:15px;height:15px;}
+.cra1-upanel__mini-btn .cra1-header-glyph svg {width:12px;height:12px;}
+.cra1-upanel__logout .cra1-header-glyph svg {width:13px;height:13px;}
+.cra1-upanel__chev {display:inline-flex;margin-left:auto;}
+.cra1-upanel__chev svg {width:12px;height:12px;}
+.cra1-upanel__username {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cra1-upanel__row {padding-right:100px;}
+.cra1-upanel__id {flex:1 1 0;grid-template-columns:minmax(0,1fr);}
+.cra1-upanel__name {min-width:0;max-width:100%;}
+.cra1-upanel__mini-btn {flex-shrink:0;}
+.cra1-shared-panel[hidden],.cra1-header-support[hidden] {display:none!important;}
+.cra1-account__menu--rich {max-height:calc(100dvh - var(--header-h,64px) - 24px);overflow-y:auto;overscroll-behavior:contain;max-width:calc(100vw - 24px);}
+.cra1-header-support__icon {display:inline-flex;color:var(--cui-icon-ink,currentColor);}
+.cra1-header-support__icon :is(img,svg) {display:block;width:16px;height:16px;object-fit:contain;}
+@media (max-width:767px) {
+  html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) {gap:2px;}
+  html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-header__icon-btn,
+  html[data-cra1-theme] .cra1-header-support__trigger {width:44px;height:44px;}
+  html[data-cra1-theme] .cra1-account--header {height:44px;}
+  html[data-cra1-theme] .cra1-account__trigger {height:44px;width:44px;justify-content:center;padding:0;}
+  .cra1-upanel__tag {height:30px;}
+  .cra1-upanel__link {padding:6px 0;}
+  .cra1-upanel__section {padding:14px 16px;}
+  .cra1-header__right .cra1-header-docs {display:none;}
+  .cra1-header__right .cra1-header-support__panel {top:calc(var(--header-h,64px) + 8px);}
+  .cra1-header__right .cra1-breadcrumb {max-width:90px;}
+}
+@media (prefers-reduced-motion:reduce) {
+  html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-header__icon-btn,
+  html[data-cra1-theme] .cra1-header-support__trigger {transition:none;}
+}
+
+/* The member shell also hosts cart and plugin pages. Keep all header actions
+   reachable there, rather than fixing individual React entry pages. */
+@media (max-width:480px) {
+  html[data-cra1-theme="member"] .cra1-header,
+  html[data-cra1-theme="cart"] .cra1-header {padding-inline:8px;column-gap:4px;}
+  html[data-cra1-theme] .cra1-header .cra1-header__left {flex:1 1 0;}
+  html[data-cra1-theme] .cra1-header .cra1-header__brand {flex:0 1 auto;min-width:0;padding-inline:3px;}
+  html[data-cra1-theme] .cra1-header .cra1-header__brand-logo {min-width:0;max-width:100%;}
+  html[data-cra1-theme] .cra1-header .cra1-header__right {gap:0;}
+}
+@media (max-width:350px) {
+  html[data-cra1-theme="member"],html[data-cra1-theme="cart"] {--header-h:100px;}
+  html[data-cra1-theme] .cra1-header {height:auto;min-height:var(--header-h);flex-wrap:wrap;row-gap:4px;padding-block:4px;}
+  html[data-cra1-theme] .cra1-header .cra1-header__left,
+  html[data-cra1-theme] .cra1-header .cra1-header__right {flex:0 0 100%;min-height:44px;}
+  html[data-cra1-theme] .cra1-header .cra1-header__right {justify-content:space-between;margin-left:0;}
+  html[data-cra1-theme] .cra1-header .cra1-header-search__panel,
+  html[data-cra1-theme] .cra1-header .cra1-header-support__panel {top:calc(var(--header-h) + 8px);}
+}

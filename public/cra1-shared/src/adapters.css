@@ -1,0 +1,266 @@
+/* Theme-only adapters. Portals inherit document context, including Vue poppers
+   mounted at body level and standalone same-origin product configuration. */
+:where(html[data-cra1-theme]) body { font-family:var(--cui-font);color:var(--cui-body);background-color:var(--cui-surface); }
+:where(html[data-cra1-theme]) { --el-color-primary:var(--cui-titanium);--el-color-primary-light-3:var(--cui-silver);--el-color-primary-light-5:var(--cui-steel);--el-color-primary-light-7:var(--cui-highlight);--el-color-primary-light-8:var(--cui-accent);--el-color-primary-light-9:var(--cui-surface);--el-color-primary-dark-2:var(--cui-graphite);--el-border-color:var(--cui-line);--el-border-color-light:var(--cui-edge);--el-text-color-primary:var(--cui-ink);--el-text-color-regular:var(--cui-body);--el-text-color-secondary:var(--cui-muted);--el-text-color-placeholder:var(--cui-muted);--el-font-family:var(--cui-font); }
+html[data-cra1-theme="website"] {--p:.341 .008 257;--pc:1 0 0;--s:.42 .012 257;--sc:1 0 0;--n:.295 .01 257;--nc:.953 .005 257;--b1:.984 .002 248;--b2:.955 .003 248;--b3:.895 .006 248;--bc:.305 .009 257;}
+html[data-cra1-theme="website"] :is(.cui-button,.cui-input) {animation:none;}
+html[data-cra1-theme="website"] :is(.footer-night,.night-section,.bento-featured,.product-card-featured) {--cui-brand:var(--cui-highlight);--cui-brand-hover:var(--cui-night-ink);--cui-ink:var(--cui-night-ink);--cui-body:var(--cui-night-body);--cui-muted:var(--cui-night-muted);--cui-surface:var(--cui-night);--cui-accent:var(--cui-night-raised);--cui-line:var(--cui-night-line);--cui-control-edge:color-mix(in srgb,var(--cui-night-muted) 30%,var(--cui-night));--cui-edge:var(--cui-night-line);}
+html[data-cra1-theme="website"] :is(.feature-item,.product-card,.article-card) > img {border-radius:15px 15px 0 0;}
+html[data-cra1-theme="website"] .ring-sheen::after {content:none;}
+html[data-cra1-theme="website"] .icon-box {background:linear-gradient(135deg,color-mix(in srgb,var(--cui-champagne) 14%,var(--cui-surface)),color-mix(in srgb,var(--cui-champagne) 5%,var(--cui-surface)));color:var(--cui-gold);}
+html[data-cra1-theme="website"] .node-name {color:var(--cui-night-ink);background:color-mix(in srgb,var(--cui-night) 90%,transparent);border-radius:3px;padding:2px 4px;}
+html[data-cra1-theme="website"] .cui-card--featured .card-arrow {color:var(--cui-champagne-light);}
+html[data-cra1-theme="website"] :is(.anchor-nav a.active,.anchor-nav a[aria-current]) {color:var(--cui-gold);border-color:var(--cui-champagne);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.cra1-aside,.cra1-header,.cra1-mobile-nav,.cra1-secondary-panel) {border-color:var(--cui-line);background-color:var(--cui-surface);}
+/* Legacy index_iframe nests the header and notice in one fixed flex row.
+   Keep both in document flow so the notice and product title remain visible. */
+html[data-cra1-theme="cart"] .goods.cart-page > .el-container > .el-container > .el-header {display:block;position:static;width:100%;height:auto !important;padding:0;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-dialog,.el-popover,.el-dropdown-menu,.el-select-dropdown,.el-message-box,.el-message,.el-notification,.el-picker-panel) {background:var(--cui-surface);border:1px solid var(--cui-control-edge);border-radius:16px;color:var(--cui-ink);box-shadow:var(--cui-shadow-pop);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-popper[x-placement^=bottom] .popper__arrow {border-bottom-color:var(--cui-line);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-popper[x-placement^=bottom] .popper__arrow::after {border-bottom-color:var(--cui-surface);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-select-dropdown__item.selected,.el-dropdown-menu__item:focus) {color:var(--cui-gold);background:var(--cui-tint);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-select-dropdown__item.hover,.el-select-dropdown__item:hover,.el-dropdown-menu__item:hover) {background:var(--cui-accent);color:var(--cui-ink);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-textarea__inner {height:auto;min-height:100px;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-input__inner {line-height:var(--cui-height-control);}
+/* Nested module selectors are more specific than a native control. Keep their
+   layout, but resolve the purchasing and focus states through shared tokens. */
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .f-order .right .cui-button--primary {display:inline-flex;align-items:center;justify-content:center;background:var(--cui-button-gradient);color:var(--cui-button-ink);font:500 14px/1.4 var(--cui-font);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-select .el-input.is-focus .cui-input,.el-input.is-active .cui-input,.f-order .cui-input:focus,.mf-cloud .cui-input:focus) {border-color:var(--cui-gold);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--cui-champagne) 20%,transparent),inset 0 1px 2px color-mix(in srgb,var(--cui-ink) 3%,transparent);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-form-item.is-error :is(.el-input__inner,.el-textarea__inner) {border-color:var(--cui-danger);box-shadow:0 0 0 3px color-mix(in srgb,var(--cui-danger) 12%,transparent);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-form-item.is-error :is(.el-input.is-focus .cui-input,.cui-input:focus) {border-color:var(--cui-danger);box-shadow:0 0 0 3px color-mix(in srgb,var(--cui-danger) 12%,transparent);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-input__inner:disabled {background:var(--cui-accent);color:var(--cui-subtle-text);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-checkbox__inner,.el-radio__inner) {width:18px;height:18px;border-color:var(--cui-control-edge);background:var(--cui-surface);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-checkbox__input.is-checked .el-checkbox__inner,.el-radio__input.is-checked .el-radio__inner) {background:var(--cui-button-gradient);border-color:var(--cui-titanium);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-checkbox__inner::after {left:6px;top:3px;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-checkbox__input.is-focus .el-checkbox__inner,.el-radio__input.is-focus .el-radio__inner) {outline:2px solid var(--cui-gold);outline-offset:3px;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-switch.is-checked .el-switch__core {background:var(--cui-button-gradient);border-color:var(--cui-titanium);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-slider__bar,.el-progress-bar__inner) {background:var(--cui-button-gradient);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-slider__button {border-color:var(--cui-titanium);background:linear-gradient(var(--cui-surface),var(--cui-accent));box-shadow:0 1px 2px color-mix(in srgb,var(--cui-ink) 22%,transparent);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-input-number {line-height:38px;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-input-number__increase,.el-input-number__decrease) {background:var(--cui-accent);color:var(--cui-body);border-color:var(--cui-line);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-table th {background:linear-gradient(var(--cui-accent),color-mix(in srgb,var(--cui-accent) 65%,var(--cui-surface)));color:var(--cui-body);font-weight:500;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-table tr {color:var(--cui-ink);background:var(--cui-surface);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-table :is(th,td) {border-color:var(--cui-edge);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-table__body tr.current-row>td {background:color-mix(in srgb,var(--cui-titanium) 9%,var(--cui-surface));}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-tabs__item {color:var(--cui-body);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-tabs__item.is-active {color:var(--cui-gold);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-tabs__active-bar {background:var(--cui-gold);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-pagination .el-pager li.active,.el-pagination .el-pager li:hover) {color:var(--cui-gold);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-pagination .el-pager li,.el-pagination .page-total,.el-dialog .dialog-title) {font-family:var(--cui-font);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-pagination .page-total,.news .no-data) {color:var(--cui-muted);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .cra1-ta-cat__tag {color:var(--cui-warning);background:color-mix(in srgb,var(--cui-warning) 6%,var(--cui-surface));}
+.cui-checkbox[data-state="checked"] {background:var(--cui-button-gradient);border-color:var(--cui-titanium);color:#fff;}
+.cui-checkbox[data-state="checked"]::after {content:none;}
+.cui-checkbox[data-state="unchecked"] {background:var(--cui-surface);}
+.cui-checkbox[data-disabled] {opacity:.5;}
+.cra1-account__menu--rich,.cra1-header-search__form,.cra1-header-search__list,.cra1-header-support__panel {background:var(--cui-surface);border-color:var(--cui-control-edge);box-shadow:var(--cui-shadow-pop);}
+.cra1-account__trigger:focus-visible,.cra1-upanel__link:focus-visible,.cra1-header-support__trigger:focus-visible {outline-color:var(--cui-gold);}
+.cra1-header-support__heading {color:var(--cui-gold);}
+/* V10 modules keep their structure; their neutral and selected surfaces consume
+   the document palette even when the module stylesheet loads asynchronously. */
+/* The asynchronously loaded system :root[theme] palette must not replace the
+   paired CRA1 text colours. These declarations remain theme scoped. */
+html:root:is([data-cra1-theme="member"],[data-cra1-theme="cart"]) {
+ --color-primary:var(--cui-titanium);--color-success:var(--cui-success);--color-warning:var(--cui-warning);--color-danger:var(--cui-danger);--color-info:var(--cui-muted);--color-text-tips:var(--cui-body);--color-discount-num:var(--cui-warning);--color-menu-bg:var(--cui-surface);--color-menu-active-bg:var(--cui-accent);--color-menu-hover-bg:var(--cui-tint);--color-menu-text:var(--cui-body);--color-menu-text-active:var(--cui-ink);
+}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-radio-button__inner,.el-checkbox-button__inner) {min-height:var(--cui-height-control);height:auto;line-height:20px;padding:9px 14px;background:linear-gradient(var(--cui-surface),var(--cui-accent));color:var(--cui-body);border-color:var(--cui-control-edge);font:400 14px/20px var(--cui-font);box-shadow:none;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-radio-button__orig-radio:checked + .el-radio-button__inner,.el-checkbox-button.is-checked .el-checkbox-button__inner) {background:var(--cui-button-gradient);color:var(--cui-button-ink);border-color:var(--cui-titanium);box-shadow:-1px 0 0 var(--cui-titanium);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-radio-button__orig-radio:disabled + .el-radio-button__inner,.el-checkbox-button.is-disabled .el-checkbox-button__inner) {background:var(--cui-accent);color:var(--cui-muted);border-color:var(--cui-line);box-shadow:none;cursor:not-allowed;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-radio-button__orig-radio:focus-visible + .el-radio-button__inner,.el-checkbox-button.is-focus .el-checkbox-button__inner) {outline:2px solid var(--cui-gold);outline-offset:3px;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.mf-cloud,.config-box) :where(div,p,span,label,button,input,select,textarea,th,td):not(.iconfont):not([class*="el-icon"]):not([class*="t-icon"]) {font-family:var(--cui-font);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .mf-cloud .el-form .el-radio-button.is-active .el-radio-button__inner {background:var(--cui-button-gradient);color:var(--cui-button-ink);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .mf-cloud :is(.el-form .flow-bw,.image-item .version-select .v-item:hover,.image-item .version-select .v-item.active,.cra1-box .cra1-item.active .top) {background:var(--cui-tint);color:var(--cui-ink);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .mf-cloud :is(.image-item,.cra1-box .cra1-item .top) {background:var(--cui-accent);border-color:var(--cui-control-edge);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.app-preset-select .el-radio.is-checked,.el-select-dropdown__item.selected) {background:var(--cui-tint);color:var(--cui-gold);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .mf-cloud .el-table th.el-table__cell {background:linear-gradient(var(--cui-accent),var(--cui-surface));color:var(--cui-body);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.mf-cloud,.mf-dcim,.common-config) :is(.s-tip,.store,.empty,.no-model-tip,.image-item .version) {color:var(--cui-muted);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-button.is-loading {pointer-events:none;}
+.cui-sheet {background:var(--cui-surface);border-color:var(--cui-control-edge);box-shadow:var(--cui-shadow-pop);color:var(--cui-ink);}
+.cui-card:focus-visible {outline:2px solid var(--cui-gold);outline-offset:3px;}
+.cui-alert--success {background:color-mix(in srgb,var(--cui-success) 6%,var(--cui-surface));color:var(--cui-success);border-color:color-mix(in srgb,var(--cui-success) 16%,var(--cui-surface));}
+.cui-alert--warning {background:color-mix(in srgb,var(--cui-warning) 6%,var(--cui-surface));color:var(--cui-warning);border-color:color-mix(in srgb,var(--cui-warning) 16%,var(--cui-surface));}
+.cui-alert--error {background:color-mix(in srgb,var(--cui-danger) 6%,var(--cui-surface));color:var(--cui-danger);border-color:color-mix(in srgb,var(--cui-danger) 16%,var(--cui-surface));}
+.cra1-header__icon-btn.cui-button {width:var(--cui-height-control);height:var(--cui-height-control);min-height:var(--cui-height-control);border-radius:var(--cui-radius-control);}
+.cra1-header-search__list,.cra1-header-support__panel,.cra1-account__menu--rich {border-radius:var(--cui-radius-card);}
+.cl-card-head {border-radius:15px 15px 0 0;}
+.cui-toast__close {width:32px;height:32px;flex-basis:32px;padding:8px;margin:-4px -4px -4px 0;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-dialog__headerbtn {width:40px;height:40px;top:8px;right:8px;display:flex;align-items:center;justify-content:center;border-radius:8px;}
+@media (hover:hover) and (pointer:fine) {
+ :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-table--enable-row-hover .el-table__body tr:hover>td {background:var(--cui-accent);}
+}
+@media (max-width:767px),(pointer:coarse) {
+ :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-input-number {line-height:42px;}
+ :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-button {min-height:44px;}
+ .cra1-header-search__input {font-size:16px;}
+ .cui-button--tile {height:44px;min-height:44px;}
+ :where(html[data-cra1-theme]) label:has(> .cui-checkbox),:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-checkbox,.el-radio) {min-height:44px;display:inline-flex;align-items:center;}
+ :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-dialog__headerbtn {width:44px;height:44px;}
+ .cui-toast__close {width:44px;height:44px;flex-basis:44px;padding:14px;margin:-10px -10px -10px 0;}
+}
+@media (prefers-reduced-motion:reduce) { :where(html[data-cra1-theme]) :is(.el-button,.el-input__inner,.el-dialog,.el-tabs__active-bar) {transition:none;animation:none;} }
+/* Native plugin layouts keep their business implementation. Decorative resource
+   artwork must not cover a narrow search field, and long associated product
+   names need their own row instead of sharing four fixed-width columns. */
+@media (max-width:600px) {
+ html[data-cra1-theme="member"] :is(.news.template,.help.template,.help-total.template,.file_download) .main-card > .back-img {display:none;}
+ html[data-cra1-theme="member"] :is(.news.template,.help.template,.help-total.template,.file_download) .main-card > .search-input {width:100%;max-width:100%;}
+ html[data-cra1-theme="member"] .template.ticket-details .main-card .base-card .card-main > .el-row:last-child {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+ html[data-cra1-theme="member"] .template.ticket-details .main-card .base-card .card-main > .el-row:last-child::before,
+ html[data-cra1-theme="member"] .template.ticket-details .main-card .base-card .card-main > .el-row:last-child::after {content:none;}
+ html[data-cra1-theme="member"] .template.ticket-details .main-card .base-card .card-main > .el-row:last-child > .el-col {width:auto;min-width:0;float:none;}
+ html[data-cra1-theme="member"] .template.ticket-details .main-card .base-card .card-main > .el-row:last-child > .el-col:last-child {grid-column:1 / -1;}
+ html[data-cra1-theme="member"] .template.ticket-details .main-card .base-card .card-main > .el-row:last-child .card-main-item {margin-top:0;}
+ html[data-cra1-theme="member"] .template.ticket-details .main-card .base-card :is(.card-title,.main-item-text,.host-item) {line-height:1.5;overflow-wrap:anywhere;}
+}
+/* Native domain filters must wrap inside the card instead of being clipped by
+   the tabs viewport; keep the date range and query button on a usable row. */
+@media (max-width:767px) {
+ html[data-cra1-theme="member"] #domain.template .content-box .list-top {flex-wrap:wrap;gap:12px;}
+ html[data-cra1-theme="member"] #domain.template .list-top .right {flex:1 1 100%;min-width:0;flex-wrap:wrap;gap:8px;}
+ html[data-cra1-theme="member"] #domain.template .list-top .keywords {width:100%;min-width:0;flex:1 1 100%;}
+ html[data-cra1-theme="member"] #domain.template .list-top .date-range {width:auto;min-width:0;flex:1 1 210px;margin:0;}
+ html[data-cra1-theme="member"] #domain.template .list-top .right .search {margin-left:0;flex:0 0 auto;}
+ html[data-cra1-theme="member"] .template.ticket .searchbar .el-select__tags > span {display:flex;align-items:center;min-width:0;width:100%;}
+ html[data-cra1-theme="member"] .template.ticket .searchbar .el-tag {min-width:0;}
+ html[data-cra1-theme="member"] .template.ticket .searchbar .el-tag + .el-tag {flex-shrink:0;}
+ html[data-cra1-theme="member"] .template.ticket .el-table__body td .cell {width:100%!important;max-width:100%;box-sizing:border-box;}
+ /* Module popovers can be portalled outside .cart-page. Retain native open/
+    close and positioning, but constrain their fixed desktop width on phones. */
+ html[data-cra1-theme="cart"] :is(.cur-content,.free-content).el-popover {max-width:calc(100vw - 16px);max-height:calc(100vh - 32px);overflow:auto;box-sizing:border-box;}
+}
+/* The native domain contact template uses desktop rem widths and tiny rem
+   captions. Keep its inputs and agreement inside the theme's mobile card. */
+html[data-cra1-theme="member"] .template .tem-form .form-tip {font:400 12px/1.6 var(--cui-font);color:var(--cui-muted);overflow-wrap:anywhere;}
+html[data-cra1-theme="member"] .template .tem-form .whios-title {font:500 14px/1.5 var(--cui-font);margin-bottom:20px;}
+html[data-cra1-theme="member"] .template .tem-form .user-type {flex-wrap:wrap;gap:8px;}
+html[data-cra1-theme="member"] .template .tem-form .user-type .type-item {display:flex;align-items:center;justify-content:center;min-height:40px;padding:8px 18px;box-sizing:border-box;border:1px solid var(--cui-control-edge);border-radius:8px;font:400 14px/20px var(--cui-font);background:var(--cui-accent);color:var(--cui-ink);}
+html[data-cra1-theme="member"] .template .tem-form .user-type .type-item.is-active {background:var(--cui-button-gradient);color:var(--cui-button-ink);border-color:var(--cui-titanium);}
+html[data-cra1-theme="member"] .template .tem-form .user-type.disabeld .type-item {color:var(--cui-muted);background:var(--cui-accent);border-color:var(--cui-line);cursor:not-allowed;}
+@media (max-width:767px) {
+ html[data-cra1-theme="member"] .template .tem-form .el-form-item {margin-left:0;margin-bottom:20px;}
+ html[data-cra1-theme="member"] .template .tem-form .el-form-item__label {float:none;display:block;width:auto!important;line-height:22px;padding:0 0 6px;}
+ html[data-cra1-theme="member"] .template .tem-form .el-form-item__label:empty {display:none;}
+ html[data-cra1-theme="member"] .template .tem-form .el-form-item__content {margin-left:0!important;min-width:0;line-height:22px;}
+ html[data-cra1-theme="member"] .template .tem-form :is(.el-input,.el-select,.el-cascader) {width:100%;max-width:100%;height:auto;}
+ html[data-cra1-theme="member"] .template .tem-form .user-type .type-item {min-height:44px;}
+ html[data-cra1-theme="member"] .template .tem-form .el-checkbox {display:flex;align-items:flex-start;gap:8px;max-width:100%;white-space:normal;}
+ html[data-cra1-theme="member"] .template .tem-form .el-checkbox__input {flex:none;margin-top:3px;}
+ html[data-cra1-theme="member"] .template .tem-form .el-checkbox__label {flex:1;min-width:0;padding-left:0;white-space:normal;overflow-wrap:anywhere;line-height:22px;}
+ html[data-cra1-theme="member"] .template .tem-form .a-blue-text {font-size:14px;}
+ html[data-cra1-theme="member"] .template .tem-form .sub-box {margin-top:20px;}
+}
+/* Theme-owned announcement consumer, also used by legacy root-template plugins. */
+html[data-cra1-theme="member"] .cra1-articles {max-width:1120px;margin:0 auto;padding:28px 24px;color:#35383c;font-size:14px;line-height:1.7;min-width:0}
+html[data-cra1-theme="member"] .cra1-articles h1 {font-size:24px;font-weight:650;line-height:1.4;margin:0}
+html[data-cra1-theme="member"] .cra1-articles h2 {font-size:24px;line-height:1.5;margin:0;overflow-wrap:anywhere}
+html[data-cra1-theme="member"] .cra1-articles__heading {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+html[data-cra1-theme="member"] .cra1-articles__heading p {color:#61656b;margin:8px 0 0}
+html[data-cra1-theme="member"] .cra1-articles__search {display:flex;gap:10px;max-width:520px;margin-bottom:20px}
+html[data-cra1-theme="member"] .cra1-articles__search input {flex:1;min-width:0;font-size:14px}
+html[data-cra1-theme="member"] .cra1-articles__categories {display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+html[data-cra1-theme="member"] .cra1-articles__categories button {border:0;border-radius:8px;padding:8px 14px;background:transparent;color:#4b525a;cursor:pointer;font:inherit}
+html[data-cra1-theme="member"] .cra1-articles__categories button[aria-current] {background:#35383c;color:#fff}
+html[data-cra1-theme="member"] .cra1-articles__category-status {display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;color:#61656b;padding:0 4px;min-width:0}
+html[data-cra1-theme="member"] .cra1-articles__category-status button {color:#70582e;text-decoration:underline;text-underline-offset:3px}
+html[data-cra1-theme="member"] .cra1-articles__list {margin:0;padding:0 24px;list-style:none}
+html[data-cra1-theme="member"] .cra1-articles__list li+li {border-top:1px solid #eef0f1}
+html[data-cra1-theme="member"] .cra1-articles__list a {display:flex;align-items:center;gap:20px;padding:22px 0;color:inherit;text-decoration:none}
+html[data-cra1-theme="member"] .cra1-articles__list a>span:first-child {flex:1;min-width:0;overflow-wrap:anywhere;font-weight:550}
+html[data-cra1-theme="member"] .cra1-articles__list time {color:#61656b;font-size:13px;white-space:nowrap}
+html[data-cra1-theme="member"] .cra1-articles__list a>span:last-child {color:#876e40;font-size:20px}
+html[data-cra1-theme="member"] .cra1-articles__empty {padding:40px 20px;text-align:center;color:#61656b}
+html[data-cra1-theme="member"] .cra1-articles__pagination {display:flex;gap:20px;align-items:center;justify-content:center;margin-top:24px}
+html[data-cra1-theme="member"] .cra1-articles__detail {padding:32px}
+html[data-cra1-theme="member"] .cra1-articles__meta {display:flex;gap:16px;color:#61656b;font-size:13px;margin:12px 0 28px}
+html[data-cra1-theme="member"] .cra1-articles__body {font-size:15px;overflow-wrap:anywhere;overflow:auto}
+html[data-cra1-theme="member"] .cra1-articles__body p {margin:0 0 16px}
+html[data-cra1-theme="member"] :is(.cra1-articles__body,.cra1-articles__attachments,.cra1-articles__adjacent) a {color:#70582e;text-decoration:underline;text-underline-offset:3px}
+html[data-cra1-theme="member"] :is(.cra1-articles__body,.cra1-articles__attachments,.cra1-articles__adjacent) a:hover {color:#35383c}
+html[data-cra1-theme="member"] .cra1-articles__body img {max-width:100%;height:auto}
+html[data-cra1-theme="member"] .cra1-articles__body pre {overflow:auto;white-space:pre-wrap}
+html[data-cra1-theme="member"] .cra1-articles__attachments,html[data-cra1-theme="member"] .cra1-articles__adjacent {display:grid;gap:12px;border-top:1px solid #eef0f1;margin-top:24px;padding-top:20px}
+html[data-cra1-theme="member"] .cra1-articles :is(a,button,input):focus-visible {outline:2px solid #876e40;outline-offset:3px}
+@media(max-width:767px) {
+  html[data-cra1-theme="member"] .cra1-articles {padding:20px 12px}
+  html[data-cra1-theme="member"] .cra1-articles h1,html[data-cra1-theme="member"] .cra1-articles h2 {font-size:20px}
+  html[data-cra1-theme="member"] .cra1-articles__heading {align-items:flex-start;flex-wrap:wrap}
+  html[data-cra1-theme="member"] .cra1-articles__list {padding:0 16px}
+  html[data-cra1-theme="member"] .cra1-articles__list a {flex-wrap:wrap;gap:8px 12px;padding:18px 0}
+  html[data-cra1-theme="member"] .cra1-articles__list a>span:first-child {flex-basis:100%}
+  html[data-cra1-theme="member"] .cra1-articles__list time {flex:1}
+  html[data-cra1-theme="member"] .cra1-articles__detail {padding:22px 18px}
+}
+/* Native plugin rem values target a 100px root. CRA1 retains V10's adaptive
+   root for layout; use px for readable copy instead of resizing that root. */
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartNews"] .news :is(.total,.file_folder .item) {font-size:14px;line-height:22px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartNews"] .news .file_folder .item {min-height:32px;padding:5px 0 5px 12px;margin-bottom:4px;box-sizing:border-box;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartNews"] .news .file_folder .item::before {height:16px;top:50%;transform:translateY(-50%);}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartNews"] .news :is(.tit,.top-search .tit) {font-size:18px;line-height:26px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartNews"] .news .news-list .item-right {min-width:0;height:auto;min-height:70px;padding-bottom:12px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartNews"] .news .news-list .title {font-size:16px;line-height:24px;overflow-wrap:anywhere;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartNews"] .news .news-list .info {font-size:13px;line-height:20px;color:var(--cui-muted);}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartNews"] .news_detail .page .link {height:auto;min-height:24px;line-height:22px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartNews"] .news_detail .page .link a {font-size:14px;line-height:22px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] :is(.help,.help-total) .main-card-title {height:auto;min-height:28px;line-height:28px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .main-card .main-card-top .top-menu-item {font-size:14px;line-height:22px;padding-top:6px;padding-bottom:6px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help .main-card .content-item-title {font-size:18px;line-height:26px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help .main-card .content-item-link .link-item {font-size:14px;line-height:22px;margin-top:8px;white-space:normal;overflow-wrap:anywhere;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help .main-card .content-item {padding-bottom:64px;min-width:0;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help .main-card .more-btn {min-height:36px;font-size:13px;bottom:12px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .content-left-text {font-size:16px;line-height:24px;height:auto;padding:12px;box-sizing:border-box;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .right-title {font-size:24px;line-height:1.5;overflow-wrap:anywhere;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .right-keywords-time {flex-wrap:wrap;gap:6px 16px;margin-top:10px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card :is(.right-time,.right-keywords) {font-size:13px;line-height:20px;color:var(--cui-muted);margin:0;overflow-wrap:anywhere;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card :is(.right-content,.right-attachment,.page) {font-size:14px;line-height:24px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .page {flex-wrap:wrap;gap:12px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartCertification"] .main-card {font-size:14px;line-height:1.6;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartCertification"] .main-card :is(.content-title,.type-title) {font-size:18px;line-height:26px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartCertification"] .main-card .check-type {flex-wrap:wrap;gap:20px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartCertification"] .main-card .check-type>div {flex:1 1 260px;width:auto;min-width:0;height:auto;min-height:220px;padding:24px 16px;box-sizing:border-box;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartCertification"] .main-card .check-type>div:has(.presonl-status) {padding-bottom:52px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartCertification"] .main-card .type-title {margin:16px 0 12px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartCertification"] .main-card .type-tips {width:100%;max-width:440px;font-size:14px;line-height:22px;margin:0;overflow-wrap:anywhere;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartCertification"] .main-card :is(.presonl-status,.status-tips,.status-info,.status-info p,.font-14,.red-text,.left-box1 p,.sao-text p,.table-box td,.el-link,.el-button) {font-size:14px;line-height:22px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartCertification"] .main-card .presonl-status {height:32px;line-height:32px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartCertification"] .main-card :is(.status-title,.title-blue,.title-green) {font-size:24px;line-height:32px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .addAccount-box :is(.title,.notice-title,.tree-title) {font-size:16px;line-height:24px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .el-form-item__label {font-size:14px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .tree-box :is(.tree,.el-tree) {min-width:0;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .tree-box .el-tree-node__content {height:auto;min-height:32px;padding-top:4px;padding-bottom:4px;box-sizing:border-box;align-items:flex-start;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .tree-box .el-tree-node__label {min-width:0;white-space:normal;overflow-wrap:anywhere;font-size:14px;line-height:22px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .tree-box .el-checkbox {flex:none;min-height:18px;height:18px;line-height:18px;margin-top:2px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .addAccount-footer button {width:auto;min-width:84px;min-height:40px;padding:8px 18px;font-size:14px;line-height:22px;border-radius:var(--cui-radius-control);box-sizing:border-box;}
+/* The native pagination has important rem declarations. Counter only those
+   declarations here; keep its component, page events and disabled behavior. */
+html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination {flex-wrap:wrap;gap:8px 0;overflow:visible;white-space:normal;font-size:13px;}
+html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination :is(.el-pager li,.el-pagination__jump,.page-total) {font-size:13px!important;}
+html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination :is(.el-pager li,.btn-prev,.btn-next) {width:auto;min-width:36px;min-height:36px;height:auto;line-height:34px;box-sizing:border-box;}
+html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination :is(.el-pagination__jump,.el-pagination__sizes) {display:inline-flex;align-items:center;height:auto;line-height:40px;}
+html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-pagination__jump {order:1;}
+html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-input__inner {height:40px!important;font-size:13px;}
+html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-pagination__editor {width:48px;height:auto;}
+html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-input__icon {line-height:40px;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartDomain"] .tem-form .sub-box .el-button {font-size:14px;line-height:20px;background:var(--cui-button-gradient);color:var(--cui-button-ink);border-color:var(--cui-titanium);border-radius:var(--cui-radius-control);}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartDomain"] .tem-form .sub-box .el-button:disabled {opacity:.5;cursor:not-allowed;}
+html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartDomain"] #domain .content-box .el-tabs__item {font-size:14px;}
+html[data-cra1-theme="cart"] .cart-page :is(.register-type .reg-ridio,.domain-one .search-title,.start-search>p,.car-top>span) {font-size:14px;line-height:22px;}
+html[data-cra1-theme="cart"] .cart-page .domain-box .domain-content .domain-left :is(.domain-one,.batch-box .batch-main) .search-title,
+html[data-cra1-theme="cart"] .cart-page .domain-box .domain-content .domain-left .domain-one .start-search p {font-size:14px;line-height:22px;}
+@media(max-width:767px) {
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .bom .el-select:first-child {min-width:120px;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .phone-box .el-select {flex:0 0 110px;min-width:110px;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .phone-box .el-form-item__content>.el-input {flex:1;min-width:0;width:0;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .tree-box .el-tree-node__content {min-height:44px;padding-top:0;padding-bottom:0;align-items:center;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .tree-box .el-checkbox {min-height:44px;height:44px;margin-top:0;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .addAccount-footer button {min-height:44px;}
+ html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination :is(.el-pager li,.btn-prev,.btn-next) {min-width:44px;min-height:44px;line-height:42px;}
+ html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-input__inner {height:44px!important;}
+ html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-pagination__sizes {display:none;}
+ html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-pagination__jump {margin-left:8px;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help .main-card .more-btn {min-height:44px;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .main-card-content {flex-direction:column;overflow:visible;gap:16px;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card :is(.content-left,.contnet-right-out,.content-right) {width:100%;min-width:0;max-width:100%;margin-left:0;box-sizing:border-box;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .content-left {max-height:240px;overflow:auto;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .content-right {padding:20px 16px;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .page {margin-left:0;}
+}

@@ -1,0 +1,13 @@
+{if ( !isset($data.cra1.show_news_classify_nav) || $data.cra1.show_news_classify_nav == 1 ) }
+        <section class="container-page pb-2" data-reveal aria-label="内容导航">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {foreach $data.cra1.news_classify_nav as $row}
+                <a href="{$row.url|default='/'}" class="feature-item glass-card group rounded-xl p-6 lift-card cui-card">
+                    <h3 class="font-semibold text-ink group-hover:text-primary">{$row.name}</h3>
+                    <p class="mt-2 text-sm leading-6 text-body">{$row.desc}</p>
+                    <span class="card-arrow mt-4 inline-block text-sm text-primary">进入 <span aria-hidden="true">→</span></span>
+                </a>
+                {/foreach}
+            </div>
+        </section>
+        {/if}

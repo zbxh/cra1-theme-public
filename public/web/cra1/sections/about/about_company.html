@@ -1,0 +1,37 @@
+{if ( isset($data.config.enterprise_name) && $data.config.enterprise_name ) }
+        <section class="container-page py-12 md:py-16" data-reveal aria-label="企业信息">
+            <div class="grid gap-8 lg:grid-cols-[1fr_360px]">
+                <article class="min-w-0">
+                    <h2 class="section-title mt-4">{if ( cra1_content_explicit($data.cra1, 'about_company_copy.title') || (( isset($data.cra1.about_company_copy['title']) && $data.cra1.about_company_copy['title'] )) ) }{$data.cra1.about_company_copy['title']}{else /}企业信息{/if}</h2>
+                    <p class="section-desc">{if ( cra1_content_explicit($data.cra1, 'about_company_copy.desc') || (( isset($data.cra1.about_company_copy['desc']) && $data.cra1.about_company_copy['desc'] )) ) }{$data.cra1.about_company_copy['desc']}{else /}以下信息来自站点的真实配置；未配置的字段不会被虚构展示。{/if}</p>
+                    <div class="band mt-8 border-l-4 border-primary bg-white/70 px-5 py-4 text-lg font-semibold text-ink">
+                        {$data.config.enterprise_name}
+                    </div>
+                </article>
+
+                <aside class="glass-card p-6 cui-card" aria-label="{if ( cra1_content_explicit($data.cra1, 'about_company_copy.txt1') || (( isset($data.cra1.about_company_copy['txt1']) && $data.cra1.about_company_copy['txt1'] )) ) }{$data.cra1.about_company_copy['txt1']}{else /}企业联系信息{/if}">
+                    <h2 class="text-lg font-semibold text-ink">{if ( cra1_content_explicit($data.cra1, 'about_company_copy.title2') || (( isset($data.cra1.about_company_copy['title2']) && $data.cra1.about_company_copy['title2'] )) ) }{$data.cra1.about_company_copy['title2']}{else /}联系信息{/if}</h2>
+                    <dl class="mt-5 space-y-4 text-sm">
+                        <div>
+                            <dt class="text-muted">企业名称</dt>
+                            <dd class="mt-1 break-words text-body">
+                                {if ( isset($data.config.enterprise_name) && $data.config.enterprise_name ) }{$data.config.enterprise_name}{else /}<span x-data x-text="$store.site.pick('enterprise_name', '—')"></span>{/if}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-muted">联系电话</dt>
+                            <dd class="mt-1 break-words text-body">
+                                {if ( isset($data.config.enterprise_telephone) && $data.config.enterprise_telephone ) }{$data.config.enterprise_telephone}{else /}<span x-data x-text="$store.site.pick('enterprise_telephone', '—')"></span>{/if}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-muted">联系邮箱</dt>
+                            <dd class="mt-1 break-words text-body">
+                                {if ( isset($data.config.enterprise_mailbox) && $data.config.enterprise_mailbox ) }{$data.config.enterprise_mailbox}{else /}<span x-data x-text="$store.site.pick('enterprise_mailbox', '—')"></span>{/if}
+                            </dd>
+                        </div>
+                    </dl>
+                </aside>
+            </div>
+        </section>
+        {/if}

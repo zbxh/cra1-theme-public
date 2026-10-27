@@ -1,0 +1,39 @@
+{if ( isset($data.cra1.show_stack_board) && $data.cra1.show_stack_board == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'stack_board_rows') || (( isset($data.cra1.stack_board_rows) && count($data.cra1.stack_board_rows) > 0 )) ) }
+<!-- 布局 P：分层堆叠板——自上而下的层级条（每层占满整宽、层间错位缩进），
+     表达「架构分层 / 能力分层」，与网格、列表都不同 -->
+<section class="relative overflow-hidden bg-surface-alt py-14 md:py-20">
+    <div class="container-page">
+        <div class="section-heading" data-reveal>
+            <div class="section-heading-copy">
+                <h2 class="section-title">{$data.cra1.stack_board_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'stack_board_desc') || (( isset($data.cra1.stack_board_desc) && $data.cra1.stack_board_desc )) ) }
+                <p class="section-desc">{$data.cra1.stack_board_desc}</p>
+                {/if}
+            </div>
+            {if ( isset($data.cra1.stack_board_link) && $data.cra1.stack_board_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'stack_board_more_text', '查看架构说明') != '' ) }<a href="{$data.cra1.stack_board_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'stack_board_more_text', '查看架构说明')} →</a>{/if}
+            {/if}
+        </div>
+        <div class="mt-9 space-y-2.5">
+            {foreach $data.cra1.stack_board_rows as $sb => $sbr}
+            <!-- stack-bar：交给 rise 机制（层序收敛升起）。
+                 这里不用 data-reveal —— 入场机制的子项选择器会排除 [data-reveal] 元素，
+                 同时挂两个属性会让本项退回"整块淡入"，机制失效。 -->
+            <div class="stack-bar flex flex-col gap-3 border border-line bg-white px-5 py-4 md:flex-row md:items-center md:gap-6 md:px-7"
+                 style="margin-left:{:min($sb * 0.75, 4.5)}rem">
+                <p class="flex w-full shrink-0 items-center gap-2.5 md:w-52">
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-brand/10 text-[11px] font-semibold tabular-nums text-brand">{:str_pad($sb + 1, 2, '0', STR_PAD_LEFT)}</span>
+                    <span class="min-w-0 truncate text-sm font-semibold text-ink">{$sbr['icon_tile']|default=''|raw}{$sbr['name']}</span>
+                </p>
+                <p class="min-w-0 flex-1 text-sm leading-6 text-body">{$sbr['desc']}</p>
+                {if $sbr['tag']}
+                <p class="shrink-0"><span class="border border-line bg-surface-alt px-2 py-0.5 text-[11px] text-body">{$sbr['tag']}</span></p>
+                {/if}
+            </div>
+            {/foreach}
+        </div>
+    </div>
+</section>
+{/if}
+{/if}

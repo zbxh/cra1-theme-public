@@ -1,0 +1,71 @@
+    {if ( isset($data.cra1.show_capability) && $data.cra1.show_capability == 1 ) }
+    <!-- 与下方「产品与价格」区块同底色连体：无投影、无底边框，内容垂直居中；
+         capability-ambient 提供与下方区块重合的光晕/雾气镜像层，使动态背景跨接缝连续。
+         这里的两团雾气是"下半部分"，由 CSS 锚定在本区块底部之下，与下方区块的同名层拼合。 -->
+    <section class="capability-ambient relative bg-surface-alt">
+        <div class="mist mist-a" aria-hidden="true"></div>
+        <div class="mist mist-b" aria-hidden="true"></div>
+        <div class="container-page">
+            <div class="promo-strip grid lg:grid-cols-[1.05fr_1.95fr]">
+                <div class="promo-panel promo-panel-hover flex flex-col justify-center overflow-hidden">
+                    {if ( cra1_content_value($data.cra1, 'cap1_link', '/cart/goodsList.htm') != '' ) }<a href="{:cra1_content_value($data.cra1, 'cap1_link', '/cart/goodsList.htm')}" class="promo-head group block px-3 pt-3 md:px-4">
+                        <span class="inline-flex items-center gap-1 text-lg font-bold text-ink transition-colors duration-150 group-hover:text-brand">
+                            {:cra1_content_value($data.cra1, 'cap1_title', '丰富的云产品矩阵')}
+                            <svg class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+                        </span>
+                        {if ( cra1_content_explicit($data.cra1, 'cap1_desc') || (( isset($data.cra1.cap1_desc) && $data.cra1.cap1_desc )) ) }
+                        <span class="mt-1 block text-xs leading-5 text-body">{$data.cra1.cap1_desc}</span>
+                        {/if}
+                    </a>{/if}
+                    <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 px-3 pb-2 pt-1 sm:grid-cols-3 md:px-4">
+                        {foreach $data.cra1.panel_links as $pl}
+                        <a href="{$pl.url}" class="cap-quick group/quick">
+                            <span class="truncate transition-colors duration-150 group-hover/quick:text-brand"> {$pl.name}</span>
+                            <svg class="h-3 w-3 shrink-0 text-muted transition-colors duration-150 group-hover/quick:text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+                        </a>
+                        {/foreach}
+                    </div>
+                </div>
+                <!-- 手机端：只保留左侧「云产品矩阵」面板并全宽展示，右侧功能卡仅平板及以上显示 -->
+                <div class="promo-panel hidden overflow-hidden sm:grid sm:grid-cols-3">
+                    <!-- 功能卡：可增删（v2.42）。配置化行数据优先；为空时回退旧 cap2~cap4 三键（历史配置兼容）。
+                         配色由服务端按序分配（brand/success/warning 轮转），不提供任意色值入口。
+                         分隔线由 .promo-entry-divided 的伪元素提供，首卡不加该类。 -->
+                        {if ( cra1_content_explicit($data.cra1, 'cap_cards') || (( count($data.cra1.cap_cards) > 0 )) ) }
+                        {foreach $data.cra1.cap_cards as $ci => $cc}
+                        <a href="{$cc.url}" class="promo-entry group{if $ci > 0} promo-entry-divided{/if}">
+                            <span class="promo-icon promo-icon-{$cc.tone}" data-cra1-icon-label="{$cc.name|htmlspecialchars}" {$cc.icon_style_attrs|default=''|raw}>
+                                {if ( !empty($cc.icon_img) && $cc.icon_png == 1 ) }<img src="{$cc.icon_img}" alt="" class="h-5 w-5">{elseif ( !empty($cc.icon_img) ) }<span class="icon-img h-5 w-5" style="--icon:url('{$cc.icon_img}')" aria-hidden="true"></span>{else /}<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l3 2"></path></svg>{/if}
+                            </span>
+                            <span class="mt-3 block truncate text-sm font-semibold text-ink transition-colors duration-150 group-hover:text-brand">{$cc.name}</span>
+                            <span class="mt-1 line-clamp-2 block text-xs leading-5 text-body">{$cc.desc}</span>
+                        </a>
+                        {/foreach}
+                        {else /}
+                        {if ( cra1_content_value($data.cra1, 'cap2_link', '/dedicated.html') != '' ) }<a href="{:cra1_content_value($data.cra1, 'cap2_link', '/dedicated.html')}" class="promo-entry group">
+                            <span class="promo-icon promo-icon-brand" data-cra1-icon-label="{:htmlspecialchars(cra1_content_value($data.cra1, 'cap2_title', '高性能基础设施'), ENT_QUOTES, 'UTF-8')}">
+                                {if ( cra1_content_explicit($data.cra1, 'cap2_icon_url') || (( !empty($data.cra1.cap2_icon_url) && $data.cra1.cap2_icon_png == 1 )) ) }<img src="{$data.cra1.cap2_icon_url}" alt="" class="h-5 w-5">{elseif ( !empty($data.cra1.cap2_icon_url) ) }<span class="icon-img h-5 w-5" style="--icon:url('{$data.cra1.cap2_icon_url}')" aria-hidden="true"></span>{else /}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="2"></rect><rect x="2" y="13" width="20" height="7" rx="2"></rect><path d="M6 7.5h.01M6 16.5h.01"></path></svg>{/if}
+                            </span>
+                            <span class="mt-3 block truncate text-sm font-semibold text-ink transition-colors duration-150 group-hover:text-brand">{:cra1_content_value($data.cra1, 'cap2_title', '高性能基础设施')}</span>
+                            <span class="mt-1 line-clamp-2 block text-xs leading-5 text-body">{$data.cra1.cap2_desc}</span>
+                        </a>{/if}
+                        {if ( cra1_content_value($data.cra1, 'cap3_link', '/service-guarantee.html') != '' ) }<a href="{:cra1_content_value($data.cra1, 'cap3_link', '/service-guarantee.html')}" class="promo-entry promo-entry-divided group">
+                            <span class="promo-icon promo-icon-success" data-cra1-icon-label="{:htmlspecialchars(cra1_content_value($data.cra1, 'cap3_title', '服务与支持'), ENT_QUOTES, 'UTF-8')}">
+                                {if ( cra1_content_explicit($data.cra1, 'cap3_icon_url') || (( !empty($data.cra1.cap3_icon_url) && $data.cra1.cap3_icon_png == 1 )) ) }<img src="{$data.cra1.cap3_icon_url}" alt="" class="h-5 w-5">{elseif ( !empty($data.cra1.cap3_icon_url) ) }<span class="icon-img h-5 w-5" style="--icon:url('{$data.cra1.cap3_icon_url}')" aria-hidden="true"></span>{else /}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.5 2.7 7.8 7 10 4.3-2.2 7-5.5 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>{/if}
+                            </span>
+                            <span class="mt-3 block truncate text-sm font-semibold text-ink transition-colors duration-150 group-hover:text-brand">{:cra1_content_value($data.cra1, 'cap3_title', '服务与支持')}</span>
+                            <span class="mt-1 line-clamp-2 block text-xs leading-5 text-body">{$data.cra1.cap3_desc}</span>
+                        </a>{/if}
+                        {if ( cra1_content_value($data.cra1, 'cap4_link', '/contact.html') != '' ) }<a href="{:cra1_content_value($data.cra1, 'cap4_link', '/contact.html')}" class="promo-entry promo-entry-divided group">
+                            <span class="promo-icon promo-icon-warning" data-cra1-icon-label="{:htmlspecialchars(cra1_content_value($data.cra1, 'cap4_title', '企业咨询'), ENT_QUOTES, 'UTF-8')}">
+                                {if ( cra1_content_explicit($data.cra1, 'cap4_icon_url') || (( !empty($data.cra1.cap4_icon_url) && $data.cra1.cap4_icon_png == 1 )) ) }<img src="{$data.cra1.cap4_icon_url}" alt="" class="h-5 w-5">{elseif ( !empty($data.cra1.cap4_icon_url) ) }<span class="icon-img h-5 w-5" style="--icon:url('{$data.cra1.cap4_icon_url}')" aria-hidden="true"></span>{else /}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"></path></svg>{/if}
+                            </span>
+                            <span class="mt-3 block truncate text-sm font-semibold text-ink transition-colors duration-150 group-hover:text-brand">{:cra1_content_value($data.cra1, 'cap4_title', '企业咨询')}</span>
+                            <span class="mt-1 line-clamp-2 block text-xs leading-5 text-body">{$data.cra1.cap4_desc}</span>
+                        </a>{/if}
+                        {/if}
+                </div>
+            </div>
+        </div>
+    </section>
+    {/if}

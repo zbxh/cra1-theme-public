@@ -1,0 +1,10 @@
+{
+  "format": 1,
+  "patches": [
+    "cra1-theme/backend/Compatibility/KnownContracts.php",
+    "cra1-theme/backend/Compatibility/native-contracts.json",
+    "cra1-theme/backend/Release/Inspector.php",
+    "cra1-theme/backend/Release/Manifest.php",
+    "cra1-theme/backend/Release/Updater.php"
+  ]
+}

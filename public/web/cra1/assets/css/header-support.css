@@ -1,0 +1,54 @@
+/* Generated from public/cra1-shared/src. Edit the source and rebuild. */
+/* 官网顶栏客服与文档入口：操作区中独立的轻量下拉框。 */
+.cra1-header-support { position: relative; display: flex; align-items: center; flex: 0 0 auto; }
+.cra1-header-support__trigger, .cra1-header-docs {
+  display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;
+  height: 30px; padding: 0; border: 0; border-radius: 4px;
+  background: transparent; color: var(--ink, #162033); text-decoration: none; cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+.cra1-header-support__trigger { width: 30px; }
+.cra1-header-support__trigger svg { width: 18px; height: 18px; }
+.cra1-header-docs { min-width: 38px; padding: 0 6px; font-size: 13px; white-space: nowrap; }
+.cra1-header-support__trigger:hover, .cra1-header-support__trigger.is-active, .cra1-header-docs:hover {
+  color: var(--brand, #1769e0); background: var(--surface-alt, #f4f7fb);
+}
+.cra1-header-support__panel {
+  position: absolute; top: calc(100% + 17px); right: 0; z-index: 55;
+  width: 256px; max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 88px); overflow-y: auto; overscroll-behavior: contain;
+  border: 1px solid var(--line, #e5e8ed); border-radius: 8px;
+  background: #fff; box-shadow: 0 12px 36px rgba(15, 23, 42, .12);
+}
+/* 填满图标与面板之间的空隙，鼠标移入面板时保持展开。 */
+.cra1-header-support::after { content: ''; position: absolute; top: 100%; right: 0; width: 30px; height: 18px; }
+.cra1-header-support__section { padding: 14px; }
+.cra1-header-support__section + .cra1-header-support__section { border-top: 1px solid var(--line, #e5e8ed); }
+.cra1-header-support__title { margin: 0; padding: 0 8px 7px; color: var(--muted, #86909c); font-size: 12px; line-height: 20px; }
+.cra1-header-support__item {
+  display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 7px 8px;
+  width: 100%; border: 0; border-radius: 4px; background: transparent;
+  color: var(--ink, #162033); font: inherit; font-size: 13px; line-height: 20px; text-align: left; text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+.cra1-header-support__item svg { width: 16px; height: 16px; flex: 0 0 16px; }
+.cra1-header-support__icon { width: 16px; height: 16px; flex: 0 0 16px; object-fit: contain; }
+button.cra1-header-support__item { cursor: pointer; }
+.cra1-header-support__item--text:hover { color: var(--ink, #162033); background: transparent; }
+.cra1-header-support__status { margin: 0; padding: 10px 22px; border-top: 1px solid var(--line, #e5e8ed); color: var(--brand, #1769e0); font-size: 12px; }
+.cra1-header-support__item span { min-width: 0; overflow-wrap: anywhere; }
+a.cra1-header-support__item:hover, button.cra1-header-support__item:hover { color: var(--brand, #1769e0); background: var(--surface-alt, #f4f7fb); }
+.cra1-header-support__trigger:focus-visible, .cra1-header-support__item:focus-visible, .cra1-header-docs:focus-visible {
+  outline: 2px solid var(--brand, #1769e0); outline-offset: 2px;
+}
+.cra1-header-support [x-cloak] { display: none !important; }
+@media (max-width: 767px) {
+  .cra1-site-header__actions { gap: 2px; }
+  .cra1-header-support__trigger, .cra1-header-docs { width: 44px; height: 44px; }
+  .cra1-header-support__panel { position: fixed; top: 72px; left: 12px; right: 12px; width: auto; }
+  .cra1-header-support__item { min-height: 44px; }
+  .cra1-header-support::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cra1-header-support__trigger, .cra1-header-docs, .cra1-header-support__item { transition: none; }
+}

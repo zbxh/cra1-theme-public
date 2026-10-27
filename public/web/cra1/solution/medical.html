@@ -1,0 +1,31 @@
+{include file="header"}
+</head>
+
+<body>
+    <!-- 跳转到主内容：必须是 body 内第一个可聚焦元素（header 在 DOM 中先于 main，
+         若放在 main 前会让键盘用户先 Tab 过整条导航）。 -->
+    <a href="#main-content" class="skip-link">跳转到主内容</a>
+    <header>{include file="public/header"}</header>
+
+    <main id="main-content">
+
+    <section class="page-hero">
+        <div class="container-page py-14 md:py-20">
+                <nav class="breadcrumb text-sm text-muted" aria-label="面包屑">
+                    <a href="/" class="hover:text-primary">首页</a><span>/</span><a href="/solution.html" class="hover:text-primary">解决方案</a><span>/</span><span aria-current="page">智慧医疗解决方案</span>
+                </nav><div class="service-hero-grid"><div class="service-hero-copy">
+            <h1 class="mt-4 text-3xl font-bold tracking-tight text-ink md:text-5xl">{$data.cra1.page_hero_title}</h1>
+
+            <p class="mt-4 max-w-2xl leading-7 text-body">{$data.cra1.page_hero_desc}</p>
+            <div class="mt-8 flex flex-wrap gap-4">
+                {if ( cra1_content_value($data.cra1, 'page_hero_btn1_url', '/cart/goodsList.htm') != '' ) }<a href="{:cra1_content_value($data.cra1, 'page_hero_btn1_url', '/cart/goodsList.htm')}" class="btn-gradient btn cui-button cui-button--primary">{:cra1_content_value($data.cra1, 'page_hero_btn1_text', '立即上云')}<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a>{/if}
+                {if ( cra1_content_value($data.cra1, 'page_hero_btn2_url', '/contact.html') != '' ) }<a href="{:cra1_content_value($data.cra1, 'page_hero_btn2_url', '/contact.html')}" class="btn btn-outline btn-primary cui-button cui-button--outline">{:cra1_content_value($data.cra1, 'page_hero_btn2_text', '咨询方案')}<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>{/if}
+            </div>
+        </div>{$data.cra1.page_hero_art|default=''|raw}</div></div>
+    </section>
+
+
+        {$data.cra1.page_modules_html|raw}
+</main>
+
+    {include file="footer"}

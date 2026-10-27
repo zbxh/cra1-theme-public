@@ -1,0 +1,57 @@
+    {if ( isset($data.cra1.show_pricing) && $data.cra1.show_pricing == 1 ) }
+    <section id="pricing" class="ambient ambient-seam relative overflow-hidden bg-gradient-to-b from-surface-alt via-surface to-surface-alt py-16 md:py-24">
+        <div class="mist mist-a" aria-hidden="true"></div>
+        <div class="mist mist-b" aria-hidden="true"></div>
+        <div class="container-page">
+            <div class="flex flex-wrap items-end justify-between gap-4" data-reveal>
+                <div class="max-w-xl">
+                    <h2 class="section-title">{if ( cra1_content_explicit($data.cra1, 'pricing_title') || (( isset($data.cra1.pricing_title) && $data.cra1.pricing_title )) ) }{$data.cra1.pricing_title}{else /}选择适合业务的云产品{/if}</h2>
+                    {if ( cra1_content_explicit($data.cra1, 'pricing_desc') || (( isset($data.cra1.pricing_desc) && $data.cra1.pricing_desc )) ) }
+                    <p class="section-desc">{$data.cra1.pricing_desc}</p>
+                    {/if}
+                </div>
+                {if ( cra1_content_value($data.cra1, 'pricing_link', '/cart/goodsList.htm') != '' ) }<a href="{:cra1_content_value($data.cra1, 'pricing_link', '/cart/goodsList.htm')}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'pricing_more_text', '查看全部商品')} →</a>{/if}
+            </div>
+            <div class="mt-10 grid gap-8 lg:grid-cols-[13rem_minmax(0,1fr)]">
+                <div class="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0" x-cloak x-show="productGroups.length">
+                    <button type="button" class="rail-link" :class="activeGroup === 0 ? 'rail-link-active' : ''" @click="fetchProducts(0)">全部产品</button>
+                    <template x-for="g in productGroups" :key="g.id">
+                        <button type="button" class="rail-link whitespace-nowrap" :class="activeGroup === g.id ? 'rail-link-active' : ''" @click="fetchProducts(g.id)" x-text="g.name"></button>
+                    </template>
+                </div>
+                <div class="grid content-start gap-4 sm:grid-cols-2" x-ref="productGrid">
+                    <template x-for="i in 4" :key="'sk' + i"><div class="product-card cui-card" x-cloak x-show="loadingProducts"><div class="skeleton-line h-4 w-2/3"></div><div class="skeleton-line mt-4 h-3 w-full"></div><div class="skeleton-line mt-2 h-3 w-4/5"></div><div class="skeleton-line mt-8 h-9 w-full"></div></div></template>
+                    <!-- 手机端只显示前 N 个（后台可配，默认 3），PC 端不受影响。
+                         data-enter-item：标记"参与重渲染入场"的项，分组切换后由 animateProducts() 播动画。 -->
+                    <template x-for="(p, pi) in products" :key="p.id">
+                        <article data-enter-item class="product-card lift-card ring-sheen cui-card" :class="{ 'hide-on-mobile': !mobileProductsAll && pi >= productMobileLimit, 'product-card-featured': !!p.tag, 'cui-card--featured': !!p.tag }">
+                            <div class="flex items-center justify-between gap-3">
+                                <h3 class="product-card-title text-base font-semibold text-ink" x-text="p.name"></h3>
+                                <span class="shrink-0 text-xs font-medium text-brand" x-show="p.tag" x-text="p.tag"></span>
+                                <span class="shrink-0 text-xs text-muted" x-show="!p.tag" x-text="p.pay_type === 'free' ? '免费' : (p.cycle || '按需')"></span>
+                            </div>
+                            <p class="product-card-desc text-sm leading-6 text-body" x-show="productDescription(p) && !productSpecs(p).length" x-text="productDescription(p)"></p><ul class="product-card-specs" x-show="productSpecs(p).length"><template x-for="(spec, si) in productSpecs(p)" :key="si"><li x-text="spec"></li></template></ul>
+                            <div class="product-card-price flex items-center justify-between gap-3">
+                                <div class="flex items-baseline gap-1"><span class="text-xs text-muted">起</span><span class="text-2xl font-semibold text-ink" x-text="(p.price === '' || p.price === null || p.price === undefined) ? '咨询' : ('￥' + p.price)"></span><span class="text-xs text-muted" x-show="p.cycle" x-text="' / ' + p.cycle"></span><span class="text-xs text-muted" x-show="!p.cycle && p.price !== '' && p.price !== null && p.price !== undefined">周期见配置</span></div>
+                                <a :href="productUrl(p)" class="btn btn-outline btn-primary btn-sm shrink-0 cui-button cui-button--outline cui-button--sm">查看配置<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>
+                            </div>
+                        </article>
+                    </template>
+                </div>
+            </div>
+            <!-- 手机端：还有更多产品时显示「加载更多」文字按钮 -->
+            <div class="mt-8 text-center sm:hidden" x-cloak x-show="!loadingProducts && products.length > productMobileLimit">
+                <!-- min-h-6 + py：全局 24px 触控规则只覆盖 main a[...]，按钮需显式声明（§10.2）
+                     @click 里追加 animateProducts()：展开的第 4..N 张卡此前是 display 瞬切，
+                     现在与分组切换走同一套错落入场（两处切换点视觉一致）。 -->
+                <button type="button" class="inline-flex min-h-6 items-center gap-1 py-0.5 text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover"
+                        @click="toggleProducts()" :aria-expanded="mobileProductsAll ? 'true' : 'false'">
+                    <span x-show="!mobileProductsAll">{if ( cra1_content_explicit($data.cra1, 'pricing_copy.load_more') || (( isset($data.cra1.pricing_copy['load_more']) && $data.cra1.pricing_copy['load_more'] )) ) }{$data.cra1.pricing_copy['load_more']}{else /}加载更多产品{/if}</span><span x-show="mobileProductsAll">收起产品</span>
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+                </button>
+            </div>
+            <div x-cloak x-show="!loadingProducts && productsFailed" class="empty-state text-center py-8" role="status"><p>暂时无法读取商品，请稍后重试</p><button type="button" class="empty-link" @click="loadProducts()">重新加载</button></div>
+            <div x-cloak x-show="!loadingProducts && !productsFailed && products.length === 0" class="empty-state mt-8">{if ( cra1_content_explicit($data.cra1, 'pricing_copy.empty_intro') || (( isset($data.cra1.pricing_copy['empty_intro']) && $data.cra1.pricing_copy['empty_intro'] )) ) }{$data.cra1.pricing_copy['empty_intro']}{else /}暂无可展示商品，请前往{/if}<a href="/cart/goodsList.htm" class="text-brand">商品目录</a>{if ( cra1_content_explicit($data.cra1, 'pricing_copy.txt2') || (( isset($data.cra1.pricing_copy['txt2']) && $data.cra1.pricing_copy['txt2'] )) ) }{$data.cra1.pricing_copy['txt2']}{else /}查看可用服务。{/if}</div>
+        </div>
+    </section>
+    {/if}

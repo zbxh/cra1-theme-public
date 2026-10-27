@@ -1,0 +1,76 @@
+{include file="header"}
+<script>window.__PAGE_DATA__ = {:json_encode(cra1_browser_page_data(isset($data) && is_array($data) ? $data : []), JSON_HEX_TAG | JSON_HEX_AMP)};</script>
+</head>
+
+<body class="cra1-marketing cra1-marketing--home" x-data="home">
+    <!-- 跳转到主内容：必须是 body 内第一个可聚焦元素（header 在 DOM 中先于 main，
+         若放在 main 前会让键盘用户先 Tab 过整条导航）。固定定位使其视觉上仍浮在顶部。 -->
+    <a href="#main-content" class="skip-link">跳转到主内容</a>
+<header>{include file="public/header"}</header>
+
+    <main id="main-content">
+    {if ( isset($data.cra1.slides) && count($data.cra1.slides) > 0 ) }
+    <section class="marketing-hero" x-data="heroCarousel" data-hero-mode="editorial" @mouseenter="stop()" @mouseleave="play()" @focusin="stop()" @focusout="if (!$el.contains($event.relatedTarget)) play()" aria-roledescription="轮播图" aria-label="活动推广">
+        <div class="marketing-hero-ambient" aria-hidden="true" inert>
+            <span class="marketing-hero-cloud marketing-hero-cloud--mint"></span>
+            <span class="marketing-hero-cloud marketing-hero-cloud--blue"></span>
+            <span class="marketing-hero-cloud marketing-hero-cloud--amber"></span>
+            <span class="marketing-hero-cloud marketing-hero-cloud--gold"></span>
+        </div>
+        <div class="container-page">
+            <div class="marketing-hero-grid">
+                <div class="marketing-hero-copy" x-ref="heroCopy" :aria-busy="copyBusy ? 'true' : null">
+                    <div class="marketing-hero-title-slot">
+                        <h1 data-hero-copy="title" x-text="copyCurrent().title">{$data.cra1.slides[0]['title']}</h1>
+                    </div>
+                    <div class="marketing-hero-description-slot">
+                        <p class="marketing-hero-description" data-hero-copy="description" x-text="copyCurrent().desc">{$data.cra1.slides[0]['desc']}</p>
+                    </div>
+                    <div class="marketing-hero-action" data-hero-copy="action" x-show="hasActions" :aria-disabled="copyBusy ? 'true' : null">
+                        <a class="btn btn-gradient cui-button cui-button--primary" href="{:htmlspecialchars($data.cra1.slides[0]['btn_url'] ?: $data.cra1.slides[0]['url'], ENT_QUOTES, 'UTF-8')}" :href="copyCurrent().btn_url || copyCurrent().url" x-show="copyCurrent().btn && (copyCurrent().btn_url || copyCurrent().url)" :tabindex="copyBusy ? -1 : null" @click="if (copyBusy) $event.preventDefault()"><span x-text="copyCurrent().btn">{$data.cra1.slides[0]['btn']}</span><span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a>
+                    </div>
+                </div>
+                <div class="marketing-hero-visual">
+                <div class="marketing-hero-media" x-ref="heroMedia" :data-effect="effect">
+                    <div class="marketing-slide-stage" x-ref="slideStage">
+                    {foreach $data.cra1.slides as $i => $slide}
+                    <div class="marketing-slide" data-slide-index="{$i}"{if $i > 0} style="display:none"{/if} :aria-hidden="index !== {$i}" :inert="index !== {$i}">
+                        {if preg_match('/\.(mp4|webm)(\?|#|$)/i', $slide['img'])}
+                        <video src="{$slide.img}"{if $i == 0} autoplay{/if} muted loop playsinline preload="metadata"></video>
+                        {else /}
+                        <picture>
+                            {php}$slideWebp = cra1_carousel_webp_source((string)$slide['img']);{/php}
+                            {if $slideWebp !== ''}<source srcset="{$slideWebp}" type="image/webp">{/if}
+                            <img src="{$slide.img}" alt="{$slide.title}"{if $i == 0} fetchpriority="high" loading="eager"{else /} loading="lazy"{/if} decoding="async">
+                        </picture>
+                        {/if}
+                        {if $slide.url}<a href="{$slide.url}" aria-label="{$slide.title}" :tabindex="index === {$i} ? 0 : -1"></a>{/if}
+                    </div>
+                    {/foreach}
+                    </div>
+                </div>
+                </div>
+            </div>
+            {if count($data.cra1.slides) > 1}
+            <div class="marketing-hero-footer">
+                <div class="marketing-tabs" aria-label="选择推广内容">
+                    {foreach $data.cra1.slides as $i => $slide}
+                    <button type="button" @click="go({$i})" :aria-current="index === {$i} ? 'true' : null" x-effect="if (index === {$i}) centerTab($el)"><span aria-hidden="true">{:sprintf('%02d', $i + 1)}</span><span>{$slide.title}</span></button>
+                    {/foreach}
+                </div>
+            </div>
+            {/if}
+        </div>
+    </section>
+    {else /}
+    <h1 class="sr-only">{$data.cra1.seo.title}</h1>
+    {/if}
+
+    {$data.cra1.page_modules_html|raw}
+
+
+</main>
+
+{include file="footer"}
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "format": 1,
+  "profiles": [
+    {
+      "id": "10-7-4-member-cloud-dcim-domain-20261023",
+      "provenance": "reviewed-integration",
+      "review_sha256": "007abe033d4008ee213e58b92ce09933d6148373c00da5d8701be665fba4c639",
+      "files": {
+        "app/common.php": "9014e86b8d4bb4eaa042b79b6f56f89f2e4bb0eebd28c7df52a91a8b84f9ec4d",
+        "app/http/middleware/Check.php": "ed20c4441cf2ac2dcc8274c95d616db7e31068d4f116f39da3a76c5ca06685f4",
+        "app/http/middleware/CheckHome.php": "bb608e33a9ab0306ff98d78a02e18687da89722e610fa5aea08d2fa184db62b2",
+        "app/http/middleware/CheckClientOperatePassword.php": "946fe832056601a458fa8e5b9ef42e3df902fe8c7e1d3f0c1c0347964025af5e",
+        "app/event/AppInit.php": "c0e9a7fffe16a9b8dcd89dd4fa68f7a759b8cc7bb4677e6fbad60205936eadc8",
+        "app/common/model/ClientModel.php": "fdbf176ae4f633e78272818aa80afe980a47ff1212603dcd2bf0268a20eae29c",
+        "app/common/model/HostModel.php": "25474cdd1cffdaad8a58e6db7a1f56e916418a2366341e85b53f880d6888fd87",
+        "app/common/model/SelfDefinedFieldModel.php": "b0d9d79652ac551c0e092c7d607084750d5b73dc203573ad3389e795ed2485d5",
+        "route/home.php": "3d99910311ba5bcbb9a7917d44fc06c0677d99bc8c4d7a898eaa50364f68a0e1",
+        "vendor/topthink/framework/src/think/route/Dispatch.php": "96859f846dc8dd088ade8058af1a3e15ab852b53c04ef8d98a74f13b7a6a526f",
+        "app/home/model/ClientareaAuthRuleModel.php": "ec842f013185c04612fe02868afe3568498ca8e753b1d23e3ba2d06171702b2f",
+        "app/common/logic/ClientOperationVerifyLogic.php": "70ee5594bf384a9f7ad28201efbaf99a37181ddc980b75a0e2e837c52a733894",
+        "app/common/logic/VerificationCodeAttemptLogic.php": "5f4492ed42fd7ec928846faed329a6ad2fab1746a1ddd3217656cda674d5a391",
+        "app/common/logic/PasswordLoginAttemptLogic.php": "dd2f742dd2321d58e34c737b6c7b7c7b2998a2a14fb407ba100e56e5dfc69397",
+        "app/common/logic/SecurityAttemptLockLogic.php": "490645d14ab01011726ef3753e0c256f9b157a8ac64b6484d064b7f587171814",
+        "app/common/logic/SecurityVerifyLogic.php": "1c08debe4387f2020a432cf04748d471269b00742bdb18c301ad8e86acd301a2",
+        "app/common/logic/HomeHostOverviewLogic.php": "bcc8b4d646da9e746eea39ebd04c8eddc2154cdbb62347369f151ab58763ab49",
+        "app/common/logic/HomeHostModuleLogic.php": "0878533b90fa1187f94cf604b09b8f08511897d28640668e91a1765fd42e72c6",
+        "app/http/middleware/RejectRepeatRequest.php": "f34110dab35e8875c61c83730156ea908d42c3b6a4f0586a41fe208ab95a95fc",
+        "app/home/controller/SecurityController.php": "4bc29d0b909aaa0d4b4afe0c4f0d44ff24851b3ae054d08d8550860c69b8fe62",
+        "public/plugins/server/mf_cloud/MfCloud.php": "1bd1a43d2c3ac00d56ffda852ef5f883a04d5412a60ca4d0aa6751fabf1cb949",
+        "public/plugins/server/mf_cloud/logic/CloudLogic.php": "8b2465c654b078ce3fba03aa217ab8c2a8515b31bb60261deafe0b4e98838763",
+        "public/plugins/server/mf_cloud/controller/home/CloudController.php": "2d7167e45271a587cdc7c44aa6d8ac63ddaf833567dbce2d88d0bcd8fdf9e8b2",
+        "public/plugins/server/mf_cloud/route.php": "dcf4d902a92205c4d9eaa98e18f5703a5ab8921714c7342b17697c4f1f9558be",
+        "public/plugins/server/mf_cloud/model/DiskModel.php": "e9fc80c97d50b531ec8b79c4765016f8814aded66f07409bfd02ecc2c9e91b2a",
+        "public/plugins/server/mf_cloud/model/ConfigModel.php": "1b130e09c0af74a4b18fd7335999d1ae4740c534f953fb6410f1e5e580aa9a43",
+        "public/plugins/server/mf_cloud/idcsmart_cloud/IdcsmartCloud.php": "e10e72224c911bb32ddc92629c03ed6330165c1a1e000995857eca0abd15dce8",
+        "public/plugins/server/mf_cloud/logic/PanelDiskState.php": "cc830b493da3d713e4d6e18909bb36c3f15724b5456852f2cc0cf4dad623aa55",
+        "public/plugins/server/mf_cloud/logic/PanelFlowTime.php": "5c379b272e7abf52e7c8aca421999192747e1520963303012d30a5efec06c34c",
+        "app/home/controller/ViewCartController.php": "f7b7222fddd10d6a3000dfeedddc815079901de31b13ca541c074b7738cacab8"
+      },
+      "system": "10.7.4",
+      "modules": {
+        "MfCloud": "4.3.0",
+        "MfDcim": "4.2.1",
+        "WestDomain": "4.2.1"
+      }
+    }
+  ]
+}

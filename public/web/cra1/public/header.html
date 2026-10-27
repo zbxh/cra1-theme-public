@@ -1,0 +1,352 @@
+<script>window.__CRA1__ = {:json_encode(cra1_browser_config(isset($data.cra1) ? $data.cra1 : cra1_theme_config()), JSON_HEX_TAG | JSON_HEX_AMP)};</script>
+<div x-data>
+    <div class="scroll-progress" x-data="{ p: 0 }"
+        @scroll.window.passive="p = window.scrollY / Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)"
+        :style="'transform: scaleX(' + p + ')'" aria-hidden="true"></div>
+
+    <header class="cra1-site-header fixed inset-x-0 top-0 z-50 border-b border-line bg-white/95 backdrop-blur" x-data="{ searchOpen: false }" :class="{ 'is-search-open': searchOpen }" @cra1-site-search="searchOpen = $event.detail.open">
+        <div class="flex h-16 w-full items-center gap-2 px-4 md:px-6 lg:px-8">
+            <div class="flex min-w-0 items-center gap-1.5 md:gap-3">
+                <a href="/" class="flex min-h-11 min-w-0 items-center gap-2" aria-label="智简魔方首页">
+                    {if ( isset($data.config) && !empty($data.config.official_website_logo) ) }
+                    <img src="{$data.config.official_website_logo}" alt="智简魔方" class="h-5 w-auto max-w-[80px] object-contain md:h-6 md:max-w-[104px]">
+                    {else /}
+                    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-brand text-[10px] font-bold text-white md:h-6 md:w-6">云</span>
+                    <span class="truncate text-sm font-semibold text-ink md:text-base">智简魔方</span>
+                    {/if}
+                </a>
+                {if ( !isset($data.cra1.show_header_slogan) || $data.cra1.show_header_slogan ) }
+                {if ( isset($data.cra1.header_slogan) && $data.cra1.header_slogan ) }
+                <!-- 竖线 + 展示短语（纯展示、不可点击；与会员中心顶栏一致） -->
+                <span class="site-header-slogan mx-1 hidden h-4 w-px shrink-0 bg-line md:block" aria-hidden="true"></span>
+                <span class="site-header-slogan hidden max-w-[15rem] truncate text-xs text-muted md:block lg:max-w-[18rem]">{$data.cra1.header_slogan}</span>
+                {/if}
+                {/if}
+            </div>
+
+            <nav class="cra1-primary-nav hidden items-center gap-0.5 lg:flex" aria-label="主导航">
+                {if ( cra1_content_explicit($data.cra1, 'cloud_menu_text') || ( isset($data.header_nav) && count($data.header_nav) > 0 ) ) }
+                {foreach $data.header_nav as $ni => $nav}
+                {if ( count($nav.children) > 0 ) }
+                {php}
+                $__cra1NavGrouped = false;
+                $__cra1NavFour = ($nav['layout_depth'] ?? 0) === 4;
+                foreach ($nav['children'] as $__cra1NavChild) {
+                    if (!empty($__cra1NavChild['children'])) $__cra1NavGrouped = true;
+                    foreach ($__cra1NavChild['children'] as $__cra1NavGrand) {
+                        if (!empty($__cra1NavGrand['children'])) $__cra1NavFour = true;
+                    }
+                }
+                {/php}
+                <div class="cra1-nav-dropdown" x-data="headerMenu">
+                    <button x-ref="navTrigger" type="button" class="nav-link cra1-nav-trigger" aria-haspopup="true"
+                            aria-controls="cra1-nav-panel-{$ni}">
+                        {$nav.name}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                    </button>
+                    <!-- Names, URLs, descriptions, order and visibility come only from header_nav.
+                         Empty grid capacity reserves space without rendering preview placeholders. -->
+                    <div x-ref="navPanel" id="cra1-nav-panel-{$ni}" x-cloak x-show="open"
+                         class="cra1-nav-panel {if $__cra1NavFour }cra1-nav-panel--four{elseif $__cra1NavGrouped /}cra1-nav-panel--grouped{else /}cra1-nav-panel--simple{/if}">
+                        <svg class="cra1-nav-pointer" viewBox="0 0 20 11" aria-hidden="true" focusable="false">
+                            <path d="M0 11 10 1 20 11Z"></path><path d="m0 11 10-10 10 10"></path>
+                        </svg>
+                        <div class="cra1-nav-surface">
+                            {if $__cra1NavGrouped }
+                            <div class="cra1-nav-layout">
+                                <div class="cra1-nav-groups">
+                                    {if $__cra1NavFour }
+                                    <p class="cra1-nav-label">{$nav.name}</p>
+                                    {else /}
+                                    {if $nav.sidebar.title != '' }<p class="cra1-nav-label">{$nav.sidebar.title|htmlspecialchars|raw}</p>{/if}
+                                    {if $nav.sidebar.description != '' }<p class="cra1-nav-aside-description">{$nav.sidebar.description|htmlspecialchars|raw}</p>{/if}
+                                    {/if}
+                                    {foreach $nav.children as $ci => $child}
+                                    {if $__cra1NavFour }
+                                    <button type="button" id="cra1-nav-group-{$ni}-{$ci}" data-nav-group="{$ci}"
+                                       class="cra1-nav-group" :class="activeGroup === {$ci} ? 'is-selected' : ''"
+                                       aria-controls="cra1-nav-products-{$ni}-{$ci}" :aria-expanded="activeGroup === {$ci} ? 'true' : 'false'"
+                                       @click="selectGroup({$ci})" @pointerenter="queueGroup({$ci}, $event)" @pointerleave="cancelGroup()" @focus="selectGroup({$ci})"
+                                       @keydown.arrow-down.prevent="moveGroup(1)" @keydown.arrow-up.prevent="moveGroup(-1)"
+                                       @keydown.arrow-right.prevent="focusProducts()">
+                                        <span>{$child.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+                                    </button>
+                                    {else /}
+                                    <a id="cra1-nav-group-{$ni}-{$ci}" data-nav-group="{$ci}" href="{$child.file_address|default='/'}"
+                                       {if ( $child.blank == 1 ) }target="_blank" rel="noopener"{/if}
+                                       class="cra1-nav-group" :class="activeGroup === {$ci} ? 'is-selected' : ''"
+                                       aria-controls="cra1-nav-products-{$ni}-{$ci}"
+                                       @pointerenter="queueGroup({$ci}, $event)" @pointerleave="cancelGroup()" @focus="selectGroup({$ci})"
+                                       @keydown.arrow-down.prevent="moveGroup(1)" @keydown.arrow-up.prevent="moveGroup(-1)"
+                                       @keydown.arrow-right.prevent="focusProducts()">
+                                        <span>{$child.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+                                    </a>
+                                    {/if}
+                                    {/foreach}
+                                    {if !$__cra1NavFour }
+                                    {if $nav.sidebar.overview.enabled }
+                                    <a class="cra1-nav-intro-overview" href="{$nav.sidebar.overview.url|htmlspecialchars|raw}" {if $nav.sidebar.overview.blank }target="_blank" rel="noopener"{/if}><span>{$nav.sidebar.overview.name|htmlspecialchars|raw}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg></a>
+                                    {/if}
+                                    {if !empty($nav.sidebar.links) }
+                                    <div class="cra1-nav-intro-links">
+                                        {foreach $nav.sidebar.links as $asideLink}
+                                        <a href="{$asideLink.file_address|default='/'|htmlspecialchars|raw}" {if $asideLink.blank == 1 }target="_blank" rel="noopener"{/if}><span>{$asideLink.name|htmlspecialchars|raw}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg></a>
+                                        {/foreach}
+                                    </div>
+                                    {/if}
+                                    {/if}
+                                </div>
+                                <div class="cra1-nav-products">
+                                    {foreach $nav.children as $ci => $child}
+                                    <section id="cra1-nav-products-{$ni}-{$ci}" data-nav-group-panel="{$ci}"
+                                             aria-labelledby="cra1-nav-group-{$ni}-{$ci}" x-show="activeGroup === {$ci}" {if $ci != 0 }x-cloak{/if}>
+                                        {if !$__cra1NavFour }<div class="cra1-nav-heading"><span>{if !empty($child.description) }{$child.description}{else /}{$child.name}{/if}</span></div>{/if}
+                                        {if $__cra1NavFour }
+                                        <div class="cra1-nav-directory">
+                                            {if !empty($child.children) }
+                                            {foreach $child.children as $grand}
+                                            <div class="cra1-nav-directory-group">
+                                                <a class="cra1-nav-directory-title" href="{$grand.file_address|default='/'}" {if $grand.blank == 1 }target="_blank" rel="noopener"{/if}>
+                                                    <span>{$grand.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+                                                </a>
+                                                {if !empty($grand.children) }
+                                                <ul class="cra1-nav-directory-links">
+                                                    {foreach $grand.children as $product}
+                                                    <li><a data-nav-product href="{$product.file_address|default='/'}" {if $product.blank == 1 }target="_blank" rel="noopener"{/if}><span>{$product.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg></a></li>
+                                                    {/foreach}
+                                                </ul>
+                                                {/if}
+                                            </div>
+                                            {/foreach}
+                                            {/if}
+                                        </div>
+                                        {else /}
+                                        {php} $__cra1NavRows = max(4, (int) ceil(count($child['children']) / 3)); {/php}
+                                        <ul class="cra1-nav-grid" style="--cra1-nav-rows:{$__cra1NavRows}">
+                                            {if !empty($child.children) }
+                                            {foreach $child.children as $grand}
+                                            <li><a class="cra1-nav-item" href="{$grand.file_address|default='/'}" {if ( $grand.blank == 1 ) }target="_blank" rel="noopener"{/if}>
+                                                <span class="cra1-nav-item__heading"><span class="cra1-nav-item__name">{$grand.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></span>
+                                                {if !empty($grand.description) }<span class="cra1-nav-item__description">{$grand.description}</span>{/if}
+                                            </a></li>
+                                            {/foreach}
+                                            {else /}
+                                            <li><a class="cra1-nav-item" href="{$child.file_address|default='/'}" {if ( $child.blank == 1 ) }target="_blank" rel="noopener"{/if}>
+                                                <span class="cra1-nav-item__heading"><span class="cra1-nav-item__name">{$child.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></span>
+                                                {if !empty($child.description) }<span class="cra1-nav-item__description">{$child.description}</span>{/if}
+                                            </a></li>
+                                            {/if}
+                                        </ul>
+                                        {/if}
+                                    </section>
+                                    {/foreach}
+                                </div>
+                            </div>
+                            {else /}
+                            <div class="cra1-nav-card-layout">
+                                <aside class="cra1-nav-intro">
+                                    {if $nav.sidebar.title != '' }<h2>{$nav.sidebar.title|htmlspecialchars|raw}</h2>{/if}
+                                    {if $nav.sidebar.description != '' }<p>{$nav.sidebar.description|htmlspecialchars|raw}</p>{/if}
+                                    {if $nav.sidebar.overview.enabled }
+                                    <a class="cra1-nav-intro-overview" href="{$nav.sidebar.overview.url|htmlspecialchars|raw}" {if $nav.sidebar.overview.blank }target="_blank" rel="noopener"{/if}><span>{$nav.sidebar.overview.name|htmlspecialchars|raw}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg></a>
+                                    {/if}
+                                    {if !empty($nav.sidebar.links) }
+                                    <div class="cra1-nav-intro-links">
+                                        {foreach $nav.sidebar.links as $asideLink}
+                                        <a href="{$asideLink.file_address|default='/'|htmlspecialchars|raw}" {if $asideLink.blank == 1 }target="_blank" rel="noopener"{/if}>
+                                            <span>{$asideLink.name|htmlspecialchars|raw}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>
+                                        </a>
+                                        {/foreach}
+                                    </div>
+                                    {/if}
+                                </aside>
+                                <ul class="cra1-nav-cards">
+                                    {foreach $nav.children as $child}
+                                    <li><a class="cra1-nav-card" href="{$child.file_address|default='/'}" {if $child.blank == 1 }target="_blank" rel="noopener"{/if}>
+                                        <span class="cra1-nav-card-icon cui-business-icon cui-business-icon--tile" {$child.icon_style_attrs|default=''|raw} aria-hidden="true">
+                                            {if !empty($child.icon_art) }{$child.icon_art|raw}
+                                            {else /}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v10H4zM8 4h8M8 20h8M8 11h.01M8 14h.01M12 11h5M12 14h5"></path></svg>{/if}
+                                        </span>
+                                        <span class="cra1-nav-card-copy"><span class="cra1-nav-item__name">{$child.name}</span>{if !empty($child.description) }<span class="cra1-nav-item__description">{$child.description}</span>{/if}</span>
+                                        <svg class="cra1-nav-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>
+                                    </a></li>
+                                    {/foreach}
+                                </ul>
+                            </div>
+                            {/if}
+                            {if $__cra1NavGrouped && !$__cra1NavFour && !empty($nav.file_address) }
+                            <div class="cra1-nav-footer"><a href="{$nav.file_address}" {if ( $nav.blank == 1 ) }target="_blank" rel="noopener"{/if}>
+                                {if !empty($nav.description) }{$nav.description}{else /}{$nav.name}{/if}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"></path></svg>
+                            </a></div>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+                {else /}
+                <a href="{$nav.file_address|default='/'}" {if ( $nav.blank == 1 ) }target="_blank" rel="noopener"{/if}
+                   class="nav-link">{$nav.name}</a>
+                {/if}
+                {/foreach}
+                {else /}
+                <a href="/" class="nav-link">首页</a>
+                <a href="/cart/goodsList.htm" class="nav-link">产品服务</a>
+                <a href="/#pricing" class="nav-link">价格方案</a>
+                <a href="/document.html" class="nav-link">文档中心</a>
+                <a href="/about.html" class="nav-link">关于我们</a>
+                {/if}
+            </nav>
+
+            <div class="cra1-site-header__actions ml-auto flex shrink-0 items-center gap-1.5 md:gap-2">
+                <!-- 三个主题使用相同的搜索框；官网仍跳转官网文章及文档。 -->
+                <div class="cra1-header-search" x-data="searchBox"
+                     data-placeholder="{:cra1_content_value($data.cra1, 'header_copy.ph_search', '搜索产品、新闻、公告、文档')}"
+                     data-searching="{:cra1_content_value($data.cra1, 'header_copy.searching', '正在搜索…')}"
+                     data-noresult="{:cra1_content_value($data.cra1, 'header_copy.noresult', '没有找到相关内容，请换个关键词')}"
+                     @cra1-site-search-close.window="close(false)"></div>
+                <div class="cra1-header-support" x-data="headerSupport" @click.stop
+                     data-support="{:htmlspecialchars(json_encode($data.cra1.header_support, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8')}"></div>
+                <a href="/document.html" class="cra1-header-docs">文档</a>
+                <button type="button" class="mega-trigger nav-menu-button lg:hidden" @click.stop="$dispatch('cra1-site-search-close'); $dispatch('cra1-header-support-close'); $store.ui.toggleMenu()"
+                        aria-label="打开网站菜单" aria-controls="cra1-mobile-navigation" :aria-expanded="$store.ui.menuOpen">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16" :class="$store.ui.menuOpen ? 'hidden' : ''"></path><path d="m6 6 12 12M18 6 6 18" :class="$store.ui.menuOpen ? '' : 'hidden'"></path></svg>
+                </button>
+                <div x-cloak x-show="$store.auth.checked" class="hidden items-center gap-1.5 sm:flex">
+                    <template x-if="!$store.auth.loggedIn && !$store.auth.error"><a href="/login.htm" @click.prevent="$store.auth.goToAuth('/login.htm')" class="btn btn-aurora">登录 / 注册</a></template>
+                    <template x-if="$store.auth.error && !$store.auth.loggedIn"><button type="button" class="btn btn-outline" :disabled="$store.auth.checking" @click="$store.auth.check()" :title="$store.auth.error" x-text="$store.auth.checking ? '正在确认…' : '重试登录状态'"></button></template>
+                    <!-- 已登录：用户块——与会员中心 topMenu 完全同一套结构、类名与样式
+                         （共用 cra1-shared 组件包中的样式、头像及下拉交互）。
+                         交互与会员中心一致：鼠标悬停展开、点击开合、点外部/Esc 关闭；面板为阿里云式三段：
+                         账号块（名称旁编辑钮 + 控制台雾效标签 + 退出登录）/ 安全中心 / 财务信息 -->
+                    <template x-if="$store.auth.loggedIn">
+                        <div class="cra1-account cra1-account--header" x-data="headerAccount" @click.stop
+                             data-basic="{:cra1_content_value($data.cra1, 'header_copy.tab_basic', '基本资料')}"
+                             data-account-security="{:cra1_content_value($data.cra1, 'header_copy.tab_security', '安全设置')}"
+                             data-security="{:cra1_content_value($data.cra1, 'header_copy.sec_title', '安全中心')}"
+                             data-finance="{:cra1_content_value($data.cra1, 'header_copy.fin_title', '财务信息')}"></div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <div id="cra1-mobile-navigation" x-data="mobileNavigation" x-cloak x-show="$store.ui.menuOpen" class="fixed inset-0 z-[60] lg:hidden" @keydown.window="onKeydown($event)" :aria-hidden="!$store.ui.menuOpen">
+        <div x-show="$store.ui.menuOpen" class="x-fade absolute inset-0 bg-ink/40" @click="$store.ui.closeMenu()" aria-hidden="true"
+             x-transition:enter="x-enter-active" x-transition:enter-start="x-enter-start" x-transition:enter-end="x-enter-end"
+             x-transition:leave="x-leave-active" x-transition:leave-start="x-leave-start" x-transition:leave-end="x-leave-end"></div>
+        <aside x-ref="drawer" x-show="$store.ui.menuOpen" class="cra1-site-drawer absolute inset-y-0 left-0 flex w-[min(21rem,88vw)] flex-col bg-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="cra1-drawer-title"
+               x-transition:enter="transition duration-300 ease-drawer" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
+               x-transition:leave="transition duration-200 ease-out" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full">
+            <div class="cra1-drawer-head">
+                <span id="cra1-drawer-title">{if ( cra1_content_explicit($data.cra1, 'header_copy.nav_title') || ( isset($data.cra1.header_copy['nav_title']) && $data.cra1.header_copy['nav_title'] ) ) }{$data.cra1.header_copy['nav_title']}{else /}网站导航{/if}</span>
+                <button x-ref="closeButton" type="button" @click="$store.ui.closeMenu()" class="cra1-drawer-close" aria-label="关闭网站菜单"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg></button>
+            </div>
+            <div class="cra1-drawer-account" x-cloak x-show="$store.auth.checked">
+                <template x-if="!$store.auth.loggedIn && !$store.auth.error">
+                    <div class="cra1-drawer-guest"><a href="/login.htm" @click.prevent="$store.auth.goToAuth('/login.htm')" class="btn btn-aurora w-full">登录 / 注册</a></div>
+                </template>
+                <template x-if="$store.auth.error && !$store.auth.loggedIn"><button type="button" class="btn btn-outline w-full" :disabled="$store.auth.checking" @click="$store.auth.check()" x-text="$store.auth.checking ? '正在确认…' : $store.auth.error"></button></template>
+                <template x-if="$store.auth.loggedIn">
+                    <div class="cra1-drawer-member">
+                        <div class="cra1-drawer-identity-row">
+                            <span class="cra1-account__avatar cra1-drawer-avatar" :style="$store.auth.avatarStyle()" x-text="$store.auth.avatarText()" aria-hidden="true"></span>
+                            <div class="cra1-drawer-identity">
+                                <span class="cra1-drawer-name" x-text="$store.auth.displayName()" :title="$store.auth.displayName()"></span>
+                                <span class="cra1-drawer-id" :title="'账号 ID：' + $store.auth.accountId()">账号 ID：<span x-text="$store.auth.accountId()"></span></span>
+                            </div>
+                            <button type="button" @click="$store.auth.logout()" class="cra1-drawer-logout" aria-label="退出登录"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M21 12H9m7 5 5-5-5-5"></path></svg>退出</button>
+                        </div>
+                        <div class="cra1-drawer-balance-row">
+                            <div class="cra1-drawer-balance"><span class="cra1-drawer-balance-label">可用余额</span><span class="cra1-drawer-balance-amount" x-text="$store.auth.credit()" :title="$store.auth.credit()"></span></div>
+                            <a href="/home.htm" @click="$store.ui.closeMenu()" class="cra1-drawer-console-hit">
+                                <span class="cra1-upanel__tag cra1-upanel__tag--console"><span class="cra1-upanel__tag-fog" :style="{ animationPlayState: $store.ui.menuOpen ? 'running' : 'paused' }" aria-hidden="true"></span><span class="cra1-upanel__tag-txt">{if ( cra1_content_explicit($data.cra1, 'header_copy.menu_console') || ( isset($data.cra1.header_copy['menu_console']) && $data.cra1.header_copy['menu_console'] ) ) }{$data.cra1.header_copy['menu_console']}{else /}控制台{/if}</span></span>
+                            </a>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <div class="cra1-drawer-backbar" x-cloak x-show="activeTop !== null">
+                <button x-ref="backButton" type="button" class="cra1-drawer-back" @click="back()" aria-label="返回一级菜单"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m14 6-6 6 6 6"></path></svg>返回</button>
+                <span class="cra1-drawer-subtitle" x-text="title" :title="title" aria-live="polite"></span>
+            </div>
+            <nav x-ref="navScroll" class="cra1-drawer-scroll" aria-label="移动导航">
+                {if ( cra1_content_explicit($data.cra1, 'cloud_menu_text') || ( isset($data.header_nav) && count($data.header_nav) > 0 ) ) }
+                {foreach $data.header_nav as $ni => $nav}
+                <div class="cra1-drawer-root" data-drawer-root="nav-{$ni}" data-drawer-title="{$nav.name|htmlspecialchars|raw}" data-drawer-depth="{$nav.layout_depth}" x-show="activeTop === null || activeTop === 'nav-{$ni}'">
+                    {if ( count($nav.children) > 0 ) }
+                    <button type="button" class="cra1-drawer-top" data-drawer-trigger x-show="activeTop === null" @click="toggleTop('nav-{$ni}', {$nav.layout_depth})" :aria-expanded="activeTop === 'nav-{$ni}' || inlineTop === 'nav-{$ni}'" aria-controls="cra1-drawer-panel-{$ni}">
+                        <span>{$nav.name}</span>
+                        {if $nav.layout_depth > 2 }<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>{else /}<svg class="cra1-drawer-chevron" :class="{ 'is-open': inlineTop === 'nav-{$ni}' }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>{/if}
+                    </button>
+                    <div id="cra1-drawer-panel-{$ni}" x-cloak x-show="activeTop === 'nav-{$ni}' || inlineTop === 'nav-{$ni}'" class="cra1-drawer-panel">
+                        {if $nav.layout_depth == 2 }
+                        <ul class="cra1-drawer-flat-list">
+                            {foreach $nav.children as $child}
+                            <li><a class="cra1-drawer-link" href="{$child.file_address|default='/'}" {if $child.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()"><span>{$child.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a></li>
+                            {/foreach}
+                        </ul>
+                        {else /}
+                        {foreach $nav.children as $ci => $child}
+                        {if !empty($child.children) }
+                        <div class="cra1-drawer-group" data-drawer-second="nav-{$ni}-second-{$ci}">
+                            <div class="cra1-drawer-group-row" :class="{ 'is-open': activeSecond === 'nav-{$ni}-second-{$ci}' }">
+                                {if $nav.layout_depth == 4 }
+                                <button type="button" class="cra1-drawer-group-title cra1-drawer-group-button" @click="toggleSecond('nav-{$ni}-second-{$ci}')" :aria-expanded="activeSecond === 'nav-{$ni}-second-{$ci}'" aria-controls="cra1-drawer-second-{$ni}-{$ci}"><span>{$child.name}</span><svg class="cra1-drawer-chevron" :class="{ 'is-open': activeSecond === 'nav-{$ni}-second-{$ci}' }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+                                {else /}
+                                <a class="cra1-drawer-group-title" href="{$child.file_address|default='/'}" {if $child.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()">{$child.name}</a>
+                                <button type="button" class="cra1-drawer-group-toggle" @click="toggleSecond('nav-{$ni}-second-{$ci}')" :aria-expanded="activeSecond === 'nav-{$ni}-second-{$ci}'" aria-controls="cra1-drawer-second-{$ni}-{$ci}" aria-label="展开或收起{$child.name|htmlspecialchars|raw}"><svg class="cra1-drawer-chevron" :class="{ 'is-open': activeSecond === 'nav-{$ni}-second-{$ci}' }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+                                {/if}
+                            </div>
+                            <div id="cra1-drawer-second-{$ni}-{$ci}" class="cra1-drawer-group-panel" x-cloak x-show="activeSecond === 'nav-{$ni}-second-{$ci}'">
+                                {foreach $child.children as $gi => $grand}
+                                {if !empty($grand.children) }
+                                <!-- Sibling controls: the button fills the header; only the title text is a link. -->
+                                <div class="cra1-drawer-branch-card" data-drawer-third="nav-{$ni}-second-{$ci}-third-{$gi}" :class="{ 'is-open': activeThird === 'nav-{$ni}-second-{$ci}-third-{$gi}' }">
+                                    <div class="cra1-drawer-card-head">
+                                        <button type="button" class="cra1-drawer-card-toggle" @click="toggleThird('nav-{$ni}-second-{$ci}-third-{$gi}')" :aria-expanded="activeThird === 'nav-{$ni}-second-{$ci}-third-{$gi}'" aria-controls="cra1-drawer-third-{$ni}-{$ci}-{$gi}" aria-label="展开或收起{$grand.name|htmlspecialchars|raw}的商品"><span class="cra1-drawer-count" aria-hidden="true">{:count($grand['children'])}</span><svg class="cra1-drawer-chevron" :class="{ 'is-open': activeThird === 'nav-{$ni}-second-{$ci}-third-{$gi}' }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+                                        <a class="cra1-drawer-card-title" href="{$grand.file_address|default='/'}" {if $grand.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()">{$grand.name}</a>
+                                    </div>
+                                    <ul id="cra1-drawer-third-{$ni}-{$ci}-{$gi}" class="cra1-drawer-products" x-cloak x-show="activeThird === 'nav-{$ni}-second-{$ci}-third-{$gi}'">
+                                        {foreach $grand.children as $product}
+                                        <li><a class="cra1-drawer-link cra1-drawer-product" href="{$product.file_address|default='/'}" {if $product.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()"><span>{$product.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a></li>
+                                        {/foreach}
+                                    </ul>
+                                </div>
+                                {else /}
+                                <a class="cra1-drawer-link" href="{$grand.file_address|default='/'}" {if $grand.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()"><span>{$grand.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>
+                                {/if}
+                                {/foreach}
+                            </div>
+                        </div>
+                        {else /}
+                        {if $nav.layout_depth == 4 }<span class="cra1-drawer-group-title">{$child.name}</span>{else /}<a class="cra1-drawer-link" href="{$child.file_address|default='/'}" {if $child.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()"><span>{$child.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>{/if}
+                        {/if}
+                        {/foreach}
+                        {/if}
+                        {if $nav.layout_depth != 4 }
+                        {if $nav.sidebar.overview.enabled }
+                        <a class="cra1-drawer-overview" href="{$nav.sidebar.overview.url|htmlspecialchars|raw}" {if $nav.sidebar.overview.blank }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()"><span>{$nav.sidebar.overview.name|htmlspecialchars|raw}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg></a>
+                        {/if}
+                        {foreach $nav.sidebar.links as $asideLink}
+                        <a class="cra1-drawer-link cra1-drawer-aside-link" href="{$asideLink.file_address|htmlspecialchars|raw}" {if $asideLink.blank }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()"><span>{$asideLink.name|htmlspecialchars|raw}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>
+                        {/foreach}
+                        {/if}
+                    </div>
+                    {else /}
+                    <a href="{$nav.file_address|default='/'}" class="cra1-drawer-top" {if $nav.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()">{$nav.name}</a>
+                    {/if}
+                </div>
+                {/foreach}
+                {else /}
+                <a href="/" class="cra1-drawer-top" @click="$store.ui.closeMenu()">首页</a>
+                <a href="/cart/goodsList.htm" class="cra1-drawer-top" @click="$store.ui.closeMenu()">产品服务</a>
+                <button type="button" class="cra1-drawer-top" @click="toggleTop('fallback-solutions', 2)" :aria-expanded="inlineTop === 'fallback-solutions'" aria-controls="cra1-drawer-fallback-solutions"><span>解决方案</span><svg class="cra1-drawer-chevron" :class="{ 'is-open': inlineTop === 'fallback-solutions' }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+                <div id="cra1-drawer-fallback-solutions" class="cra1-drawer-panel" x-cloak x-show="inlineTop === 'fallback-solutions'"><ul class="cra1-drawer-flat-list"><li><a href="/solution.html" class="cra1-drawer-link" @click="$store.ui.closeMenu()">全部方案</a></li><li><a href="/solution/ecommerce.html" class="cra1-drawer-link" @click="$store.ui.closeMenu()">电商零售</a></li><li><a href="/solution/finance.html" class="cra1-drawer-link" @click="$store.ui.closeMenu()">金融科技</a></li></ul></div>
+                <a href="/#pricing" class="cra1-drawer-top" @click="$store.ui.closeMenu()">价格方案</a><a href="/document.html" class="cra1-drawer-top" @click="$store.ui.closeMenu()">文档中心</a><a href="/partner/cps.html" class="cra1-drawer-top" @click="$store.ui.closeMenu()">合作伙伴</a><a href="/about.html" class="cra1-drawer-top" @click="$store.ui.closeMenu()">关于我们</a><a href="/contact.html" class="cra1-drawer-top" @click="$store.ui.closeMenu()">联系我们</a>
+                {/if}
+            </nav>
+            <div class="cra1-drawer-footer">{:cra1_content_value($data.cra1, 'hotline', '400-000-0000')}</div>
+        </aside>
+    </div>
+</div>
+
+<div class="cra1-notices-host" data-cra1-notices data-notice-theme="website" hidden></div>

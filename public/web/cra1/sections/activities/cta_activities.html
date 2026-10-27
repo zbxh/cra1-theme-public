@@ -1,0 +1,10 @@
+<section class="container-page pb-12 md:pb-16">
+            <div class="cta-band rounded-xl px-6 py-10 text-center md:px-10">
+                <h2 class="text-2xl font-semibold text-white">{if ( cra1_content_explicit($data.cra1, 'cta_activities_copy.title') || (( isset($data.cra1.cta_activities_copy['title']) && $data.cra1.cta_activities_copy['title'] )) ) }{$data.cra1.cta_activities_copy['title']}{else /}需要了解适合您的产品吗？{/if}</h2>
+                <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/85">{if ( cra1_content_explicit($data.cra1, 'cta_activities_copy.txt1') || (( isset($data.cra1.cta_activities_copy['txt1']) && $data.cra1.cta_activities_copy['txt1'] )) ) }{$data.cra1.cta_activities_copy['txt1']}{else /}先咨询业务场景，再根据实际需求选择产品和服务。{/if}</p>
+                <div class="mt-6 flex flex-wrap justify-center gap-3">
+                    <a href="/regist.htm" class="btn bg-white px-7 text-primary hover:bg-white/90 cui-button cui-button--primary">注册账户</a>
+                    <a href="/contact.html" class="btn btn-outline px-7 cui-button cui-button--outline">联系咨询<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>
+                </div>
+            </div>
+        </section>

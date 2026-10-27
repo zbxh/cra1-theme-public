@@ -1,0 +1,51 @@
+{if ( isset($data.cra1.show_switch_deck) && $data.cra1.show_switch_deck == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'switch_deck_rows') || (( isset($data.cra1.switch_deck_rows) && count($data.cra1.switch_deck_rows) > 0 )) ) }
+<!-- 布局 R：可切换面板台——左列是选项卡（纵排），右侧是当前项的详细面板，
+     用 Alpine 切换（与页面其他区块的 x-data 独立命名，避免冲突） -->
+<section class="relative overflow-hidden bg-white py-14 md:py-20" x-data="switchDeck">
+    <div class="container-page">
+        <div class="section-heading" data-reveal>
+            <div class="section-heading-copy">
+                <h2 class="section-title">{$data.cra1.switch_deck_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'switch_deck_desc') || (( isset($data.cra1.switch_deck_desc) && $data.cra1.switch_deck_desc )) ) }
+                <p class="section-desc">{$data.cra1.switch_deck_desc}</p>
+                {/if}
+            </div>
+            {if ( isset($data.cra1.switch_deck_link) && $data.cra1.switch_deck_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'switch_deck_more_text', '查看全部能力') != '' ) }<a href="{$data.cra1.switch_deck_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'switch_deck_more_text', '查看全部能力')} →</a>{/if}
+            {/if}
+        </div>
+        <div class="mt-9 grid gap-6 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-10">
+            <!-- 移动端：横滑选项卡（§10.3）；lg：纵排 -->
+            <div class="scrollbar-none -mx-5 flex gap-2 overflow-x-auto px-5 pb-1 lg:mx-0 lg:flex-col lg:gap-1 lg:overflow-visible lg:px-0 lg:pb-0" role="tablist" aria-label="{$data.cra1.switch_deck_title}">
+                {foreach $data.cra1.switch_deck_rows as $sd => $sdr}
+                <!-- tab-underline：激活项底部 scaleX 指示条（origin-left 展开，方向无关的最低成本方案），
+                     与边框高亮叠加但不冲突——边框表达选中、指示条表达"刚切换到" -->
+                <button type="button" role="tab" class="tab-underline relative shrink-0 whitespace-nowrap border border-line px-4 py-3 text-left text-sm transition-colors duration-150 lg:w-full lg:whitespace-normal"
+                        :class="active === {$sd} ? 'border-brand/40 bg-brand/5 text-gradient-active' : 'bg-white text-body hover:border-brand/25'"
+                        :aria-selected="active === {$sd} ? 'true' : 'false'"
+                        @click="active = {$sd}">{$sdr['icon_tile']|default=''|raw}{$sdr['name']}</button>
+                {/foreach}
+            </div>
+            <div class="min-w-0 border border-line bg-surface-alt/50 p-6 md:p-8">
+                {foreach $data.cra1.switch_deck_rows as $sd2 => $sdr2}
+                <!-- x-transition：此前面板交换是 x-show 瞬切（全站唯一真正的选项卡组却没有动效）。
+                     面板在选项卡右侧展开，从下方 6px 移入表达"从选项卡这边过来"（origin-aware）。
+                     面板交换是瞬时覆盖而非交叉淡出：两个面板同时显示会叠加文字（不可读），
+                     故只写 enter、不写 leave（§7.5.2 exit 更快 → 瞬时隐藏即最快）。 -->
+                <div x-show="active === {$sd2}" x-cloak class="x-fade-up min-w-0"
+x-transition:enter="x-enter-active" x-transition:enter-start="x-enter-start" x-transition:enter-end="x-enter-end">
+                    <h3 class="text-base font-semibold text-ink md:text-lg">{$sdr2['name']}</h3>
+                    {if $sdr2['desc']}<p class="mt-3 text-sm leading-7 text-body">{$sdr2['desc']}</p>{/if}
+                    {if $sdr2['tag']}<p class="mt-4"><span class="badge-soft">{$sdr2['tag']}</span></p>{/if}
+                    {if $sdr2['url']}
+                    <a href="{$sdr2['url']}" class="mt-6 inline-flex items-center gap-1 text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">了解该能力 <svg class="card-arrow h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
+                    {/if}
+                </div>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+</section>
+{/if}
+{/if}

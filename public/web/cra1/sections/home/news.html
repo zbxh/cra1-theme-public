@@ -1,0 +1,59 @@
+    {if ( isset($data.cra1.show_news) && $data.cra1.show_news == 1 ) }
+    <section class="ambient relative overflow-hidden bg-gradient-to-b from-surface-alt via-surface to-white py-16 md:py-24">
+        <div class="mist mist-b" aria-hidden="true"></div>
+        <div class="mist mist-c" aria-hidden="true"></div>
+        <div class="container-page">
+            <div class="flex flex-wrap items-end justify-between gap-4" data-reveal>
+                <div class="max-w-xl">
+                    <h2 class="section-title">{if ( cra1_content_explicit($data.cra1, 'news_title') || (( isset($data.cra1.news_title) && $data.cra1.news_title )) ) }{$data.cra1.news_title}{else /}最新公告与行业资讯{/if}</h2>
+                    {if ( cra1_content_explicit($data.cra1, 'news_desc') || (( isset($data.cra1.news_desc) && $data.cra1.news_desc )) ) }
+                    <p class="section-desc">{$data.cra1.news_desc}</p>
+                    {/if}
+                </div>
+                {if ( cra1_content_value($data.cra1, 'news_link', '/document.html') != '' ) }<a href="{:cra1_content_value($data.cra1, 'news_link', '/document.html')}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'news_more_text', '进入文档中心')} →</a>{/if}
+            </div>
+            <div class="home-news-grid mt-10 grid gap-4" :class="!loadingNews && !newsFailed && news.length === 0 ? 'home-news-grid--compact' : ''" data-reveal>
+                <div class="home-notices bento-card glass-flat spotlight-hover flex flex-col p-6 md:p-7 cui-card">
+                    <div class="flex items-center justify-between"><h3 class="font-semibold text-ink">官方公告</h3><a href="/announce.html" class="text-sm text-brand">更多 →</a></div>
+                    <ul class="mt-3 flex-1" x-cloak x-show="!loadingNotices">
+                        <template x-for="(n, i) in notices" :key="n.id">
+                            <li class="border-t border-line first:border-t-0" :class="i === 0 ? 'py-4' : ''">
+                                <a :href="'/announce-details.html?id=' + n.id" class="flex items-center justify-between gap-4" :class="i === 0 ? '' : 'py-3'">
+                                    <span class="min-w-0">
+                                        <span class="block truncate" :class="i === 0 ? 'text-base font-semibold text-ink' : 'text-sm text-body'" x-text="n.title"></span>
+                                        <span class="mt-1 block text-xs leading-5 text-body line-clamp-1" x-show="i === 0 && n.description" x-text="n.description || ''"></span>
+                                    </span>
+                                    <time class="shrink-0 text-xs text-muted" x-text="timeText(n.create_time)"></time>
+                                </a>
+                            </li>
+                        </template>
+                    </ul>
+                    <div x-cloak x-show="!loadingNotices && noticesFailed" class="empty-state mt-4 py-8" role="status"><p>暂时无法读取内容</p><button type="button" class="empty-link" @click="loadNews('notices')">重新加载</button></div>
+                    <div x-cloak x-show="loadingNotices" class="space-y-3 pt-4"><div class="skeleton-line h-4 w-full"></div><div class="skeleton-line h-4 w-4/5"></div><div class="skeleton-line h-4 w-3/5"></div></div>
+                    <div x-cloak x-show="!loadingNotices && !noticesFailed && notices.length === 0" class="empty-state mt-4 py-8">暂无公告</div>
+                </div>
+                <div x-show="loadingNews || news.length || newsFailed" class="home-news bento-card glass-flat spotlight-hover flex flex-col p-6 cui-card" data-reveal style="--reveal-delay:80ms">
+                    <div class="flex items-center justify-between"><h3 class="font-semibold text-ink">新闻资讯</h3><a href="/news.html" class="text-sm text-brand">更多 →</a></div>
+                    <ul class="mt-3 flex-1" x-cloak x-show="!loadingNews">
+                        <template x-for="(n, i) in news" :key="n.id">
+                            <li class="border-t border-line first:border-t-0">
+                                <a :href="'/news-details.html?id=' + n.id" class="flex items-center justify-between gap-4 py-3">
+                                    <span class="truncate text-sm" :class="i === 0 ? 'font-medium text-ink' : 'text-body'" x-text="n.title"></span>
+                                    <time class="shrink-0 text-xs text-muted" x-text="timeText(n.create_time)"></time>
+                                </a>
+                            </li>
+                        </template>
+                    </ul>
+                    <div x-cloak x-show="!loadingNews && newsFailed" class="empty-state mt-4 py-8" role="status"><p>暂时无法读取内容</p><button type="button" class="empty-link" @click="loadNews('news')">重新加载</button></div>
+                    <div x-cloak x-show="loadingNews" class="space-y-3 pt-4"><div class="skeleton-line h-4 w-full"></div><div class="skeleton-line h-4 w-4/5"></div></div>
+                    <div x-cloak x-show="!loadingNews && !newsFailed && news.length === 0" class="empty-state mt-4 py-8">暂无新闻</div>
+                </div>
+                <div class="bento-card bento-cta spotlight-hover flex flex-col justify-center p-6 cui-card cui-card--featured" data-reveal style="--reveal-delay:160ms">
+                    <span class="block text-lg font-semibold text-white">文档与帮助</span>
+                    <span class="mt-1.5 block text-sm leading-6 text-white/75">{if ( cra1_content_explicit($data.cra1, 'news_copy.txt1') || (( isset($data.cra1.news_copy['txt1']) && $data.cra1.news_copy['txt1'] )) ) }{$data.cra1.news_copy['txt1']}{else /}接入指南、产品手册与常见问题{/if}</span>
+                    <a href="/document.html" class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-white">{:cra1_content_value($data.cra1, 'news_more_text', '进入文档中心')} <svg class="card-arrow h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
+                </div>
+            </div>
+        </div>
+    </section>
+    {/if}

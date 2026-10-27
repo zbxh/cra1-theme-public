@@ -1,0 +1,18 @@
+<section class="container-page py-12 md:py-16" data-reveal>
+            <div class="">
+                <div class="article-list grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {if ( cra1_content_explicit($data.cra1, 'partner_agent_program_copy') || (( isset($data.cra1.partner_agent_program_copy) && count($data.cra1.partner_agent_program_copy) > 0 )) ) }
+                {foreach [1,2,3,4] as $pgi}
+                {if ( cra1_content_explicit($data.cra1, 'partner_agent_program_copy') || (( isset($data.cra1.partner_agent_program_copy['t' . $pgi]) && $data.cra1.partner_agent_program_copy['t' . $pgi] )) ) }
+                <article class="article-card glass-card p-6 cui-card"><h2 class="text-lg font-semibold text-ink">{$data.cra1.partner_agent_program_copy['t' . $pgi]}</h2><p class="mt-2 text-sm leading-6 text-body">{$data.cra1.partner_agent_program_copy['d' . $pgi]}</p></article>
+                {/if}
+                {/foreach}
+                {else /}
+<article class="article-card glass-card p-6 cui-card"><h2 class="text-lg font-semibold text-ink">产品支持</h2><p class="mt-2 text-sm leading-6 text-body">围绕产品能力与适用场景提供合作前的资料沟通。</p></article>
+                    <article class="article-card glass-card p-6 cui-card"><h2 class="text-lg font-semibold text-ink">技术沟通</h2><p class="mt-2 text-sm leading-6 text-body">根据客户场景协同讨论部署方式与服务边界。</p></article>
+                    <article class="article-card glass-card p-6 cui-card"><h2 class="text-lg font-semibold text-ink">市场协同</h2><p class="mt-2 text-sm leading-6 text-body">合作物料、品牌使用和联合推广以授权范围为准。</p></article>
+                    <article class="article-card glass-card p-6 cui-card"><h2 class="text-lg font-semibold text-ink">持续对接</h2><p class="mt-2 text-sm leading-6 text-body">合作政策、结算方式和支持级别请以双方确认内容为准。</p></article>
+                {/if}
+                </div>
+            </div>
+        </section>

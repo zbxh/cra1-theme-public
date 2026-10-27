@@ -1,0 +1,7 @@
+<section class="container-page py-12 md:py-16">
+            <div class="cta-band rounded-xl px-6 py-10 text-center md:px-10">
+                <h2 class="text-2xl font-semibold text-white">{if ( cra1_content_explicit($data.cra1, 'cta_guarantee_copy.title') || (( isset($data.cra1.cta_guarantee_copy['title']) && $data.cra1.cta_guarantee_copy['title'] )) ) }{$data.cra1.cta_guarantee_copy['title']}{else /}需要专属支持？{/if}</h2>
+                <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/85">{if ( cra1_content_explicit($data.cra1, 'cta_guarantee_copy.txt1') || (( isset($data.cra1.cta_guarantee_copy['txt1']) && $data.cra1.cta_guarantee_copy['txt1'] )) ) }{$data.cra1.cta_guarantee_copy['txt1']}{else /}提交业务场景和联系方式，我们会根据实际情况协助跟进。{/if}</p>
+                <a href="/contact.html" class="btn mt-6 bg-white px-7 text-primary hover:bg-white/90 cui-button cui-button--primary">联系咨询</a>
+            </div>
+        </section>

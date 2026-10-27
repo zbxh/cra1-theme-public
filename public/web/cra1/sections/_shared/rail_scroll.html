@@ -1,0 +1,55 @@
+{if ( isset($data.cra1.show_rail_scroll) && $data.cra1.show_rail_scroll == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'rail_scroll_rows') || (( isset($data.cra1.rail_scroll_rows) && count($data.cra1.rail_scroll_rows) > 0 )) ) }
+<!-- 布局 E：横滑卡片轨——移动端左右滑动（§10.3），桌面端转为错位两行网格 -->
+<section class="relative overflow-hidden bg-gradient-to-b from-white to-surface-alt py-14 md:py-20" x-data="scrollRail">
+    <div class="container-page">
+        <div class="section-heading" data-reveal>
+            <div class="section-heading-copy">
+                <h2 class="section-title">{$data.cra1.rail_scroll_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'rail_scroll_desc') || (( isset($data.cra1.rail_scroll_desc) && $data.cra1.rail_scroll_desc )) ) }
+                <p class="section-desc">{$data.cra1.rail_scroll_desc}</p>
+                {/if}
+            </div>
+            {if ( isset($data.cra1.rail_scroll_link) && $data.cra1.rail_scroll_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'rail_scroll_more_text', '查看全部') != '' ) }<a href="{$data.cra1.rail_scroll_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'rail_scroll_more_text', '查看全部')} →</a>{/if}
+            {/if}
+        </div>
+        <!-- 滑轨控件：仅小屏显示（md 起容器变三列网格，按钮会变成无意义的一排）。
+             圆点标出当前位置，箭头到端自动禁用。 -->
+        <div class="mt-5 flex items-center justify-between gap-3 md:hidden">
+            <div class="flex items-center gap-1.5" aria-label="浏览位置">
+                <template x-for="i in pageCount" :key="'rd' + i">
+                    <button type="button" class="rail-dot" :aria-label="'浏览第 ' + i + ' 组'" :aria-current="pageIndex === (i - 1) ? 'true' : null" :class="pageIndex === (i - 1) ? 'rail-dot-active' : ''"
+                            @click="goPage(i - 1)"><span aria-hidden="true"></span></button>
+                </template>
+            </div>
+            <div class="flex shrink-0 items-center gap-2">
+                <button type="button" class="rail-nav-btn" aria-label="向前浏览" :disabled="atStart" @click="step(-1)">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+                </button>
+                <button type="button" class="rail-nav-btn" aria-label="向后浏览" :disabled="atEnd" @click="step(1)">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- 手机端：横滑；md+：三列（不用四等分，避免 §8.1「四格」）
+         注意：本容器在移动端需**贴屏幕左右边缘**（-mx-5 + px-5）才有"可滑动"的暗示，
+         因此它必须在 .container-page 之外；md 起用 md:container-page 回到内容列。
+         控件放在上面的 container-page 内，不影响这里的几何。 -->
+    <div x-ref="rail" class="scrollbar-none mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 md:container-page md:mt-9 md:grid md:grid-cols-3 md:overflow-visible md:px-8 md:pb-0">
+                {foreach $data.cra1.rail_scroll_rows as $rs => $rr}
+                {if $rr['url']}<a href="{$rr['url']}" class="group flex w-[76%] shrink-0 snap-start flex-col border border-line bg-white p-6 lift-card md:w-auto" data-reveal>{else /}<div class="group flex w-[76%] shrink-0 snap-start flex-col border border-line bg-white p-6 md:w-auto" data-reveal>{/if}
+                    <span class="flex items-center gap-2">
+                        {if $rr['tag']}<span class="badge-soft !px-2 !py-0.5 !text-[10px]">{$rr['tag']}</span>{/if}
+                        <span class="text-xs tabular-nums text-muted">{:str_pad($rs + 1, 2, '0', STR_PAD_LEFT)}</span>
+                    </span>
+                    <h3 class="mt-4 text-base font-semibold text-ink md:text-lg">{$rr['icon_tile']|default=''|raw}{$rr['name']}</h3>
+                    {if $rr['desc']}<p class="mt-2 flex-1 text-sm leading-6 text-body">{$rr['desc']}</p>{/if}
+                    {if $rr['url']}<span class="mt-5 inline-flex items-center gap-1 text-sm font-medium text-brand">了解详情 <svg class="card-arrow h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>{/if}
+                {if $rr['url']}</a>{else /}</div>{/if}
+                {/foreach}
+    </div>
+</section>
+{/if}
+{/if}

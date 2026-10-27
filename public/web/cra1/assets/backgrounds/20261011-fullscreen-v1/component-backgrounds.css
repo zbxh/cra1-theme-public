@@ -1,0 +1,50 @@
+/* Opt-in fullscreen backgrounds for the component preview only. */
+.component-preview .cp-background-entry-actions { display: flex; align-items: center; gap: 24px; }
+.component-preview.cp-background-only { height: 100svh; overflow: hidden; }
+.component-preview.cp-background-only > :not(.cp-background-layer):not(.cp-background-controls):not(.cp-symbols) { display: none !important; }
+.component-preview .cp-background-layer {
+  position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+  overflow: hidden; background: #212327; contain: strict;
+}
+.component-preview .cp-background-layer canvas { display: block; width: 100%; height: 100%; }
+.component-preview :is(.cp-background-layer,.cp-background-controls)[hidden] { display: none !important; }
+.component-preview .cp-background-controls {
+  --fx-surface: #292c30; --fx-ink: #edf0f3; --fx-body: #b9c2cb; --fx-line: #454b51; --fx-active: #41464c;
+  position: fixed; z-index: 1010; left: 50%; bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateX(-50%); display: flex; align-items: center; gap: 7px;
+  padding: 8px; border: 1px solid var(--fx-line); border-radius: 12px;
+  background: var(--fx-surface); color: var(--fx-ink);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 12%);
+  font: 12px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  white-space: nowrap;
+}
+.component-preview .cp-background-controls[data-palette="light"] { --fx-surface: #f9fafb; --fx-ink: #2b2f34; --fx-body: #626971; --fx-line: #d8dde1; --fx-active: #e7ebee; }
+.component-preview .cp-background-modes { display: flex; align-items: center; gap: 3px; }
+.component-preview .cp-background-controls button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 36px; border: 1px solid transparent; border-radius: 7px;
+  padding: 0 11px; color: var(--fx-body); background: transparent; font: inherit; cursor: pointer;
+}
+.component-preview .cp-background-modes button span { font: 10px/1 Arial, sans-serif; opacity: .5; }
+.component-preview .cp-background-modes button[aria-pressed="true"] { color: var(--fx-ink); background: var(--fx-active); border-color: var(--fx-line); }
+.component-preview .cp-background-controls :is(button,select):focus-visible { outline: 2px solid #c5a777; outline-offset: 2px; }
+.component-preview .cp-background-controls button:disabled { cursor: default; opacity: .5; }
+.component-preview .cp-background-divider { width: 1px; height: 20px; margin: 0 2px; background: var(--fx-line); }
+.component-preview .cp-background-select { display: none; }
+@media (hover: hover) {
+  .component-preview .cp-background-controls button:not(:disabled):hover { color: var(--fx-ink); background: var(--fx-active); }
+}
+@media (max-width: 1023px) {
+  .component-preview .cp-background-controls { gap: 4px; padding: 7px; }
+  .component-preview .cp-background-controls button { padding: 0 8px; }
+  .component-preview .cp-background-modes button span { display: none; }
+}
+@media (max-width: 767px) {
+  .component-preview .cp-background-entry-actions { gap: 12px; }
+  .component-preview .cp-background-entry-actions .cp-icon { display: none; }
+  .component-preview .cp-background-controls { width: min(390px, calc(100% - 24px)); bottom: max(12px, env(safe-area-inset-bottom)); gap: 4px; padding: 7px; }
+  .component-preview .cp-background-modes, .component-preview .cp-background-divider { display: none; }
+  .component-preview .cp-background-select { display: block; flex: 1; min-width: 0; min-height: 44px; border: 1px solid var(--fx-line); border-radius: 7px; padding: 0 7px; color: var(--fx-ink); background: var(--fx-active); font: inherit; }
+  .component-preview .cp-background-controls button { min-height: 44px; padding: 0 7px; }
+}
+@media (pointer: coarse) { .component-preview .cp-background-controls button { min-height: 44px; } }

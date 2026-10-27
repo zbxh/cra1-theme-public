@@ -1,0 +1,38 @@
+{if ( isset($data.cra1.show_price_slider) && $data.cra1.show_price_slider == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'price_slider_rows') || (( isset($data.cra1.price_slider_rows) && count($data.cra1.price_slider_rows) > 0 )) ) }
+<!-- 布局 O：横向价格条——每档一行横条（左侧型号、中部规格、右侧价格与按钮），
+     与网格卡片形态正交，适合「配置档位」逐行比较 -->
+<section class="relative overflow-hidden bg-white py-14 md:py-20">
+    <div class="container-page">
+        <div class="section-heading" data-reveal>
+            <div class="section-heading-copy">
+                <h2 class="section-title">{$data.cra1.price_slider_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'price_slider_desc') || (( isset($data.cra1.price_slider_desc) && $data.cra1.price_slider_desc )) ) }
+                <p class="section-desc">{$data.cra1.price_slider_desc}</p>
+                {/if}
+            </div>
+            {if ( isset($data.cra1.price_slider_link) && $data.cra1.price_slider_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'price_slider_more_text', '查看全部配置') != '' ) }<a href="{$data.cra1.price_slider_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'price_slider_more_text', '查看全部配置')} →</a>{/if}
+            {/if}
+        </div>
+        <ul class="mt-8 space-y-3">
+            {foreach $data.cra1.price_slider_rows as $ps => $psr}
+            <li class="price-row group grid gap-4 border border-line bg-white px-5 py-5 transition-colors duration-150 hover:border-brand/35 md:grid-cols-[14rem_minmax(0,1fr)_10rem] md:items-center md:gap-8 md:px-7" data-reveal>
+                <div class="min-w-0">
+                    <p class="flex items-center gap-2 text-sm font-semibold text-ink">
+                        {$psr['icon_tile']|default=''|raw}{$psr['name']}
+                        {if $psr['tag']}<span class="badge-soft !px-2 !py-0.5 !text-[10px]">{$psr['tag']}</span>{/if}
+                    </p>
+                </div>
+                <p class="min-w-0 text-sm leading-6 text-body">{$psr['desc']}</p>
+                <div class="flex items-center justify-between gap-4 md:flex-col md:items-end md:gap-2">
+                    {if $psr['value']}<p class="text-lg font-semibold leading-none tabular-nums text-ink"><span class="text-xs font-normal text-muted">￥</span>{$psr['value']}{if $psr['period']}<span class="price-period">{$psr['period']}</span>{/if}</p><span class="price-note">{if !$psr['period']}计费周期以选购页为准{/if}</span>{/if}
+                    <a href="{$psr['url']|default='/cart/goodsList.htm'}" class="btn btn-outline btn-primary btn-xs shrink-0 cui-button cui-button--outline cui-button--sm">{$psr['action']}<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>
+                </div>
+            </li>
+            {/foreach}
+        </ul>
+    </div>
+</section>
+{/if}
+{/if}

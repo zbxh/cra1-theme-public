@@ -1,0 +1,53 @@
+/* Content stays visible without JavaScript. Page entrances use the Web
+   Animations API and release their compositing layers after 250ms. */
+html[data-cra1-theme="website"][data-cra1-motion="ready"] body { animation: none; }
+
+:where(html[data-cra1-theme]) .cui-card {
+  transition: border-color 180ms var(--cui-ease-out);
+}
+html[data-cra1-theme] :is(.cui-button,.cui-button--icon) {
+  transition: transform 120ms var(--cui-ease-out), border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+html[data-cra1-theme] .cui-tabs__trigger {
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+@keyframes cui-panel-in {
+  from { opacity: 0; translate: 0 4px; }
+  to { opacity: 1; translate: 0 0; }
+}
+@keyframes cui-dialog-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cui-layer-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cui-sheet-left { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes cui-sheet-right { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-cra1-theme] .cui-button:active:not(:disabled):not([aria-disabled="true"]):not(.is-disabled):not([aria-busy="true"]):not(.is-loading) { transform: scale(.98); }
+  html[data-cra1-theme] .cui-button--icon:active:not(:disabled):not([aria-disabled="true"]):not(.is-disabled) { transform: scale(.97); }
+  :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is([role="tabpanel"],.el-tab-pane):not([hidden]) {
+    animation: cui-panel-in 180ms var(--cui-ease-out);
+  }
+  html[data-cra1-theme] [data-state="open"][style*="--radix-collapsible-content-height"] {
+    animation: cui-panel-in 180ms var(--cui-ease-out);
+  }
+  /* Tailwind owns the centering translate. The transform below adds only the
+     entrance offset, including when those positioning utilities are important. */
+  html[data-cra1-theme] .cui-dialog[data-state="open"] { animation: cui-dialog-in 200ms var(--cui-ease-out); }
+  html[data-cra1-theme] .cui-dialog-overlay[data-state="open"] { animation: cui-layer-in 160ms ease-out; }
+  html[data-cra1-theme] .cui-sheet[data-state="open"] { animation: cui-sheet-left 200ms var(--cui-ease-out); }
+  html[data-cra1-theme] .cui-sheet.right-0[data-state="open"] { animation-name: cui-sheet-right; }
+  :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-dialog__wrapper.dialog-fade-enter-active { animation-duration: 200ms; animation-timing-function: var(--cui-ease-out); }
+  :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-dialog__wrapper.dialog-fade-leave-active { animation-duration: 140ms; }
+}
+
+/* Closed overlays must stop intercepting clicks immediately. Radix otherwise
+   retains animated overlays with inline pointer-events during their exit. */
+html[data-cra1-theme] :is(.cui-dialog-overlay,.cui-dialog,.cui-sheet)[data-state="closed"] { display: none; animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-cra1-theme] :is(.cui-card,.cui-button,.cui-button--icon,.cui-tabs__trigger,.cui-dialog,.cui-sheet,.cui-dialog-overlay,[role="tabpanel"],.el-tab-pane,[style*="--radix-collapsible-content-height"]) { animation: none; transition: none; }
+  html[data-cra1-theme] :is(.cui-button,.cui-button--icon):active:not(:disabled):not([aria-disabled="true"]):not(.is-disabled) { transform: none; }
+}

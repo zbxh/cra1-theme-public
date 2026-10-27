@@ -1,0 +1,32 @@
+<section class="container-page py-12 md:py-16" data-reveal>
+            <div class="grid gap-8 lg:grid-cols-[1fr_360px]">
+                <div>
+                    
+                    <h2 class="section-title mt-4">{if ( cra1_content_explicit($data.cra1, 'core_intro_copy.title') || (( isset($data.cra1.core_intro_copy['title']) && $data.cra1.core_intro_copy['title'] )) ) }{$data.cra1.core_intro_copy['title']}{else /}一起建设可靠的云服务{/if}</h2>
+                    <p class="section-desc">{if ( cra1_content_explicit($data.cra1, 'core_intro_copy.desc') || (( isset($data.cra1.core_intro_copy['desc']) && $data.cra1.core_intro_copy['desc'] )) ) }{$data.cra1.core_intro_copy['desc']}{else /}岗位开放情况、职责要求和投递方式以实际招聘通知为准，页面不展示未经确认的岗位或待遇信息。{/if}</p>
+                    <div class="article-list mt-8 grid gap-5 sm:grid-cols-2">
+                        <article class="article-card glass-card p-6 cui-card">
+                            <h3 class="text-lg font-semibold text-ink">技术与平台</h3>
+                            <p class="mt-2 text-sm leading-6 text-body">{if ( cra1_content_explicit($data.cra1, 'core_intro_copy.txt1') || (( isset($data.cra1.core_intro_copy['txt1']) && $data.cra1.core_intro_copy['txt1'] )) ) }{$data.cra1.core_intro_copy['txt1']}{else /}关注云平台、自动化运维、网络与安全等方向。{/if}</p>
+                        </article>
+                        <article class="article-card glass-card p-6 cui-card">
+                            <h3 class="text-lg font-semibold text-ink">产品与服务</h3>
+                            <p class="mt-2 text-sm leading-6 text-body">{if ( cra1_content_explicit($data.cra1, 'core_intro_copy.txt2') || (( isset($data.cra1.core_intro_copy['txt2']) && $data.cra1.core_intro_copy['txt2'] )) ) }{$data.cra1.core_intro_copy['txt2']}{else /}关注企业客户需求，持续优化产品体验与服务流程。{/if}</p>
+                        </article>
+                        <article class="article-card glass-card p-6 cui-card">
+                            <h3 class="text-lg font-semibold text-ink">销售与合作</h3>
+                            <p class="mt-2 text-sm leading-6 text-body">{if ( cra1_content_explicit($data.cra1, 'core_intro_copy.txt3') || (( isset($data.cra1.core_intro_copy['txt3']) && $data.cra1.core_intro_copy['txt3'] )) ) }{$data.cra1.core_intro_copy['txt3']}{else /}连接客户与合作伙伴，推动业务场景落地。{/if}</p>
+                        </article>
+                        <article class="article-card glass-card p-6 cui-card">
+                            <h3 class="text-lg font-semibold text-ink">开放沟通</h3>
+                            <p class="mt-2 text-sm leading-6 text-body">{if ( cra1_content_explicit($data.cra1, 'core_intro_copy.txt4') || (( isset($data.cra1.core_intro_copy['txt4']) && $data.cra1.core_intro_copy['txt4'] )) ) }{$data.cra1.core_intro_copy['txt4']}{else /}欢迎通过官方联系方式咨询当前招聘安排。{/if}</p>
+                        </article>
+                    </div>
+                </div>
+                <aside class="glass-card p-6 cui-card">
+                    <h2 class="text-lg font-semibold text-ink">{if ( cra1_content_explicit($data.cra1, 'core_intro_copy.title2') || (( isset($data.cra1.core_intro_copy['title2']) && $data.cra1.core_intro_copy['title2'] )) ) }{$data.cra1.core_intro_copy['title2']}{else /}应聘咨询{/if}</h2>
+                    <p class="mt-3 text-sm leading-6 text-body">{if ( cra1_content_explicit($data.cra1, 'core_intro_copy.txt5') || (( isset($data.cra1.core_intro_copy['txt5']) && $data.cra1.core_intro_copy['txt5'] )) ) }{$data.cra1.core_intro_copy['txt5']}{else /}请在咨询内容中注明应聘方向，并留下可用联系方式。{/if}</p>
+                    <a href="/contact.html" class="btn-gradient btn mt-6 w-full cui-button cui-button--primary">{if ( cra1_content_explicit($data.cra1, 'core_intro_copy.contact_button') || (( isset($data.cra1.core_intro_copy['contact_button']) && $data.cra1.core_intro_copy['contact_button'] )) ) }{$data.cra1.core_intro_copy['contact_button']}{else /}联系招聘团队{/if}<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a>
+                </aside>
+            </div>
+        </section>

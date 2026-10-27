@@ -1,0 +1,66 @@
+{
+  "category_primary": {
+    "label": "一级产品分类",
+    "defaultIcon": "iconify:lucide:package"
+  },
+  "category_secondary": {
+    "label": "二级产品分类",
+    "defaultIcon": "iconify:lucide:package"
+  },
+  "product_model": {
+    "label": "产品型号",
+    "defaultIcon": "iconify:lucide:package"
+  },
+  "config_method": {
+    "label": "选配方式",
+    "defaultIcon": "iconify:lucide:settings"
+  },
+  "billing_cycle": {
+    "label": "付费周期",
+    "defaultIcon": "iconify:lucide:credit-card"
+  },
+  "basic": {
+    "label": "基础配置",
+    "defaultIcon": "iconify:lucide:cpu"
+  },
+  "package": {
+    "label": "套餐配置",
+    "defaultIcon": "iconify:lucide:package"
+  },
+  "instance": {
+    "label": "实例配置",
+    "defaultIcon": "iconify:lucide:cpu"
+  },
+  "model": {
+    "label": "型号配置",
+    "defaultIcon": "iconify:lucide:package"
+  },
+  "image": {
+    "label": "镜像配置",
+    "defaultIcon": "iconify:lucide:monitor"
+  },
+  "storage": {
+    "label": "存储配置",
+    "defaultIcon": "iconify:lucide:server"
+  },
+  "network": {
+    "label": "网络配置",
+    "defaultIcon": "iconify:lucide:network"
+  },
+  "security": {
+    "label": "安全组",
+    "defaultIcon": "iconify:lucide:shield-check"
+  },
+  "other": {
+    "label": "其他设置",
+    "defaultIcon": "iconify:lucide:settings"
+  },
+  "option": {
+    "label": "自定义选项",
+    "defaultIcon": "iconify:lucide:settings"
+  },
+  "price": {
+    "label": "配置费用",
+    "defaultIcon": "iconify:lucide:credit-card"
+  }
+}

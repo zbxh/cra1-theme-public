@@ -1,0 +1,2907 @@
+/* ==========================================================================
+   CRA1 会员中心主题 · 外壳样式（shadcn/ui 设计体系）
+   参考：https://ui.shadcn.com/blocks —— sidebar-07（可折叠侧栏）+ dashboard-01（inset 布局）
+
+   结构（对齐 shadcn SidebarProvider / SidebarInset）：
+     .cra1-shell                  → SidebarProvider（flex 容器）
+       .cra1-aside                → Sidebar（固定宽度，可折叠为图标）
+       .cra1-shell__body          → SidebarInset（内容区）
+         .cra1-header             → SiteHeader（h-12，border-b）
+         .cra1-shell__content     → 内容容器（p-4 / lg:px-6）
+
+   单位说明：全部使用 px。
+   系统 js/common/common.js 会把根字号设为 clientWidth/19.2（桌面约 75px），
+   使用 rem 会导致尺寸被放大 4.7 倍。
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   插件页等无 Tailwind preflight 的页面：主题组件统一 border-box。
+   否则 .cra1-notice-bar__inner 的 width:1440 是 content-box，
+   加上左右 padding 后实际占位 1548px，公告条与主体内容对不齐。
+   -------------------------------------------------------------------------- */
+[class^="cra1-"], [class*=" cra1-"],
+.cra1-notice-bar, .cra1-notice-bar *,
+.cra1-header, .cra1-header *,
+.cra1-aside, .cra1-aside *,
+.cra1-account, .cra1-account *,
+.cra1-upanel, .cra1-upanel *,
+.cra1-panel-grid, .cra1-panel-grid *,
+.cra1-nav-group, .cra1-nav-group * {
+  box-sizing: border-box;
+}
+
+:root {
+  /* 字体栈：系统里多处 CSS（含第三方模块）写死 `font-family: PingFang SC`
+     且无回退，在缺少该字体的平台上会退回 serif。这里定义统一字体栈，
+     供主题与模块内容共用。 */
+  --font-sans: var(--cui-font);
+
+  /* shadcn 语义色（映射到 cloud 品牌令牌 · 阿里云控制台观感基准） */
+  --background: var(--cui-accent);
+  --foreground: var(--cui-ink);
+  --muted: var(--cui-accent);
+  --muted-foreground: var(--cui-muted);
+  --border: var(--cui-line);
+  --input: var(--cui-control-edge);
+  --ring: var(--cui-gold);
+  --primary: var(--cui-brand);
+  --primary-foreground: var(--cui-white);
+  --accent: var(--cui-accent);
+  --accent-foreground: var(--cui-ink);
+  --destructive: #e7000b;
+  --radius: 8px;
+
+  /* 侧栏专用（shadcn --sidebar-*） */
+  --sidebar: var(--cui-surface);
+  --sidebar-foreground: var(--cui-ink);
+  --sidebar-primary: var(--cui-ink);
+  --sidebar-primary-foreground: var(--cui-white);
+  --sidebar-accent: var(--cui-accent);
+  --sidebar-accent-foreground: var(--cui-ink);
+  --sidebar-border: var(--cui-line);
+  --sidebar-ring: var(--cui-gold);
+
+  /* 尺寸（shadcn --sidebar-width / --header-height） */
+  --aside-w: 256px;
+  --aside-w-icon: 48px;
+  --aside-rail-w: 200px;   /* 双栏侧栏的左栏（一级入口）宽度 */
+  --header-h: 48px;
+}
+
+/* --------------------------------------------------------------------------
+   SidebarProvider + SidebarInset
+   -------------------------------------------------------------------------- */
+.cra1-shell {
+  display: flex;
+  min-height: 100vh;
+  /* 不设背景色：底色由 html::before 的动态渐变提供（见文件末背景章节） */
+  background: transparent;
+}
+
+.cra1-shell__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+/* 插件/购物车页：Element 内层容器自带灰白底（rgb(246,246,250)）横跨全宽，
+   会把 1440 内容之外的渐变背景挡住 —— 统一透明，让全局渐变透出。
+   宽度机制按【结构】匹配而非根类名：系统官方插件的页面脚手架恒为
+   「body 直接子级根元素 → .el-container → .el-container → .el-main」，
+   根类名各插件自取（.template/.template.ticket/.file_download/.goods…）。
+   按 body>div 结构选择后，任何沿用官方脚手架的插件页（含未来新增）
+   自动与主体内容同宽，无需再逐页加根类选择器。 */
+body > div > .el-container > .el-container,
+.template > .el-container > .el-container,
+.goods > .el-container > .el-container {
+  background: transparent;
+}
+
+/* 需求2：el-main 自带白底+圆角（主题继承），在 1440 限宽下就是一圈
+   「白色外框」。容器只做定位，底色透明，白色留给内部的卡片本身。 */
+body > div > .el-container > .el-container > .el-main,
+.template > .el-container > .el-container > .el-main,
+.goods > .el-container > .el-container > main.el-main {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.cra1-shell__content,
+/* 覆盖所有会员中心页面与后续新增页面：
+   - React/外壳页：.cra1-shell__content
+   - 购物车/插件页（Element 布局）：body>div 结构选择器为主（根类名无关，
+     如文件下载页根类 .file_download 无 .template 也能对齐），
+     历史 .template / .goods 选择器保留作兜底（根元素不在 body 直接子级时） */
+body > div > .el-container > .el-container > .el-main,
+.template > .el-container > .el-container > .el-main,
+.goods > .el-container > .el-container > main.el-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 16px;
+  /* 需求2：主体内容最宽 1440px、水平居中，超宽屏两边留白 */
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .cra1-shell__content,
+  body > div > .el-container > .el-container > .el-main,
+  .template > .el-container > .el-container > .el-main,
+  .goods > .el-container > .el-container > main.el-main { padding: 16px 32px 32px; }
+}
+
+/* --------------------------------------------------------------------------
+   卡片视觉（重构后）：阿里云工作台式实色白卡
+   「1px 描边 + 极淡阴影」，无毛玻璃。覆盖面与旧玻璃规则一致：
+     - React 侧  .bg-surface 卡片（shadcn Card / 弹窗 / 面板）
+     - Vue 侧    .main-card / .el-card / .el-dialog / 弹层
+     - 模块页注入的 .cra1-module-view 卡片
+   只动 background/边框/阴影，不动布局尺寸。
+   -------------------------------------------------------------------------- */
+
+/* 弹层与下拉：加深阴影与描边分层 */
+.el-dialog,
+.cra1-shell .el-dialog,
+.el-popover.el-popper,
+.cra1-msg-panel,
+.cra1-lang__menu,
+.el-dropdown-menu {
+  background: #ffffff !important;
+  border-color: #E5E8ED !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 12px 28px rgba(29, 33, 41, 0.12) !important;
+}
+
+/* 表格/输入框等内嵌面板：实色白 */
+.cra1-shell .el-table,
+.cra1-shell .el-input__wrapper,
+.cra1-shell .el-textarea__inner,
+.cra1-shell .el-tabs--border-card {
+  --el-bg-color-overlay: #ffffff;
+}
+
+/* Element 输入框：描边对齐主题（浅灰 1px） */
+.cra1-shell .el-input__wrapper {
+  box-shadow: 0 0 0 1px #E5E8ED inset !important;
+}
+
+/* 卡片内部小块不再叠加卡片底（避免双白） */
+
+/* --------------------------------------------------------------------------
+   Sidebar
+   -------------------------------------------------------------------------- */
+/* 主导航：桌面默认不显示（阿里云风格 —— 顶栏图标按需唤出）。
+   用 fixed 浮层而非 flex 子项，因此内容区宽度不再受侧栏影响，
+   900~1440px 区间都能拿回完整的 256px 阅读宽度。
+   .is-open 由顶栏 cra1-header__menu-btn 通过 cloud:toggle-aside 事件切换。 */
+.cra1-aside {
+  position: fixed;
+  top: var(--header-h);
+  left: 0;
+  bottom: 0;
+  /* 双栏：左栏 200px（一级入口）+ 右栏自适应（约 660px，容纳 3 列分组块） */
+  width: 860px;
+  max-width: calc(100vw - 8px);
+  z-index: 46;
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+  border-right: 1px solid var(--sidebar-border);
+  /* 双栏横向排布：左栏（一级） + 右栏（二三级面板） */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  box-shadow: 6px 0 16px -8px rgba(0, 0, 0, 0.12);
+  transform: translateX(-100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 200ms ease, opacity 200ms ease, visibility 0s linear 200ms;
+}
+
+.cra1-aside.is-open {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+  transition: transform 200ms ease, opacity 200ms ease, visibility 0s;
+}
+
+/* 主导航浮层的遮罩：仅桌面展开时出现，点击关闭 */
+.cra1-aside__overlay.is-desktop {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .cra1-aside__overlay.is-desktop.is-open { display: block; z-index: 45; }
+}
+
+/* 折叠把手：贴在侧栏右缘（双栏外缘） */
+.cra1-aside__rail {
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 56px;
+  border: 0;
+  border-radius: 3px 0 0 3px;
+  background: var(--border);
+  cursor: w-resize;
+  z-index: 10;
+}
+
+/* --------------------------------------------------------------------------
+   SiteHeader
+   -------------------------------------------------------------------------- */
+.cra1-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--header-h);
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  /* 高于侧栏浮层(46/50)与遮罩(45/49)：顶栏永远不被黑色阴影盖住，
+     其下拉面板（账户/语言/消息）打开时也浮在遮罩之上 */
+  z-index: 60;
+}
+
+.cra1-header__left,
+.cra1-header__right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+/* 顶栏内所有直接子元素：禁止拉伸、垂直居中 */
+.cra1-header__left > *,
+.cra1-header__right > * {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.cra1-header__right { margin-left: auto; }
+
+
+.cra1-header__icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: calc(var(--radius) - 4px);
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.cra1-header__icon-btn svg { width: 16px; height: 16px; }
+
+.cra1-header__badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--destructive);
+  color: #fff;
+  font-size: 10px;
+  line-height: 15px;
+  text-align: center;
+}
+
+.cra1-header__sep {
+  width: 1px;
+  height: 16px;
+  margin: 0 4px;
+  background: var(--border);
+}
+
+/* 面包屑（shadcn Breadcrumb） */
+.cra1-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  min-width: 0;
+}
+
+.cra1-breadcrumb__root {
+  color: var(--muted-foreground);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cra1-breadcrumb__sep { color: var(--muted-foreground); }
+
+.cra1-breadcrumb__current {
+  color: var(--foreground);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 侧边栏切换图标：桌面与移动端都显示（主导航默认关闭，靠它唤出） */
+.cra1-header__menu-btn { display: inline-flex; }
+
+/* 顶栏品牌：只展示一个 LOGO 图片的超链接。
+   系统 Logo 多为白色横向字标，浅色顶栏上不可见，因此用深色底座承载；
+   图片加载失败时回退为首字方块，避免出现空白占位。 */
+.cra1-header__brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--sidebar-primary);
+  overflow: hidden;
+  text-decoration: none;
+  transition: opacity 150ms ease;
+}
+
+.cra1-header__brand-logo {
+  display: block;
+  width: auto;
+  max-width: 112px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.cra1-header__brand--text {
+  width: 30px;
+  padding: 0;
+  color: var(--sidebar-primary-foreground);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* 下拉浮层（消息 / 语言） */
+.cra1-header__msg,
+.cra1-lang {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 30px;          /* 锁定为控件高度，避免内部块级子元素把 wrapper 撑高 */
+}
+
+/* wrapper 内的按钮不做额外定位，避免叠加 */
+.cra1-lang > .cra1-header__icon-btn,
+.cra1-header__msg > .cra1-header__icon-btn { position: relative; }
+
+.cra1-msg-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 320px;
+  max-height: 380px;
+  overflow-y: auto;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,.08), 0 2px 4px -2px rgba(0,0,0,.06);
+  transform-origin: top right;
+  z-index: 40;
+  animation: cra1-pop-in 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.cra1-msg-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cra1-msg-panel__more {
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cra1-msg-item {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.cra1-msg-item:last-child { border-bottom: 0; }
+
+.cra1-msg-item__dot {
+  flex: 0 0 6px;
+  width: 6px;
+  height: 6px;
+  margin-top: 5px;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+.cra1-msg-item__dot.is-read { background: var(--border); }
+.cra1-msg-item__body { min-width: 0; flex: 1 1 auto; }
+
+.cra1-msg-item__title {
+  display: block;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cra1-msg-item__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.cra1-msg-panel__empty {
+  padding: 24px 12px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  text-align: center;
+}
+
+.cra1-lang__code { font-size: 12px; font-weight: 600; }
+
+.cra1-lang__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 128px;
+  padding: 4px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,.08), 0 2px 4px -2px rgba(0,0,0,.06);
+  transform-origin: top right;
+  z-index: 40;
+  animation: cra1-pop-in 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.cra1-lang__item {
+  display: block;
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: calc(var(--radius) - 4px);
+  background: transparent;
+  color: var(--foreground);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.cra1-lang__item.is-active { background: var(--accent); font-weight: 500; }
+
+/* --------------------------------------------------------------------------
+   hover 门控（仅精确指针设备，防触屏粘滞）
+   -------------------------------------------------------------------------- */
+@media (hover: hover) and (pointer: fine) {
+  .cra1-header__icon-btn:hover { background: var(--accent); }
+  .cra1-header__brand:hover { opacity: 0.88; }
+  .cra1-account__item:hover,
+  .cra1-lang__item:hover,
+  .cra1-msg-item:hover { background: var(--accent); }
+  .cra1-msg-panel__more:hover { text-decoration: underline; }
+}
+
+/* 焦点可见（键盘可达性） */
+.cra1-header__icon-btn:focus-visible,
+.cra1-account__item:focus-visible,
+.cra1-msg-item:focus-visible,
+.cra1-lang__item:focus-visible {
+  outline: 2px solid var(--sidebar-ring);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   响应式：≤1024px 侧栏转抽屉（shadcn Sheet）
+   -------------------------------------------------------------------------- */
+/* 遮罩默认从顶栏下缘开始（top: var(--header-h)）：
+   顶栏不被黑色阴影遮蔽、保持可见可点；阴影只盖主体内容区。
+   移动端抽屉场景由下方媒体查询恢复全屏遮罩（抽屉从屏幕顶部开始）。 */
+.cra1-aside__overlay {
+  display: none;
+  position: fixed;
+  top: var(--header-h);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 49;
+  background: rgba(0, 0, 0, 0.5);
+  animation: cra1-fade-in 180ms ease-out;
+}
+
+@media (max-width: 1024px) {
+  .cra1-aside {
+    /* 移动端抽屉：从屏幕顶端开始（桌面是顶栏下方，因为顶栏常驻） */
+    top: 0;
+    height: 100vh;
+    z-index: 50;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.16);
+    /* 抽屉始终完整宽度：不继承桌面折叠态，
+       否则用户在桌面折叠后进移动端会得到 48px 的窄抽屉。 */
+    width: var(--aside-w) !important;
+  }
+  /* 移动端抽屉盖住顶栏 → 遮罩恢复全屏 */
+  .cra1-aside__overlay {
+    top: 0;
+  }
+  /* 移动端遮罩（桌面用的是 .is-desktop 变体） */
+  .cra1-aside__overlay.is-open { display: block; }
+  .cra1-aside__rail { display: none; }
+  .cra1-breadcrumb__root,
+  .cra1-breadcrumb__sep { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   动画（对齐主题 7.5：≤300ms、自定义 ease-out、非 scale(0)）
+   -------------------------------------------------------------------------- */
+@keyframes cra1-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cra1-notice-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cra1-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+@keyframes cra1-pop-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --------------------------------------------------------------------------
+   减少动态
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .cra1-aside,
+  .cra1-header__icon-btn,
+  .cra1-header__brand,
+  .cra1-account__item,
+  .cra1-lang__item,
+  .cra1-msg-item {
+    transition-duration: 0.001ms !important;
+  }
+  .cra1-aside__skeleton-row,
+  .cra1-msg-panel,
+  .cra1-lang__menu,
+  .cra1-aside__overlay { animation: none; }
+}
+
+/* --------------------------------------------------------------------------
+   插件页内的 Element 组件微调（shadcn 风格靠拢：圆角/边框/阴影）
+   仅调整外观，不改结构与交互，避免影响插件功能。
+   -------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------------
+   顶栏用户块 + 用户下拉面板：已抽到官网与会员中心共用的唯一一套样式
+   （/web/cra1/assets/css/user-panel.css，由 header.php 引入）。
+   类名不变：.cra1-account--header / .cra1-account__trigger / .cra1-account__avatar /
+   .cra1-account__menu--rich / .cra1-upanel__*；两站令牌由该文件内的桥接变量映射。
+   -------------------------------------------------------------------------- */
+
+/* ==========================================================================
+   页面底色 —— 阿里云控制台式浅灰纯底（重构后取代 wlj 动态渐变）
+   卡片为实色白 + 1px 描边 + 极淡阴影（见玻璃模块章节的替代规则）
+   ========================================================================== */
+
+html,
+body {
+  background: #F2F3F5;
+}
+
+/* 内容区所在 body 之下不再需要渐变层，占位规则保留以兼容旧引用 */
+.cra1-shell,
+.cra1-shell__body {
+  background: transparent;
+}
+
+
+/* --------------------------------------------------------------------------
+   插件页装饰元素的宽度修正
+   部分插件（news / help / helpTotal / file_download）自带的 CSS 用
+   `width: calc(100% - 190px)` 硬编码了 default 主题的侧栏宽度（190px）。
+   本主题侧栏为 256px（含边框 257px），导致这些元素右侧溢出
+   （实测 257 + 1250 = 1507px > 1440 视口）。
+
+   .top-back 是纯装饰块（position:absolute; z-index:-1 的背景条），
+   仅需修正宽度，不影响任何功能或交互。
+   -------------------------------------------------------------------------- */
+.top-back {
+  /* 导航改为浮层后不再占用内容区宽度，插件硬编码的
+     `calc(100% - 190px)` 反而会留下 190px 空隙，这里统一拉满。 */
+  width: 100% !important;
+  max-width: 100%;
+}
+
+
+/* --------------------------------------------------------------------------
+   图形验证码弹窗（系统 TpCaptcha 插件注入的 HTML）
+   插件模板用 rem 做定位与尺寸，而本系统根字号为 ~75px（rem 适配），
+   导致 -3.6rem 实际是 -270px，弹窗偏离屏幕中心且内容溢出。
+   这里在主题层覆盖为 px，并约束在视口内。
+   -------------------------------------------------------------------------- */
+.captcha-content {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  width: min(92vw, 400px) !important;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 20px !important;
+  background: #fff !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,.08), 0 24px 48px rgba(0,0,0,.16) !important;
+  z-index: 2000 !important;
+  opacity: 1 !important;
+}
+
+/* 插件用 rem 定义的字号/间距在 75px 根字号下会失真，统一改为 px */
+.captcha-content .captcha-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+.captcha-content #captcha-input {
+  width: 100% !important;
+  height: 40px !important;
+  padding: 0 12px !important;
+  font-size: 14px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  box-sizing: border-box;
+}
+.captcha-content #captcha-img {
+  height: 40px !important;
+  width: auto !important;
+  max-width: 120px !important;
+  object-fit: contain;
+}
+.captcha-content button,
+.captcha-content .btn {
+  height: 40px !important;
+  padding: 0 16px !important;
+  font-size: 14px !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+}
+
+
+/* --------------------------------------------------------------------------
+   图形验证码弹窗（系统 TpCaptcha 插件注入的 HTML）
+   插件自带的 CSS 全部使用 rem（如 width:5.66rem），而系统把根字号设为
+   clientWidth/19.2（桌面约 75px），1rem ≈ 75px → 5.66rem = 424px，
+   会撑破弹窗、图片溢出到右侧。
+
+   修法：为验证码容器单独重置 rem 基准（1rem = 20px 的设计基准 ×
+   主题缩放）。这里直接按插件的设计意图换算：插件按 1rem=100px 设计
+   （0.16rem=16px 字号），而系统根字号是 clientWidth/19.2，两者比值
+   约 100/75。用 font-size 覆盖无法改变 rem（rem 只认根元素），
+   因此改为把容器内所有 rem 值按 1rem=16px 重写。
+   -------------------------------------------------------------------------- */
+[data-cra1-captcha] {
+  /* 建立独立层叠与定位上下文，避免插件样式影响页面其他元素 */
+  position: relative;
+  z-index: 200;
+}
+
+/* 插件模态框容器：固定在视口居中 */
+[data-cra1-captcha] .captcha-content {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin-top: 0 !important;
+  width: 340px !important;
+  padding: 16px !important;
+  background: #fff !important;
+  border: 1px solid var(--border, #e5e5e5) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16) !important;
+}
+
+/* 遮罩（插件用 .captcha-mask 或类似类名，统一兜底） */
+[data-cra1-captcha] .captcha-mask,
+[data-cra1-captcha] .captcha-bg {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  z-index: -1 !important;
+}
+
+/* 验证码图片：限制在容器内，不再溢出 */
+[data-cra1-captcha] #captcha-img,
+[data-cra1-captcha] img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* 输入行：input 与验证码图片并排（插件原始结构是 flex 行） */
+[data-cra1-captcha] .captcha-main {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-top: 12px !important;
+  padding-left: 0 !important;
+}
+
+/* 输入框：自适应剩余宽度，不再强制 100% 挤掉图片 */
+[data-cra1-captcha] #captcha-input,
+[data-cra1-captcha] input[type="text"] {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 40px !important;
+  padding: 0 12px !important;
+  font-size: 14px !important;
+  border: 1px solid var(--border, #e5e5e5) !important;
+  border-radius: 8px !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+}
+
+/* 验证码图片：固定宽度，不被压缩 */
+[data-cra1-captcha] #captcha-img {
+  flex: 0 0 auto !important;
+  width: 110px !important;
+  height: 40px !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+}
+
+[data-cra1-captcha] #captcha-input:focus {
+  border-color: var(--primary, var(--cui-titanium)) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb,var(--cui-titanium) 14.0%,transparent) !important;
+}
+
+[data-cra1-captcha] .captcha-footer button,
+[data-cra1-captcha] button {
+  height: 36px !important;
+  padding: 0 16px !important;
+  font-size: 14px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+}
+
+[data-cra1-captcha] .captcha-title,
+[data-cra1-captcha] [class*="title"] {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  margin-bottom: 12px !important;
+}
+
+/* --------------------------------------------------------------------------
+   页面外壳包裹层
+   .cra1-page 是本主题各系统页的最外层容器（Vue 挂载点）。
+   刻意不使用 default 主题的 .template：第三方模块的挂载脚本会执行
+   getElementsByClassName("template")[0] 取自己的根节点，若本主题外壳也占用
+   该 class，模块就会把整个外壳误当作它的 Vue 模板重新编译。
+   详见 js/shell.js 顶部说明。
+   -------------------------------------------------------------------------- */
+.cra1-page {
+  min-height: 100vh;
+  /* 这里不做 display:none 首屏隐藏：
+     Vue 2 编译模板来源于 outerHTML，挂载时会把 {{ }} 解析掉，
+     没有闪烁问题；而一旦隐藏后挂载失败（脚本异常/被拦截），
+     页面会永久空白，代价远大于收益。 */
+}
+
+/* --------------------------------------------------------------------------
+   模块内页（产品内页/自定义导航列表等第三方 HTML）
+   这些内容由 mf_cloud / mf_dcim / idcsmart_common 等模块后端渲染，
+   内部沿用 ElementUI + rem 布局。主题的 rem 基准是 视口/19.2（桌面约 75px），
+   比官方 default 主题的基准大，导致模块内容整体偏大、横向溢出。
+
+   处理原则：只做「作用域收敛」，不改第三方模板结构。
+   .cra1-module-view 是 React 侧注入的容器，第三方内容全在其中，
+   因此这里的选择器不会外溢到主题自身页面。
+   -------------------------------------------------------------------------- */
+.cra1-module-view {
+  /* 第三方模块 CSS 大量使用 `font-family: PingFang SC`（无回退链），
+     在 Linux/Windows 上找不到该字体时浏览器会退回 serif，导致模块内容
+     显示为衬线体、与主题其余部分明显割裂。这里统一覆盖为与主题一致的
+     字体栈，并让子元素继承。 */
+  font-family: var(--font-sans);
+}
+
+.cra1-module-view,
+.cra1-module-view *:not(i):not([class*="icon"]) {
+  font-family: inherit;
+}
+
+/* 模块模板内的根容器（.template / .main-card 等）在嵌入时要撑满内容区 */
+.cra1-module-view > div > .template,
+.cra1-module-view > div > .main-card {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 隐藏模块模板自带的骨架屏：外层 React 已有加载态，避免两层 loading */
+.cra1-module-view #mainLoading,
+.cra1-module-view .pro-des-loading #mainLoading {
+  display: none !important;
+}
+
+/* 第三方表格：统一圆角与边框色，去掉 default 主题的绿色边框残留 */
+.cra1-module-view .el-table {
+  font-size: 13px;
+}
+
+.cra1-module-view .el-table th.el-table__cell {
+  background: var(--muted, #f5f5f5);
+  color: var(--muted-foreground, #737373);
+  font-weight: 500;
+}
+
+.cra1-module-view .el-table td.el-table__cell,
+.cra1-module-view .el-table th.el-table__cell {
+  border-bottom-color: var(--border, #e5e5e5);
+}
+
+/* 模块内页里的标题栏降级为「区块标题」
+   模块模板自带 .main-card-title（如「产品列表」），原字号很大且加粗，
+   会在视觉上压过本主题的 PageHeader，造成一页两个主标题。
+   这里把它降到次级标题的字号与字重，让页面只有一个 H1 层级。 */
+.cra1-module-view .main-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* 模块模板的标题还常用 .title-text（cloudList.css 里是 28px），
+   同样降级，避免一页出现两个主标题。 */
+.cra1-module-view .title-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+/* 模块按钮统一成主题的主色与圆角 */
+
+/* 模块表单项圆角 */
+
+/* ── 产品控制面板完全重构（阿里云 ECS 详情页式打散重排）──────────────────
+   概要横条由 React 渲染（IP/配置/到期/操作），模块 HTML 的 .card-top 中
+   冗余展示隐藏，保留操作按钮与备注。.top-msg 实例/付款信息紧凑并排。 */
+.cra1-module-view .card-top .row2-left { display: none; }
+.cra1-module-view .card-top .operation-row1 { display: none; }
+.cra1-module-view .card-top .back-img { display: none; }
+
+/* ── 产品控制面板概要区压缩（阿里云 ECS 详情页式紧凑布局）────────────────
+   模块模板 .card-top（概要大卡）原字号/间距偏大，与压缩后的侧栏实例信息卡
+   并排时页面冗长。这里只做间距/字号/行高的收敛，不改结构与逻辑。 */
+.cra1-module-view .main-card { padding: 16px; }
+
+/* 概要头：状态徽标行 + IP 行 + 操作区，整体紧凑 */
+.cra1-module-view .card-top { margin-bottom: 14px; }
+.cra1-module-view .operation-row1 { margin-bottom: 10px; }
+.cra1-module-view .operation-row1 .host-status { font-size: 13px; }
+.cra1-module-view .operation-row2 { gap: 12px; margin-bottom: 10px; }
+.cra1-module-view .operation-row2 .row2-left .el-divider--vertical { height: 2em; }
+.cra1-module-view .operation-row2 .ip-text,
+.cra1-module-view .operation-row2 [class*="ip"] { font-size: 12px; }
+.cra1-module-view .operation-row3 { margin-top: 8px; font-size: 12px; }
+
+/* 实例信息 + 付款信息两卡：字段行距/字号紧凑 */
+.cra1-module-view .top-msg { gap: 14px; }
+.cra1-module-view .msg-l .l-b .info-item,
+.cra1-module-view .msg-r .r-b .row { margin-bottom: 6px; font-size: 12px; line-height: 1.6; }
+.cra1-module-view .msg-l .l-b .info-item .info-label,
+.cra1-module-view .msg-l .l-b .info-item .info-value { font-size: 12px; }
+.cra1-module-view .msg-r .r-t { margin-bottom: 8px; }
+.cra1-module-view .msg-r .r-b .row { padding: 2px 0; }
+
+/* 功能 tab 行紧凑 */
+.cra1-module-view .el-tabs__item { font-size: 13px; height: 36px; line-height: 36px; }
+.cra1-module-view .tabs { margin-top: 14px; }
+
+/* 管理九宫格间距收紧 */
+.cra1-module-view .manage-content .manage-item { margin-bottom: 10px; }
+.cra1-module-view .manage-content .item-top-btn { margin-bottom: 6px; }
+
+/* 横向滚动兜底：模块表格列多时允许容器内滚动，不撑破内容区 */
+.cra1-module-view .el-table__body-wrapper,
+.cra1-module-view .table {
+  overflow-x: auto;
+}
+
+/* 模块筛选栏在窄屏换行
+   模块用 `.main-card-search{display:flex; justify-content:space-between}` 单行布局，
+   其中 `.right-search .el-select/.el-input{width:2.2rem}`（≈165px @75px 根字号）。
+   桌面端够用，但在手机/平板宽度下这一行不换行，会把文档撑宽 190px 以上。
+   这里只改窄屏下的换行与宽度，不改桌面端排布。 */
+@media (max-width: 1200px) {
+  .cra1-module-view .main-card-search {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+
+  .cra1-module-view .main-card-search .right-search {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    row-gap: 12px;
+  }
+
+  .cra1-module-view .main-card-search .right-search .el-select,
+  .cra1-module-view .main-card-search .right-search .el-input {
+    width: auto;
+    flex: 1 1 160px;
+    min-width: 140px;
+  }
+
+  /* 模块内的固定宽度分页/工具栏同样允许换行
+     （.template 直挂形态——工单/子账户等整页 Vue 插件页——同样生效） */
+  .cra1-module-view .page,
+  .cra1-module-view .content_searchbar,
+  .template .page,
+  .template .content_searchbar {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+
+  /* 工单页搜索组（.searchbar.com-search）内含固定宽 select/input，
+     窄屏下允许换行，否则「查询」按钮会被推出视口 */
+  .template .searchbar.com-search {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .template .searchbar.com-search .el-input,
+  .template .searchbar.com-search .el-select {
+    width: 100%;
+  }
+}
+
+/* 插件页公告/说明容器（工单 .order-des 等）：修复「公告关闭时残留空框」——
+   插件模板给 .order-des 设了 min-height 与边框，公告内容为空时
+   会渲染出一个 ~75px 的全宽空白框。
+   两种挂载形态都要覆盖：React 内嵌（.cra1-module-view 前缀）
+   与整页 Vue 外壳（.template 直挂，如工单/子账户插件页）。 */
+.cra1-module-view .order-des,
+.template .order-des {
+  /* !important：插件 css（如 ticket.css）在 cra1-shell.css 之后加载，
+     同特异性下会覆盖本主题的 reset，必须用重要声明压实 */
+  min-height: 0 !important;
+  margin-top: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: visible !important;
+}
+
+.cra1-module-view .order-des:not(:empty),
+.template .order-des:not(:empty) {
+  margin-top: 14px !important;
+  padding: 12px 14px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: calc(var(--radius) - 4px) !important;
+  background: var(--surface, #fff) !important;
+  font-size: 13px !important;
+  line-height: 1.7 !important;
+  color: var(--body, var(--cui-body)) !important;
+}
+
+/* 插件页「新建工单」等主操作按钮：默认主题用 rem 定宽（1.12rem≈84px），
+   文字换行局促；改为内容自适应 + 统一高度与圆角（同样覆盖两种形态） */
+.cra1-module-view .content_searchbar .new-ticket-btn,
+.cra1-module-view .new-ticket-btn,
+.template .content_searchbar .new-ticket-btn,
+.template .new-ticket-btn {
+  width: auto;
+  min-width: 96px;
+  height: 36px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--radius) - 4px);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* 模块弹窗层级：Element 自带动态 z-index（内联 style，每次打开递增且恒高于
+   自己的 .v-modal 遮罩）。此前这里强制 !important 2000 会把内联值废掉——
+   开过一次弹层后（计数 >2000），黑遮罩就反过来盖住弹窗（全屏黑纱、点击
+   遮罩才关闭）。外壳 z-index 最高 40，Element 的 2000+ 天然压得住，交给它。 */
+
+/* --------------------------------------------------------------------------
+   富文本内容（协议 / 公告 / 帮助详情）
+   后台富文本编辑器产出的 HTML 结构不可控，这里给出稳定的阅读排版。
+   -------------------------------------------------------------------------- */
+.cra1-rich-text {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--foreground);
+  word-break: break-word;
+}
+
+.cra1-rich-text > *:first-child { margin-top: 0; }
+.cra1-rich-text > *:last-child { margin-bottom: 0; }
+
+.cra1-rich-text p { margin: 0 0 14px; }
+
+.cra1-rich-text h1,
+.cra1-rich-text h2,
+.cra1-rich-text h3,
+.cra1-rich-text h4 {
+  margin: 26px 0 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.cra1-rich-text h1 { font-size: 22px; }
+.cra1-rich-text h2 { font-size: 18px; }
+.cra1-rich-text h3 { font-size: 16px; }
+.cra1-rich-text h4 { font-size: 14px; }
+
+.cra1-rich-text a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cra1-rich-text ul,
+.cra1-rich-text ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+
+.cra1-rich-text li { margin: 6px 0; }
+.cra1-rich-text ul li { list-style: disc; }
+.cra1-rich-text ol li { list-style: decimal; }
+
+.cra1-rich-text blockquote {
+  margin: 0 0 14px;
+  padding: 10px 16px;
+  border-left: 3px solid var(--primary);
+  background: var(--muted, #f5f5f5);
+  border-radius: 0 calc(var(--radius) - 4px) calc(var(--radius) - 4px) 0;
+  color: var(--muted-foreground);
+}
+
+.cra1-rich-text code {
+  padding: 2px 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  background: var(--muted, #f5f5f5);
+  border-radius: 4px;
+}
+
+.cra1-rich-text pre {
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  background: var(--muted, #f5f5f5);
+  border-radius: var(--radius);
+}
+
+.cra1-rich-text pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.cra1-rich-text img {
+  max-width: 100%;
+  height: auto;
+  border-radius: calc(var(--radius) - 2px);
+  margin: 8px 0;
+}
+
+.cra1-rich-text table {
+  width: 100%;
+  margin: 0 0 14px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.cra1-rich-text th,
+.cra1-rich-text td {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.cra1-rich-text th {
+  background: var(--muted, #f5f5f5);
+  font-weight: 500;
+}
+
+.cra1-rich-text hr {
+  margin: 22px 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+/* ==========================================================================
+/* ==========================================================================
+   阿里云式双栏侧栏：一级窄栏（左） + 二三级面板（右）
+   --------------------------------------------------------------------------
+   结构：
+     .cra1-aside                侧栏浮层（一级栏 + 面板 同层 flex；遮罩只盖内容区）
+       .cra1-aside__rail-col    左栏：一级入口列表（固定 200px）
+       .cra1-aside__panel       右栏：当前一级的二级/三级面板（自适应宽度）
+         .cra1-aside__panel-head    面板头（标题 + 移动端返回键 + 关闭键）
+         .cra1-aside__panel-body    面板内容（滚动）
+           .cra1-nav-l2             二级行（组标题，可直达；点击展开其三级）
+           .cra1-nav-l3             三级行（页面链接，展开态下可见）
+
+   打开导航即整组就位（一级自动定位 + 面板默认展开含当前页的二级）。
+   折叠态（.is-collapsed）只留左栏图标列。
+   ========================================================================== */
+
+/* 双栏容器 */
+.cra1-aside {
+  /* 桌面宽度 = 左栏 200 + 右栏 560（浮层由外层 .cra1-aside 定位） */
+}
+
+/* 加载骨架（左栏内） */
+.cra1-aside__skeleton { display: flex; flex-direction: column; gap: 8px; padding: 4px 0; }
+.cra1-aside__skeleton-row {
+  height: 28px;
+  border-radius: calc(var(--radius) - 4px);
+  background: linear-gradient(90deg, var(--muted) 25%, var(--accent) 50%, var(--muted) 75%);
+  background-size: 200% 100%;
+  animation: cra1-shimmer 1.4s infinite;
+}
+
+/* 左栏：一级入口列表 */
+.cra1-aside__rail-col {
+  flex: 0 0 var(--aside-rail-w);
+  width: var(--aside-rail-w);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 8px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* 与顶栏的呼吸间隔（需求 1） */
+  border-right: 1px solid var(--sidebar-border);
+  background: var(--sidebar);
+}
+
+.cra1-primary-separator {
+  flex: 0 0 auto;
+  height: 0;
+  margin: 12px 10px;
+  border-top: 1px solid var(--sidebar-border);
+}
+
+.cra1-primary-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--sidebar-foreground);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.cra1-primary-item__icon {
+  flex: 0 0 18px;
+  width: 18px;
+  font-size: 17px;
+  text-align: center;
+  color: currentColor;
+  opacity: 0.85;
+}
+
+.cra1-primary-item__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cra1-primary-item__chevron {
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  color: var(--muted-foreground);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+/* 选中一级：浅色品牌底 + 品牌色文字，箭头指向右侧菜单面板 */
+.cra1-primary-item.is-active {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  background: color-mix(in srgb,var(--cui-titanium) 10.0%,transparent);
+  color: var(--primary);
+}
+@supports (background: color-mix(in srgb, red 10%, transparent)) {
+  .cra1-primary-item.is-active { background: color-mix(in srgb, var(--primary) 10%, transparent); }
+}
+.cra1-primary-item.is-active .cra1-primary-item__chevron {
+  opacity: 1;
+  color: var(--primary);
+}
+
+/* 右栏：二三级面板 */
+.cra1-aside__panel {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+  animation: cra1-panel-in 180ms ease-out;
+}
+
+.cra1-aside__panel-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cra1-aside__panel-title {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+  line-height: 1.3;
+}
+
+.cra1-aside__panel-title-main {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cra1-aside__panel-title-sub {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
+/* 面板关闭键：伪元素画 × */
+.cra1-aside__panel-close {
+  flex: 0 0 auto;
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: calc(var(--radius) - 4px);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.cra1-aside__panel-close::before,
+.cra1-aside__panel-close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+}
+.cra1-aside__panel-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.cra1-aside__panel-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
+
+/* 移动端返回键：桌面隐藏 */
+.cra1-aside__panel-back {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: calc(var(--radius) - 4px);
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+}
+.cra1-aside__panel-back svg { width: 16px; height: 16px; }
+
+.cra1-aside__panel-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 16px 20px;
+}
+
+/* 分组块多列排布（阿里云式）：每块 = 二级标题 + 全部三级页面，常驻展开。
+   列宽 200px，面板内自动排 2-3 列；块内不跨列断开（break-inside）。 */
+.cra1-panel-grid {
+  column-width: 200px;
+  column-gap: 28px;
+}
+
+.cra1-nav-group {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  padding: 2px 0 10px;
+}
+
+/* 二级行（组标题）：块内第一行；可点击直达；当前页所在组高亮 */
+.cra1-nav-l2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 32px;
+  margin-bottom: 2px;
+  padding: 4px 8px;
+  border-radius: calc(var(--radius) - 4px);
+  color: var(--foreground);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.cra1-nav-l2__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.cra1-nav-l2:hover { background: var(--sidebar-accent); }
+/* 当前页所在的二级（或已展开的二级）：品牌色文字 */
+.cra1-nav-l2.is-active { color: var(--primary); }
+.cra1-nav-l2.is-link.is-active { font-weight: 600; }
+
+/* 三级行（页面链接） */
+.cra1-nav-l3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 30px;
+  padding: 4px 8px 4px 16px;
+  border-radius: calc(var(--radius) - 4px);
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: default;
+}
+.cra1-nav-l3__hit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+.cra1-nav-l3__dot {
+  flex: 0 0 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--border);
+  transition: background-color 150ms ease;
+}
+.cra1-nav-l3__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cra1-nav-l3.is-active { color: var(--primary); }
+.cra1-nav-l3.is-active .cra1-nav-l3__dot { background: var(--primary); }
+.cra1-nav-l3__hit:hover { color: var(--primary); }
+
+/* 最近访问：流式标签布局（替代多列网格）——
+   不限制一行条数，够宽就一直排；放不下时整条换行（条目不可分割）；
+   条目内文本过长自动折行（时间列固定不参与挤压） */
+.cra1-recent-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px 8px;
+  padding: 2px 2px 10px;
+}
+.cra1-nav-recent {
+  /* l2 基类的 width:100% 会让 chip 拉满整行，流式布局里必须收回内容宽 */
+  width: auto;
+  flex: 0 1 auto;
+  height: auto;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 6px 10px;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--sidebar-accent);
+  color: var(--foreground);
+}
+.cra1-nav-recent .cra1-nav-l2__name {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  word-break: break-word;
+  line-height: 1.45;
+  font-weight: 500;
+}
+.cra1-nav-recent__time {
+  flex: 0 0 auto;
+  margin-left: 2px;
+  padding-left: 10px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+.cra1-nav-recent.is-active {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  background: color-mix(in srgb,var(--cui-titanium) 12.0%,transparent);
+  color: var(--primary);
+}
+.cra1-nav-recent.is-active .cra1-nav-recent__time { color: var(--primary); }
+@media (max-width: 1024px) {
+  .cra1-nav-recent__time { display: none; }
+}
+
+.cra1-nav-sub__empty {
+  padding: 20px 10px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* hover 门控 */
+@media (hover: hover) and (pointer: fine) {
+  .cra1-primary-item:hover { background: var(--sidebar-accent); color: var(--sidebar-accent-foreground); }
+  .cra1-primary-item.is-active:hover {
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+    background: color-mix(in srgb,var(--cui-titanium) 14.0%,transparent);
+    color: var(--primary);
+  }
+  .cra1-nav-l2:hover { background: var(--sidebar-accent); color: var(--foreground); }
+  .cra1-nav-l2.is-active:hover { color: var(--primary); }
+  /* 最近访问 chip 默认即有底色，hover 需要更强的反馈 */
+  .cra1-recent-flow .cra1-nav-recent:hover {
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    background: color-mix(in srgb,var(--cui-titanium) 8.0%,transparent);
+    color: var(--primary);
+  }
+  .cra1-recent-flow .cra1-nav-recent.is-active:hover {
+    background: color-mix(in srgb, var(--primary) 16%, transparent);
+    background: color-mix(in srgb,var(--cui-titanium) 16.0%,transparent);
+  }
+  .cra1-aside__panel-close:hover,
+  .cra1-aside__panel-back:hover { background: var(--accent); color: var(--foreground); }
+}
+
+/* 焦点可见 */
+.cra1-primary-item:focus-visible,
+.cra1-nav-l2:focus-visible,
+.cra1-nav-l3__hit:focus-visible,
+.cra1-aside__panel-close:focus-visible,
+.cra1-aside__panel-back:focus-visible {
+  outline: 2px solid var(--sidebar-ring);
+  outline-offset: 2px;
+}
+
+@keyframes cra1-panel-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* 折叠为图标态：只留左栏图标列（更窄），面板隐藏 */
+.cra1-aside.is-collapsed:not(.is-open) { width: var(--aside-w-icon); }
+.cra1-aside.is-collapsed:not(.is-open) .cra1-aside__rail-col {
+  flex-basis: var(--aside-w-icon);
+  width: var(--aside-w-icon);
+  padding: 14px 6px 12px;
+  border-right: 0;
+}
+.cra1-aside.is-collapsed:not(.is-open) .cra1-primary-item {
+  justify-content: center;
+  padding: 0;
+  gap: 0;
+}
+.cra1-aside.is-collapsed:not(.is-open) .cra1-primary-item__label,
+.cra1-aside.is-collapsed:not(.is-open) .cra1-primary-item__chevron { display: none; }
+.cra1-aside.is-collapsed:not(.is-open) .cra1-aside__panel { display: none; }
+
+/* 减少动态 */
+@media (prefers-reduced-motion: reduce) {
+  .cra1-primary-item,
+  .cra1-primary-item__chevron,
+  .cra1-nav-l2,
+  .cra1-nav-l3,
+  .cra1-nav-l3__dot { transition-duration: 0.001ms !important; }
+  .cra1-aside__panel { animation: none; }
+}
+
+/* --------------------------------------------------------------------------
+   响应式：≤1024px 侧栏转抽屉 —— 一次只显示一栏（一级 ⇄ 面板）
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .cra1-aside {
+    top: 0;
+    height: 100vh;
+    z-index: 50;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.16);
+    width: var(--aside-w) !important;
+  }
+  .cra1-aside__overlay { top: 0; }
+  .cra1-aside__rail-col { display: flex; }
+  .cra1-aside__panel { display: none; }
+  .cra1-aside__rail { display: none; }
+
+  /* 进入面板：一级栏隐藏，面板占满抽屉 */
+  .cra1-aside.is-mobile-detail .cra1-aside__rail-col { display: none; }
+  .cra1-aside.is-mobile-detail .cra1-aside__panel {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: var(--background);
+  }
+
+  .cra1-aside__panel-back { display: inline-flex; }
+  .cra1-aside__panel-close { display: none; }
+
+  /* 顶栏（z-60）保持在抽屉之上可见可点：
+     抽屉内容整体从顶栏下缘开始，返回键不会被顶栏的菜单按钮挡住 */
+  .cra1-aside__rail-col { padding-top: calc(var(--header-h) + 12px); }
+  .cra1-aside__panel-head { padding-top: calc(var(--header-h) + 6px); }
+
+  /* 触屏目标 ≥44px */
+  .cra1-primary-item { height: 44px; }
+  .cra1-nav-l2 { min-height: 40px; }
+  .cra1-nav-l3 { min-height: 40px; }
+  .cra1-aside__panel-body { padding: 10px 8px 16px; }
+}
+
+@media (max-width: 390px) {
+  /* 保留顶栏下方偏移：padding-top 不能被压缩掉。
+     rail-col 同理 —— 压掉后一级按钮滑到顶栏 logo 下方，被挡住点不了 */
+  .cra1-aside__panel-head { padding: calc(var(--header-h) + 6px) 10px 8px; min-height: 52px; }
+  .cra1-aside__rail-col { padding: calc(var(--header-h) + 12px) 6px 12px; }
+  .cra1-aside__panel-body { padding: 8px 6px 14px; }
+}
+
+/* ==========================================================================
+   顶部公告（后台「会员中心主题 → 内容设置」按条编辑）
+   --------------------------------------------------------------------------
+   单条横条：左=公告标签（HTML，可鎏金渐变），中=标题，右=链接/关闭图标。
+   global=1 的条目全站显示（由顶栏组件渲染）；多条时按 interval_ms 轮播，
+   右下角显示 n/m 计数。样式对齐 shadcn/ui：语义色令牌、单像素分隔线、
+   小圆角、克制的动效（≤220ms）。
+   ========================================================================== */
+.cra1-notice-bar {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: hidden;
+  /* §5.2 硬性标准：公告栏左右边缘必须与主体内容**严格对齐**。
+     对齐方式与 .cra1-shell__content 用同一套盒模型（同 max-width、同 padding），
+     否则两侧 padding 不同时（如 1280 档 32 vs 20）会各差 32px。 */
+  /* 视觉对齐主体卡片：主体内容盒 = max-width:1440 + padding 32（小屏 16），
+     卡片边缘即内容的 padding 边。公告栏自身画边框，因此宽度必须扣掉这段
+     padding，边框才能与卡片左右边缘落在同一条竖线上。 */
+  width: calc(100% - 64px);
+  max-width: calc(1440px - 64px);
+  margin: 16px auto 0;
+  padding: 0;
+  border: 1px solid rgba(201, 158, 86, 0.32);
+  border-radius: var(--radius);
+  /* 浅金暖色渐变（参考截图通知栏）：左浅米 → 中浅金 → 右更浅 */
+  background: linear-gradient(90deg, #FDFBF4 0%, #FAF2DF 55%, #FBF6EA 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  animation: cra1-notice-in 220ms ease-out;
+}
+
+/* 右侧 ✦ 装饰星（截图同款点缀，避开按钮区域） */
+.cra1-notice-bar::before {
+  content: '\2726';
+  position: absolute;
+  right: 190px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(201, 158, 86, 0.55);
+  font-size: 15px;
+  pointer-events: none;
+}
+
+
+
+.cra1-notice-bar__inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  width: 100%;
+  padding: 5px 84px 5px 14px;
+}
+
+/* 关闭按钮：贴右缘内侧 */
+.cra1-notice-bar .cra1-notice-bar__close,
+.cra1-notice-bar__close {
+  color: #8A6D3B;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+
+/* 点击区（标题+内容同行，靠左，超出省略） */
+.cra1-notice-bar__hit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+.cra1-notice-bar__hit:hover { opacity: 0.78; }
+.cra1-notice-bar__hit:focus-visible {
+  outline: 2px solid var(--sidebar-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.cra1-notice-bar__title {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 46%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3D3325;
+}
+.cra1-notice-bar__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: #8A6D3B;
+}
+.cra1-notice-bar__title .cra1-rich-text { display: inline; }
+
+@media (max-width: 1023px) {
+  /* 小屏内容容器 padding:16px → 公告栏宽度扣 32px，边缘与卡片对齐 */
+  .cra1-notice-bar { width: calc(100% - 32px); max-width: none; margin: 16px auto 0; padding: 0; }
+}
+
+/* 左：公告标签（HTML 来自后台，服务端已清理并保留内联样式）。
+   标签为空时前台不渲染该节点；这里只约束排版，不覆盖自定义外观。 */
+.cra1-notice-bar__label {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  max-width: 30%;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.cra1-notice-bar__label > * { flex: 0 0 auto; }
+
+/* 中：标题 / 内容（HTML）。flex-1 居中占位，超长省略 */
+.cra1-notice-bar__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  font-size: 13px;
+  color: var(--foreground);
+}
+.cra1-notice-bar__body a { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
+
+/* 右：了解更多 → 深色胶囊按钮（截图「立即认证 →」同款形态） */
+.cra1-notice-bar__link {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #2B2620;
+  color: #F7F1E4;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.cra1-notice-bar__link svg { width: 13px; height: 13px; }
+.cra1-notice-bar__link:hover {
+  background: #463D2E;
+  text-decoration: none;
+  color: #fff;
+}
+.cra1-notice-bar__link:active { transform: scale(0.97); }
+
+.cra1-notice-bar__close {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: calc(var(--radius) - 4px);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.cra1-notice-bar__close:hover { background: var(--accent); color: var(--foreground); }
+.cra1-notice-bar__close svg { width: 14px; height: 14px; }
+
+/* 右上角轮播计数（仅多条时出现） */
+.cra1-notice-bar__count {
+  position: absolute;
+  right: 16px;
+  bottom: 2px;
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--muted-foreground);
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 轮播切换（Vue transition） */
+.cra1-notice-fade-enter-active,
+.cra1-notice-fade-leave-active { transition: opacity 180ms ease, transform 180ms ease; }
+.cra1-notice-fade-enter-from { opacity: 0; transform: translateY(-4px); }
+.cra1-notice-fade-leave-to { opacity: 0; transform: translateY(4px); }
+
+/* 焦点可见 */
+.cra1-notice-bar__close:focus-visible,
+.cra1-notice-bar__link:focus-visible {
+  outline: 2px solid var(--sidebar-ring);
+  outline-offset: 2px;
+}
+
+/* 移动端：压缩留白，标题保持单行省略 */
+@media (max-width: 768px) {
+  .cra1-notice-bar__inner { padding: 6px 48px 6px 12px; gap: 8px; min-height: 38px; }
+  .cra1-notice-bar__label { max-width: 36%; }
+  .cra1-notice-bar__body { text-align: left; }
+  /* 手机端隐藏内容列（需求），仅保留标签+标题 */
+  .cra1-notice-bar__text { display: none !important; }
+  /* §5.2：公告栏左右边缘必须与主体内容严格对齐。
+     这里**不能**再加 margin：内容容器在小屏是「满宽 + padding 16」，
+     公告栏也必须同为「满宽 + padding 16」，否则会各差 12px。 */
+  .cra1-notice-bar { padding: 0; margin: 16px auto 0; width: calc(100% - 32px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cra1-notice-bar,
+  .cra1-notice-fade-enter-active,
+  .cra1-notice-fade-leave-active { animation: none; transition-duration: 0.001ms !important; }
+}
+
+/* 详情弹窗：毛玻璃卡 + 遮罩 */
+.cra1-notice-dialog__mask {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.4);
+  animation: cra1-fade-in 160ms ease-out;
+}
+.cra1-notice-dialog {
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #E5E8ED;
+  border-radius: var(--radius);
+  background: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 12px 28px rgba(29, 33, 41, 0.12);
+  animation: cra1-pop-in 180ms ease-out;
+  overflow: hidden;
+}
+.cra1-notice-dialog__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.cra1-notice-dialog__title {
+  flex: 1 1 auto;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.cra1-notice-dialog__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: calc(var(--radius) - 4px);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.cra1-notice-dialog__close:hover { background: var(--accent); color: var(--foreground); }
+.cra1-notice-dialog__close svg { width: 14px; height: 14px; }
+.cra1-notice-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 20px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--foreground);
+}
+.cra1-notice-dialog__name {
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.cra1-notice-dialog__empty { margin: 0; color: var(--muted-foreground); }
+.cra1-notice-dialog__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 20px 16px;
+  border-top: 1px solid var(--border);
+}
+.cra1-notice-dialog__btn {
+  padding: 0 18px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   加载遮罩治理（需求：页面加载不出现白色蒙版）
+   --------------------------------------------------------------------------
+   #mainLoading（页面首屏遮罩，菜单就绪后由 asideMenu 隐藏）与模块模板的
+   .pro-des-loading / #mainLoading.pro-des（白底盖住侧栏右侧内容区）原本都是
+   白色蒙版。保留加载指示点（蓝色 ddr），但去掉白色背景并不再拦截点击；
+   模块内遮罩另有 ModuleView 的 3.4s 兜底移除。
+   注意 !important：这些规则来自 default 主题 common.css / 模块 CSS，
+   加载顺序晚于本文件。
+   -------------------------------------------------------------------------- */
+#mainLoading { background: transparent !important; pointer-events: none !important; }
+#mainLoading.pro-des { background: transparent !important; }
+#mainLoading.pro-des::before,
+.pro-des-loading::before { background: transparent !important; }
+.pro-des-loading { pointer-events: none !important; }
+
+
+/* ==========================================================================
+   订购产品 / 购物车页重塑（阿里云式，CSS-only，不改 public/cart/）
+   注意：goodsList.css / shoppingCar.css 在本文件之后加载，因此关键属性用
+   !important + 更高特异性选择器压住默认样式。
+   ========================================================================== */
+
+/* 搜索区：一行靠右、控件统一高度圆角 */
+.template .search-box,
+.goods > .el-container .search-box {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 0 0 18px !important;
+}
+.template .search-box .search-btn {
+  height: 36px !important;
+  padding: 0 22px !important;
+  border-radius: calc(var(--radius) - 4px) !important;
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  font-size: 13px;
+}
+.template .search-box .search-btn:hover { background: var(--cui-brand-hover) !important; border-color: var(--cui-brand-hover) !important; }
+
+/* 商品卡片网格：填满行宽 */
+.template .goods-list-div,
+.goods > .el-container .goods-list-div {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+  gap: 18px !important;
+}
+
+/* 玻璃卡片 + 悬停浮起 */
+.template .shopping-item,
+.goods > .el-container .shopping-item {
+  position: relative !important;
+}
+
+/* 顶部品牌渐变条（替代灰块占位） */
+.template .shopping-item .goods-description,
+.goods > .el-container .shopping-item .goods-description {
+  height: 92px !important;
+  background:
+    radial-gradient(120% 160% at 85% -20%, rgba(255, 255, 255, 0.5) 0%, transparent 55%),
+    linear-gradient(135deg, var(--cui-titanium) 0%, var(--cui-silver) 55%, var(--cui-highlight) 100%) !important;
+  position: relative;
+}
+.template .shopping-item .goods-description::before,
+.goods > .el-container .shopping-item .goods-description::before {
+  content: '' !important;
+  position: absolute;
+  right: -26px;
+  top: -30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+}
+.template .shopping-item .goods-description::after,
+.goods > .el-container .shopping-item .goods-description::after {
+  content: '' !important;
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  width: 34px;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.25));
+}
+
+/* 内容区排版 */
+.template .shopping-item .goods-content,
+.goods > .el-container .shopping-item .goods-content {
+  padding: 14px 18px 16px !important;
+}
+.template .shopping-item .goods-name-text,
+.goods > .el-container .shopping-item .goods-name-text {
+  font-size: 14.5px !important;
+  font-weight: 600 !important;
+  color: var(--foreground) !important;
+}
+.template .shopping-item .goods-active,
+.goods > .el-container .shopping-item .goods-active { display: none !important; }
+
+/* 价格 + 购买按钮 */
+.template .shopping-item .price-box,
+.goods > .el-container .shopping-item .price-box {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px !important;
+}
+.template .shopping-item .item-price,
+.goods > .el-container .shopping-item .item-price {
+  color: var(--primary) !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums;
+}
+.template .shopping-item .item-price-prefix { font-size: 12px !important; font-weight: 600 !important; margin-right: 1px !important; }
+.template .shopping-item .item-price-cycle { font-size: 12px !important; font-weight: 400 !important; color: var(--muted-foreground) !important; margin-left: 2px !important; }
+.template .shopping-item .buy-btn,
+.goods > .el-container .shopping-item .buy-btn {
+  height: 32px !important;
+  padding: 0 20px !important;
+  border-radius: calc(var(--radius) - 4px) !important;
+  font-size: 13px !important;
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  transition: background-color 150ms ease, transform 150ms ease !important;
+}
+.template .shopping-item .buy-btn:hover { background: var(--cui-brand-hover) !important; border-color: var(--cui-brand-hover) !important; transform: translateY(-1px); }
+
+/* 购物车：表头底色、边框统一 */
+.template .el-table { background: transparent; }
+.template .el-table th.el-table__cell {
+  background: rgba(244, 247, 251, 0.92) !important;
+  color: var(--foreground) !important;
+  font-weight: 600;
+}
+.template .el-table--border,
+.template .el-table--group { border-color: var(--border) !important; }
+.template .el-table td.el-table__cell,
+.template .el-table th.el-table__cell.is-leaf { border-color: var(--border) !important; }
+.template .el-link--primary { color: var(--primary) !important; }
+
+/* --------------------------------------------------------------------------
+   间距体系修复（用户反馈：卡片内容样式错乱——全部贴边、无内外边距）
+   cart 页 main-card 的 padding 全是 0（default 主题的 padding 在 rem 下被
+   CRA1 主题根字号缩小后丢失/被覆盖），标题/搜索/内容全部贴卡片边缘。
+   这里统一补齐：卡片内边距 24、标题下 16、搜索与内容间距 16。
+   -------------------------------------------------------------------------- */
+.template .main-card,
+.goods > .el-container .main-card {
+  padding: 24px !important;
+}
+
+.template .main-title,
+.goods > .el-container .main-title {
+  margin: 0 0 16px !important;
+  padding: 0 !important;
+  line-height: 1.3 !important;
+}
+
+/* 商品列表：标题与搜索区之间、搜索与网格之间留出间距 */
+.template .main-content-box,
+.goods > .el-container .main-content-box {
+  padding: 0 !important;
+}
+.template .search-box,
+.goods > .el-container .search-box {
+  margin-bottom: 18px !important;
+}
+
+/* 购物车：搜索区贴卡片顶部，与下方表格留距；表格与底栏留距 */
+.template .goods-box,
+.goods > .el-container .goods-box {
+  margin: 18px 0 20px !important;
+}
+.template .footer-box,
+.goods > .el-container .footer-box {
+  margin: 4px 24px 24px !important;
+}
+
+/* 结算页同样受益：标题与表格间距 */
+.template .main-content-box { padding: 0 !important; }
+
+/* 购物车底栏：el-footer 固定条本身透明化（原为白底横条，宽 1475 与内容错位），
+   footer-box 升级为与内容区同宽（1440 居中）的玻璃卡，56px 高、左右 24px 内边距，
+   全部子项垂直居中。注意 footer-box 无 cra1- 类，不在全局 border-box 组内，需显式声明 */
+.template .el-footer,
+.goods > .el-container .el-footer {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  padding: 12px 16px !important;
+  background: transparent !important;
+  box-sizing: border-box;
+}
+
+.template .footer-box,
+.goods > .el-container .footer-box {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 1440px !important;
+  margin: 0 auto !important;
+  height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px;
+  padding: 0 24px !important;
+  border: 1px solid #E5E8ED !important;
+  border-radius: var(--radius) !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.template .footer-box .footer-left,
+.goods > .el-container .footer-box .footer-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px;
+}
+.template .footer-box .footer-right,
+.goods > .el-container .footer-box .footer-right {
+  display: flex !important;
+  align-items: center !important;
+}
+.template .footer-box .el-button--primary {
+  font-size: 13px !important;
+}
+.template .el-link--primary { color: var(--primary) !important; }
+
+/* 购物车空态：玻璃卡片内居中 */
+.template .goods-box > div > .el-empty { padding: 60px 0; }
+.template .el-empty__description p { color: var(--muted-foreground) !important; }
+
+/* SelfChangeIp: 产品详情页"更换IP"按钮 */
+.sch-pd-change-ip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--cui-titanium);
+  background: var(--cui-titanium);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: filter 150ms ease;
+}
+.sch-pd-change-ip:hover { filter: brightness(1.08); }
+
+/* ==========================================================================
+   工单详情（插件 idcsmart_ticket ticketDetails.htm，整页 .template 直挂）
+   --------------------------------------------------------------------------
+   主题层重塑（不改插件模板/插件 CSS）：
+     1. 头部对齐：插件自带 .top（工单详情 + 返回）在 sticky 主题头部下被
+        负 margin 拉出可视区——以 padding-top 压回头部之下；
+     2. 沟通记录改对话气泡：用户（.Client）右对齐品牌浅底，客服（.Admin）
+        左对齐灰底；徽标/头像行、气泡圆角、行距全部走主题令牌；
+     3. 回复输入区卡片化（工具条按钮统一主题样式）。
+   !important：插件 CSS（ticketDetails.css）后于主题加载，同特异性下会覆盖。
+   ========================================================================== */
+.template.ticket-details .main-card > .top {
+  /* 修复：插件页面自身负 margin 让标题块钻进 sticky 主题头部底下 */
+  margin: 0 !important;
+  padding: calc(var(--header-h) + 16px) 4px 10px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: var(--foreground) !important;
+}
+
+.template.ticket-details .main-card > .top .top-img {
+  width: 18px;
+  height: 18px;
+  fill: var(--muted-foreground);
+  transition: fill 150ms ease;
+}
+.template.ticket-details .main-card > .top .top-img:hover { fill: var(--primary); }
+
+.template.ticket-details .main-card > .top-line {
+  height: 1px;
+  background: var(--border) !important;
+  opacity: 1 !important;
+}
+
+/* 工单基础信息卡（#单号标题 + 提交时间/部门/状态/关联产品 + 关闭工单） */
+.template.ticket-details .main-card .base-card {
+  margin-bottom: 16px !important;
+}
+.template.ticket-details .main-card .base-card .card-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--foreground) !important;
+  margin: 0 0 14px !important;
+}
+.template.ticket-details .main-card .base-card .card-main {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+.template.ticket-details .main-card .base-card .card-main-item .main-item-label {
+  font-size: 12px !important;
+  color: var(--muted-foreground) !important;
+}
+.template.ticket-details .main-card .base-card .card-main-item .main-item-text {
+  font-size: 13px !important;
+  color: var(--foreground) !important;
+}
+.template.ticket-details .main-card .base-card .close-btn {
+  background: transparent !important;
+  border: 1px solid var(--border) !important;
+  border-radius: calc(var(--radius) - 4px) !important;
+  color: var(--danger) !important;
+  height: 32px !important;
+  font-size: 12px !important;
+}
+.template.ticket-details .main-card .base-card .close-btn:hover {
+  background: rgba(180, 35, 24, 0.06) !important;
+}
+
+/* 沟通记录标题降为区块级，避免与页面主标题争层级 */
+.template.ticket-details .main-card .card .card-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--muted-foreground) !important;
+  margin: 18px 0 12px !important;
+}
+
+/* 对话气泡：容器铺满，行间距统一 */
+.template.ticket-details .talk-main .main-old-msg {
+  padding: 2px 0 !important;
+}
+.template.ticket-details .talk-main .main-old-msg .reply-item {
+  margin: 0 0 18px !important;
+  /* 插件行是 flex-direction:column —— 横向对齐由内容块自身的 margin-left:auto 控制 */
+  align-items: stretch !important;
+}
+.template.ticket-details .talk-main .main-old-msg .reply-item .reply-time,
+.template.ticket-details .talk-main .main-old-msg .reply-item .reply-name {
+  font-size: 11px !important;
+  color: var(--muted-foreground) !important;
+}
+
+/* 用户消息（.Client）：右对齐 + 品牌浅底气泡 */
+/* 行是纵向 flex：气泡块用 margin-left:auto 推到右侧（含时间行与头像行） */
+.template.ticket-details .talk-main .main-old-msg .Client .reply-item-top,
+.template.ticket-details .talk-main .main-old-msg .Client .reply-item-content,
+.template.ticket-details .talk-main .main-old-msg .Client .reply-item-actions {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+.template.ticket-details .talk-main .main-old-msg .Client .reply-item-content {
+  max-width: min(72%, 560px) !important;
+  background: var(--primary) !important;
+  background: color-mix(in srgb,var(--cui-titanium) 9.0%,transparent) !important;
+  border: 1px solid color-mix(in srgb,var(--cui-titanium) 18.0%,transparent) !important;
+  border-radius: 12px 12px 3px 12px !important;
+  color: var(--foreground) !important;
+  font-size: 13px !important;
+  line-height: 1.7 !important;
+  padding: 10px 14px !important;
+  text-align: left !important;
+}
+.template.ticket-details .talk-main .main-old-msg .Client .reply-item-content img {
+  border-radius: 8px !important;
+}
+
+/* 客服消息（.Admin）：左对齐 + 灰底气泡（带小尾巴圆角差） */
+.template.ticket-details .talk-main .main-old-msg .Admin .reply-item-top,
+.template.ticket-details .talk-main .main-old-msg .Admin .reply-item-content,
+.template.ticket-details .talk-main .main-old-msg .Admin .reply-item-actions {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+.template.ticket-details .talk-main .main-old-msg .Admin .reply-item-content {
+  max-width: min(72%, 560px) !important;
+  background: var(--surface, #fff) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px 12px 12px 3px !important;
+  color: var(--foreground) !important;
+  font-size: 13px !important;
+  line-height: 1.7 !important;
+  padding: 10px 14px !important;
+  text-align: left !important;
+}
+
+/* 回复输入区：卡片化（输入框 + 发送/上传按钮统一主题样式） */
+.template.ticket-details .talk-main .msg-input .el-textarea__inner {
+  font-size: 13px !important;
+}
+.template.ticket-details .talk-main .send-btn {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  border-radius: calc(var(--radius) - 4px) !important;
+  height: 34px !important;
+  font-size: 13px !important;
+}
+.template.ticket-details .talk-main .upload-btn .el-button {
+  font-size: 12px !important;
+}
+
+/* ≤768：气泡放宽到 88%，避免长句折行过碎 */
+@media (max-width: 768px) {
+  .template.ticket-details .talk-main .main-old-msg .Client .reply-item-content,
+  .template.ticket-details .talk-main .main-old-msg .Admin .reply-item-content {
+    max-width: 88% !important;
+  }
+  .template.ticket-details .main-card > .top {
+    padding: calc(var(--header-h) + 10px) 2px 8px !important;
+  }
+}
+
+/* 新建工单表单（addTicket.htm）：标题/关联产品用 5.2rem 定宽（约 390px），
+   平板档两个并排会撑破内容区（768 档实测溢出 82px）。
+   主题层放宽：≤1200px 改为弹性宽度换行；并保留插件自身的 750px 断点兼容。 */
+@media (max-width: 1200px) {
+  .template.add-ticket .main-card .main-form .select-type,
+  .template.add-ticket .main-card .main-form .select-title,
+  .template.add-ticket .main-card .main-form .select-host {
+    width: auto;
+    flex: 1 1 220px;
+    min-width: 0;
+  }
+  .template.add-ticket .main-card .main-form .title-host {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+}
+
+/* 新建工单表单卡片化：label 与输入框行距、卡片内边距统一主题节奏 */
+.template.add-ticket .main-card .main-form .el-form-item {
+  margin-bottom: 18px;
+}
+.template.add-ticket .main-card .main-form .el-form-item__label {
+  font-size: 13px;
+  color: var(--body, var(--cui-body));
+}
+.template.add-ticket .main-card .sub-btn {
+  border-radius: calc(var(--radius) - 4px) !important;
+}
+
+/* ==========================================================================
+   工单提交助手面板（ticket-assist.js 注入，addTicket 页）
+   主题风格：分类 chips 卡片、产品复选网格、提示条；全部走令牌色。
+   ========================================================================== */
+.cra1-ta-panel {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface, #fff);
+}
+.cra1-ta-panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.cra1-ta-panel__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.cra1-ta-panel__hint {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.cra1-ta-panel__cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cra1-ta-cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--surface-alt, #f5f7fa);
+  color: var(--foreground);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+.cra1-ta-cat:hover { border-color: var(--primary); color: var(--primary); }
+.cra1-ta-cat.is-active {
+  border-color: var(--primary);
+  background: color-mix(in srgb,var(--cui-titanium) 8.0%,transparent);
+  color: var(--primary);
+  font-weight: 600;
+}
+.cra1-ta-cat__tag {
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(181, 83, 9, 0.1);
+  color: var(--warning, #b45309);
+}
+.cra1-ta-panel__extra {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 13px;
+  color: var(--muted-foreground);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+/* display:flex 会覆盖 [hidden] 的 UA display:none，残影留 11px 边框+内边距
+   （用户看到「中间没内容也有一条虚线」）——空态必须整体归零 */
+.cra1-ta-panel__extra[hidden],
+.cra1-ta-picked[hidden],
+.cra1-ta-notice[hidden] {
+  display: none !important;
+}
+.cra1-ta-extra__link {
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+.cra1-ta-extra__link:hover { text-decoration: underline; }
+.cra1-ta-extra__tip { font-size: 12px; color: var(--muted-foreground); }
+
+/* 关联产品下拉多选（复用插件 el-form-item 行：label 左 80px 同其他必填项，
+   控件区为本组件；+N 徽标/清空/提示均排触发框右侧一行） */
+.cra1-ta-hosts {
+  width: 100%;
+}
+.cra1-ta-msel { position: relative; }
+.cra1-ta-msel__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/* 对齐插件 el-input：宽 5.2rem（rem 基准 75px→390px）、高 0.46rem（≈35px）、
+   左内边距 15px、右箭头位 30px */
+.cra1-ta-msel__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 390px;
+  max-width: 100%;
+  height: 35px;
+  padding: 0 30px 0 15px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface, #fff);
+  font-size: 14px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.cra1-ta-msel__trigger:hover,
+.cra1-ta-msel.is-open .cra1-ta-msel__trigger {
+  border-color: var(--primary);
+}
+.cra1-ta-msel.is-open .cra1-ta-msel__trigger {
+  box-shadow: 0 0 0 2px color-mix(in srgb,var(--cui-titanium) 12.0%,transparent);
+}
+.cra1-ta-msel__text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 框内选中态：首个产品名卡片（×移除）+ 剩余数量 +N（参考云厂商多选样式） */
+.cra1-ta-msel__sel {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.cra1-ta-msel__card {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 3px 6px 3px 10px;
+  border-radius: 3px;
+  background: var(--muted, #f0f2f5);
+  color: var(--foreground);
+  font-size: 12px;
+  line-height: 18px;
+}
+.cra1-ta-msel__cardname {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cra1-ta-msel__cardx {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  color: #909399;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.cra1-ta-msel__cardx:hover { background: #c0c4cc; color: #fff; }
+.cra1-ta-msel__more {
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: var(--muted, #f0f2f5);
+  color: #606266;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+}
+/* display:flex 系元素需显式兜底 hidden（覆盖 UA display:none） */
+.cra1-ta-msel__sel[hidden],
+.cra1-ta-msel__more[hidden],
+.cra1-ta-msel__panel[hidden] {
+  display: none !important;
+}
+.cra1-ta-msel__arrow {
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  transition: transform 150ms ease;
+}
+.cra1-ta-msel.is-open .cra1-ta-msel__arrow { transform: rotate(180deg); }
+/* 行内提示：排在筛选框（含徽标/清空）右侧 */
+.cra1-ta-msel__hint {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+.cra1-ta-msel__panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 60;
+  width: 390px;
+  max-width: 100%;
+  max-height: 264px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface, #fff);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 12px 28px rgba(29, 33, 41, 0.12);
+}
+.cra1-ta-msel__opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: calc(var(--radius) - 4px);
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+.cra1-ta-msel__opt:hover { background: #F2F3F5; }
+.cra1-ta-msel__opt input { accent-color: var(--primary); }
+.cra1-ta-msel__optname {
+  flex: 1;
+  font-size: 13px;
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cra1-ta-msel__opt.is-on .cra1-ta-msel__optname { color: var(--primary); font-weight: 500; }
+.cra1-ta-msel__optmark { color: var(--primary); font-weight: 700; }
+.cra1-ta-hosts__empty {
+  padding: 12px 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.cra1-ta-hostreq {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border: 1px solid rgba(181, 83, 9, 0.3);
+  border-radius: calc(var(--radius) - 2px);
+  background: rgba(181, 83, 9, 0.06);
+  color: var(--warning, #b45309);
+  font-size: 12.5px;
+}
+
+/* 步进式分类：面包屑 / 已选路径 / 工单通知 */
+.cra1-ta-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.cra1-ta-crumb {
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--surface, #fff);
+  color: var(--primary);
+  font-size: 13px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+.cra1-ta-crumb:hover { border-color: var(--primary); }
+.cra1-ta-crumb.is-current {
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: default;
+  padding-left: 0;
+}
+.cra1-ta-crumb__sep { color: var(--muted-foreground); }
+.cra1-ta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.cra1-ta-picked {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 13px;
+}
+.cra1-ta-picked__label { color: var(--muted-foreground); }
+.cra1-ta-picked__item {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb,var(--cui-titanium) 8.0%,transparent);
+  color: var(--primary);
+  font-weight: 500;
+}
+.cra1-ta-picked__sep { color: var(--muted-foreground); }
+.cra1-ta-picked__redo {
+  border: 0;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.cra1-ta-picked__redo:hover { color: var(--primary); }
+
+/* 工单通知（插件 ticket/config 数据，与列表页同源） */
+.cra1-ta-notice {
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border: 1px solid rgba(181, 83, 9, 0.25);
+  border-left: 3px solid var(--warning, #b45309);
+  border-radius: calc(var(--radius) - 2px);
+  background: rgba(181, 83, 9, 0.05);
+}
+.cra1-ta-notice__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--warning, #b45309);
+  margin-bottom: 4px;
+}
+.cra1-ta-notice__body {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--body, var(--cui-body));
+  word-break: break-word;
+}
+.cra1-ta-notice__body * { max-width: 100%; }
+
+/* 教程劝导页（有教程链接的分类，选完先看教程）+ 产品多选组标签 */
+.cra1-ta-tutorial {
+  padding: 4px 2px 2px;
+}
+.cra1-ta-tutorial__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.cra1-ta-tutorial__text {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--body, var(--cui-body));
+}
+.cra1-ta-tutorial__link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  padding: 9px 18px;
+  border: 1px solid var(--primary);
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.cra1-ta-tutorial__link:hover {
+  background: var(--primary);
+  color: #fff;
+}
+.cra1-ta-tutorial__tip {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.cra1-ta-tutorial__btn {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+@media (hover: hover) {
+  .cra1-ta-tutorial__btn:hover { background: var(--brand-hover, var(--cui-brand-hover)); }
+}
+/* label 红星（插在插件 el-form-item__label 内、文字前，同 Element required 星） */
+.cra1-ta-hosts__req {
+  margin-right: 4px;
+  color: #f56c6c;
+  font-weight: 600;
+}
+.cra1-ta-hosts__req[hidden] { display: none; }
+/* title-host 并排行内：关联产品 form-item 占满剩余宽（min-width:0 允许收缩，
+   否则窄屏下 390px 触发框把行撑出视口） */
+.template.add-ticket .main-form .title-host .el-form-item:nth-child(2) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 工单提交助手：表单初始隐藏（防「先闪插件表单再刷新到分类面板」）。
+   ticket-assist.js boot 成功后由 JS 控制显隐（选完分类才显示）；
+   boot 失败/助手未启用时 JS 会移除本类恢复插件原样。 */
+.template.add-ticket .main-form.cra1-ta-form-hidden { display: none !important; }
+
+/* ==========================================================================
+   手机档头部精简（购物车/会员中心移动外壳）：隐藏 LOGO 右侧面包屑模块
+   （窄屏下头部拥挤——品牌、汉堡、右侧操作区保留）
+   ========================================================================== */
+@media (max-width: 768px) {
+  .cra1-header .cra1-breadcrumb,
+  .cra1-header .cra1-header__sep {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   手机档抽屉修正：解除桌面折叠态残留 + 层级高于底部价格计算器
+   --------------------------------------------------------------------------
+   购物车底部价格计算器（.cl-rail-dock）z-index=100，而侧栏抽屉 z=50 ——
+   抽屉下半被计算器盖住。同时桌面折叠态（is-collapsed）会把抽屉内的
+   一级菜单标签隐藏（只剩图标）——「一级菜单没有正常显示」的根因。
+   ≤1024 抽屉始终完整：全宽 + 标签/箭头恢复 + 层级高于 dock。
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .cra1-aside.is-collapsed:not(.is-open) {
+    width: var(--aside-w) !important;
+  }
+
+  .cra1-aside.is-collapsed:not(.is-open) .cra1-aside__rail-col {
+    flex-basis: auto;
+    width: 100%;
+    padding: calc(var(--header-h) + 12px) 10px 12px;
+    border-right: 1px solid var(--border);
+  }
+
+  .cra1-aside.is-collapsed:not(.is-open) .cra1-primary-item {
+    justify-content: flex-start;
+    padding: 0 10px;
+    gap: 10px;
+  }
+
+  .cra1-aside.is-collapsed:not(.is-open) .cra1-primary-item__label {
+    display: flex;
+  }
+
+  .cra1-aside.is-collapsed:not(.is-open) .cra1-primary-item__chevron {
+    display: block;
+  }
+
+  /* 层级：抽屉 120 / 遮罩 119（高于底部价格计算器 z=100；
+     Element 弹层 2000+ 仍在其上） */
+  .cra1-aside {
+    z-index: 120 !important;
+  }
+
+  .cra1-aside__overlay {
+    z-index: 119 !important;
+  }
+
+  /* 顶栏不被抽屉遮挡：抽屉/遮罩从顶栏下缘开始（顶栏保持可见可点） */
+  .cra1-aside {
+    top: var(--header-h);
+    height: calc(100vh - var(--header-h));
+  }
+
+  .cra1-aside__overlay {
+    top: var(--header-h);
+  }
+
+  /* 顶栏不再覆盖抽屉：内容顶部垫复位（此前为顶栏让位加了 header-h 偏移） */
+  .cra1-aside__rail-col {
+    padding-top: 12px;
+  }
+
+  .cra1-aside__panel-head {
+    padding-top: 6px;
+  }
+}
+
+/* ==========================================================================
+   v20 手机端二级侧边菜单折叠（≤1024 抽屉内生效；PC 恒展开不受影响）
+   - 组标题行右侧折叠箭头（纯 CSS 三角，无图标字体依赖）
+   - .is-folded 隐藏组内三级行
+   ========================================================================== */
+.cra1-nav-group__toggle {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  /* 组标题行改 flex，箭头靠右 */
+  .cra1-nav-group .cra1-nav-l2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .cra1-nav-group__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    margin-right: -6px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-sm, 4px);
+    background: transparent;
+    color: var(--text-3, #909399);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .cra1-nav-group__toggle:active {
+    background: var(--fill-2, #f2f3f5);
+  }
+
+  .cra1-nav-group__chev {
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg); /* 收起：向下 */
+    transition: transform 0.18s ease;
+  }
+
+  .cra1-nav-group__toggle.is-open .cra1-nav-group__chev {
+    transform: rotate(-135deg); /* 展开：向上 */
+  }
+
+  /* 折叠态：隐藏组内三级行 */
+  .cra1-nav-group.is-folded .cra1-nav-l3 {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cra1-nav-group__chev {
+      transition: none;
+    }
+  }
+}
+
+/* Frozen navigation auth appearance; height alone follows the new controls. */

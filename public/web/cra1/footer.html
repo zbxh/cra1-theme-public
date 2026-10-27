@@ -1,0 +1,83 @@
+<footer class="footer-night text-body">
+    <div class="container-page">
+        <!-- 服务承诺条 / CTA / 底部菜单栏均在后台「页脚设置」中配置，PHP 侧预构建输出 -->
+        {$data.cra1.footer_promise_html|raw}
+
+        <div class="flex flex-col gap-5 border-b border-line py-8 md:flex-row md:items-center md:justify-between">
+            <div><div class="text-lg font-semibold text-ink">{$data.cra1.seo.siteName|default=''}</div><div class="mt-1 max-w-xl text-sm leading-6 text-body">{:cra1_content_value($data.cra1, 'footer_about', '一站式 IDC 云服务平台')}</div></div>
+            {$data.cra1.footer_cta_html|raw}
+        </div>
+
+        <div class="grid gap-10 border-b border-line py-10 lg:grid-cols-[1fr_18rem]">
+            <div class="footer-menu-grid grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-5">
+                {$data.cra1.footer_menu_html|raw}
+            </div>
+
+            <div class="footer-contact border-l border-line pl-0 lg:pl-8">
+                <div class="text-sm font-semibold text-ink">联系我们</div>
+                <div class="mt-4 space-y-2 text-sm leading-6 text-body">
+                    {if ( isset($data.config.enterprise_name) && $data.config.enterprise_name ) }<div>{$data.config.enterprise_name}</div>{else /}<div x-data x-text="$store.site.pick('enterprise_name', '智简魔方')"></div>{/if}
+                    {if ( isset($data.config.enterprise_telephone) && $data.config.enterprise_telephone ) }<div>{$data.config.enterprise_telephone}</div>{else /}<div x-data x-text="$store.site.pick('enterprise_telephone', '')"></div>{/if}
+                    {if ( isset($data.config.enterprise_mailbox) && $data.config.enterprise_mailbox ) }<div>{$data.config.enterprise_mailbox}</div>{else /}<div x-data x-text="$store.site.pick('enterprise_mailbox', '')"></div>{/if}
+                </div>
+                {if ( !empty($data.cra1.footer_qrcode_url) ) }<img src="{$data.cra1.footer_qrcode_url}" alt="客服二维码" class="mt-4 h-20 w-20 rounded border border-line bg-white object-contain p-1">{elseif ( !cra1_content_explicit($data.cra1, 'footer_qrcode_url') && isset($data.config.enterprise_qrcode) && $data.config.enterprise_qrcode ) }<img src="{$data.config.enterprise_qrcode}" alt="企业联系图片" class="footer-contact-image">{/if}
+            </div>
+        </div>
+
+        {if ( !empty($data.cra1.footer_links_html) ) }
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-line py-5 text-sm text-muted"><span>{if ( cra1_content_explicit($data.cra1, 'footer_copy.links_title') || (( isset($data.cra1.footer_copy['links_title']) && $data.cra1.footer_copy['links_title'] )) ) }{$data.cra1.footer_copy['links_title']}{else /}友情链接{/if}</span>{$data.cra1.footer_links_html|raw}</div>
+        {elseif ( $data.cra1.show_footer_links == 1 && !cra1_content_explicit($data.cra1, 'footer_links_text') && isset($data.friendly_link) && count($data.friendly_link) > 0 ) }
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-line py-5 text-sm text-muted"><span>友情链接</span>{foreach $data.friendly_link as $value}<a href="{$value.url}" target="_blank" rel="nofollow noopener" class="transition-colors duration-150 hover:text-brand">{$value.name}</a>{/foreach}</div>
+        {/if}
+
+        {if ( !isset($data.cra1.show_footer_bottom) || $data.cra1.show_footer_bottom == 1 ) }
+        <div class="flex flex-col gap-3 py-5 text-xs text-muted md:flex-row md:items-center md:justify-between">
+            <div class="flex flex-wrap gap-4"><a :href="$store.site.termsServiceUrl()" x-data class="transition-colors duration-150 hover:text-brand">{if ( cra1_content_explicit($data.cra1, 'footer_copy.terms') || (( isset($data.cra1.footer_copy['terms']) && $data.cra1.footer_copy['terms'] )) ) }{$data.cra1.footer_copy['terms']}{else /}用户协议{/if}</a><a :href="$store.site.termsPrivacyUrl()" x-data class="transition-colors duration-150 hover:text-brand">{if ( cra1_content_explicit($data.cra1, 'footer_copy.privacy') || (( isset($data.cra1.footer_copy['privacy']) && $data.cra1.footer_copy['privacy'] )) ) }{$data.cra1.footer_copy['privacy']}{else /}隐私政策{/if}</a>{$data.cra1.footer_icp_html|raw}{if ( !cra1_content_explicit($data.cra1, 'footer_icp_text') && empty($data.cra1.footer_icp_html) && isset($data.config.icp_info) && $data.config.icp_info ) }<a href="{$data.config.icp_info_link|default='https://beian.miit.gov.cn/'}" target="_blank" rel="nofollow noopener" class="transition-colors duration-150 hover:text-brand">{$data.config.icp_info}</a>{/if}</div>
+            <div class="text-left md:text-right">{if ( cra1_content_explicit($data.cra1, 'footer_copyright_text') || !empty($data.cra1.footer_copyright_html) ) }{$data.cra1.footer_copyright_html|raw}{else /}<span x-data x-text="$store.site.pick('copyright_info', '')"></span>{/if}</div>
+        </div>
+        {/if}
+
+    </div>
+</footer>
+    {if ( isset($data.cra1.float_enable) && $data.cra1.float_enable == 1 ) }
+    <!-- 右侧悬浮导航：竖向胶囊（悬浮条目）+ 底部独立圆形「返回顶部」按钮。
+         竖向位置、右缘间距与两者间隙都由 .float-dock / .float-top 控制（见 src/app.css）：
+         胶囊锚在视口中线略偏下，按钮绝对定位挂在胶囊正下方 8px，
+         所以按钮出现/消失只会「长出来」，不会推动胶囊。
+         注意：v2.51 起页脚改为深色圆角 sheet 并在 .footer-night 作用域内重映射令牌，
+         fixed 悬浮导航必须留在 footer 元素之外，否则会继承深色令牌。 -->
+    <div x-data="floatButtons" class="float-dock fixed z-40 hidden flex-col md:flex" @keydown.escape.window="expanded = false" @click.outside="expanded = false">
+        <button type="button" class="float-dock-toggle" :aria-expanded="expanded ? 'true' : 'false'" aria-controls="floating-contact-options" @click="expanded = !expanded" aria-label="打开或收起联系入口"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 13v-2a8 8 0 0 1 16 0v2M4 12H3v6h4v-6Zm16 0h1v6h-4v-6ZM17 19c0 2-3 2-5 2"/></svg></button>
+        <div id="floating-contact-options" class="float-dock-pill" :class="expanded ? 'is-open' : ''">
+            <template x-for="(item, fi) in items" :key="fi">
+                <a :href="item.url" :aria-label="item.name" class="float-dock-item"
+                    :target="isExternal(item.url) ? '_blank' : '_self'" :rel="isExternal(item.url) ? 'noopener' : null">
+                    <!-- 图标在上、名称在下（与参考设计稿一致：图标 + 常显文字） -->
+                    <span class="float-dock-icon" :data-cui-icon-style="item.icon_style ? '1' : null" :style="item.icon_css || {}">
+                        <!-- 图标库（Iconify/Icons8，服务端本地缓存）优先；内置键回退内联 SVG -->
+                        <template x-if="item.icon_png == 1"><img :src="item.icon_img" alt="" class="h-5 w-5"></template>
+                        <template x-if="item.icon_img && item.icon_png != 1"><span class="icon-img h-5 w-5" :style="'--icon:url(' + item.icon_img + ')'" aria-hidden="true"></span></template>
+                        <template x-if="!item.icon_img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path :d="iconPath(item.icon)"></path></svg></template>
+                    </span>
+                    <span class="float-dock-label" x-text="item.name"></span>
+                </a>
+            </template>
+        </div>
+        <!-- 返回顶部：独立圆形按钮（滚动后出现）。
+             不放悬停文字（.float-tip）——圆形按钮自身已表意明确，多余标签反显啰嗦；
+             读屏仍可识别，因为有 aria-label。 -->
+        <button type="button" x-cloak x-show="showTop" @click="window.scrollTo({ top: 0 })" class="float-top" aria-label="返回顶部" title="返回顶部">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg>
+        </button>
+    </div>
+    {/if}
+<script src="/web/cra1/assets/js/api.js?v={:filemtime(IDCSMART_ROOT . 'public/web/cra1/assets/js/api.js')}" defer></script>
+<!-- 头像生成（官网与会员中心共用的唯一实现，见文件头说明） -->
+<script src="{:cra1_theme_asset_url('website', '20261017-compat-v3/app.js', '/web/cra1/releases/20261017-compat-v3/app.js')}" defer></script>
+<script src="/web/cra1/assets/js/alpine.min.js?v={:filemtime(IDCSMART_ROOT . 'public/web/cra1/assets/js/alpine.min.js')}" defer></script>
+{if isset($data.cra1.custom_js) && $data.cra1.custom_js && (!isset($data.cra1.custom_js_enabled) || $data.cra1.custom_js_enabled == 1) }
+<!-- 后台自定义 JS：DOMContentLoaded 晚于 defer 脚本，确保在主题脚本与 Alpine 之后、全局作用域执行 -->
+<script>document.addEventListener('DOMContentLoaded', function(){ window.eval({:json_encode($data.cra1.custom_js, 15)}); });</script>
+{/if}
+</body>
+</html>

@@ -1,0 +1,33 @@
+{if ( isset($data.cra1.show_icon_ribbon) && $data.cra1.show_icon_ribbon == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'icon_ribbon_rows') || (( isset($data.cra1.icon_ribbon_rows) && count($data.cra1.icon_ribbon_rows) > 0 )) ) }
+<!-- 布局 F：图标条——无卡片描边，靠图标 + 细竖线切分，用于「能力清单」类短句并排 -->
+<section class="relative overflow-hidden border-y border-line bg-white py-12 md:py-16">
+    <div class="container-page">
+        {if ( cra1_content_explicit($data.cra1, 'icon_ribbon_title') || (( isset($data.cra1.icon_ribbon_title) && $data.cra1.icon_ribbon_title )) ) }
+        <div class="flex flex-wrap items-baseline justify-between gap-3" data-reveal>
+            <h2 class="text-lg font-semibold text-ink md:text-2xl">{$data.cra1.icon_ribbon_title}</h2>
+            {if ( isset($data.cra1.icon_ribbon_link) && $data.cra1.icon_ribbon_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'icon_ribbon_more_text', '了解更多') != '' ) }<a href="{$data.cra1.icon_ribbon_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'icon_ribbon_more_text', '了解更多')} →</a>{/if}
+            {/if}
+        </div>
+        {/if}
+        <ul class="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
+            {foreach $data.cra1.icon_ribbon_rows as $ir => $ic}
+            <li class="flex min-w-0 gap-3.5" data-reveal>
+                <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full" data-cra1-icon-label="{$ic['name']|htmlspecialchars} {$ic['icon_style_attrs']|default=''|raw}">
+                    <!-- 图标三态与页脚/悬浮导航一致：PNG 用 img；SVG 用遮罩随文字变色；无图标时回退对勾 -->
+                    {if $ic['icon_png'] == 1}<img src="{$ic['icon_img']}" alt="" style="width:1.125rem;height:1.125rem">
+                    {elseif $ic['icon_img']}<span class="icon-img" style="--icon:url('{$ic['icon_img']}');width:1.125rem;height:1.125rem" aria-hidden="true"></span>
+                    {else /}<svg style="width:1.125rem;height:1.125rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{/if}
+                </span>
+                <span class="min-w-0">
+                    <span class="block text-sm font-semibold text-ink">{if $ic['url']}<a href="{$ic['url']}" class="transition-colors duration-150 hover:text-brand">{$ic['name']}</a>{else /}{$ic['name']}{/if}</span>
+                    {if $ic['desc']}<span class="mt-1 block text-xs leading-5 text-body">{$ic['desc']}</span>{/if}
+                </span>
+            </li>
+            {/foreach}
+        </ul>
+    </div>
+</section>
+{/if}
+{/if}

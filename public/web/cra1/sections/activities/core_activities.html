@@ -1,0 +1,26 @@
+<section class="container-page py-12 md:py-16" data-reveal>
+            <div class="">
+                <div class="article-list grid gap-5 sm:grid-cols-2">
+                    <article class="article-card glass-card lift-card p-7 cui-card">
+
+                        <h2 class="text-xl font-semibold text-ink">{if ( cra1_content_explicit($data.cra1, 'core_activities_copy.title') || (( isset($data.cra1.core_activities_copy['title']) && $data.cra1.core_activities_copy['title'] )) ) }{$data.cra1.core_activities_copy['title']}{else /}产品活动{/if}</h2>
+                        <p class="mt-3 text-sm leading-6 text-body">{if ( cra1_content_explicit($data.cra1, 'core_activities_copy.txt1') || (( isset($data.cra1.core_activities_copy['txt1']) && $data.cra1.core_activities_copy['txt1'] )) ) }{$data.cra1.core_activities_copy['txt1']}{else /}产品优惠、试用与服务调整将通过官网活动页面或官方公告发布。{/if}</p>
+                    </article>
+                    <article class="article-card glass-card lift-card p-7 cui-card">
+
+                        <h2 class="text-xl font-semibold text-ink">{if ( cra1_content_explicit($data.cra1, 'core_activities_copy.title2') || (( isset($data.cra1.core_activities_copy['title2']) && $data.cra1.core_activities_copy['title2'] )) ) }{$data.cra1.core_activities_copy['title2']}{else /}会员活动{/if}</h2>
+                        <p class="mt-3 text-sm leading-6 text-body">{if ( cra1_content_explicit($data.cra1, 'core_activities_copy.txt2') || (( isset($data.cra1.core_activities_copy['txt2']) && $data.cra1.core_activities_copy['txt2'] )) ) }{$data.cra1.core_activities_copy['txt2']}{else /}会员专属活动以账户可见的活动规则为准，参与前请阅读适用条件。{/if}</p>
+                    </article>
+                    <article class="article-card glass-card lift-card p-7 cui-card">
+
+                        <h2 class="text-xl font-semibold text-ink">{if ( cra1_content_explicit($data.cra1, 'core_activities_copy.title3') || (( isset($data.cra1.core_activities_copy['title3']) && $data.cra1.core_activities_copy['title3'] )) ) }{$data.cra1.core_activities_copy['title3']}{else /}服务更新{/if}</h2>
+                        <p class="mt-3 text-sm leading-6 text-body">{if ( cra1_content_explicit($data.cra1, 'core_activities_copy.txt3') || (( isset($data.cra1.core_activities_copy['txt3']) && $data.cra1.core_activities_copy['txt3'] )) ) }{$data.cra1.core_activities_copy['txt3']}{else /}服务能力、产品范围和使用规则如有变化，将及时在公告中说明。{/if}</p>
+                    </article>
+                    <article class="article-card glass-card lift-card p-7 cui-card">
+
+                        <h2 class="text-xl font-semibold text-ink">{if ( cra1_content_explicit($data.cra1, 'core_activities_copy.title4') || (( isset($data.cra1.core_activities_copy['title4']) && $data.cra1.core_activities_copy['title4'] )) ) }{$data.cra1.core_activities_copy['title4']}{else /}活动咨询{/if}</h2>
+                        <p class="mt-3 text-sm leading-6 text-body">{if ( cra1_content_explicit($data.cra1, 'core_activities_copy.txt4') || (( isset($data.cra1.core_activities_copy['txt4']) && $data.cra1.core_activities_copy['txt4'] )) ) }{$data.cra1.core_activities_copy['txt4']}{else /}对活动内容有疑问时，可通过在线咨询提交具体产品和业务场景。{/if}</p>
+                    </article>
+                </div>
+            </div>
+        </section>

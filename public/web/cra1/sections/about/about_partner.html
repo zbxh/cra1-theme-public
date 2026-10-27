@@ -1,0 +1,31 @@
+{if ( !isset($data.cra1.show_about_partner) || $data.cra1.show_about_partner == 1 ) }
+        <section class="container-page py-12 md:py-16" data-reveal aria-label="合作案例">
+            <h2 class="section-title">合作案例</h2>
+            <!-- 跑马灯：与资质荣誉墙同一套机制（两份内容 + translateX(-50%) 无缝循环，
+                 margin 间隔、hover 暂停、reduced-motion 降级为横向滚动），第二份 aria-hidden -->
+            {if ( cra1_content_explicit($data.cra1, 'about_partner') || (( isset($data.cra1.about_partner) && count($data.cra1.about_partner) > 0 )) ) }
+            <div class="marquee mt-8" style="--marquee-duration: {:max(count($data.cra1.about_partner), 1) * 7}s">
+                <div class="marquee-track items-stretch py-1">
+                    {foreach $data.cra1.about_partner as $row}
+                    <article class="article-card glass-card mr-5 w-72 shrink-0 overflow-hidden p-0 cui-card"><div class="cui-card__clip">
+                        <img src="{$row.url}" alt="{$row.name}" class="h-40 w-full object-cover" loading="lazy" decoding="async">
+                        <div class="p-5">
+                            <h3 class="text-sm font-medium text-ink">{$row.name}</h3>
+                            {if ( !empty($row.desc) ) }<p class="mt-2 text-xs leading-5 text-body">{$row.desc}</p>{/if}
+                        </div>
+                    </div></article>
+                    {/foreach}
+                    {foreach $data.cra1.about_partner as $row}
+                    <article class="article-card glass-card mr-5 w-72 shrink-0 overflow-hidden p-0 cui-card" aria-hidden="true"><div class="cui-card__clip">
+                        <img src="{$row.url}" alt="" class="h-40 w-full object-cover" loading="lazy" decoding="async">
+                        <div class="p-5">
+                            <h3 class="text-sm font-medium text-ink">{$row.name}</h3>
+                            {if ( !empty($row.desc) ) }<p class="mt-2 text-xs leading-5 text-body">{$row.desc}</p>{/if}
+                        </div>
+                    </div></article>
+                    {/foreach}
+                </div>
+            </div>
+            {/if}
+        </section>
+        {/if}

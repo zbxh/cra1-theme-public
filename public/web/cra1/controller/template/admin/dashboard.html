@@ -1,0 +1,283 @@
+<link rel="stylesheet" href="../default/css/template_controller.css" />
+<link rel="stylesheet" href="/web/cra1/controller/template/admin/dashboard.css" />
+
+<!-- ======= 酷锐A1主题独立管理台 ======= -->
+<div id="content" v-cloak>
+  <com-config>
+    <t-card class="list-card-container">
+      <div class="common-header top">
+        <div class="tabs flex">
+          <t-button theme="primary" disabled @click="save" :loading="submitting">保存全部配置</t-button>
+          <t-button theme="default" variant="base" disabled @click="reset">恢复全部默认</t-button>
+          <t-button theme="default" variant="base" @click="load">重新读取</t-button>
+        </div>
+        <span class="cra1-tip">此旧管理页仅供读取。配置保存和恢复默认请使用独立主题后台。</span>
+      </div>
+
+      <div class="cd-layout">
+        <!-- 左侧分组导航 -->
+        <aside class="cd-nav">
+          <div class="cd-nav-title">CRA1 官网配置</div>
+          <button type="button" v-for="g in groups" :key="g.key" class="cd-nav-item"
+              :class="{ active: active === g.key }" @click="active = g.key">{{ g.label }}</button>
+        </aside>
+
+        <!-- 右侧配置面板 -->
+        <section class="cd-panel">
+          <!-- 网站菜单 -->
+          <div v-show="active === 'menu'">
+            <h3 class="cd-panel-title">网站菜单</h3>
+            <p class="cra1-tip">控制官网桌面导航与移动端抽屉（每行：名称|链接|简介|是否新窗口，二级项在名称前加 &gt;）。</p>
+            <label class="form-control"><span class="cra1-label">菜单结构</span>
+              <textarea readonly v-model="form.cloud_menu_text" rows="14"
+                  class="textarea textarea-bordered w-full bg-white font-mono text-xs leading-5"></textarea></label>
+            <p class="cra1-tip">示例：产品服务|/cart/goodsList.htm|产品与服务|0，下一行 &gt;云服务器|/cloud.html|弹性云服务器|0。链接支持 /、https://、tel:、mailto:。「产品服务」下拉的商品列表仍实时读取商品接口。</p>
+          </div>
+
+          <!-- 首屏轮播 -->
+          <div v-show="active === 'carousel'">
+            <h3 class="cd-panel-title">首屏轮播</h3>
+            <p class="cra1-tip">每行：图片或视频地址|链接|标题|描述|按钮文字|按钮链接。后四段可省略；按钮链接省略时使用整页链接；按钮文字为空时不显示按钮。</p>
+            <label class="form-control"><span class="cra1-label">轮播内容（支持 jpg/png/webp 图片与 mp4/webm 视频）</span>
+              <textarea readonly v-model="form.slides_text" rows="8"
+                  class="textarea textarea-bordered w-full bg-white font-mono text-xs leading-5"></textarea></label>
+            <p class="cra1-tip">示例：/web/cra1/assets/img/banner/banner-hw-1.jpg|/cart/goodsList.htm|弹性计算|按需快速创建云服务器|选购云服务器|/cloud.html</p>
+          </div>
+
+          <!-- 首页产品 -->
+          <div v-show="active === 'products'">
+            <h3 class="cd-panel-title">首页产品</h3>
+            <p class="cra1-tip">指定首页「产品与价格」模块展示的商品。每行：商品ID|排序|展示标签（标签可省略）。名称与价格仍实时读取商品接口，不在此保存价格。</p>
+            <label class="form-control"><span class="cra1-label">指定商品（留空时按分组自动展示）</span>
+              <textarea readonly v-model="form.home_products_text" rows="6"
+                  class="textarea textarea-bordered w-full bg-white font-mono text-xs leading-5"></textarea></label>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">最多显示数量（1-12）</span>
+                <t-input disabled v-model="form.home_products_limit"></t-input></label>
+              <label class="form-control"><span class="cra1-label">默认分组 ID（0 为全部）</span>
+                <t-input disabled v-model="form.home_products_group"></t-input></label>
+            </div>
+            <p class="cra1-tip">商品 ID 可在「商品管理」列表查看；未配置时首页自动读取商品分组与商品。</p>
+          </div>
+
+          <!-- 能力矩阵 -->
+          <div v-show="active === 'capability'">
+            <h3 class="cd-panel-title">轮播下双面板</h3>
+            <label class="form-control flex items-center gap-3">
+              <t-switch disabled v-model="form.show_capability_bool"></t-switch>
+              <span class="text-sm text-body">显示此区块</span>
+            </label>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">左栏标题</span>
+                <t-input disabled v-model="form.cap1_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">左栏描述</span>
+                <t-input disabled v-model="form.cap1_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">左栏链接</span>
+                <t-input disabled v-model="form.cap1_link"></t-input></label>
+            </div>
+            <label class="form-control"><span class="cra1-label">左栏快捷链接（每行：文字|链接，建议 6 条）</span>
+              <textarea readonly v-model="form.panel_links_text" rows="6"
+                  class="textarea textarea-bordered w-full bg-white font-mono text-xs leading-5"></textarea></label>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">卡 2 标题</span>
+                <t-input disabled v-model="form.cap2_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">卡 2 描述</span>
+                <t-input disabled v-model="form.cap2_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">卡 2 链接</span>
+                <t-input disabled v-model="form.cap2_link"></t-input></label>
+              <label class="form-control"><span class="cra1-label">卡 3 标题</span>
+                <t-input disabled v-model="form.cap3_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">卡 3 描述</span>
+                <t-input disabled v-model="form.cap3_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">卡 3 链接</span>
+                <t-input disabled v-model="form.cap3_link"></t-input></label>
+              <label class="form-control"><span class="cra1-label">卡 4 标题</span>
+                <t-input disabled v-model="form.cap4_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">卡 4 描述</span>
+                <t-input disabled v-model="form.cap4_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">卡 4 链接</span>
+                <t-input disabled v-model="form.cap4_link"></t-input></label>
+            </div>
+          </div>
+
+          <!-- 产品与价格 -->
+          <div v-show="active === 'pricing'">
+            <h3 class="cd-panel-title">产品与价格模块</h3>
+            <label class="form-control flex items-center gap-3">
+              <t-switch disabled v-model="form.show_pricing_bool"></t-switch>
+              <span class="text-sm text-body">显示此区块</span>
+            </label>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">模块标题</span>
+                <t-input disabled v-model="form.pricing_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">模块描述</span>
+                <t-input disabled v-model="form.pricing_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">右上链接</span>
+                <t-input disabled v-model="form.pricing_link"></t-input></label>
+              <label class="form-control"><span class="cra1-label">右上链接文字</span>
+                <t-input disabled v-model="form.pricing_more_text"></t-input></label>
+            </div>
+          </div>
+
+          <!-- 解决方案 -->
+          <div v-show="active === 'solutions'">
+            <h3 class="cd-panel-title">解决方案模块</h3>
+            <label class="form-control flex items-center gap-3">
+              <t-switch disabled v-model="form.show_solutions_bool"></t-switch>
+              <span class="text-sm text-body">显示此区块</span>
+            </label>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">模块标题</span>
+                <t-input disabled v-model="form.sol_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">模块描述</span>
+                <t-input disabled v-model="form.sol_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">右上链接</span>
+                <t-input disabled v-model="form.sol_link"></t-input></label>
+              <label class="form-control"><span class="cra1-label">右上链接文字</span>
+                <t-input disabled v-model="form.sol_more_text"></t-input></label>
+            </div>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">方案 1 标题</span>
+                <t-input disabled v-model="form.sol1_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 1 描述</span>
+                <t-input disabled v-model="form.sol1_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 1 链接</span>
+                <t-input disabled v-model="form.sol1_url"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 2 标题</span>
+                <t-input disabled v-model="form.sol2_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 2 描述</span>
+                <t-input disabled v-model="form.sol2_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 2 链接</span>
+                <t-input disabled v-model="form.sol2_url"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 3 标题</span>
+                <t-input disabled v-model="form.sol3_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 3 描述</span>
+                <t-input disabled v-model="form.sol3_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 3 链接</span>
+                <t-input disabled v-model="form.sol3_url"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 4 标题</span>
+                <t-input disabled v-model="form.sol4_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 4 描述</span>
+                <t-input disabled v-model="form.sol4_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">方案 4 链接</span>
+                <t-input disabled v-model="form.sol4_url"></t-input></label>
+            </div>
+          </div>
+
+          <!-- 快速上手步骤 -->
+          <div v-show="active === 'steps'">
+            <h3 class="cd-panel-title">快速上手步骤</h3>
+            <label class="form-control flex items-center gap-3">
+              <t-switch disabled v-model="form.show_steps_bool"></t-switch>
+              <span class="text-sm text-body">显示此区块</span>
+            </label>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">模块标题</span>
+                <t-input disabled v-model="form.band_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">模块描述</span>
+                <t-input disabled v-model="form.band_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">右上链接</span>
+                <t-input disabled v-model="form.band_link"></t-input></label>
+              <label class="form-control"><span class="cra1-label">右上链接文字</span>
+                <t-input disabled v-model="form.band_more_text"></t-input></label>
+            </div>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">步骤 1 标题</span>
+                <t-input disabled v-model="form.band_item1_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">步骤 1 描述</span>
+                <t-input disabled v-model="form.band_item1_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">步骤 2 标题</span>
+                <t-input disabled v-model="form.band_item2_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">步骤 2 描述</span>
+                <t-input disabled v-model="form.band_item2_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">步骤 3 标题</span>
+                <t-input disabled v-model="form.band_item3_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">步骤 3 描述</span>
+                <t-input disabled v-model="form.band_item3_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">步骤 4 标题</span>
+                <t-input disabled v-model="form.band_item4_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">步骤 4 描述</span>
+                <t-input disabled v-model="form.band_item4_desc"></t-input></label>
+            </div>
+          </div>
+
+          <!-- 服务节点 -->
+          <div v-show="active === 'nodes'">
+            <h3 class="cd-panel-title">全球服务节点</h3>
+            <label class="form-control flex items-center gap-3">
+              <t-switch disabled v-model="form.show_nodes_bool"></t-switch>
+              <span class="text-sm text-body">显示此区块</span>
+            </label>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">模块标题</span>
+                <t-input disabled v-model="form.nodes_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">模块描述</span>
+                <t-input disabled v-model="form.nodes_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">右上链接</span>
+                <t-input disabled v-model="form.nodes_link"></t-input></label>
+              <label class="form-control"><span class="cra1-label">右上链接文字</span>
+                <t-input disabled v-model="form.nodes_more_text"></t-input></label>
+            </div>
+            <label class="form-control"><span class="cra1-label">节点列表</span>
+              <textarea readonly v-model="form.nodes_text" rows="8"
+                  class="textarea textarea-bordered w-full bg-white font-mono text-xs leading-5"></textarea></label>
+            <p class="cra1-tip">两种格式均可：名称|经度|纬度（如 北京|116.41|39.90）；或 名称|地区|经度|纬度|是否显示（如 华北|北京|116.41|39.90|1，0 为隐藏）。经度 -180~180，纬度 -85~85，非法行自动忽略。</p>
+          </div>
+
+          <!-- 新闻公告 -->
+          <div v-show="active === 'news'">
+            <h3 class="cd-panel-title">新闻公告模块</h3>
+            <label class="form-control flex items-center gap-3">
+              <t-switch disabled v-model="form.show_news_bool"></t-switch>
+              <span class="text-sm text-body">显示此区块</span>
+            </label>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">模块标题</span>
+                <t-input disabled v-model="form.news_title"></t-input></label>
+              <label class="form-control"><span class="cra1-label">模块描述</span>
+                <t-input disabled v-model="form.news_desc"></t-input></label>
+              <label class="form-control"><span class="cra1-label">右上链接</span>
+                <t-input disabled v-model="form.news_link"></t-input></label>
+              <label class="form-control"><span class="cra1-label">右上链接文字</span>
+                <t-input disabled v-model="form.news_more_text"></t-input></label>
+            </div>
+          </div>
+
+          <!-- 悬浮导航与页脚 -->
+          <div v-show="active === 'footer'">
+            <h3 class="cd-panel-title">悬浮导航与页脚</h3>
+            <label class="form-control"><span class="cra1-label">右侧悬浮导航（每行：名称|链接|图标，图标可选 kefu/phone/qq/wechat，缺省为链接图标；返回顶部内置）</span>
+              <textarea readonly v-model="form.float_items_text" rows="4"
+                  class="textarea textarea-bordered w-full bg-white font-mono text-xs leading-5"></textarea></label>
+            <label class="form-control flex items-center gap-3 mt-2">
+              <t-switch disabled v-model="form.float_enable_bool"></t-switch>
+              <span class="text-sm text-body">显示右侧悬浮导航</span>
+            </label>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">移动端抽屉底部热线</span>
+                <t-input disabled v-model="form.hotline"></t-input></label>
+              <label class="form-control"><span class="cra1-label">页脚品牌简介</span>
+                <t-input disabled v-model="form.footer_about"></t-input></label>
+            </div>
+            <div class="cra1-grid">
+              <label class="form-control"><span class="cra1-label">服务承诺 1</span>
+                <t-input disabled v-model="form.promise_1"></t-input></label>
+              <label class="form-control"><span class="cra1-label">服务承诺 2</span>
+                <t-input disabled v-model="form.promise_2"></t-input></label>
+              <label class="form-control"><span class="cra1-label">服务承诺 3</span>
+                <t-input disabled v-model="form.promise_3"></t-input></label>
+              <label class="form-control"><span class="cra1-label">服务承诺 4</span>
+                <t-input disabled v-model="form.promise_4"></t-input></label>
+            </div>
+            <label class="form-control"><span class="cra1-label">「产品服务」下拉商品卡简介（每行：商品名称或ID|简介，未命中时显示通用文案）</span>
+              <textarea readonly v-model="form.mega_notes_text" rows="4"
+                  class="textarea textarea-bordered w-full bg-white font-mono text-xs leading-5"></textarea></label>
+            <p class="cra1-tip">页脚导航、企业信息、备案、版权与友链请使用原生「网站信息配置 / 底部导航」维护。</p>
+          </div>
+        </section>
+      </div>
+    </t-card>
+  </com-config>
+</div>
+
+<script src="/web/cra1/controller/template/admin/dashboard.js" defer></script>

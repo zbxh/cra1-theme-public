@@ -1,0 +1,9 @@
+{if ( !isset($data.cra1.show_feedback_channels) || $data.cra1.show_feedback_channels == 1 ) }
+        <section class="container-page pb-2" data-reveal aria-label="反馈渠道">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {foreach $data.cra1.feedback_channels as $row}
+                <div class="feature-item glass-card rounded-xl p-6 cui-card"><h3 class="font-semibold text-ink">{$row.name}</h3><p class="mt-2 text-sm leading-6 text-body">{$row.desc}</p></div>
+                {/foreach}
+            </div>
+        </section>
+        {/if}

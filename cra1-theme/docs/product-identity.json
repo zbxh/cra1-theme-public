@@ -1,0 +1,12 @@
+{
+  "format": 1,
+  "product": "cra1-theme",
+  "display_name": "酷锐A1主题",
+  "brand": "CRA1",
+  "theme_id": "cra1",
+  "php_namespace": "CRA1\\Theme",
+  "controller": "template\\cra1\\controller\\Cra1",
+  "shared_global": "CRA1Shared",
+  "member_api_prefix": "/console/v1/cra1-theme/",
+  "session_cookie": "CRA1THEMEID"
+}

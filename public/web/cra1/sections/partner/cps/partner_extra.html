@@ -1,0 +1,13 @@
+{if ( !isset($data.cra1.show_partner_cps_extra) || $data.cra1.show_partner_cps_extra == 1 ) }
+        <section class="container-page pb-2" data-reveal aria-label="推广合作权益">
+            <div class="grid gap-4 md:grid-cols-3">
+                {foreach $data.cra1.partner_cps_extra as $row}
+                <a href="{$row.url|default='/contact.html'}" class="feature-item glass-card group rounded-xl p-6 lift-card cui-card">
+                    <h3 class="font-semibold text-ink group-hover:text-primary">{$row.name}</h3>
+                    <p class="mt-2 text-sm leading-6 text-body">{$row.desc}</p>
+                    <span class="card-arrow mt-4 inline-block text-sm text-primary">了解 <span aria-hidden="true">→</span></span>
+                </a>
+                {/foreach}
+            </div>
+        </section>
+        {/if}

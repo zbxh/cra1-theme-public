@@ -1,0 +1,18 @@
+<!-- 酷锐A1主题旧配置入口：已迁移至独立管理台，仅做跳转兼容 -->
+<div style="padding:12px;border:1px solid #d9dce3;background:#f6f7f9;margin:12px 0">旧主题管理页仅供读取；修改与恢复默认请使用独立主题后台。</div>
+<div id="content" v-cloak>
+  <com-config>
+    <t-card class="list-card-container">
+      <div class="common-header top">
+        <span class="cra1-tip">酷锐A1主题配置已迁移至独立管理台，正在跳转……</span>
+      </div>
+    </t-card>
+  </com-config>
+</div>
+<script>
+  (function () {
+    var target = new URL('dashboard.htm', location.href);
+    target.search = '?theme=cra1';
+    location.replace(target.href);
+  })();
+</script>

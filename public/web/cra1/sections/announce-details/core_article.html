@@ -1,0 +1,35 @@
+<section class="reading-section container-page min-h-[60vh] py-12 md:py-16" data-reveal>
+            <div class="mx-auto max-w-3xl">
+                <a href="/announce.html" class="text-sm text-primary hover:opacity-80">{if ( cra1_content_explicit($data.cra1, 'core_article_copy.txt1') || (( isset($data.cra1.core_article_copy['txt1']) && $data.cra1.core_article_copy['txt1'] )) ) }{$data.cra1.core_article_copy['txt1']}{else /}← 返回公告列表{/if}</a>
+
+                <div x-cloak x-show="loading" class="mt-8 glass-card p-8 md:p-10 cui-card" aria-live="polite" aria-label="公告加载中">
+                    <div class="skeleton-line h-8 w-2/3"></div><div class="skeleton-line mt-5 h-4 w-1/4"></div>
+                    <div class="skeleton-line mt-8 h-4 w-full"></div><div class="skeleton-line mt-3 h-4 w-full"></div><div class="skeleton-line mt-3 h-4 w-3/4"></div>
+                </div>
+                <div x-cloak x-show="!loading && notFound" class="empty-state mt-8 py-20 text-center">{if ( cra1_content_explicit($data.cra1, 'core_article_copy.txt2') || (( isset($data.cra1.core_article_copy['txt2']) && $data.cra1.core_article_copy['txt2'] )) ) }{$data.cra1.core_article_copy['txt2']}{else /}公告不存在或已删除{/if}</div>
+
+                <div x-cloak x-show="!loading && loadFailed" class="empty-state mt-8 py-20 text-center" role="status"><p>暂时无法读取内容，请稍后重试</p><button type="button" class="btn btn-sm btn-outline cui-button cui-button--outline cui-button--sm mt-4" @click="retry()">重新加载</button></div>
+                <article data-reading-article x-cloak x-show="!loading && item" class="article-card mt-8 glass-card p-6 md:p-10 cui-card">
+                    <h2 class="text-2xl font-bold leading-snug text-ink md:text-3xl" x-text="item?.title"></h2>
+                    <p class="mt-4 text-sm text-muted" x-text="timeText(item?.create_time)"></p>
+                    <div class="rich-content reading-content mt-8" x-html="item?.content || ''" x-effect="item && $nextTick(() => prepareReading())" x-cloak x-show="item"
+                          x-transition:enter="transition duration-300 ease-out"
+                          x-transition:enter-start="opacity-0"
+                          x-transition:enter-end="opacity-100"></div>
+
+                    <div x-cloak x-show="item && attachments(item).length" class="mt-10 border-t border-base-200 pt-6">
+                        <h3 class="text-base font-semibold text-ink">{if ( cra1_content_explicit($data.cra1, 'core_article_copy.txt11') || (( isset($data.cra1.core_article_copy['txt11']) && $data.cra1.core_article_copy['txt11'] )) ) }{$data.cra1.core_article_copy['txt11']}{else /}相关附件{/if}</h3>
+                        <ul class="mt-3 space-y-2 text-sm">
+                            <template x-for="(attachment, aIdx) in attachments(item)" :key="aIdx + '-' + attachmentUrl(attachment)">
+                                <li><a :href="attachmentUrl(attachment)" target="_blank" rel="noopener" class="text-primary hover:opacity-80"><span x-text="attachmentName(attachment)"></span> ↗</a></li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    <nav class="mt-10 grid gap-3 border-t border-base-200 pt-6 text-sm sm:grid-cols-2" aria-label="相邻公告">
+                        <a x-cloak x-show="previous && previous.id" :href="previous ? '/announce-details.html?id=' + previous.id : '#'" class="min-w-0 rounded-xl border border-base-200 px-4 py-3 text-body hover:border-primary hover:text-primary"><span class="block text-xs text-muted">{if ( cra1_content_explicit($data.cra1, 'core_article_copy.txt9') || (( isset($data.cra1.core_article_copy['txt9']) && $data.cra1.core_article_copy['txt9'] )) ) }{$data.cra1.core_article_copy['txt9']}{else /}上一篇{/if}</span><span class="mt-1 block truncate" x-text="previous ? previous.title : ''"></span></a>
+                        <a x-cloak x-show="next && next.id" :href="next ? '/announce-details.html?id=' + next.id : '#'" class="min-w-0 rounded-xl border border-base-200 px-4 py-3 text-body hover:border-primary hover:text-primary sm:text-right"><span class="block text-xs text-muted">{if ( cra1_content_explicit($data.cra1, 'core_article_copy.txt10') || (( isset($data.cra1.core_article_copy['txt10']) && $data.cra1.core_article_copy['txt10'] )) ) }{$data.cra1.core_article_copy['txt10']}{else /}下一篇{/if}</span><span class="mt-1 block truncate" x-text="next ? next.title : ''"></span></a>
+                    </nav>
+                </article>
+            </div>
+        </section>

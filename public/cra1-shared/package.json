@@ -1,0 +1,12 @@
+{
+  "name": "cra1-shared",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "postcss": "^8.5.6"
+  },
+  "license": "SEE LICENSE IN ../../cra1-theme/LICENSE.txt"
+}

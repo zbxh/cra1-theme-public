@@ -1,0 +1,102 @@
+{
+  "custom_code": {
+    "css": "",
+    "js": "",
+    "css_enabled": true,
+    "js_enabled": true
+  },
+  "schema_version": 2,
+  "version": 0,
+  "updated_at": 0,
+  "updated_by": "",
+  "content": {
+    "goodslist": {
+      "copy": {
+        "title": "",
+        "subtitle": "",
+        "card_title": "产品型号",
+        "tabs_title": "选配方式",
+        "show_desc": true
+      },
+      "grid": {
+        "desktop_columns": 3,
+        "tablet_columns": 2,
+        "mobile_columns": 1,
+        "rows_per_load": 3,
+        "desc_max_lines": 2
+      },
+      "card_sections": [
+        {
+          "key": "desc",
+          "enabled": true
+        },
+        {
+          "key": "tags",
+          "enabled": true
+        },
+        {
+          "key": "stock",
+          "enabled": true
+        },
+        {
+          "key": "promo",
+          "enabled": true
+        },
+        {
+          "key": "price",
+          "enabled": true
+        }
+      ],
+      "default_selection": {
+        "product_id": 0
+      },
+      "config_panel": {
+        "default_open": true
+      },
+      "heading_icons": {
+        "category_primary": "",
+        "category_secondary": "",
+        "product_model": "",
+        "config_method": "",
+        "billing_cycle": "",
+        "basic": "",
+        "package": "",
+        "instance": "",
+        "model": "",
+        "image": "",
+        "storage": "",
+        "network": "",
+        "security": "",
+        "other": "",
+        "option": "",
+        "price": ""
+      }
+    },
+    "shoppingcar": {
+      "empty": {
+        "title": "",
+        "description": "",
+        "button_text": "",
+        "button_target": "/cart/goodsList.htm"
+      },
+      "recommendations": {
+        "enabled": false,
+        "title": "",
+        "items": []
+      }
+    },
+    "settlement": {
+      "copy": {
+        "title": "",
+        "agree_text": ""
+      }
+    },
+    "orderresult": {
+      "copy": {
+        "success_title": "",
+        "cancel_title": "",
+        "pending_title": ""
+      }
+    }
+  }
+}

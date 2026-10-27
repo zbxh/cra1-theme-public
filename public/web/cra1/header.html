@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-cn" data-theme="cra1" data-cra1-theme="website">
+<head>
+{php}require_once IDCSMART_ROOT.'public/cra1-shared/runtime.php'; $__cra1Runtime=CRA1ThemeRuntime::load('website');{/php}
+<script>window.__CRA1_RUNTIME__={:json_encode($__cra1Runtime, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE)};</script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    {php}
+    /*
+     * 标题取值：系统 $title 优先，但系统给不出「页名」时用主题按页解析的标题兜底。
+     *
+     * 系统对详情页的标题由插件钩子按数据填充，取不到数据时只回退成站点名
+     * （实测 news-details.html?id=99999 → <title>智简魔方v10业务系统</title>），
+     * 于是「新闻详情」这种页面会渲染成裸站点名，浏览器标签与搜索结果都无法区分页面。
+     * 主题已按页解析出 titleFull（如「新闻详情-站点名」，同一份值也用于 og:title），
+     * 这里只在系统标题为空或退化成裸站点名时改用它；系统给出更具体的标题
+     * （如详情页的「示例-站点名」）时保持不动，避免覆盖掉更精确的信息。
+     */
+    $__seo = (isset($data['cra1']['seo']) && is_array($data['cra1']['seo'])) ? $data['cra1']['seo'] : [];
+    $__seoTitle = isset($__seo['titleFull']) ? trim((string) $__seo['titleFull']) : '';
+    $__siteName = isset($__seo['siteName']) ? trim((string) $__seo['siteName']) : '';
+    $__sysTitle  = isset($title) ? trim((string) $title) : '';
+    $__titleOut  = $__sysTitle;
+    if ($__seoTitle !== '' && ($__sysTitle === '' || ($__siteName !== '' && $__sysTitle === $__siteName))) {
+        $__titleOut = $__seoTitle;
+    }
+    if ($__titleOut === '') {
+        $__titleOut = $__seoTitle !== '' ? $__seoTitle : $__siteName;
+    }
+    {/php}
+    <title>{$__titleOut}</title>
+    <meta name="keywords" content="{$keywords}">
+    <meta name="description" content="{$description}">
+    <script>document.documentElement.classList.add('js');window.__CRA1_SITE_NAME__ = '{$data.cra1.seo.siteName|default=''}';</script>
+    <!-- 自带 ?v= 参数时系统不再追加固定版本号，文件更新即可刷新浏览器缓存 -->
+    <link rel="stylesheet" href="{:cra1_theme_asset_url('website', '20261014-theme-fixes-v1/app.css', '/web/cra1/releases/20261014-theme-fixes-v1/app.css')}">
+    <!-- 顶栏用户块/用户面板：官网与会员中心共用的一套样式（类名同构，单点维护） -->
+    <!-- 三端共用组件：只加载一次，位于独立主题代码之前。 -->
+    <link rel="stylesheet" href="{:cra1_theme_asset_url('shared', 'cra1-shared.css', '/cra1-shared/releases/20261017-member-auth-v2/cra1-shared.css')}">
+    <!-- 按 defer 顺序先于 API、主题脚本和 Alpine 执行，避免阻塞正文解析。 -->
+    <script src="{:cra1_theme_asset_url('shared', 'cra1-shared.js', '/cra1-shared/releases/20261017-member-auth-v2/cra1-shared.js')}" defer></script>
+    {if isset($data.page_key) && $data.page_key == 'home' && isset($data.cra1.slides[0]['img']) && $data.cra1.slides[0]['img'] && !preg_match('/\.(mp4|webm)$/i', $data.cra1.slides[0]['img']) }
+    <!-- 只有首页使用轮播图，其他页面不下载未使用的首页图片。
+         首屏轮播第一张图是 LCP 元素：preload 让浏览器在解析到 <img> 之前就开始下载；
+         仅在本地存在配套 WebP 时使用它，否则预加载原图，与 picture 的选择保持一致。
+         注意必须用 ['key'] 而非 .key：think-template 对「数组下标后接点语法」只转换前半段
+         （$a.cra1.slides[0].img → $a['cra1']['slides'][0].img），会产生 PHP 解析错误并导致整站 404。 -->
+    {php}$__cra1HeroWebp = cra1_carousel_webp_source((string)$data['cra1']['slides'][0]['img']);{/php}
+    {if $__cra1HeroWebp !== '' }
+    <!-- 只 preload WebP：<picture> 的 source 会让支持 WebP 的浏览器直接命中它；
+         若浏览器不支持 WebP，<source> 被忽略、由 <img> 的原图兜底，
+         此时 preload 的那条会因 type 不匹配而不下载，不会造成重复流量。 -->
+    <link rel="preload" as="image" type="image/webp" href="{$__cra1HeroWebp}" fetchpriority="high">
+    {else /}
+    <link rel="preload" as="image" href="{$data.cra1.slides[0]['img']}" fetchpriority="high">
+    {/if}
+    {/if}
+    {if isset($data.page_key) && in_array($data.page_key, ['home', 'cloud'], true)}
+    <link rel="stylesheet" href="{:cra1_theme_asset_url('website', '20261011-business-icons-v1/marketing.css', '/web/cra1/releases/20261011-business-icons-v1/marketing.css')}">
+    {/if}
+    {if isset($data.cra1.custom_css) && $data.cra1.custom_css && (!isset($data.cra1.custom_css_enabled) || $data.cra1.custom_css_enabled == 1) }
+    <!-- 后台自定义 CSS：位于全站样式表之后，级联最高优先级 -->
+    <style>{$data.cra1.custom_css|raw}</style>
+    {/if}

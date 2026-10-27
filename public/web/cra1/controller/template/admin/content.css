@@ -1,0 +1,111 @@
+/* ============================================================
+   酷锐A1主题内容配置页 · 后台样式
+   跟随 TDesign 变量，适配后台明暗主题
+   ============================================================ */
+
+/* ---- 区块卡片 ---- */
+#content .cra1-section {
+  margin-top: 24px;
+  padding: 24px 24px 10px;
+  border: 1px solid var(--td-component-stroke, #e7e7e7);
+  border-radius: 9px;
+  background-color: var(--td-bg-color-container, #fff);
+  transition: box-shadow 200ms ease;
+}
+#content .cra1-section:hover {
+  box-shadow: var(--td-shadow-1, 0 1px 10px rgba(0, 0, 0, 0.05));
+}
+#content .cra1-section:first-of-type {
+  margin-top: 20px;
+}
+
+/* ---- 区块标题 ---- */
+#content .cra1-section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--td-text-color-primary, rgba(0, 0, 0, 0.9));
+}
+#content .cra1-section-title::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #4e7cf6, #7a5af8);
+}
+/* 区块标题右侧的显示开关 */
+#content .cra1-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--td-text-color-secondary, rgba(0, 0, 0, 0.6));
+}
+
+/* ---- 表单布局：两列栅格 ---- */
+#content .cra1-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+  margin-bottom: 16px;
+}
+#content .form-control {
+  display: block;
+  margin-bottom: 14px;
+}
+#content .cra1-grid .form-control {
+  margin-bottom: 0;
+}
+#content .cra1-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--td-text-color-secondary, rgba(0, 0, 0, 0.6));
+}
+#content .form-control .t-input,
+#content .form-control .t-textarea__inner,
+#content .form-control .t-select {
+  background-color: var(--td-bg-color-container, #fff);
+}
+
+/* ---- 提示文字 ---- */
+#content .cra1-tip {
+  font-size: 13px;
+  color: var(--td-text-color-placeholder, rgba(0, 0, 0, 0.4));
+}
+
+/* ---- 顶部操作区 ---- */
+#content .common-header.top {
+  align-items: center;
+  padding-bottom: 8px;
+}
+#content .common-header.top .cra1-tip {
+  margin-left: auto;
+}
+
+/* ---- 响应式 ---- */
+@media (max-width: 900px) {
+  #content .cra1-grid {
+    grid-template-columns: 1fr;
+  }
+  #content .cra1-section {
+    padding: 18px 16px 6px;
+  }
+}
+
+/* 三列栅格（大面板菜单编辑） */
+#content .cra1-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 20px;
+  margin-bottom: 16px;
+}
+#content .cra1-grid-3 .form-control { margin-bottom: 0; }
+@media (max-width: 1100px) {
+  #content .cra1-grid-3 { grid-template-columns: 1fr; }
+}

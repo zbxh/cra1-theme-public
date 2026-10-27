@@ -1,0 +1,3603 @@
+{
+  "format": 1,
+  "description": "Fixed build/native reference inputs. Observed checksums preserve source ownership; verified checksums come from the official installation and upgrade fixture, not from the current merchant site.",
+  "references": {
+    "public/cart/template/mobile/cra1/api": "public/cart/template/pc/cra1/api",
+    "public/cart/template/mobile/cra1/css": "public/cart/template/pc/cra1/css",
+    "public/cart/template/mobile/cra1/goods.php": "public/cart/template/pc/cra1/goods.php",
+    "public/cart/template/mobile/cra1/goodsList.php": "public/cart/template/pc/cra1/goodsList.php",
+    "public/cart/template/mobile/cra1/goods_embed.php": "public/cart/template/pc/cra1/goods_embed.php",
+    "public/cart/template/mobile/cra1/goods_iframe.php": "public/cart/template/pc/cra1/goods_iframe.php",
+    "public/cart/template/mobile/cra1/img": "public/cart/template/pc/cra1/img",
+    "public/cart/template/mobile/cra1/index_iframe.php": "public/cart/template/pc/cra1/index_iframe.php",
+    "public/cart/template/mobile/cra1/js": "public/cart/template/pc/cra1/js",
+    "public/cart/template/mobile/cra1/orderResult.php": "public/cart/template/pc/cra1/orderResult.php",
+    "public/cart/template/mobile/cra1/settlement.php": "public/cart/template/pc/cra1/settlement.php",
+    "public/cart/template/mobile/cra1/shoppingCar.php": "public/cart/template/pc/cra1/shoppingCar.php",
+    "public/cart/template/mobile/cra1/theme.jpg": "public/cart/template/pc/cra1/theme.jpg",
+    "public/cart/template/pc/cra1/api/goodsList.js": "public/cart/template/pc/default/api/goodsList.js",
+    "public/cart/template/pc/cra1/api/product.js": "public/cart/template/pc/default/api/product.js",
+    "public/cart/template/pc/cra1/api/shopping.js": "public/cart/template/pc/default/api/shopping.js",
+    "public/cart/template/pc/cra1/css/goods.css": "public/cart/template/pc/default/css/goods.css",
+    "public/cart/template/pc/cra1/css/goodsList.css": "public/cart/template/pc/default/css/goodsList.css",
+    "public/cart/template/pc/cra1/css/goods_iframe.css": "public/cart/template/pc/default/css/goods_iframe.css",
+    "public/cart/template/pc/cra1/css/settlement.css": "public/cart/template/pc/default/css/settlement.css",
+    "public/cart/template/pc/cra1/css/shoppingCar.css": "public/cart/template/pc/default/css/shoppingCar.css",
+    "public/cart/template/pc/cra1/img/firewall-icon.png": "public/cart/template/pc/default/img/firewall-icon.png",
+    "public/cart/template/pc/cra1/img/firewall-icon.svg": "public/cart/template/pc/default/img/firewall-icon.svg",
+    "public/cart/template/pc/cra1/img/sold_out.svg": "public/cart/template/pc/default/img/sold_out.svg",
+    "public/clientarea/template/mobile/cra1": "public/clientarea/template/pc/cra1",
+    "public/clientarea/template/pc/cra1/api/account.js": "public/clientarea/template/pc/default/api/account.js",
+    "public/clientarea/template/pc/cra1/api/certification.js": "public/clientarea/template/pc/default/api/certification.js",
+    "public/clientarea/template/pc/cra1/api/goods.js": "public/clientarea/template/pc/default/api/goods.js",
+    "public/clientarea/template/pc/cra1/api/goodsList.js": "public/clientarea/template/pc/default/api/goodsList.js",
+    "public/clientarea/template/pc/cra1/api/home.js": "public/clientarea/template/pc/default/api/home.js",
+    "public/clientarea/template/pc/cra1/api/orderDetail.js": "public/clientarea/template/pc/default/api/orderDetail.js",
+    "public/clientarea/template/pc/cra1/api/product.js": "public/clientarea/template/pc/default/api/product.js",
+    "public/clientarea/template/pc/cra1/api/security.js": "public/clientarea/template/pc/default/api/security.js",
+    "public/clientarea/template/pc/cra1/api/security_group.js": "public/clientarea/template/pc/default/api/security_group.js",
+    "public/clientarea/template/pc/cra1/api/shopping.js": "public/clientarea/template/pc/default/api/shopping.js",
+    "public/clientarea/template/pc/cra1/api/template.js": "public/clientarea/template/pc/default/api/template.js",
+    "public/clientarea/template/pc/cra1/api/withdraw.js": "public/clientarea/template/pc/default/api/withdraw.js",
+    "public/clientarea/template/pc/cra1/components/autoRenew": "public/clientarea/template/pc/default/components/autoRenew",
+    "public/clientarea/template/pc/cra1/components/batchRenewpage": "public/clientarea/template/pc/default/components/batchRenewpage",
+    "public/clientarea/template/pc/cra1/components/captchaDialog": "public/clientarea/template/pc/default/components/captchaDialog",
+    "public/clientarea/template/pc/cra1/components/cashBack": "public/clientarea/template/pc/default/components/cashBack",
+    "public/clientarea/template/pc/cra1/components/certificationTips": "public/clientarea/template/pc/default/components/certificationTips",
+    "public/clientarea/template/pc/cra1/components/clientLevelDialog": "public/clientarea/template/pc/default/components/clientLevelDialog",
+    "public/clientarea/template/pc/cra1/components/coinActive": "public/clientarea/template/pc/default/components/coinActive",
+    "public/clientarea/template/pc/cra1/components/contractInfo": "public/clientarea/template/pc/default/components/contractInfo",
+    "public/clientarea/template/pc/cra1/components/countDownButton": "public/clientarea/template/pc/default/components/countDownButton",
+    "public/clientarea/template/pc/cra1/components/creditNotice": "public/clientarea/template/pc/default/components/creditNotice",
+    "public/clientarea/template/pc/cra1/components/customGoods": "public/clientarea/template/pc/default/components/customGoods",
+    "public/clientarea/template/pc/cra1/components/discountCode": "public/clientarea/template/pc/default/components/discountCode",
+    "public/clientarea/template/pc/cra1/components/eventCode": "public/clientarea/template/pc/default/components/eventCode",
+    "public/clientarea/template/pc/cra1/components/flowPacket": "public/clientarea/template/pc/default/components/flowPacket",
+    "public/clientarea/template/pc/cra1/components/forgetDialog": "public/clientarea/template/pc/default/components/forgetDialog",
+    "public/clientarea/template/pc/cra1/components/hostStatus": "public/clientarea/template/pc/default/components/hostStatus",
+    "public/clientarea/template/pc/cra1/components/ipDefase": "public/clientarea/template/pc/default/components/ipDefase",
+    "public/clientarea/template/pc/cra1/components/pagination": "public/clientarea/template/pc/default/components/pagination",
+    "public/clientarea/template/pc/cra1/components/preSalesService": "public/clientarea/template/pc/default/components/preSalesService",
+    "public/clientarea/template/pc/cra1/components/productFilter": "public/clientarea/template/pc/default/components/productFilter",
+    "public/clientarea/template/pc/cra1/components/rechargeDialog": "public/clientarea/template/pc/default/components/rechargeDialog",
+    "public/clientarea/template/pc/cra1/components/refundDialog": "public/clientarea/template/pc/default/components/refundDialog",
+    "public/clientarea/template/pc/cra1/components/registDialog": "public/clientarea/template/pc/default/components/registDialog",
+    "public/clientarea/template/pc/cra1/components/renewDialog": "public/clientarea/template/pc/default/components/renewDialog",
+    "public/clientarea/template/pc/cra1/components/resetAuth/resetAuth.css": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.css",
+    "public/clientarea/template/pc/cra1/components/resetAuth/resetAuth.js": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.js",
+    "public/clientarea/template/pc/cra1/components/safeConfirm": "public/clientarea/template/pc/default/components/safeConfirm",
+    "public/clientarea/template/pc/cra1/components/scrollText": "public/clientarea/template/pc/default/components/scrollText",
+    "public/clientarea/template/pc/cra1/components/securityVerification": "public/clientarea/template/pc/default/components/securityVerification",
+    "public/clientarea/template/pc/cra1/components/shadowContent": "public/clientarea/template/pc/default/components/shadowContent",
+    "public/clientarea/template/pc/cra1/components/trafficWarning": "public/clientarea/template/pc/default/components/trafficWarning",
+    "public/clientarea/template/pc/cra1/components/unsubscribe/unsubscribe.css": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.css",
+    "public/clientarea/template/pc/cra1/components/unsubscribe/unsubscribe.js": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.js",
+    "public/clientarea/template/pc/cra1/components/withdrawDialog": "public/clientarea/template/pc/default/components/withdrawDialog",
+    "public/clientarea/template/pc/cra1/css/common/common.css": "public/clientarea/template/pc/default/css/common/common.css",
+    "public/clientarea/template/pc/cra1/css/common/element-comment.css": "public/clientarea/template/pc/default/css/common/element-comment.css",
+    "public/clientarea/template/pc/cra1/css/common/reset.css": "public/clientarea/template/pc/default/css/common/reset.css",
+    "public/clientarea/template/pc/cra1/css/common/viewer.min.css": "public/clientarea/template/pc/default/css/common/viewer.min.css",
+    "public/clientarea/template/pc/cra1/css/finance.css": "public/clientarea/template/pc/default/css/finance.css",
+    "public/clientarea/template/pc/cra1/img": "public/clientarea/template/pc/default/img",
+    "public/clientarea/template/pc/cra1/js/common": "public/clientarea/template/pc/default/js/common",
+    "public/clientarea/template/pc/cra1/lang/en-us/element-lang.js": "public/clientarea/template/pc/default/lang/en-us/element-lang.js",
+    "public/clientarea/template/pc/cra1/lang/en-us/index.js": "public/clientarea/template/pc/default/lang/en-us/index.js",
+    "public/clientarea/template/pc/cra1/lang/index.js": "public/clientarea/template/pc/default/lang/index.js",
+    "public/clientarea/template/pc/cra1/lang/zh-cn/element-lang.js": "public/clientarea/template/pc/default/lang/zh-cn/element-lang.js",
+    "public/clientarea/template/pc/cra1/lang/zh-cn/index.js": "public/clientarea/template/pc/default/lang/zh-cn/index.js",
+    "public/clientarea/template/pc/cra1/lang/zh-hk/element-lang.js": "public/clientarea/template/pc/default/lang/zh-hk/element-lang.js",
+    "public/clientarea/template/pc/cra1/lang/zh-hk/index.js": "public/clientarea/template/pc/default/lang/zh-hk/index.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/account.js": "public/clientarea/template/pc/default/api/account.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/certification.js": "public/clientarea/template/pc/default/api/certification.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/goods.js": "public/clientarea/template/pc/default/api/goods.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/goodsList.js": "public/clientarea/template/pc/default/api/goodsList.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/home.js": "public/clientarea/template/pc/default/api/home.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/orderDetail.js": "public/clientarea/template/pc/default/api/orderDetail.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/product.js": "public/clientarea/template/pc/default/api/product.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/security.js": "public/clientarea/template/pc/default/api/security.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/security_group.js": "public/clientarea/template/pc/default/api/security_group.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/shopping.js": "public/clientarea/template/pc/default/api/shopping.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/template.js": "public/clientarea/template/pc/default/api/template.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/api/withdraw.js": "public/clientarea/template/pc/default/api/withdraw.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/components/resetAuth/resetAuth.css": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.css",
+    "public/clientarea/template/pc/cra1/releases/{release}/components/resetAuth/resetAuth.js": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/components/resetAuth/resetAuth.less": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.less",
+    "public/clientarea/template/pc/cra1/releases/{release}/components/unsubscribe/unsubscribe.css": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.css",
+    "public/clientarea/template/pc/cra1/releases/{release}/components/unsubscribe/unsubscribe.js": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.js",
+    "public/clientarea/template/pc/cra1/releases/{release}/components/unsubscribe/unsubscribe.less": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.less",
+    "public/clientarea/template/pc/cra1/theme": "public/clientarea/template/pc/default/theme",
+    "public/clientarea/template/pc/cra1/utils/directive.js": "public/clientarea/template/pc/default/utils/directive.js",
+    "public/clientarea/template/pc/cra1/utils/util.js": "public/clientarea/template/pc/default/utils/util.js",
+    "public/home/template/mobile/cra1": "public/home/template/pc/cra1",
+    "public/home/template/pc/cra1/img": "public/home/template/pc/default/img"
+  },
+  "native_dependencies": [
+    {
+      "path": "app/admin/validate/ConfigurationValidate.php",
+      "purpose": "原生主题设置校验",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "5a08285676b0f75ac8e455d28eabcb512aadfa1ee77a281e6b46e960d9a7f1dc"
+      ],
+      "observed_sha256": "5a08285676b0f75ac8e455d28eabcb512aadfa1ee77a281e6b46e960d9a7f1dc",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "app/common/logic/ClientareaTemplateLogic.php",
+      "purpose": "原生外壳及页面解析契约",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "31c8fcd15d0d3f65add3956202a9d2dedf77f83b59bc663e972d3d01fe230109"
+      ],
+      "observed_sha256": "31c8fcd15d0d3f65add3956202a9d2dedf77f83b59bc663e972d3d01fe230109",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "app/common/model/ConfigurationModel.php",
+      "purpose": "原生主题设置读取与保存",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "7c86e2b852a72738eb04b4207614c611cae7257379676254a575920a382299e4"
+      ],
+      "observed_sha256": "7c86e2b852a72738eb04b4207614c611cae7257379676254a575920a382299e4",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "app/common/model/HostModel.php",
+      "purpose": "权限过滤后的产品数据",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "9bcf55a4c8c1a845e5af2a499f6e9bdcec305d5f8ac5680507c85b2508f45015"
+      ],
+      "observed_sha256": "25474cdd1cffdaad8a58e6db7a1f56e916418a2366341e85b53f880d6888fd87",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "app/common/model/SelfDefinedFieldModel.php",
+      "purpose": "产品自定义字段类型与可见性",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "b0d9d79652ac551c0e092c7d607084750d5b73dc203573ad3389e795ed2485d5"
+      ],
+      "observed_sha256": "b0d9d79652ac551c0e092c7d607084750d5b73dc203573ad3389e795ed2485d5",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "app/event/AppInit.php",
+      "purpose": "主题钩子装载时机",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "c0e9a7fffe16a9b8dcd89dd4fa68f7a759b8cc7bb4677e6fbad60205936eadc8"
+      ],
+      "observed_sha256": "c0e9a7fffe16a9b8dcd89dd4fa68f7a759b8cc7bb4677e6fbad60205936eadc8",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "app/home/controller/ViewCartController.php",
+      "purpose": "购物车模板解析",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "4b9f1fedeb33efa6dd494adbe712a5922441a30702029195423c543c96dcd91e"
+      ],
+      "observed_sha256": "f7b7222fddd10d6a3000dfeedddc815079901de31b13ca541c074b7738cacab8",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "app/home/controller/ViewClientController.php",
+      "purpose": "会员模板与未知模块回退",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "79322f64fc9242a53a271c966bf501a51824277039a464b83fccde9814ff4418"
+      ],
+      "observed_sha256": "79322f64fc9242a53a271c966bf501a51824277039a464b83fccde9814ff4418",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "app/home/model/ClientareaAuthRuleModel.php",
+      "purpose": "复用原生已登记权限与未登记读取的兼容判断",
+      "impact": "读取规则模型变更时须重新执行子账户权限回归，不覆盖系统文件",
+      "verified_sha256": [
+        "ec842f013185c04612fe02868afe3568498ca8e753b1d23e3ba2d06171702b2f"
+      ],
+      "observed_sha256": "ec842f013185c04612fe02868afe3568498ca8e753b1d23e3ba2d06171702b2f",
+      "verification": "official-10.7.2-to-10.7.4-files-and-native-subaccount-http",
+      "verification_scope": "Independent native 10.7.4 subaccount projection and resource authorization acceptance."
+    },
+    {
+      "path": "app/http/middleware/Check.php",
+      "purpose": "通知读取的原生 JWT、注销及密码失效校验",
+      "impact": "原生登录校验契约变化时，通知按未登录处理，不公开会员专用内容",
+      "verified_sha256": [
+        "ed20c4441cf2ac2dcc8274c95d616db7e31068d4f116f39da3a76c5ca06685f4"
+      ],
+      "observed_sha256": "ed20c4441cf2ac2dcc8274c95d616db7e31068d4f116f39da3a76c5ca06685f4",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance and read-only native notification authentication."
+    },
+    {
+      "path": "app/http/middleware/CheckAdmin.php",
+      "purpose": "安装向导原生超级管理员鉴权",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "2c7367415a1032af536ccaf96aa5c8922c5a3b409094e30d01b4a10637d2a125"
+      ],
+      "observed_sha256": "2c7367415a1032af536ccaf96aa5c8922c5a3b409094e30d01b4a10637d2a125",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "app/http/middleware/CheckClientCookieJwt.php",
+      "purpose": "通知读取的原生账户状态及会话有效期校验",
+      "impact": "原生登录校验契约变化时，通知按未登录处理，不公开会员专用内容",
+      "verified_sha256": [
+        "3bcfef74a49abdc6216a167c6bf7be74f7db7c96444320c59337d953d6e51d12"
+      ],
+      "observed_sha256": "3bcfef74a49abdc6216a167c6bf7be74f7db7c96444320c59337d953d6e51d12",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance and read-only native notification authentication."
+    },
+    {
+      "path": "app/http/middleware/CheckClientOperatePassword.php",
+      "purpose": "原生敏感操作中间件位置",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "7a45bf5c7beb703df42a75792afcde0cbd567daec92c4f2006f0e31398ed1ac3"
+      ],
+      "observed_sha256": "946fe832056601a458fa8e5b9ef42e3df902fe8c7e1d3f0c1c0347964025af5e",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "app/http/middleware/CheckHome.php",
+      "purpose": "原生会员身份及会话校验",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "076994a0825e1751bb62b889d15e217480a3c0279e350774834aa8f26d5b83ae"
+      ],
+      "observed_sha256": "bb608e33a9ab0306ff98d78a02e18687da89722e610fa5aea08d2fa184db62b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/api/goodsList.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "8860b06d0cdab8ea3ebb0b6aa68a6351232dea85c609e91a6e4bafcc152db237"
+      ],
+      "observed_sha256": "8860b06d0cdab8ea3ebb0b6aa68a6351232dea85c609e91a6e4bafcc152db237",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/api/product.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "b7592749fb4bef072ba5ba2f0c117887b204b030676284e1380f5e08a127df5b"
+      ],
+      "observed_sha256": "b7592749fb4bef072ba5ba2f0c117887b204b030676284e1380f5e08a127df5b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/api/shopping.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "4845153c49367c9a510d432498f7f7c45e29f2dd6c66112b90212650c3c8d5c4"
+      ],
+      "observed_sha256": "4845153c49367c9a510d432498f7f7c45e29f2dd6c66112b90212650c3c8d5c4",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/css/goods.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "1acc7094a81fba6ddd8ea35328f0abfd174e1b509a5bd6af7e697564c4c3cf83"
+      ],
+      "observed_sha256": "1acc7094a81fba6ddd8ea35328f0abfd174e1b509a5bd6af7e697564c4c3cf83",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/css/goodsList.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "91f0569d2795033f3a1d85e59a4eccb6899d54f7a0e6b9e6f0c2d967e1ea0db1"
+      ],
+      "observed_sha256": "91f0569d2795033f3a1d85e59a4eccb6899d54f7a0e6b9e6f0c2d967e1ea0db1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/css/goods_iframe.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "84a7997be014a0e3e21bade8faaa6e3e36dd7a38892eabaaf816adf9b7e76056"
+      ],
+      "observed_sha256": "84a7997be014a0e3e21bade8faaa6e3e36dd7a38892eabaaf816adf9b7e76056",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/css/settlement.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "769e86e7554548d5aeb9e1a5e1d2c10f6562b777f9a41cf3e9d3a427fc0b3d66"
+      ],
+      "observed_sha256": "769e86e7554548d5aeb9e1a5e1d2c10f6562b777f9a41cf3e9d3a427fc0b3d66",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/css/shoppingCar.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "fbac465af9b774e92ac45bc26cb1c8d8090b3c1df8fa49a8b1caa7aa65b8434d"
+      ],
+      "observed_sha256": "fbac465af9b774e92ac45bc26cb1c8d8090b3c1df8fa49a8b1caa7aa65b8434d",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/img/firewall-icon.png",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "4aad616e73523cf6a6dd6c8ba0900c702fe2f9c78ebacf8bfc2f7830c41717ed"
+      ],
+      "observed_sha256": "4aad616e73523cf6a6dd6c8ba0900c702fe2f9c78ebacf8bfc2f7830c41717ed",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/img/firewall-icon.svg",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "c81d3dea17c8899dd05b40c899d9c976b512d862787331dd521833fe8ae3ca95"
+      ],
+      "observed_sha256": "c81d3dea17c8899dd05b40c899d9c976b512d862787331dd521833fe8ae3ca95",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/img/sold_out.svg",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "cae4b51bf9e53440c80b2e742740afb6fca66c04255e0f1d73a054d8c5124bf0"
+      ],
+      "observed_sha256": "cae4b51bf9e53440c80b2e742740afb6fca66c04255e0f1d73a054d8c5124bf0",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/cart/template/pc/default/theme.jpg",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "5018bb0d1fb7b4933e5a07d03170c07d2a491d6f25bbe20b00f8f5b0a14c41bd"
+      ],
+      "observed_sha256": "5018bb0d1fb7b4933e5a07d03170c07d2a491d6f25bbe20b00f8f5b0a14c41bd",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/account.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "36c13c309e9f3ded1196eda97d3676fbc5c19900a8b755606371efec03f2e4d9"
+      ],
+      "observed_sha256": "36c13c309e9f3ded1196eda97d3676fbc5c19900a8b755606371efec03f2e4d9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/certification.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "9b0acbdb251ae9d1c8edebe1afcad6704c21afe11ea025f67552c324eaef5d63"
+      ],
+      "observed_sha256": "9b0acbdb251ae9d1c8edebe1afcad6704c21afe11ea025f67552c324eaef5d63",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/goods.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "cbd9c7c18b5364dd35feccbf8a0273104643bbe74cedc336bdf9e8741e002594"
+      ],
+      "observed_sha256": "cbd9c7c18b5364dd35feccbf8a0273104643bbe74cedc336bdf9e8741e002594",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/goodsList.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "1e8ccf939db18fe0efa272f62832976f8aa6ceb4c7fd184f5c1319cce15ed836"
+      ],
+      "observed_sha256": "1e8ccf939db18fe0efa272f62832976f8aa6ceb4c7fd184f5c1319cce15ed836",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/home.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "22cdbb752e10c29a0aa25b1e5e26af953b0a4617e1ed8c407673ef20194c672b"
+      ],
+      "observed_sha256": "22cdbb752e10c29a0aa25b1e5e26af953b0a4617e1ed8c407673ef20194c672b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/orderDetail.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "02492fa108f3b6d6286825caeba2a186212fd0d27e8071e8637fa178272e1695"
+      ],
+      "observed_sha256": "02492fa108f3b6d6286825caeba2a186212fd0d27e8071e8637fa178272e1695",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/product.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "8132f0edbc7647fa5631ff63886a82e338120c5bd681ba424d72231a8ae3b34f"
+      ],
+      "observed_sha256": "8132f0edbc7647fa5631ff63886a82e338120c5bd681ba424d72231a8ae3b34f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/security.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "fb4486bf7ca48437be593f20302c4a2ade4566f06419cfe1e4b39f40cc2aa384"
+      ],
+      "observed_sha256": "fb4486bf7ca48437be593f20302c4a2ade4566f06419cfe1e4b39f40cc2aa384",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/security_group.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "0c342adc465544ca38cf291645d857543406809c5441358d840be35fcf79e364"
+      ],
+      "observed_sha256": "0c342adc465544ca38cf291645d857543406809c5441358d840be35fcf79e364",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/shopping.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "824229ff909061786f37191526d41e5137cf3adc049ff14bdb469fc5b59c539d"
+      ],
+      "observed_sha256": "824229ff909061786f37191526d41e5137cf3adc049ff14bdb469fc5b59c539d",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/template.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "observed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/api/withdraw.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "c620b01efad89c9c8bfb349900615214d6ccde39b8c31356d8cf3c19e296e953"
+      ],
+      "observed_sha256": "c620b01efad89c9c8bfb349900615214d6ccde39b8c31356d8cf3c19e296e953",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/autoRenew/autoRenew.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "4c28b325d03e7a1999d2c79c15035ff328895fdaf0c15d4b100b1d611239cf19"
+      ],
+      "observed_sha256": "4c28b325d03e7a1999d2c79c15035ff328895fdaf0c15d4b100b1d611239cf19",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/batchRenewpage/batchRenewpage.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "fd1be567ee7d613aa726feefd24d467b356909373cc20d5f816c7d6d8a64876a"
+      ],
+      "observed_sha256": "fd1be567ee7d613aa726feefd24d467b356909373cc20d5f816c7d6d8a64876a",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/captchaDialog/captchaDialog.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "3c2c231dc30957a904676b716718adf36b0aa9d7ad61f0929c834259b9298720"
+      ],
+      "observed_sha256": "3c2c231dc30957a904676b716718adf36b0aa9d7ad61f0929c834259b9298720",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/cashBack/cashBack.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "213d8e773ff404ade09e3cc6993dc801d76623d32a235cd1071c9acd11daf267"
+      ],
+      "observed_sha256": "213d8e773ff404ade09e3cc6993dc801d76623d32a235cd1071c9acd11daf267",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/certificationTips/certificationDialog.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "52efb4031151be3f3a46dcc6eba582ec2f4873efa3d8b06093aa276919759aac"
+      ],
+      "observed_sha256": "52efb4031151be3f3a46dcc6eba582ec2f4873efa3d8b06093aa276919759aac",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/clientLevelDialog/clientLevelDialog.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "bf408dea83fbcf3f55893ee9ccb230ddbf5c4c81ee6d426ad0ed1513289339da"
+      ],
+      "observed_sha256": "bf408dea83fbcf3f55893ee9ccb230ddbf5c4c81ee6d426ad0ed1513289339da",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/clientLevelDialog/clientLevelDialog.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "7fe8fc676ac0028e4a921e5210902b12f4dae4ca74f479dd5e21aa6092cd3cf6"
+      ],
+      "observed_sha256": "7fe8fc676ac0028e4a921e5210902b12f4dae4ca74f479dd5e21aa6092cd3cf6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/clientLevelDialog/clientLevelDialog.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "58b048edf59ce429cdb54e54fa03436447b9b500472bae1f48415ccf43dd8f87"
+      ],
+      "observed_sha256": "58b048edf59ce429cdb54e54fa03436447b9b500472bae1f48415ccf43dd8f87",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/coinActive/coinActive.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "e97a33c78ad82a2f3bf18372e93dbc710edf8fa5f899add06fb02017d2c45196"
+      ],
+      "observed_sha256": "e97a33c78ad82a2f3bf18372e93dbc710edf8fa5f899add06fb02017d2c45196",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/coinActive/coinActive.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "c297c1d3d0a57b2b0449b691e06240507b957b83ffa6574e0391d77113c8cbe1"
+      ],
+      "observed_sha256": "c297c1d3d0a57b2b0449b691e06240507b957b83ffa6574e0391d77113c8cbe1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/coinActive/coinActive.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "54b52bc859886845af446f1507a730bac67286b64c8a2f93a97c128bc7c12bac"
+      ],
+      "observed_sha256": "54b52bc859886845af446f1507a730bac67286b64c8a2f93a97c128bc7c12bac",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/contractInfo/contractInfo.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "328ae0a3469c6c8c044710bda4637ef2289867fdef85f15b1302a5be66a8804c"
+      ],
+      "observed_sha256": "328ae0a3469c6c8c044710bda4637ef2289867fdef85f15b1302a5be66a8804c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/contractInfo/contractInfo.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "eba039cf9150eef3794b705bb7de9a4ba9a15b59cc261e6759da781256af058c"
+      ],
+      "observed_sha256": "eba039cf9150eef3794b705bb7de9a4ba9a15b59cc261e6759da781256af058c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/contractInfo/contractInfo.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d08cc4e3c977f22661f5fdb6fce6069ad7089684fe6f39138117ecfa6ca9b81d"
+      ],
+      "observed_sha256": "d08cc4e3c977f22661f5fdb6fce6069ad7089684fe6f39138117ecfa6ca9b81d",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/countDownButton/countDownButton.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "77266249616cb58dd17e0464e318c707eab0edb040363e7e7d49d7e003d2e481"
+      ],
+      "observed_sha256": "77266249616cb58dd17e0464e318c707eab0edb040363e7e7d49d7e003d2e481",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/creditNotice/creditNotice.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "edff5b1750823267da025e01256173eded1167cbe8719eb321e5c8bde301ef88"
+      ],
+      "observed_sha256": "edff5b1750823267da025e01256173eded1167cbe8719eb321e5c8bde301ef88",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/customGoods/customGoods.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "8cdc32ed341134e4c5d3f3a46eabed3f2a7b43c75785f52dd522e4c234322485"
+      ],
+      "observed_sha256": "8cdc32ed341134e4c5d3f3a46eabed3f2a7b43c75785f52dd522e4c234322485",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/discountCode/discountCode.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "5b723bb4b8d50eb4f5b36821a2017a7f1b00f3e33d31328613b483804f7fe273"
+      ],
+      "observed_sha256": "5b723bb4b8d50eb4f5b36821a2017a7f1b00f3e33d31328613b483804f7fe273",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/discountCode/discountCode.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "0d5b1287d216604b2d9c3ef1b64bc44bb18bbfc8c8bea195d27fec5fa3625b37"
+      ],
+      "observed_sha256": "0d5b1287d216604b2d9c3ef1b64bc44bb18bbfc8c8bea195d27fec5fa3625b37",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/discountCode/discountCode.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "51b5367da9a1bc4e0f29d8030b16092afd1c51fe7bf92930eb401e8e9d806e9f"
+      ],
+      "observed_sha256": "51b5367da9a1bc4e0f29d8030b16092afd1c51fe7bf92930eb401e8e9d806e9f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/eventCode/eventCode.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a8132c5d9fdb56fa756361022c733e4d99f0e6c6570c261f27b56ff4a52eddc0"
+      ],
+      "observed_sha256": "a8132c5d9fdb56fa756361022c733e4d99f0e6c6570c261f27b56ff4a52eddc0",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/flowPacket/flowPacket.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "3fa8c71a7037e0dbf63ea2e1abb4e9309bdf33aee861912d65708a02faacfe47"
+      ],
+      "observed_sha256": "3fa8c71a7037e0dbf63ea2e1abb4e9309bdf33aee861912d65708a02faacfe47",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/forgetDialog/.gitkeep",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "observed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/hostStatus/hostStatus.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "1bd03ad28963b9775119bf13713ea934f1e724f837d110585dc3b5218ac92829"
+      ],
+      "observed_sha256": "1bd03ad28963b9775119bf13713ea934f1e724f837d110585dc3b5218ac92829",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/ipDefase/ipDefase.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "69f621cd7cacfdd02930f26b74153a12d7ee424be77b10ef9970b5e29d710be2"
+      ],
+      "observed_sha256": "69f621cd7cacfdd02930f26b74153a12d7ee424be77b10ef9970b5e29d710be2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/pagination/pagination.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "1fb6e05817c41f0a700420f41666094a56271ea69ee0e778e6d5f19b378eb800"
+      ],
+      "observed_sha256": "1fb6e05817c41f0a700420f41666094a56271ea69ee0e778e6d5f19b378eb800",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/preSalesService/preSalesService.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "910e93e84680b27def6b52e5e9520dbfbc10c4aaa1880997f3ba4a15c0fb8f59"
+      ],
+      "observed_sha256": "910e93e84680b27def6b52e5e9520dbfbc10c4aaa1880997f3ba4a15c0fb8f59",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/preSalesService/preSalesService.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "29662e5a6c683dfadddde61f6df5322d8f2c058be8dbfdf60c4e7bd55fe55377"
+      ],
+      "observed_sha256": "29662e5a6c683dfadddde61f6df5322d8f2c058be8dbfdf60c4e7bd55fe55377",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/preSalesService/preSalesService.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "7a052b5975e685bb2c1a683f6742c8ddfed6c62a3a81972bf8f5615e5e8207c4"
+      ],
+      "observed_sha256": "7a052b5975e685bb2c1a683f6742c8ddfed6c62a3a81972bf8f5615e5e8207c4",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/productFilter/productFilter.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "db2847d30761ddb367d97a85f706e918e7716fe8b4b542f1a205610e8ae77553"
+      ],
+      "observed_sha256": "db2847d30761ddb367d97a85f706e918e7716fe8b4b542f1a205610e8ae77553",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/rechargeDialog/rechargeDialog.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "702a69b904d14f9b3ca02423e1d2510a5128322b0839c637d65a0afcffd6c842"
+      ],
+      "observed_sha256": "702a69b904d14f9b3ca02423e1d2510a5128322b0839c637d65a0afcffd6c842",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/refundDialog/refundDialog.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "519585b2ee913298016e2c8282373bd789d387951d4ee3b63c4a1f1d109d72b1"
+      ],
+      "observed_sha256": "519585b2ee913298016e2c8282373bd789d387951d4ee3b63c4a1f1d109d72b1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/registDialog/.gitkeep",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "observed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/renewDialog/renewDialog.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "217e0e7534ae81557b089e3b2200104bec1c179a6f98a36f81ef1c7c4ff8e681"
+      ],
+      "observed_sha256": "217e0e7534ae81557b089e3b2200104bec1c179a6f98a36f81ef1c7c4ff8e681",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/renewDialog/renewDialog.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "cc32f77ba0c27bf4ce2375d65ce5ad3c555b424336bccc31a5f5f09581605173"
+      ],
+      "observed_sha256": "cc32f77ba0c27bf4ce2375d65ce5ad3c555b424336bccc31a5f5f09581605173",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/renewDialog/renewDialog.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "8c8beec01d00e3ea6ec8994da648fd0d20b8560fe9bb5ced7ea0d88873bb3a1b"
+      ],
+      "observed_sha256": "8c8beec01d00e3ea6ec8994da648fd0d20b8560fe9bb5ced7ea0d88873bb3a1b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "7ca821e237ef5809544aae7a430a1ce0d9f1d02161924881ed4cfea1d277c46f"
+      ],
+      "observed_sha256": "7ca821e237ef5809544aae7a430a1ce0d9f1d02161924881ed4cfea1d277c46f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "7033ff185391f976aac950acbc60c9779fbad0bd89c7fbb30edf54ef112d89f1"
+      ],
+      "observed_sha256": "7033ff185391f976aac950acbc60c9779fbad0bd89c7fbb30edf54ef112d89f1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.less",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "15aff1099e8bec85ed1a0e6528780a0a5419ab6aa97a913d4cbeab66632dcf46"
+      ],
+      "observed_sha256": "15aff1099e8bec85ed1a0e6528780a0a5419ab6aa97a913d4cbeab66632dcf46",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/safeConfirm/safeConfirm.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "4e68bd096ccbc23c5e8d6691c8dceffee4ef42f852158d2bcd38d682cbac0295"
+      ],
+      "observed_sha256": "4e68bd096ccbc23c5e8d6691c8dceffee4ef42f852158d2bcd38d682cbac0295",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/scrollText/scrollText.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "6922cb5a1eb81a5e151913609bcbc317afd7c5700b3d8b5c7e162a7c12d60d6f"
+      ],
+      "observed_sha256": "6922cb5a1eb81a5e151913609bcbc317afd7c5700b3d8b5c7e162a7c12d60d6f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/securityVerification/securityVerification.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "10bd87815210da3d2e56f0c2275cf2b65f95b0b1d0815c8524ede0da7845f918"
+      ],
+      "observed_sha256": "10bd87815210da3d2e56f0c2275cf2b65f95b0b1d0815c8524ede0da7845f918",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/shadowContent/shadowContent.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "f8e7a95a42dd73665ef8d39a6f10b5459fa10d36e46d04b987efd161cb93a919"
+      ],
+      "observed_sha256": "f8e7a95a42dd73665ef8d39a6f10b5459fa10d36e46d04b987efd161cb93a919",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/trafficWarning/trafficWarning.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "eb53a8e5bdb085c8a4df699b9cb03ac77381e82669717434c6ca7d6dc930c802"
+      ],
+      "observed_sha256": "eb53a8e5bdb085c8a4df699b9cb03ac77381e82669717434c6ca7d6dc930c802",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "39b2b7ad6ca935310bc08618aaba7609cb11dc6790bb672e80e2b1dd45c838bc"
+      ],
+      "observed_sha256": "39b2b7ad6ca935310bc08618aaba7609cb11dc6790bb672e80e2b1dd45c838bc",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "e51c65ad1378b57760532d3a7146a328fcc514184e805d57c5068b2ef3db0f52"
+      ],
+      "observed_sha256": "e51c65ad1378b57760532d3a7146a328fcc514184e805d57c5068b2ef3db0f52",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.less",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "e1769e80610b236f921732273602afbe505c0fea55409254a11056e2e0ae7f7a"
+      ],
+      "observed_sha256": "e1769e80610b236f921732273602afbe505c0fea55409254a11056e2e0ae7f7a",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/components/withdrawDialog/withdrawDialog.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "53ec6461672e1831dbbc800b07af9e368e40a59998d4aea51077cbc549fdaf77"
+      ],
+      "observed_sha256": "53ec6461672e1831dbbc800b07af9e368e40a59998d4aea51077cbc549fdaf77",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/css/common/common.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "863ffbd14576dec0cbbc730abb75eab4db988d6474ea88061778a2af0bbe7439"
+      ],
+      "observed_sha256": "863ffbd14576dec0cbbc730abb75eab4db988d6474ea88061778a2af0bbe7439",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/css/common/element-comment.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "343a59e0c54c448eb1bbd22855e7657b72150b654c802826c707ca0e0bb4d492"
+      ],
+      "observed_sha256": "343a59e0c54c448eb1bbd22855e7657b72150b654c802826c707ca0e0bb4d492",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/css/common/reset.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "5100cf4d58b834fe25af728d2dc03f7e441d8eb5832a0e7e898058c591e6af7c"
+      ],
+      "observed_sha256": "5100cf4d58b834fe25af728d2dc03f7e441d8eb5832a0e7e898058c591e6af7c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/css/common/viewer.min.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "6c7f2360b51ba2f436d38fabaa33995fb9c115db70459894df021efb56986e01"
+      ],
+      "observed_sha256": "6c7f2360b51ba2f436d38fabaa33995fb9c115db70459894df021efb56986e01",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/css/finance.css",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "c09c6d0d8342b67f784a87ba30c8ae3f7f3bca050622341b8651999d63f6f790"
+      ],
+      "observed_sha256": "c09c6d0d8342b67f784a87ba30c8ae3f7f3bca050622341b8651999d63f6f790",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/IDcard-1.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "f51f98578bf45f6de0c629a688af3ba824a5cd47f6b4963e615cccc8cc9562f9"
+      ],
+      "observed_sha256": "f51f98578bf45f6de0c629a688af3ba824a5cd47f6b4963e615cccc8cc9562f9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/IDcard-2.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "83d82936107d1a383fccc947b7a3a55ca1dfbc53ef43ec5c9a4237018b96cef4"
+      ],
+      "observed_sha256": "83d82936107d1a383fccc947b7a3a55ca1dfbc53ef43ec5c9a4237018b96cef4",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/IDcard-3.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a5c0d9049a0eed500c206079eb943de3c74289d21979b8012f2910eb5ac68c6b"
+      ],
+      "observed_sha256": "a5c0d9049a0eed500c206079eb943de3c74289d21979b8012f2910eb5ac68c6b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/compony_icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "5874d97b07a021ecd0621056017874481b8e39dcb0b79dcaacc903384898a716"
+      ],
+      "observed_sha256": "5874d97b07a021ecd0621056017874481b8e39dcb0b79dcaacc903384898a716",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/enterprise_certification.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "e243c00cb681399070827ee1205d2aa7ac4d6659ce6dda861f29eaa83e14ce61"
+      ],
+      "observed_sha256": "e243c00cb681399070827ee1205d2aa7ac4d6659ce6dda861f29eaa83e14ce61",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/error.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "c3488c53ce96e4a321581f2442cc6eabd49eb1d69d558e8cf770890fae767e1c"
+      ],
+      "observed_sha256": "c3488c53ce96e4a321581f2442cc6eabd49eb1d69d558e8cf770890fae767e1c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/personal_certification.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "5f1512f0da525586b4ea3e063d96d9624762a498272e980683160eafd7cae6f7"
+      ],
+      "observed_sha256": "5f1512f0da525586b4ea3e063d96d9624762a498272e980683160eafd7cae6f7",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/personal_icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "5e9e50ce39284ce67d20b3a017451caf3ec3489cd89de82455074cae58b0a8d3"
+      ],
+      "observed_sha256": "5e9e50ce39284ce67d20b3a017451caf3ec3489cd89de82455074cae58b0a8d3",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/success.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a9775c5f483e2ede0ec53ab029f5d7720408cd78040054ee58a5498e010bfcfa"
+      ],
+      "observed_sha256": "a9775c5f483e2ede0ec53ab029f5d7720408cd78040054ee58a5498e010bfcfa",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/unauthorized.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a691c70a5ce1ab14ff6fa6ab7a14765ea251473fcf6728fe5288316df90a8086"
+      ],
+      "observed_sha256": "a691c70a5ce1ab14ff6fa6ab7a14765ea251473fcf6728fe5288316df90a8086",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/upload-ID-1.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a2676f27d035479f067c4ffee22171bf173f7c7ebfc910d43a1174194d199a2e"
+      ],
+      "observed_sha256": "a2676f27d035479f067c4ffee22171bf173f7c7ebfc910d43a1174194d199a2e",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/account/upload-ID-2.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2c25a64d557f100c0793fb3649706b824d4aa2db782f74ebabdb2936b9eb1e40"
+      ],
+      "observed_sha256": "2c25a64d557f100c0793fb3649706b824d4aa2db782f74ebabdb2936b9eb1e40",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ali/banner.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "c14b7a21b7b50dac4e0aeac4f83f25e0efed422d9f636ab1195ca76816729801"
+      ],
+      "observed_sha256": "c14b7a21b7b50dac4e0aeac4f83f25e0efed422d9f636ab1195ca76816729801",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ali/icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2371ba31059857151c0892ec40896aee3117c1eb257eb1d319777cd014247939"
+      ],
+      "observed_sha256": "2371ba31059857151c0892ec40896aee3117c1eb257eb1d319777cd014247939",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ali/left.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "0a96fa87c14bfa9812b9ee358cf0eb69c45ab8bf8821895685d78ac0978e8b49"
+      ],
+      "observed_sha256": "0a96fa87c14bfa9812b9ee358cf0eb69c45ab8bf8821895685d78ac0978e8b49",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ali/logo.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "bad8da6d6f71f4d87664edd85085a4460ce5450df83a9e3ae84b7b147694f33e"
+      ],
+      "observed_sha256": "bad8da6d6f71f4d87664edd85085a4460ce5450df83a9e3ae84b7b147694f33e",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ali/right.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "49c89e48532ddd7a4181c106d0a21f4d3345416a94169847220f071476854054"
+      ],
+      "observed_sha256": "49c89e48532ddd7a4181c106d0a21f4d3345416a94169847220f071476854054",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ali/user.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "3cc981793645bd66a98e9eba37ad04c618131155cb42e3d3c0d6239f66cb91f7"
+      ],
+      "observed_sha256": "3cc981793645bd66a98e9eba37ad04c618131155cb42e3d3c0d6239f66cb91f7",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloud/CN.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d439b164395f09a19c5ab2094ad22c4954f1a55e5bc628224d82148002271ad7"
+      ],
+      "observed_sha256": "d439b164395f09a19c5ab2094ad22c4954f1a55e5bc628224d82148002271ad7",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloud/DE.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "4ca1c74889eb01a30c14a453eba5483f70f87e5bf948516c70a5bcc3cc58d22b"
+      ],
+      "observed_sha256": "4ca1c74889eb01a30c14a453eba5483f70f87e5bf948516c70a5bcc3cc58d22b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloud/US.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "811e2e00ca6320a17c4ce3ddf9bec9b7f538a4dfdfcf5dc357ae963c68ce9efd"
+      ],
+      "observed_sha256": "811e2e00ca6320a17c4ce3ddf9bec9b7f538a4dfdfcf5dc357ae963c68ce9efd",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloud/fault.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "59d4051fc470bedafb634d2c03a2f964c60d287951f8df7c65eaac6c10fada5c"
+      ],
+      "observed_sha256": "59d4051fc470bedafb634d2c03a2f964c60d287951f8df7c65eaac6c10fada5c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloud/off.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "4a7d12a6c22205aaf2490d127a25f5bb388d02e76f93b82beb5637f10de2b6fd"
+      ],
+      "observed_sha256": "4a7d12a6c22205aaf2490d127a25f5bb388d02e76f93b82beb5637f10de2b6fd",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloud/on.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "32304c152f9c45edebf9d0e7d1101b874c49cceaaf4d796b913789c6450e0728"
+      ],
+      "observed_sha256": "32304c152f9c45edebf9d0e7d1101b874c49cceaaf4d796b913789c6450e0728",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloud/operating.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "86b75839f2d86cf8819dfe84f5dfbab2e2a6653139de4c489d58dc94e011ec37"
+      ],
+      "observed_sha256": "86b75839f2d86cf8819dfe84f5dfbab2e2a6653139de4c489d58dc94e011ec37",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloud/pass-hide.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "c1aa75fa802e5e163e7f0653030fc8f63b7003995610050ec68c7bdc4714ee9d"
+      ],
+      "observed_sha256": "c1aa75fa802e5e163e7f0653030fc8f63b7003995610050ec68c7bdc4714ee9d",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloud/pass-show.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ed9494e12ca7f8c32ecc0c12aedeb14c5f137bb4b8f53aad64a190504c397ae8"
+      ],
+      "observed_sha256": "ed9494e12ca7f8c32ecc0c12aedeb14c5f137bb4b8f53aad64a190504c397ae8",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloud/suspended.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2ddf1d248746f0cf57d5f790f0f8f672bdbad7ad4e8a067cfeb61c471c88ac2d"
+      ],
+      "observed_sha256": "2ddf1d248746f0cf57d5f790f0f8f672bdbad7ad4e8a067cfeb61c471c88ac2d",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloudDetail/console.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "012c6955aae4b7834374fd6ce91c82a6e08493c69b8ad9c8442f2b1baa36be30"
+      ],
+      "observed_sha256": "012c6955aae4b7834374fd6ce91c82a6e08493c69b8ad9c8442f2b1baa36be30",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloudDetail/fault.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "59d4051fc470bedafb634d2c03a2f964c60d287951f8df7c65eaac6c10fada5c"
+      ],
+      "observed_sha256": "59d4051fc470bedafb634d2c03a2f964c60d287951f8df7c65eaac6c10fada5c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloudDetail/no.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2ddf1d248746f0cf57d5f790f0f8f672bdbad7ad4e8a067cfeb61c471c88ac2d"
+      ],
+      "observed_sha256": "2ddf1d248746f0cf57d5f790f0f8f672bdbad7ad4e8a067cfeb61c471c88ac2d",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloudDetail/off.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "4a7d12a6c22205aaf2490d127a25f5bb388d02e76f93b82beb5637f10de2b6fd"
+      ],
+      "observed_sha256": "4a7d12a6c22205aaf2490d127a25f5bb388d02e76f93b82beb5637f10de2b6fd",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloudDetail/on.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "32304c152f9c45edebf9d0e7d1101b874c49cceaaf4d796b913789c6450e0728"
+      ],
+      "observed_sha256": "32304c152f9c45edebf9d0e7d1101b874c49cceaaf4d796b913789c6450e0728",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloudDetail/operating.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "86b75839f2d86cf8819dfe84f5dfbab2e2a6653139de4c489d58dc94e011ec37"
+      ],
+      "observed_sha256": "86b75839f2d86cf8819dfe84f5dfbab2e2a6653139de4c489d58dc94e011ec37",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloudDetail/restart.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "5f5963a221bc059b30bbc131cbe72bca3249cdfb551ff72c1ee1eb34739ba8a3"
+      ],
+      "observed_sha256": "5f5963a221bc059b30bbc131cbe72bca3249cdfb551ff72c1ee1eb34739ba8a3",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/cloudDetail/suspend.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2ddf1d248746f0cf57d5f790f0f8f672bdbad7ad4e8a067cfeb61c471c88ac2d"
+      ],
+      "observed_sha256": "2ddf1d248746f0cf57d5f790f0f8f672bdbad7ad4e8a067cfeb61c471c88ac2d",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/404.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "4c3d726bf92c03eb3681e5f79a9f8e8ba49633c3b1aed8a465c3fabe9617910a"
+      ],
+      "observed_sha256": "4c3d726bf92c03eb3681e5f79a9f8e8ba49633c3b1aed8a465c3fabe9617910a",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/503.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "7c5ae652201f1a7c1d049312407731bf7a9c5fc18fd02e871bbcdf85cc7eafbb"
+      ],
+      "observed_sha256": "7c5ae652201f1a7c1d049312407731bf7a9c5fc18fd02e871bbcdf85cc7eafbb",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/CN.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "e89a6231c872b044ea3411cc1721db5051fc9b9a47d7e3abd5a4f8c69d418b09"
+      ],
+      "observed_sha256": "e89a6231c872b044ea3411cc1721db5051fc9b9a47d7e3abd5a4f8c69d418b09",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/US.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "25be2de75e2d2e55620068642f3225a7f90ff68fad65b6d1dc9d63daeafdbb74"
+      ],
+      "observed_sha256": "25be2de75e2d2e55620068642f3225a7f90ff68fad65b6d1dc9d63daeafdbb74",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/bank.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "9c1d741057860a402b60811ac723bd092693bc6d1bc4124979185c8b1451ba64"
+      ],
+      "observed_sha256": "9c1d741057860a402b60811ac723bd092693bc6d1bc4124979185c8b1451ba64",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/bell.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "72477c8759046c658faebe9bbcb471dfa75efd39fee2f654b640700840018c2b"
+      ],
+      "observed_sha256": "72477c8759046c658faebe9bbcb471dfa75efd39fee2f654b640700840018c2b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/cart.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "36e7f1b4cc5ea98bb1c1b3449b9694090d33e401c83696ce5df675fd29f740dd"
+      ],
+      "observed_sha256": "36e7f1b4cc5ea98bb1c1b3449b9694090d33e401c83696ce5df675fd29f740dd",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/cart.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "9904c8d189997e1746b87d89f7aa6bb3cce5b4e7f1c2cf7dc111e074a2ea2e77"
+      ],
+      "observed_sha256": "9904c8d189997e1746b87d89f7aa6bb3cce5b4e7f1c2cf7dc111e074a2ea2e77",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/close.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "28d7f46430abc91a5b30de9ac764eccc84684934322f6fa917ad510617d8a8cf"
+      ],
+      "observed_sha256": "28d7f46430abc91a5b30de9ac764eccc84684934322f6fa917ad510617d8a8cf",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/close_icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "de214781c0bb7df4b19b748de48a76a2c50bc5265c34761b92a2d3aa9cb99964"
+      ],
+      "observed_sha256": "de214781c0bb7df4b19b748de48a76a2c50bc5265c34761b92a2d3aa9cb99964",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/contract_img.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "c0b6ae3aba5606231ba1c5fae3122654e84d6340cf1eebda57c662d215043ef3"
+      ],
+      "observed_sha256": "c0b6ae3aba5606231ba1c5fae3122654e84d6340cf1eebda57c662d215043ef3",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/credit-icon.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "183649d2bce4d7c190d450fa2d65530dadfd2370ca7da496ba705b401ffa87c7"
+      ],
+      "observed_sha256": "183649d2bce4d7c190d450fa2d65530dadfd2370ca7da496ba705b401ffa87c7",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/credit_log.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "9b96606be311712bd0a076df0f1de723b15e11bd5b3e8835ad683563ac70ef3a"
+      ],
+      "observed_sha256": "9b96606be311712bd0a076df0f1de723b15e11bd5b3e8835ad683563ac70ef3a",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/exit.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a5f628f9e1cf46c0874bd4b6b61bb89fd18e3d18224ead73c87b272f6bff085f"
+      ],
+      "observed_sha256": "a5f628f9e1cf46c0874bd4b6b61bb89fd18e3d18224ead73c87b272f6bff085f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/help.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d4c0fa9e6f8f5951079cc23c972c2772505c96e2b3704d0a4e2c1483292f8bed"
+      ],
+      "observed_sha256": "d4c0fa9e6f8f5951079cc23c972c2772505c96e2b3704d0a4e2c1483292f8bed",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/left_btn.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "1f6a45d2088a9d82ffd4ca2d07312123e2205c131923111d69e1c0f7944aba0e"
+      ],
+      "observed_sha256": "1f6a45d2088a9d82ffd4ca2d07312123e2205c131923111d69e1c0f7944aba0e",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/login_back.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "06d8ad360cc6b51be08a11bfc2ee3fc76213f014880f133a2b6cccd427be9ba8"
+      ],
+      "observed_sha256": "06d8ad360cc6b51be08a11bfc2ee3fc76213f014880f133a2b6cccd427be9ba8",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/login_icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "3d2d6cae58030d6aba8244c8b0338b02a2a5ef83342056099974a119154a539d"
+      ],
+      "observed_sha256": "3d2d6cae58030d6aba8244c8b0338b02a2a5ef83342056099974a119154a539d",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/maintain.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "7c5ae652201f1a7c1d049312407731bf7a9c5fc18fd02e871bbcdf85cc7eafbb"
+      ],
+      "observed_sha256": "7c5ae652201f1a7c1d049312407731bf7a9c5fc18fd02e871bbcdf85cc7eafbb",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "71304555f2babe003763513aad9c3eb8be73a9fbfa8f44096689cd4ca488ef24"
+      ],
+      "observed_sha256": "71304555f2babe003763513aad9c3eb8be73a9fbfa8f44096689cd4ca488ef24",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu1.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "1e3f329512f0deca30091fe674ca44dbef4256deb5c222e795f2f303b6ed18ce"
+      ],
+      "observed_sha256": "1e3f329512f0deca30091fe674ca44dbef4256deb5c222e795f2f303b6ed18ce",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu10.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "1f8e596b53208ecfaad31193d800846c13b1fb68f18e4f5f8864adb4d1d7fcb1"
+      ],
+      "observed_sha256": "1f8e596b53208ecfaad31193d800846c13b1fb68f18e4f5f8864adb4d1d7fcb1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu11.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "be4cc780c5bcd8fdf28615d3cf2de7212f6616df78748a7a9d6014f95ebf4683"
+      ],
+      "observed_sha256": "be4cc780c5bcd8fdf28615d3cf2de7212f6616df78748a7a9d6014f95ebf4683",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu2.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "7c6ff61e864fc5df1d5541983b4f12cc27b3f6e5e0dc1c5c0863cf57efb184e8"
+      ],
+      "observed_sha256": "7c6ff61e864fc5df1d5541983b4f12cc27b3f6e5e0dc1c5c0863cf57efb184e8",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu3.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "fd4a96c5adb2f646734e7db0cc8a4a49ae6d54c7aaf0830a99741e8794f26150"
+      ],
+      "observed_sha256": "fd4a96c5adb2f646734e7db0cc8a4a49ae6d54c7aaf0830a99741e8794f26150",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu4.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "b017e8a2ab04c0fdd22da224c37021dc11f390dee456f9d85a282de7009689ab"
+      ],
+      "observed_sha256": "b017e8a2ab04c0fdd22da224c37021dc11f390dee456f9d85a282de7009689ab",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu5.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "87cca07743f497c1a4f1940c65eb6ace7712e7283d09fef99c5cb305c447f889"
+      ],
+      "observed_sha256": "87cca07743f497c1a4f1940c65eb6ace7712e7283d09fef99c5cb305c447f889",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu6.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "47cfb22a6add8882779bff11c63966f5c832e6d083de98761daa603b24c885f7"
+      ],
+      "observed_sha256": "47cfb22a6add8882779bff11c63966f5c832e6d083de98761daa603b24c885f7",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu7.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "1d96fff33ad4548362f4909fdc46cf7cd3d888cd79fe49e68d1e5ee3d5fdb424"
+      ],
+      "observed_sha256": "1d96fff33ad4548362f4909fdc46cf7cd3d888cd79fe49e68d1e5ee3d5fdb424",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu8.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "deb86f32ff2b0c2c6c4c591e3b9e83582e5a76eb59012624fed1f5f2dd1bcb76"
+      ],
+      "observed_sha256": "deb86f32ff2b0c2c6c4c591e3b9e83582e5a76eb59012624fed1f5f2dd1bcb76",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/menu9.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "577ad7b81a15542027d92ba279307acdb37d7847b51d182369f958f71b174fd5"
+      ],
+      "observed_sha256": "577ad7b81a15542027d92ba279307acdb37d7847b51d182369f958f71b174fd5",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/money.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "c4935360a96cb9998d9fc13599d11f70c4649c07528c528a27fcd538d5497c0e"
+      ],
+      "observed_sha256": "c4935360a96cb9998d9fc13599d11f70c4649c07528c528a27fcd538d5497c0e",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/msg.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "06394101265eeaa07408e6c47c4ec030d9a15b5741badc73594aef9897500907"
+      ],
+      "observed_sha256": "06394101265eeaa07408e6c47c4ec030d9a15b5741badc73594aef9897500907",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/msg.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "6380aff7aab44fbcf4ca9de8b1bb4f682cd0a952c3de99c584a2fba76f8e8ccf"
+      ],
+      "observed_sha256": "6380aff7aab44fbcf4ca9de8b1bb4f682cd0a952c3de99c584a2fba76f8e8ccf",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/msg_no.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d66565e7e4bb669d84608dfa1c2121f205e0b1c0a7b6455b22242049d877af82"
+      ],
+      "observed_sha256": "d66565e7e4bb669d84608dfa1c2121f205e0b1c0a7b6455b22242049d877af82",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/msg_tip.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "01c91762f7f2233cb4a21cdcc11a8e012e5af11c96cbe1ae62156fca26e460a5"
+      ],
+      "observed_sha256": "01c91762f7f2233cb4a21cdcc11a8e012e5af11c96cbe1ae62156fca26e460a5",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/network_erro.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a31e8d8d4679990352bd67e3227e883a2ed6779acabd964432ee035b32e66b6a"
+      ],
+      "observed_sha256": "a31e8d8d4679990352bd67e3227e883a2ed6779acabd964432ee035b32e66b6a",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/no-auth.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a5230f9da767baa90d01ba4c730d337f03587badec46494b2313abc2b01aac82"
+      ],
+      "observed_sha256": "a5230f9da767baa90d01ba4c730d337f03587badec46494b2313abc2b01aac82",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/no_permission.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ca0b131858849df0fd59c03e3fb25992136ef65e809a2f9ff992b68b3ab10178"
+      ],
+      "observed_sha256": "ca0b131858849df0fd59c03e3fb25992136ef65e809a2f9ff992b68b3ab10178",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/pay_select.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "9d72dc60066c17485cc2f1245839c2e74c63a46c60401ae3e10386c7afe849d6"
+      ],
+      "observed_sha256": "9d72dc60066c17485cc2f1245839c2e74c63a46c60401ae3e10386c7afe849d6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/payloading.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "f7eb72950dbc281ee75c9cf51ae7fa5b0ccbc269f280db74da5908f4f2a83699"
+      ],
+      "observed_sha256": "f7eb72950dbc281ee75c9cf51ae7fa5b0ccbc269f280db74da5908f4f2a83699",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/qr_loading.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "131e246882f2856ab88f57cd2294b446e08f23988b92896380f1ecfc439f23b5"
+      ],
+      "observed_sha256": "131e246882f2856ab88f57cd2294b446e08f23988b92896380f1ecfc439f23b5",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/recharge_1.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "b6636fb0ad24cd42d0691339fa0d37c53710db350ee31f2daca003a5055ad812"
+      ],
+      "observed_sha256": "b6636fb0ad24cd42d0691339fa0d37c53710db350ee31f2daca003a5055ad812",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/recharge_2.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "5e185a1c09fcbfff67fc0453b77374c5fd11080be861dff8a94a47eabea7b203"
+      ],
+      "observed_sha256": "5e185a1c09fcbfff67fc0453b77374c5fd11080be861dff8a94a47eabea7b203",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/right_btn.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d32907d6ce6a2b970171c33836fae557c95c90edb07baa5d2d9323d6065077c0"
+      ],
+      "observed_sha256": "d32907d6ce6a2b970171c33836fae557c95c90edb07baa5d2d9323d6065077c0",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/search.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "016afeee7b3845559f51a577a1b70fcfa3f71cf672463c5a6be1a38d17719ea3"
+      ],
+      "observed_sha256": "016afeee7b3845559f51a577a1b70fcfa3f71cf672463c5a6be1a38d17719ea3",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/source_back.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "1b822786d2bbbb3eb70106d76e863321e1b7fd3f04aeae6f36d6130af4db46cc"
+      ],
+      "observed_sha256": "1b822786d2bbbb3eb70106d76e863321e1b7fd3f04aeae6f36d6130af4db46cc",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/common/toTop.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "fb9396b19588cc628d8dbe41296b1f460fc1c1313551671508cd2f2b5edae5f2"
+      ],
+      "observed_sha256": "fb9396b19588cc628d8dbe41296b1f460fc1c1313551671508cd2f2b5edae5f2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/finance/back.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "6008a8e156ece29344865bfeefd2f686f98e706d81f518fcc3465cdfb298dfd9"
+      ],
+      "observed_sha256": "6008a8e156ece29344865bfeefd2f686f98e706d81f518fcc3465cdfb298dfd9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/finance/icon_1.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "672ad04e60c7d9ef34ceaea185c6102ae25d27083e27602f5ab22046d552a8e6"
+      ],
+      "observed_sha256": "672ad04e60c7d9ef34ceaea185c6102ae25d27083e27602f5ab22046d552a8e6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/goodsList/search_domain.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "b1b9c38139dbedc30cac9d5d13888f60a109e437a1a7d10b8cc4469055e830ef"
+      ],
+      "observed_sha256": "b1b9c38139dbedc30cac9d5d13888f60a109e437a1a7d10b8cc4469055e830ef",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/goodsList/upload.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "28d8fe70e02b46d88cd05d1b00dca5314848a6a774f1d1d50ef9a22b9d4435e7"
+      ],
+      "observed_sha256": "28d8fe70e02b46d88cd05d1b00dca5314848a6a774f1d1d50ef9a22b9d4435e7",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/activation-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "db1a07ae563112c4e04c6b5fe66da65c3bf996eb3bba4a2f4a55a201f3ddb812"
+      ],
+      "observed_sha256": "db1a07ae563112c4e04c6b5fe66da65c3bf996eb3bba4a2f4a55a201f3ddb812",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/compny-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a86439c074f44b2dae57dcdca200f64311526c4c8cc9553eb51e3cbcb6493625"
+      ],
+      "observed_sha256": "a86439c074f44b2dae57dcdca200f64311526c4c8cc9553eb51e3cbcb6493625",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/copy.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "181556aed6be5c02e6aff73e079e402876efb5ede986531571d5e4df582731d6"
+      ],
+      "observed_sha256": "181556aed6be5c02e6aff73e079e402876efb5ede986531571d5e4df582731d6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/credit-card.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2cf7308a84eb592d7566dd4afc9781c7d38b84288961d02e35553d63e0b265d2"
+      ],
+      "observed_sha256": "2cf7308a84eb592d7566dd4afc9781c7d38b84288961d02e35553d63e0b265d2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/email-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ef013eec0f2d576fe12e58c1708341b673e9b7293c1aadfcffb92e0ed483dfca"
+      ],
+      "observed_sha256": "ef013eec0f2d576fe12e58c1708341b673e9b7293c1aadfcffb92e0ed483dfca",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/no-pay-order.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "231ba23052251afe4fbf06963c9dac5ad3ccf9735c2c8e2e0c4df7542734090b"
+      ],
+      "observed_sha256": "231ba23052251afe4fbf06963c9dac5ad3ccf9735c2c8e2e0c4df7542734090b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/person-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "53de9f59988dd84c1a4e2818ab0cb6c9d174b28e442b763a6d02b206e5a3b45f"
+      ],
+      "observed_sha256": "53de9f59988dd84c1a4e2818ab0cb6c9d174b28e442b763a6d02b206e5a3b45f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/pic-1.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "28adca5e48e9b8779a7699fc9ce0a78747a3c912eeac116effaa69eb995f0f22"
+      ],
+      "observed_sha256": "28adca5e48e9b8779a7699fc9ce0a78747a3c912eeac116effaa69eb995f0f22",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/prduct-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "763a9db397af2454ca7bf8b2c8653b2140e2eb4c26f59d08bbc1593d0246fb21"
+      ],
+      "observed_sha256": "763a9db397af2454ca7bf8b2c8653b2140e2eb4c26f59d08bbc1593d0246fb21",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/recommend-img.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "be3b4106a788c965de6aa29dac53775c13de921b66be095ba78be1f09589f7a5"
+      ],
+      "observed_sha256": "be3b4106a788c965de6aa29dac53775c13de921b66be095ba78be1f09589f7a5",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/reword.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "3385da133f3d222e66b0cad40409dd7fe5e087869a08c6f162add0db729926b9"
+      ],
+      "observed_sha256": "3385da133f3d222e66b0cad40409dd7fe5e087869a08c6f162add0db729926b9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/tel-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2d6f66fc9a1ef9d1918c8e4b6518958a0134c50eb53130d470d0d8d01b330cce"
+      ],
+      "observed_sha256": "2d6f66fc9a1ef9d1918c8e4b6518958a0134c50eb53130d470d0d8d01b330cce",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/wx.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ffda5aef231a7490b6cdb606560f8bf5b7e0ba840a11f4020ab54a9f9bd730d1"
+      ],
+      "observed_sha256": "ffda5aef231a7490b6cdb606560f8bf5b7e0ba840a11f4020ab54a9f9bd730d1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/home/wx_hover.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "bc858db1232fccaa8398d7886b618fd931ce5eb30572de61c48b837e3ce4d6cd"
+      ],
+      "observed_sha256": "bc858db1232fccaa8398d7886b618fd931ce5eb30572de61c48b837e3ce4d6cd",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/invoice/back_5684.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "6008a8e156ece29344865bfeefd2f686f98e706d81f518fcc3465cdfb298dfd9"
+      ],
+      "observed_sha256": "6008a8e156ece29344865bfeefd2f686f98e706d81f518fcc3465cdfb298dfd9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/invoice/组 6796.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "9708548224680708084aabfbc68e02f6ab584711a450ff6c4868b937e885b6dc"
+      ],
+      "observed_sha256": "9708548224680708084aabfbc68e02f6ab584711a450ff6c4868b937e885b6dc",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/invoice/组 6944.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "64fcf86e8ade1a8139a4ff68942943558da78f7cd06599c22ae5e26c0d45d5dc"
+      ],
+      "observed_sha256": "64fcf86e8ade1a8139a4ff68942943558da78f7cd06599c22ae5e26c0d45d5dc",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/invoice/组 6945.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a4ffe954c985b186f59f1526d73bd3d073850cddae262e6bc56fa2b560f12c6b"
+      ],
+      "observed_sha256": "a4ffe954c985b186f59f1526d73bd3d073850cddae262e6bc56fa2b560f12c6b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/invoice/组 6946.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "32b67f9e873664183a4e9066e9a1c44e0f014e8b70b8e286eef97fde6770ac92"
+      ],
+      "observed_sha256": "32b67f9e873664183a4e9066e9a1c44e0f014e8b70b8e286eef97fde6770ac92",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/invoice/蒙版组 714.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "c2d649d27bacc964e55ab2839827861abe536c777b40b6f2a6e45b568011e22a"
+      ],
+      "observed_sha256": "c2d649d27bacc964e55ab2839827861abe536c777b40b6f2a6e45b568011e22a",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/invoice/路径 5684.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "6008a8e156ece29344865bfeefd2f686f98e706d81f518fcc3465cdfb298dfd9"
+      ],
+      "observed_sha256": "6008a8e156ece29344865bfeefd2f686f98e706d81f518fcc3465cdfb298dfd9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/market/statistics-back.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a95a08c6b571d42dade0b8e68bb4969a55d22b1cea50d6816475592828b32420"
+      ],
+      "observed_sha256": "a95a08c6b571d42dade0b8e68bb4969a55d22b1cea50d6816475592828b32420",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/no-auth.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a5230f9da767baa90d01ba4c730d337f03587badec46494b2313abc2b01aac82"
+      ],
+      "observed_sha256": "a5230f9da767baa90d01ba4c730d337f03587badec46494b2313abc2b01aac82",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/referral/back.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "b2c65a9678fa03b5c22f53d35743c1014e58207ca6998e6d801e029ae6403921"
+      ],
+      "observed_sha256": "b2c65a9678fa03b5c22f53d35743c1014e58207ca6998e6d801e029ae6403921",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/referral/top1.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a016a0c79a4450496017c09f5e1919da2496be0803991616a44d1c61c5e6"
+      ],
+      "observed_sha256": "ab40a016a0c79a4450496017c09f5e1919da2496be0803991616a44d1c61c5e6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/referral/top2.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "b28f5a236515b9a593d462d840bafd67d63b7f1218c6649c6dfc7af9aba28451"
+      ],
+      "observed_sha256": "b28f5a236515b9a593d462d840bafd67d63b7f1218c6649c6dfc7af9aba28451",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/referral/top3.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d8bb34b63a77ecc7f7841ba8df3ba92b8406d742c1e7173a40fb900b3f22eef9"
+      ],
+      "observed_sha256": "d8bb34b63a77ecc7f7841ba8df3ba92b8406d742c1e7173a40fb900b3f22eef9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/referral/top4.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "fec5791c18109441bfde682e6133f4e5cf52ca2a5f3fabbf0f563c60c69b167d"
+      ],
+      "observed_sha256": "fec5791c18109441bfde682e6133f4e5cf52ca2a5f3fabbf0f563c60c69b167d",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ticket/admin.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "191f0488ec9978b8feb4e3b56dfd44a9d52248b1883d4668affb23235cd3c4f6"
+      ],
+      "observed_sha256": "191f0488ec9978b8feb4e3b56dfd44a9d52248b1883d4668affb23235cd3c4f6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ticket/client.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "e5d293b21352526b9aa5d368f19136d2881f284d6014e29e3f3a5929d3ee5f7c"
+      ],
+      "observed_sha256": "e5d293b21352526b9aa5d368f19136d2881f284d6014e29e3f3a5929d3ee5f7c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ticket/top-bg-1.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "441a7d9e0047ad7ded080611a2c97b0c0878113a3cc2f0d3f71b93287859ed6f"
+      ],
+      "observed_sha256": "441a7d9e0047ad7ded080611a2c97b0c0878113a3cc2f0d3f71b93287859ed6f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ticket/top-bg-2.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "5080a60a6b2647e7fac0d3872bfe4912e4d96269a079950af9212b73ced494b6"
+      ],
+      "observed_sha256": "5080a60a6b2647e7fac0d3872bfe4912e4d96269a079950af9212b73ced494b6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ticket/top-bg-3.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "06fc2ed202d5200a34834793eebeceff7a8e34a387b029314c63f534527a5c7c"
+      ],
+      "observed_sha256": "06fc2ed202d5200a34834793eebeceff7a8e34a387b029314c63f534527a5c7c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/ticket/top-bg-4.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "3f6529dca93e90bcb0ebe88062b4f995c5b1a241337d7fe50481b3738dde6246"
+      ],
+      "observed_sha256": "3f6529dca93e90bcb0ebe88062b4f995c5b1a241337d7fe50481b3738dde6246",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/voucher/check.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d681990321307d76b79f36f9f4c5b58e2c7c7c6e1f79b8a0690463ce0e88abb0"
+      ],
+      "observed_sha256": "d681990321307d76b79f36f9f4c5b58e2c7c7c6e1f79b8a0690463ce0e88abb0",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/voucher/voucher_01.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "e0a027df77567de52c7cc40ec42af1e841940c24c2bbd8ee02d8c40e04b55fb0"
+      ],
+      "observed_sha256": "e0a027df77567de52c7cc40ec42af1e841940c24c2bbd8ee02d8c40e04b55fb0",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/voucher/voucher_02.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "f385d51ea5f302f09c4d3a0900105e2ecf159f89f88f066f6e9ffb4fdb326195"
+      ],
+      "observed_sha256": "f385d51ea5f302f09c4d3a0900105e2ecf159f89f88f066f6e9ffb4fdb326195",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/voucher/voucher_03.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2cce29165826150f345c9afb7bdcebbf5d959db4080e3a608c263d03973d4a2c"
+      ],
+      "observed_sha256": "2cce29165826150f345c9afb7bdcebbf5d959db4080e3a608c263d03973d4a2c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/voucher/voucher_04.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "6c982bd52a560faa47dd99134316e25b3047660938d376c1867fc7c72c1246ab"
+      ],
+      "observed_sha256": "6c982bd52a560faa47dd99134316e25b3047660938d376c1867fc7c72c1246ab",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/img/voucher/voucher_05.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "f4f27c56217499bbe2e64ddd5f57214cbd2c259d55df4f52d92a8a583f804c9f"
+      ],
+      "observed_sha256": "f4f27c56217499bbe2e64ddd5f57214cbd2c259d55df4f52d92a8a583f804c9f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/axios.min.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "284c88127d5e891a0fd35811dcb3ea73886dfb58c3f1642b8dcb66d67919ca94"
+      ],
+      "observed_sha256": "284c88127d5e891a0fd35811dcb3ea73886dfb58c3f1642b8dcb66d67919ca94",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/common.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "5586e889e3229cab8bae2b2212d78f1c5c0759bd3b7c6b51035489d12d34471a"
+      ],
+      "observed_sha256": "5586e889e3229cab8bae2b2212d78f1c5c0759bd3b7c6b51035489d12d34471a",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/crypto-js.min.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "bba05a999896e6d09e9a37b69ebb5e282d8aa0b20a5fd94a3d2a6f0a43a16a6c"
+      ],
+      "observed_sha256": "bba05a999896e6d09e9a37b69ebb5e282d8aa0b20a5fd94a3d2a6f0a43a16a6c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/echarts.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "f1be1544f74e1a1bb945325f2f88936cf41fb1c7005ad02a4cd043c101e70020"
+      ],
+      "observed_sha256": "f1be1544f74e1a1bb945325f2f88936cf41fb1c7005ad02a4cd043c101e70020",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/element.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "452874081253c0b6c5f28d096f994b67201940dfa9faecaafb32c9dfc87028ae"
+      ],
+      "observed_sha256": "452874081253c0b6c5f28d096f994b67201940dfa9faecaafb32c9dfc87028ae",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/html2canvas.min.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "e87e550794322e574a1fda0c1549a3c70dae5a93d9113417a429016838eab8cb"
+      ],
+      "observed_sha256": "e87e550794322e574a1fda0c1549a3c70dae5a93d9113417a429016838eab8cb",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/html2pdf.bundle.min.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "85e6ee9ce246e3ae4424313f7e46a5ed860a28d757811de8dc9c43f306049d65"
+      ],
+      "observed_sha256": "85e6ee9ce246e3ae4424313f7e46a5ed860a28d757811de8dc9c43f306049d65",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/jquery.mini.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "257d5f704c82eb97673a342fbc9c24a5661a234d4b1b91f17926d79277e7edee"
+      ],
+      "observed_sha256": "257d5f704c82eb97673a342fbc9c24a5661a234d4b1b91f17926d79277e7edee",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/jspdf.min.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "42e178aaabcbb33c89075c0a54347c0d7c6e1e7883706cbc1c00344134c22729"
+      ],
+      "observed_sha256": "42e178aaabcbb33c89075c0a54347c0d7c6e1e7883706cbc1c00344134c22729",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/qrcode.min.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "38350479cefe037b0a7a8d79b468cfc16c7c128dcc5b37b0168ff9f7afe95012"
+      ],
+      "observed_sha256": "38350479cefe037b0a7a8d79b468cfc16c7c128dcc5b37b0168ff9f7afe95012",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/viewer.min.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "80fbe68949ec8c3219eb2013ce6fa8ef401e7e5b77f84062d2446cf9650706e2"
+      ],
+      "observed_sha256": "80fbe68949ec8c3219eb2013ce6fa8ef401e7e5b77f84062d2446cf9650706e2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/js/common/vue.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "7dd2db46af36f2433d72b05347e93b7ab3dee42a596294472642c3eb1fc4d06e"
+      ],
+      "observed_sha256": "7dd2db46af36f2433d72b05347e93b7ab3dee42a596294472642c3eb1fc4d06e",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/lang/en-us/element-lang.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "79ef3f65be1000b82998851bfb90c0f56ccf3bb1ba602f4a4c072c1aaeda227b"
+      ],
+      "observed_sha256": "79ef3f65be1000b82998851bfb90c0f56ccf3bb1ba602f4a4c072c1aaeda227b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/lang/en-us/index.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "f9f35181fd258ab7e12d54b915e1d5dba644555e57549690d77dda127dc0349f"
+      ],
+      "observed_sha256": "f9f35181fd258ab7e12d54b915e1d5dba644555e57549690d77dda127dc0349f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/lang/index.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "1e8d142d57773dbaf14f25e663cd1bae1c60d92fe689a07e90fa7af1407fb7b6"
+      ],
+      "observed_sha256": "1e8d142d57773dbaf14f25e663cd1bae1c60d92fe689a07e90fa7af1407fb7b6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/lang/zh-cn/element-lang.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "59f5d211dd6abf3fde556fddecb1fcc0415689f596849df0c5034adad01b64e9"
+      ],
+      "observed_sha256": "59f5d211dd6abf3fde556fddecb1fcc0415689f596849df0c5034adad01b64e9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/lang/zh-cn/index.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "9208126edc8e8fc1dbe720788e1fbcb19a1123f3d7b17e32a002f836a52548ee"
+      ],
+      "observed_sha256": "9208126edc8e8fc1dbe720788e1fbcb19a1123f3d7b17e32a002f836a52548ee",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/lang/zh-hk/element-lang.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "df525dc7bef63c9bd34c66da8ddb1e8d5675234aa4416850a781322d172f5ee1"
+      ],
+      "observed_sha256": "df525dc7bef63c9bd34c66da8ddb1e8d5675234aa4416850a781322d172f5ee1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/lang/zh-hk/index.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "0a6b2b9ca8f48d6eeb6c81da83152c973d82e6612b369442dc2d8c350bd2296a"
+      ],
+      "observed_sha256": "0a6b2b9ca8f48d6eeb6c81da83152c973d82e6612b369442dc2d8c350bd2296a",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme.jpg",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "a251bf6c8c3615a4f686874bdb88e9966b8e8608fdd130ba3cff40d913946a11"
+      ],
+      "observed_sha256": "a251bf6c8c3615a4f686874bdb88e9966b8e8608fdd130ba3cff40d913946a11",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/default/element-ui.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "c0549f93f853278312d1f85fcf13bf6af2484984f273549d3bd77e241e27b70b"
+      ],
+      "observed_sha256": "c0549f93f853278312d1f85fcf13bf6af2484984f273549d3bd77e241e27b70b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/default/fonts/element-icons.ttf",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2"
+      ],
+      "observed_sha256": "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/default/fonts/element-icons.woff",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17"
+      ],
+      "observed_sha256": "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/default/index.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "b8b98b2ec64198829750f246506454a2e1f527a30826df520c66012957a4c535"
+      ],
+      "observed_sha256": "b8b98b2ec64198829750f246506454a2e1f527a30826df520c66012957a4c535",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/default/index.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "aa22fadc9c2486bd08ce1dd6abf3033fa889072bbad635a8c79afa6f793c8008"
+      ],
+      "observed_sha256": "aa22fadc9c2486bd08ce1dd6abf3033fa889072bbad635a8c79afa6f793c8008",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/index.js",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "9320dd6233db53db323957758c608b57b073ce9491d54a0fea4d5a1ee8ad9270"
+      ],
+      "observed_sha256": "9320dd6233db53db323957758c608b57b073ce9491d54a0fea4d5a1ee8ad9270",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme1/element-ui.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "baacd7d0e0f4005a4b27bdbc4cea2479b03c02d24bedfa18d59be95c69575203"
+      ],
+      "observed_sha256": "baacd7d0e0f4005a4b27bdbc4cea2479b03c02d24bedfa18d59be95c69575203",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme1/fonts/element-icons.ttf",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2"
+      ],
+      "observed_sha256": "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme1/fonts/element-icons.woff",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17"
+      ],
+      "observed_sha256": "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme1/index.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ae133268a4aebe7d5302069e23fbe08d42bdd1835dda0f67d4284a4e887a9316"
+      ],
+      "observed_sha256": "ae133268a4aebe7d5302069e23fbe08d42bdd1835dda0f67d4284a4e887a9316",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme1/index.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "513c4a4c5f1cceb0b3c4d6ac479d0e3bbc08ec81b90147f9acc51593c227e574"
+      ],
+      "observed_sha256": "513c4a4c5f1cceb0b3c4d6ac479d0e3bbc08ec81b90147f9acc51593c227e574",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme2/element-ui.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "c07c4b3afafedd02062e754c72d38102be2f1c8e19b20e8b331667dac8d795a7"
+      ],
+      "observed_sha256": "c07c4b3afafedd02062e754c72d38102be2f1c8e19b20e8b331667dac8d795a7",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme2/fonts/element-icons.ttf",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2"
+      ],
+      "observed_sha256": "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme2/fonts/element-icons.woff",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17"
+      ],
+      "observed_sha256": "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme2/index.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "222e758f9f9af213aa172a663329cc0121da34ac1d64805bb3cb3d702230a41e"
+      ],
+      "observed_sha256": "222e758f9f9af213aa172a663329cc0121da34ac1d64805bb3cb3d702230a41e",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme2/index.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "380c486eb75ef11921de37d3f9ebba68516418459fe090907b0e9aa4c0ea61c1"
+      ],
+      "observed_sha256": "380c486eb75ef11921de37d3f9ebba68516418459fe090907b0e9aa4c0ea61c1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme3/element-ui.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "1e2c359ee6138cd390582d3e64d77929c8af0c06330792684847048d7fef6afd"
+      ],
+      "observed_sha256": "1e2c359ee6138cd390582d3e64d77929c8af0c06330792684847048d7fef6afd",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme3/fonts/element-icons.ttf",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2"
+      ],
+      "observed_sha256": "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme3/fonts/element-icons.woff",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17"
+      ],
+      "observed_sha256": "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme3/index.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ec2b039b00eda229f5a85a17c9ae720ce501acdb10f0403cff64dbc77f01e023"
+      ],
+      "observed_sha256": "ec2b039b00eda229f5a85a17c9ae720ce501acdb10f0403cff64dbc77f01e023",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme3/index.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d76140878e4f9e9711f80ee9455b4dea0c68be083ef7669205e2fae37a79134a"
+      ],
+      "observed_sha256": "d76140878e4f9e9711f80ee9455b4dea0c68be083ef7669205e2fae37a79134a",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme4/element-ui.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "59661f3d89dec2a976babdc1f84c037c3b82b95325f2430bb780c6517d677245"
+      ],
+      "observed_sha256": "59661f3d89dec2a976babdc1f84c037c3b82b95325f2430bb780c6517d677245",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme4/fonts/element-icons.ttf",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2"
+      ],
+      "observed_sha256": "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme4/fonts/element-icons.woff",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17"
+      ],
+      "observed_sha256": "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme4/index.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "131a1d824df984b9080c632a9800ce73855577e2c9dcfd80a0c1aaa8bd7f5d3b"
+      ],
+      "observed_sha256": "131a1d824df984b9080c632a9800ce73855577e2c9dcfd80a0c1aaa8bd7f5d3b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme4/index.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "cae483538bb4ea8d4a0dcaed6516920c9b6d081ecdc0c7c14b8b2cda08697207"
+      ],
+      "observed_sha256": "cae483538bb4ea8d4a0dcaed6516920c9b6d081ecdc0c7c14b8b2cda08697207",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme5/element-ui.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "18c8176b14c191a99c4c88cbe8063ba493617184e643e8370f254066f3c6b7e1"
+      ],
+      "observed_sha256": "18c8176b14c191a99c4c88cbe8063ba493617184e643e8370f254066f3c6b7e1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme5/fonts/element-icons.ttf",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2"
+      ],
+      "observed_sha256": "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme5/fonts/element-icons.woff",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17"
+      ],
+      "observed_sha256": "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme5/index.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "5d44a23808baff2d0fe26bf83caa95c317c91ec648b77db2128b9fd186104fd6"
+      ],
+      "observed_sha256": "5d44a23808baff2d0fe26bf83caa95c317c91ec648b77db2128b9fd186104fd6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme5/index.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d90543b4fd7e7d69d2d5df0f21c7b6ac42ea7623bb53432171c5d337de8bc4e2"
+      ],
+      "observed_sha256": "d90543b4fd7e7d69d2d5df0f21c7b6ac42ea7623bb53432171c5d337de8bc4e2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme6/element-ui.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "917ef5711e7cb73882b0617d128718cd69cadcf03307b1aeb470e15cecfceead"
+      ],
+      "observed_sha256": "917ef5711e7cb73882b0617d128718cd69cadcf03307b1aeb470e15cecfceead",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme6/fonts/element-icons.ttf",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2"
+      ],
+      "observed_sha256": "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme6/fonts/element-icons.woff",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17"
+      ],
+      "observed_sha256": "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme6/index.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ad27b022a7d27c505c1601944028c61b7263886f20219b25f79ebf7d583973c8"
+      ],
+      "observed_sha256": "ad27b022a7d27c505c1601944028c61b7263886f20219b25f79ebf7d583973c8",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme6/index.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d76cfed28e2cdeceaca0d9a5f909b7acde5757844f88ecca257576d522edc700"
+      ],
+      "observed_sha256": "d76cfed28e2cdeceaca0d9a5f909b7acde5757844f88ecca257576d522edc700",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme7/element-ui.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "259e1708a5c7feef1a1e6721c6c6ef198cd6271b83a9886636a1df70e2e93904"
+      ],
+      "observed_sha256": "259e1708a5c7feef1a1e6721c6c6ef198cd6271b83a9886636a1df70e2e93904",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme7/fonts/element-icons.ttf",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2"
+      ],
+      "observed_sha256": "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme7/fonts/element-icons.woff",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17"
+      ],
+      "observed_sha256": "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme7/index.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "95e51899d358777149601d944c39cc03ac5cf05cd0ef7d985deab921d249c17f"
+      ],
+      "observed_sha256": "95e51899d358777149601d944c39cc03ac5cf05cd0ef7d985deab921d249c17f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme7/index.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "b17f55ed06529a17789f457944e3e35a72c2ffb3dfdec7e863ecafed7a9b732e"
+      ],
+      "observed_sha256": "b17f55ed06529a17789f457944e3e35a72c2ffb3dfdec7e863ecafed7a9b732e",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme8/element-ui.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "7ba1a440d1c26f29b0dc247bac6865d12baac23be620729aef46e8a41404bf13"
+      ],
+      "observed_sha256": "7ba1a440d1c26f29b0dc247bac6865d12baac23be620729aef46e8a41404bf13",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme8/fonts/element-icons.ttf",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2"
+      ],
+      "observed_sha256": "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme8/fonts/element-icons.woff",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17"
+      ],
+      "observed_sha256": "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme8/index.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2ec6f80100082a0c98bcfaad6800e6a40166e91c691e1b0a028ee7e9262fb44c"
+      ],
+      "observed_sha256": "2ec6f80100082a0c98bcfaad6800e6a40166e91c691e1b0a028ee7e9262fb44c",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme8/index.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "b5fe39a825db81f0234cbbd12aed694554a5a72228557452dc9c802d7df9de3b"
+      ],
+      "observed_sha256": "b5fe39a825db81f0234cbbd12aed694554a5a72228557452dc9c802d7df9de3b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme9/element-ui.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "abe930218ff22df90bb2f6a4e6bf8ca8ca1b4c20bf1d3d692a9df414c85cad5e"
+      ],
+      "observed_sha256": "abe930218ff22df90bb2f6a4e6bf8ca8ca1b4c20bf1d3d692a9df414c85cad5e",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme9/fonts/element-icons.ttf",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2"
+      ],
+      "observed_sha256": "a30f5b3ba6a48822eae041e0ca5412a289125e4ba661d047dae565ac43b4a6b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme9/fonts/element-icons.woff",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17"
+      ],
+      "observed_sha256": "ab40a58972be2ceab32e7e35dab3131b959aae63835d7bda1a79ae51f9a73c17",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme9/index.css",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a39a62c6f4854a858fd6eb65b5fd807c200321b13d78d0ffe431f8557f53b9c9"
+      ],
+      "observed_sha256": "a39a62c6f4854a858fd6eb65b5fd807c200321b13d78d0ffe431f8557f53b9c9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/theme/theme9/index.less",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "dee5b0c62fcf3f2fa695306a890c88defa13e98107303ebbe5035eb1362ba812"
+      ],
+      "observed_sha256": "dee5b0c62fcf3f2fa695306a890c88defa13e98107303ebbe5035eb1362ba812",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/utils/directive.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "5b9a0462e39f843d9a8b1854356a2aa60ccfd0b8766c6b2042a7168a72afb879"
+      ],
+      "observed_sha256": "5b9a0462e39f843d9a8b1854356a2aa60ccfd0b8766c6b2042a7168a72afb879",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/utils/util.js",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "ead508ea6481f37e5930ae7d315b532f2f718d7dcf1eff6bdd2015b4bd464aea"
+      ],
+      "observed_sha256": "ead508ea6481f37e5930ae7d315b532f2f718d7dcf1eff6bdd2015b4bd464aea",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/activation-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "db1a07ae563112c4e04c6b5fe66da65c3bf996eb3bba4a2f4a55a201f3ddb812"
+      ],
+      "observed_sha256": "db1a07ae563112c4e04c6b5fe66da65c3bf996eb3bba4a2f4a55a201f3ddb812",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/compny-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "a86439c074f44b2dae57dcdca200f64311526c4c8cc9553eb51e3cbcb6493625"
+      ],
+      "observed_sha256": "a86439c074f44b2dae57dcdca200f64311526c4c8cc9553eb51e3cbcb6493625",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/copy.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "181556aed6be5c02e6aff73e079e402876efb5ede986531571d5e4df582731d6"
+      ],
+      "observed_sha256": "181556aed6be5c02e6aff73e079e402876efb5ede986531571d5e4df582731d6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/credit-card.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2cf7308a84eb592d7566dd4afc9781c7d38b84288961d02e35553d63e0b265d2"
+      ],
+      "observed_sha256": "2cf7308a84eb592d7566dd4afc9781c7d38b84288961d02e35553d63e0b265d2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/email-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ef013eec0f2d576fe12e58c1708341b673e9b7293c1aadfcffb92e0ed483dfca"
+      ],
+      "observed_sha256": "ef013eec0f2d576fe12e58c1708341b673e9b7293c1aadfcffb92e0ed483dfca",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/index_bg.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "31968d9f1fe4855431abbfa1d2a86f626b79fdbaa679ac4168eb375838a71135"
+      ],
+      "observed_sha256": "31968d9f1fe4855431abbfa1d2a86f626b79fdbaa679ac4168eb375838a71135",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/no-pay-order.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "231ba23052251afe4fbf06963c9dac5ad3ccf9735c2c8e2e0c4df7542734090b"
+      ],
+      "observed_sha256": "231ba23052251afe4fbf06963c9dac5ad3ccf9735c2c8e2e0c4df7542734090b",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/person-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "53de9f59988dd84c1a4e2818ab0cb6c9d174b28e442b763a6d02b206e5a3b45f"
+      ],
+      "observed_sha256": "53de9f59988dd84c1a4e2818ab0cb6c9d174b28e442b763a6d02b206e5a3b45f",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/pic-1.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "28adca5e48e9b8779a7699fc9ce0a78747a3c912eeac116effaa69eb995f0f22"
+      ],
+      "observed_sha256": "28adca5e48e9b8779a7699fc9ce0a78747a3c912eeac116effaa69eb995f0f22",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/prduct-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "763a9db397af2454ca7bf8b2c8653b2140e2eb4c26f59d08bbc1593d0246fb21"
+      ],
+      "observed_sha256": "763a9db397af2454ca7bf8b2c8653b2140e2eb4c26f59d08bbc1593d0246fb21",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/recommend-img.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "be3b4106a788c965de6aa29dac53775c13de921b66be095ba78be1f09589f7a5"
+      ],
+      "observed_sha256": "be3b4106a788c965de6aa29dac53775c13de921b66be095ba78be1f09589f7a5",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/referral/back.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "b2c65a9678fa03b5c22f53d35743c1014e58207ca6998e6d801e029ae6403921"
+      ],
+      "observed_sha256": "b2c65a9678fa03b5c22f53d35743c1014e58207ca6998e6d801e029ae6403921",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/referral/top1.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ab40a016a0c79a4450496017c09f5e1919da2496be0803991616a44d1c61c5e6"
+      ],
+      "observed_sha256": "ab40a016a0c79a4450496017c09f5e1919da2496be0803991616a44d1c61c5e6",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/referral/top2.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "b28f5a236515b9a593d462d840bafd67d63b7f1218c6649c6dfc7af9aba28451"
+      ],
+      "observed_sha256": "b28f5a236515b9a593d462d840bafd67d63b7f1218c6649c6dfc7af9aba28451",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/referral/top3.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "d8bb34b63a77ecc7f7841ba8df3ba92b8406d742c1e7173a40fb900b3f22eef9"
+      ],
+      "observed_sha256": "d8bb34b63a77ecc7f7841ba8df3ba92b8406d742c1e7173a40fb900b3f22eef9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/referral/top4.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "fec5791c18109441bfde682e6133f4e5cf52ca2a5f3fabbf0f563c60c69b167d"
+      ],
+      "observed_sha256": "fec5791c18109441bfde682e6133f4e5cf52ca2a5f3fabbf0f563c60c69b167d",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/reword.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "3385da133f3d222e66b0cad40409dd7fe5e087869a08c6f162add0db729926b9"
+      ],
+      "observed_sha256": "3385da133f3d222e66b0cad40409dd7fe5e087869a08c6f162add0db729926b9",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/tel-icon.png",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "2d6f66fc9a1ef9d1918c8e4b6518958a0134c50eb53130d470d0d8d01b330cce"
+      ],
+      "observed_sha256": "2d6f66fc9a1ef9d1918c8e4b6518958a0134c50eb53130d470d0d8d01b330cce",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/wx.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "ffda5aef231a7490b6cdb606560f8bf5b7e0ba840a11f4020ab54a9f9bd730d1"
+      ],
+      "observed_sha256": "ffda5aef231a7490b6cdb606560f8bf5b7e0ba840a11f4020ab54a9f9bd730d1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/img/wx_hover.svg",
+      "purpose": "原生基础库或业务回退依赖",
+      "impact": "须在官方升级后复验接口及加载顺序",
+      "verified_sha256": [
+        "bc858db1232fccaa8398d7886b618fd931ce5eb30572de61c48b837e3ce4d6cd"
+      ],
+      "observed_sha256": "bc858db1232fccaa8398d7886b618fd931ce5eb30572de61c48b837e3ce4d6cd",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/home/template/pc/default/theme.jpg",
+      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
+      "impact": "原生版本变化可能影响未知模块回退",
+      "verified_sha256": [
+        "a251bf6c8c3615a4f686874bdb88e9966b8e8608fdd130ba3cff40d913946a11"
+      ],
+      "observed_sha256": "a251bf6c8c3615a4f686874bdb88e9966b8e8608fdd130ba3cff40d913946a11",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/plugins/server/mf_cloud/controller/home/CloudController.php",
+      "purpose": "模块操作方法及权限",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "b26b7bdc0f74b860b95946d7a563f853245971c6f2b471194e13639ec66caff5"
+      ],
+      "observed_sha256": "2d7167e45271a587cdc7c44aa6d8ac63ddaf833567dbce2d88d0bcd8fdf9e8b2",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/plugins/server/mf_cloud/logic/CloudLogic.php",
+      "purpose": "磁盘及流量适配父类契约",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "612082a5c774403d7924ca6ceb816e19918fa21af899d4a91e28382b6568457f"
+      ],
+      "observed_sha256": "8b2465c654b078ce3fba03aa217ab8c2a8515b31bb60261deafe0b4e98838763",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/plugins/server/mf_cloud/route.php",
+      "purpose": "模块已登记接口",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "051cae4e2a15b5d9f73c1e193133f5a0d8751d0e80919cfbe8251de3bc6212fc"
+      ],
+      "observed_sha256": "dcf4d902a92205c4d9eaa98e18f5703a5ab8921714c7342b17697c4f1f9558be",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "route/home.php",
+      "purpose": "会员与业务接口路由契约",
+      "impact": "必须匹配纯净官方基线及真实升级验收；本站历史改动不作为已兼容依据",
+      "verified_sha256": [
+        "08d4a123b863a5eeb2557125c729a9cd2a81ef6e90ee73151d1959bd500ff971"
+      ],
+      "observed_sha256": "3d99910311ba5bcbb9a7917d44fc06c0677d99bc8c4d7a898eaa50364f68a0e1",
+      "verification": "official-10.7.2-to-10.7.4-files",
+      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    }
+  ]
+}

@@ -1,0 +1,5277 @@
+{
+  "sections": [
+    {
+      "key": "site",
+      "label": "系统设置",
+      "items": [
+        {
+          "key": "site-info",
+          "label": "网站信息",
+          "fields": [
+            {
+              "key": "hotline",
+              "label": "客服热线（移动端抽屉底部展示）",
+              "type": "text"
+            },
+            {
+              "key": "header_slogan",
+              "label": "顶栏短语（LOGO 右侧）",
+              "type": "text",
+              "placeholder": "让云与算力变得更简单",
+              "hint": "显示在 LOGO 与菜单之间，纯展示文案（不可点击）。建议 8-16 字。"
+            },
+            {
+              "key": "show_header_slogan",
+              "label": "显示顶栏短语与竖线",
+              "type": "switch",
+              "default": "1"
+            },
+            {
+              "key": "copy_header_text",
+              "label": "官网顶栏公共文案",
+              "type": "rows",
+              "cols": [
+                {
+                  "key": "key",
+                  "label": "文案标识"
+                },
+                {
+                  "key": "text",
+                  "label": "显示文案",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ]
+            }
+          ],
+          "hint": "网站名称 / Logo / 备案号 / 版权等请使用 v10 原生「网站信息配置」维护；页脚相关内容在「页脚设置」中配置。"
+        },
+        {
+          "key": "site-support",
+          "label": "客服信息",
+          "hint": "官网顶栏客服下拉框，可配置分组、文字、图标与联系方式。",
+          "fields": [
+            {
+              "key": "header_support_json",
+              "label": "客服信息",
+              "type": "text",
+              "visual": {
+                "widget": "support-contacts"
+              }
+            }
+          ]
+        },
+        {
+          "key": "site-menu",
+          "label": "菜单导航",
+          "fields": [
+            {
+              "key": "cloud_menu_text",
+              "label": "菜单结构",
+              "type": "rows",
+              "addLabel": "添加菜单项",
+              "tree": true,
+              "menuLike": true,
+              "hint": "支持四级。二级显示左侧介绍与图文卡片，三级显示分类目录；在对应一级菜单的编辑框中设置左侧标题、说明、总览及快捷入口。四级只有三级分组标题和四级商品链接可跳转，二级仅切换分类。购物车数据来源自动同步分类和商品。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "云服务器",
+                  "required": true
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/cloud.html",
+                  "url": true
+                },
+                {
+                  "key": "desc",
+                  "label": "简介",
+                  "placeholder": "弹性云服务器"
+                },
+                {
+                  "key": "blank",
+                  "label": "新窗口打开",
+                  "type": "checkbox"
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "source",
+                  "label": "下级数据来源",
+                  "type": "select",
+                  "options": [
+                    [
+                      "",
+                      "手工菜单"
+                    ],
+                    [
+                      "cart",
+                      "购物车分类与商品（自动同步）"
+                    ]
+                  ]
+                },
+                {
+                  "key": "sidebar",
+                  "label": "下拉菜单左侧内容",
+                  "type": "menu-sidebar"
+                }
+              ],
+              "maxLevel": 4
+            },
+            {
+              "key": "cloud_menu_aside_text",
+              "label": "二级菜单公共快捷入口（默认）",
+              "type": "rows",
+              "addLabel": "添加快捷入口",
+              "hint": "未单独设置时，二级下拉左侧使用这些公共快捷入口。单个菜单的左侧内容请在对应一级菜单编辑框中设置。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "desc",
+                  "label": "简介"
+                },
+                {
+                  "key": "blank",
+                  "label": "新窗口打开",
+                  "type": "checkbox"
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                }
+              ]
+            }
+          ],
+          "hint": "桌面与手机共用菜单结构，最多四级。自动商品目录的内容在商品管理中维护。"
+        },
+        {
+          "key": "site-float",
+          "label": "悬浮导航",
+          "fields": [
+            {
+              "key": "float_items_text",
+              "label": "右侧悬浮导航",
+              "type": "rows",
+              "addLabel": "添加悬浮按钮",
+              "hint": "名称建议 **2 字**（最多 3 字）——条目仅 52px 宽、名称常显在图标下方，字数一多会被挤压换行。返回顶部按钮始终内置。图标可选内置键或图标库（点击「选择图标」搜索 Iconify / Icons8，保存后自动缓存到本站）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "客服",
+                  "required": true,
+                  "hint": "建议 2 字，最多 3 字"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/contact.html",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                }
+              ]
+            },
+            {
+              "key": "float_enable",
+              "label": "显示右侧悬浮导航",
+              "type": "switch"
+            }
+          ],
+          "hint": "页面右侧竖排悬浮按钮（客服/电话等），图标可选内置键或图标库；返回顶部按钮始终内置。"
+        },
+        {
+          "key": "site-pagehero",
+          "label": "页面页首",
+          "fields": [
+            {
+              "key": "page_hero_rows_text",
+              "label": "页首标题/描述/按钮",
+              "type": "rows",
+              "addLabel": "添加页面",
+              "hint": "每行：页面|标题|描述|主按钮文字|主链接|副按钮文字|副链接。页面填模板名（如 cloud / ssl / about / partner/cps），* 表示全页兜底；留空列前台保留原样，缺行时用原默认文案。",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "页面",
+                  "placeholder": "cloud 或 *",
+                  "required": true,
+                  "type": "pages"
+                },
+                {
+                  "key": "title",
+                  "label": "标题",
+                  "placeholder": "云服务器"
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "一句话说明"
+                },
+                {
+                  "key": "btn1",
+                  "label": "主按钮文字",
+                  "placeholder": "选购云服务器"
+                },
+                {
+                  "key": "url1",
+                  "label": "主链接",
+                  "placeholder": "/cart/goodsList.htm",
+                  "url": true
+                },
+                {
+                  "key": "btn2",
+                  "label": "副按钮文字",
+                  "placeholder": "咨询上云方案"
+                },
+                {
+                  "key": "url2",
+                  "label": "副链接",
+                  "placeholder": "/contact.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "page_hero_anchor_text",
+              "label": "页内锚点导航",
+              "type": "rows",
+              "addLabel": "添加页面",
+              "hint": "每行：页面|名称#锚点,名称#锚点。锚点为区块 id（如 overview / faq）；留空沿用模板默认。",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "页面",
+                  "placeholder": "cloud 或 *",
+                  "required": true,
+                  "type": "pages"
+                },
+                {
+                  "key": "anchors",
+                  "label": "锚点列表",
+                  "placeholder": "产品概览#overview,核心优势#advantages",
+                  "required": true
+                }
+              ]
+            }
+          ],
+          "hint": "全站 30 个页面的页首主视觉（标题/描述/行动按钮/锚点导航）统一在此配置。"
+        },
+        {
+          "key": "site-footer",
+          "label": "页脚设置",
+          "fields": [
+            {
+              "key": "show_footer_promise",
+              "label": "显示服务承诺条",
+              "type": "switch"
+            },
+            {
+              "key": "footer_promise_items_text",
+              "label": "服务承诺条",
+              "type": "rows",
+              "addLabel": "添加承诺",
+              "hint": "每行：承诺文案|图标。每条承诺配独立图标（点选或搜索选择）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "承诺文案",
+                  "placeholder": "3天 无忧退款",
+                  "required": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                }
+              ]
+            },
+            {
+              "key": "footer_about",
+              "label": "品牌简介",
+              "type": "text"
+            },
+            {
+              "key": "show_footer_cta",
+              "label": "显示行动按钮",
+              "type": "switch"
+            },
+            {
+              "key": "footer_cta_text",
+              "label": "行动按钮",
+              "type": "rows",
+              "addLabel": "添加按钮",
+              "hint": "每行：按钮文字|链接。拖拽排序（第 1 个为渐变主按钮），眼睛隐藏后前台不渲染。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "按钮文字",
+                  "placeholder": "查看产品",
+                  "required": true
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/cart/goodsList.htm",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "show_footer_links",
+              "label": "显示友情链接",
+              "type": "switch"
+            },
+            {
+              "key": "footer_links_text",
+              "label": "友情链接",
+              "type": "rows",
+              "addLabel": "添加友链",
+              "hint": "每行：名称|链接|新窗口(1)。留空时显示 v10 系统友情链接。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "合作伙伴",
+                  "required": true
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "https://example.com",
+                  "url": true
+                },
+                {
+                  "key": "blank",
+                  "label": "新窗口打开",
+                  "type": "checkbox"
+                }
+              ]
+            },
+            {
+              "key": "show_footer_menu",
+              "label": "显示底部菜单栏",
+              "type": "switch"
+            },
+            {
+              "key": "footer_menu_text",
+              "label": "底部菜单栏",
+              "type": "rows",
+              "addLabel": "添加底部栏目",
+              "tree": true,
+              "menuLike": true,
+              "hint": "支持三级：一级（栏目标题）→ 二级（栏目链接）→ 三级（链接子项，缩进显示）。点击「添加下级」新增子项；拖拽排序；眼睛/开关控制前台是否渲染。留空时前台回退默认栏目。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "产品",
+                  "required": true
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/cloud.html",
+                  "url": true
+                },
+                {
+                  "key": "desc",
+                  "label": "简介（底部不展示）",
+                  "placeholder": ""
+                },
+                {
+                  "key": "level",
+                  "label": "级别",
+                  "type": "select",
+                  "options": [
+                    [
+                      "1",
+                      "一级"
+                    ],
+                    [
+                      "2",
+                      "二级"
+                    ],
+                    [
+                      "3",
+                      "三级"
+                    ]
+                  ]
+                },
+                {
+                  "key": "blank",
+                  "label": "新窗口打开",
+                  "type": "checkbox"
+                }
+              ]
+            },
+            {
+              "key": "show_footer_bottom",
+              "label": "显示底部信息行",
+              "type": "switch"
+            },
+            {
+              "key": "footer_icp_text",
+              "label": "ICP 备案文案",
+              "type": "text",
+              "hint": "留空时使用 v10 原生「ICP 备案号」配置；两者都为空则不显示。"
+            },
+            {
+              "key": "footer_icp_url",
+              "label": "ICP 备案链接",
+              "type": "text",
+              "placeholder": "https://beian.miit.gov.cn/"
+            },
+            {
+              "key": "footer_copyright_text",
+              "label": "版权文案",
+              "type": "text",
+              "hint": "留空时使用 v10 原生「版权信息」配置。"
+            },
+            {
+              "key": "footer_qrcode_url",
+              "label": "客服二维码图片",
+              "type": "text",
+              "hint": "留空时使用 v10 原生「客服二维码」；支持 https:// 图片地址或站内路径。"
+            },
+            {
+              "key": "copy_footer_text",
+              "label": "页脚公共文案",
+              "type": "rows",
+              "cols": [
+                {
+                  "key": "key",
+                  "label": "文案标识"
+                },
+                {
+                  "key": "text",
+                  "label": "显示文案",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ]
+            }
+          ],
+          "hint": "页脚全部内容：服务承诺条、品牌简介与行动按钮、底部菜单栏、友情链接、底部信息行（用户协议 / 隐私政策 / ICP 备案 / 版权）。企业名称 / 电话 / 邮箱 / 二维码请使用 v10 原生配置。"
+        },
+        {
+          "key": "site-custom",
+          "label": "自定义代码",
+          "fields": [
+            {
+              "key": "custom_css",
+              "label": "自定义 CSS",
+              "type": "textarea",
+              "rows": 12,
+              "hint": "注入于全站样式表之后，级联最高优先级，无需 !important 即可覆盖主题样式。"
+            },
+            {
+              "key": "custom_js",
+              "label": "自定义 JavaScript",
+              "type": "textarea",
+              "rows": 12,
+              "hint": "在主题脚本与 Alpine 初始化完成之后执行（DOMContentLoaded 后、全局作用域）；定义全局变量请使用 window.xxx = ...。"
+            },
+            {
+              "key": "custom_css_enabled",
+              "label": "启用自定义 CSS",
+              "type": "switch"
+            },
+            {
+              "key": "custom_js_enabled",
+              "label": "启用自定义 JS",
+              "type": "switch"
+            }
+          ],
+          "hint": "在页面 <head> 或 <body> 末尾追加自定义 HTML（统计代码、客服脚本等）。留空即不注入，内容原样输出、不做转义，仅站点管理员可编辑。"
+        },
+        {
+          "key": "site-seo",
+          "label": "SEO 全局",
+          "hint": "站点级 SEO 默认值。每页的标题/描述/关键词默认由主题按页面语义内置（见「官网主题 → SEO 设置」），此处设置全站兜底与社交分享图。",
+          "fields": [
+            {
+              "key": "seo_site_title_suffix",
+              "label": "标题后缀",
+              "type": "text",
+              "hint": "拼接在每页标题之后（如「智简魔方」）。留空使用站点名称。"
+            },
+            {
+              "key": "seo_default_description",
+              "label": "默认描述",
+              "type": "textarea",
+              "rows": 3,
+              "hint": "页面未单独配置描述时使用；建议 60-160 字。留空使用站点名称。"
+            },
+            {
+              "key": "seo_default_keywords",
+              "label": "默认关键词",
+              "type": "text",
+              "hint": "英文逗号分隔。留空使用站点名称。"
+            },
+            {
+              "key": "seo_og_image",
+              "label": "社交分享图",
+              "type": "text",
+              "hint": "og:image / Twitter 卡片配图；支持站内路径或 https 地址。留空使用站点 Logo。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "home",
+      "label": "首页配置",
+      "items": [
+        {
+          "key": "home-carousel",
+          "label": "首屏轮播",
+          "fields": [
+            {
+              "key": "slides_effect",
+              "label": "轮播切换效果",
+              "type": "select",
+              "options": [
+                [
+                  "cube",
+                  "3D 方块旋转"
+                ],
+                [
+                  "flip",
+                  "3D 翻转"
+                ],
+                [
+                  "slide",
+                  "横向滑动"
+                ],
+                [
+                  "fade",
+                  "淡入淡出"
+                ],
+                [
+                  "none",
+                  "直接切换"
+                ]
+              ],
+              "hint": "选择轮播图片或视频的切换效果。系统偏好减少动态效果时采用直接切换。"
+            },
+            {
+              "key": "slides_text",
+              "label": "轮播内容",
+              "type": "rows",
+              "addLabel": "添加轮播",
+              "hint": "支持 jpg/png/webp 图片与 mp4/webm 视频。点击「编辑」在弹窗中填写各段内容；拖拽排序，眼睛图标可临时隐藏。",
+              "cols": [
+                {
+                  "key": "img",
+                  "label": "图片/视频地址",
+                  "placeholder": "/web/cra1/assets/img/banner/banner-hw-1.jpg",
+                  "required": true
+                },
+                {
+                  "key": "url",
+                  "label": "整页链接",
+                  "placeholder": "/cloud.html",
+                  "url": true
+                },
+                {
+                  "key": "title",
+                  "label": "标题",
+                  "placeholder": "弹性计算"
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "rows": 2,
+                  "placeholder": "按需创建云服务器"
+                },
+                {
+                  "key": "btn",
+                  "label": "按钮文字",
+                  "placeholder": "查看产品"
+                },
+                {
+                  "key": "btn_url",
+                  "label": "按钮链接",
+                  "placeholder": "/cart/goodsList.htm",
+                  "url": true
+                }
+              ]
+            }
+          ],
+          "hint": "首屏轮播图：每行一条（图片|标题|描述|按钮文字|按钮链接）。首条为 LCP 元素按高优先级加载；支持视频条目。"
+        },
+        {
+          "key": "home-capability",
+          "label": "轮播下双面板",
+          "fields": [
+            {
+              "key": "show_capability",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "cap1_title",
+              "label": "左栏标题",
+              "type": "text"
+            },
+            {
+              "key": "cap1_desc",
+              "label": "左栏描述",
+              "type": "text"
+            },
+            {
+              "key": "cap1_link",
+              "label": "左栏链接",
+              "type": "text"
+            },
+            {
+              "key": "panel_links_text",
+              "label": "左栏快捷链接",
+              "type": "rows",
+              "addLabel": "添加快捷链接",
+              "hint": "建议 6 条，两行三列展示。",
+              "cols": [
+                {
+                  "key": "text",
+                  "label": "文字",
+                  "placeholder": "云服务器",
+                  "required": true
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/cloud.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "cap_cards_text",
+              "label": "功能卡片",
+              "type": "rows",
+              "addLabel": "添加功能卡",
+              "hint": "每行：名称|描述|链接|图标。轮播下双面板右侧的功能卡，可自由增删；图标底色按顺序自动分配（品牌蓝/成功绿/警示橙轮转），无需手填色值。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "高性能基础设施",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "面向不同负载提供清晰的产品路径。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/dedicated.html",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                }
+              ]
+            }
+          ],
+          "hint": "首屏下方双面板：左侧「云产品矩阵」含标题/描述与快捷入口条目；右侧功能卡可增删，图标底色按顺序自动分配。"
+        },
+        {
+          "key": "home-pricing",
+          "label": "产品与价格（含指定商品）",
+          "fields": [
+            {
+              "key": "show_pricing",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "pricing_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "pricing_desc",
+              "label": "模块描述",
+              "type": "text"
+            },
+            {
+              "key": "pricing_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "pricing_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "home_products_text",
+              "label": "指定商品",
+              "type": "rows",
+              "tree": true,
+              "addLabel": "添加分组",
+              "importLabel": "导入商品",
+              "hint": "按「二级分组 → 商品」维护：分组行本身不展示商品，只用于归类与前台筛选；商品行填商品 ID 与展示标签。可拖拽排序（拖到分组上即归入该组）、逐条显隐。留空时按下方「默认分组」自动展示。「描述」只作用于本模块（在商品行点铅笔图标单独编辑），不会写入 v10 商品资料。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "云服务器 / 分组名",
+                  "required": true
+                },
+                {
+                  "key": "id",
+                  "label": "商品 ID",
+                  "placeholder": "101"
+                },
+                {
+                  "key": "tag",
+                  "label": "展示标签",
+                  "placeholder": "热门产品"
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "留空则用 v10 商品描述",
+                  "type": "textarea",
+                  "hint": "仅本模块展示使用，不修改 v10 系统商品描述"
+                }
+              ]
+            },
+            {
+              "key": "home_products_limit",
+              "label": "最多显示数量（1-12）",
+              "type": "text"
+            },
+            {
+              "key": "home_products_mobile_limit",
+              "label": "手机端显示产品数量（1-12）",
+              "type": "text",
+              "hint": "仅作用于手机端（<640px）：超出该数量的产品默认隐藏，存在更多时显示「加载更多产品」文字按钮；PC 端始终全部显示，默认 3。"
+            },
+            {
+              "key": "home_products_group",
+              "label": "默认分组 ID（0 为全部）",
+              "type": "text",
+              "hint": "仅在「指定商品」留空时生效。"
+            }
+          ],
+          "hint": "产品与价格模块：标题/描述/右上链接 + 商品来源（全部商品或指定商品清单）+ 桌面与手机端展示数量 + 默认分组。"
+        },
+        {
+          "key": "home-solutions",
+          "label": "解决方案模块",
+          "fields": [
+            {
+              "key": "show_solutions",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "sol_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_desc",
+              "label": "模块描述",
+              "type": "text"
+            },
+            {
+              "key": "sol_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "sol_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "sol_home_cards_text",
+              "label": "方案卡片",
+              "type": "rows",
+              "addLabel": "添加方案卡",
+              "hint": "每行：名称|描述|链接。首页解决方案模块的方案卡，可自由增删；卡片数量变化时前台自动重排。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "电商零售",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "面向活动流量、交易连续性和数据运营的基础设施组合。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/solution/ecommerce.html",
+                  "url": true
+                }
+              ]
+            }
+          ],
+          "hint": "解决方案模块：标题/描述/右上链接 + 方案卡片（可增删，前台自动重排）。模块内固定的「全部方案」大卡与「定制方案」入口不属于方案卡片。"
+        },
+        {
+          "key": "home-steps",
+          "label": "快速上手步骤",
+          "fields": [
+            {
+              "key": "show_steps",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "band_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "band_desc",
+              "label": "模块描述",
+              "type": "text"
+            },
+            {
+              "key": "band_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "band_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "band_items_text",
+              "label": "步骤条目",
+              "type": "rows",
+              "addLabel": "添加步骤",
+              "hint": "每行：标题|描述。快速上手步骤，可自由增删；序号按顺序自动生成。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "注册账户",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "完成注册与实名认证，即可进入产品选购"
+                }
+              ]
+            }
+          ],
+          "hint": "快速上手步骤：标题/描述/右上链接 + 步骤条目（可增删，序号自动生成）。"
+        },
+        {
+          "key": "home-nodes",
+          "label": "全球服务地区",
+          "fields": [
+            {
+              "key": "show_nodes",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "nodes_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "nodes_desc",
+              "label": "模块描述",
+              "type": "text"
+            },
+            {
+              "key": "nodes_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "nodes_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "nodes_stat_text",
+              "label": "三项统计",
+              "type": "rows",
+              "addLabel": "添加统计项",
+              "hint": "每行「名称|数值」。**数值留空则自动汇总**：第 1 行=地区数、第 2 行=节点数、第 3 行=机房数；填写则显示填写值（可用「30+」这类口径）。行首加 ! 可隐藏该行。",
+              "cols": [
+                {
+                  "key": "label",
+                  "label": "名称",
+                  "placeholder": "覆盖地区",
+                  "required": true
+                },
+                {
+                  "key": "value",
+                  "label": "数值",
+                  "placeholder": "留空自动汇总"
+                }
+              ]
+            },
+            {
+              "key": "nodes_panel_text",
+              "label": "面板文案",
+              "type": "rows",
+              "addLabel": "添加文案",
+              "hint": "每行「键|文案」。键固定为 node（节点数量单位）、rack（机房数量单位）。",
+              "cols": [
+                {
+                  "key": "key",
+                  "label": "键",
+                  "placeholder": "node / 线路",
+                  "required": true
+                },
+                {
+                  "key": "value",
+                  "label": "文案",
+                  "placeholder": "节点 / CN2 线路"
+                }
+              ]
+            },
+            {
+              "key": "nodes_lines_text",
+              "label": "全局标签",
+              "type": "tags",
+              "placeholder": "CN2 线路, 精品线路",
+              "hint": "所有地区默认展示这些标签（展示在面板底部）。输入后用英文逗号或回车应用，标签固定在框内且可拖拽排序；地区列表里单独填了标签的地区会覆盖它。"
+            },
+            {
+              "key": "nodes_text",
+              "label": "地区列表",
+              "type": "rows",
+              "addLabel": "添加地区",
+              "hint": "每行：地区|经度|纬度|详情|节点数|机房数|标签（后四段均可省略）。经度 -180~180（东经为正），纬度 -85~85（北纬为正）；经纬度非数字的行前台会忽略。「详情」在悬停/聚焦该地区时以面板展示；「标签」展示在节点数、机房数下方，输入后用英文逗号或回车应用，标签固定在框内且可拖拽排序。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "地区",
+                  "placeholder": "香港",
+                  "required": true
+                },
+                {
+                  "key": "lng",
+                  "label": "经度",
+                  "placeholder": "114.17",
+                  "number": true
+                },
+                {
+                  "key": "lat",
+                  "label": "纬度",
+                  "placeholder": "22.32",
+                  "number": true
+                },
+                {
+                  "key": "detail",
+                  "label": "详情",
+                  "placeholder": "CN2 机房 · 三网直连"
+                },
+                {
+                  "key": "nodes",
+                  "label": "节点数",
+                  "placeholder": "12",
+                  "number": true
+                },
+                {
+                  "key": "racks",
+                  "label": "机房数",
+                  "placeholder": "4",
+                  "number": true
+                },
+                {
+                  "key": "lines",
+                  "label": "标签",
+                  "placeholder": "CN2 线路, 精品线路",
+                  "type": "tags"
+                }
+              ]
+            }
+          ],
+          "hint": "全球服务地区模块：地区清单条目、三项统计数字（留空时按地区行自动汇总）与标题描述。"
+        },
+        {
+          "key": "home-news",
+          "label": "新闻公告模块",
+          "fields": [
+            {
+              "key": "show_news",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "news_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "news_desc",
+              "label": "模块描述",
+              "type": "text"
+            },
+            {
+              "key": "news_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "news_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            }
+          ],
+          "hint": "新闻公告模块：标题/右上链接 + 数据来源（按分类或最新）。前台读取 v10 已发布的新闻与公告。"
+        },
+        {
+          "key": "home-figure-band",
+          "label": "数据带（数字横排）",
+          "fields": [
+            {
+              "key": "show_figure_band",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "figure_band_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "figure_band_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "figure_band_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "figure_band_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "figure_band_rows_text",
+              "label": "数据带条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            }
+          ],
+          "hint": "默认开启（可关）。关闭开关后该布局从首页移除；开启时出现在首页对应位置（在「页面模块布局」中可拖拽调整顺序）。"
+        },
+        {
+          "key": "home-switch-deck",
+          "label": "能力切换台（左选项卡）",
+          "fields": [
+            {
+              "key": "show_switch_deck",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "switch_deck_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "switch_deck_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "switch_deck_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "switch_deck_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "switch_deck_rows_text",
+              "label": "能力切换台条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            }
+          ],
+          "hint": "默认开启（可关）。关闭开关后该布局从首页移除；开启时出现在首页对应位置（在「页面模块布局」中可拖拽调整顺序）。"
+        },
+        {
+          "key": "home-duo-feature",
+          "label": "非对称双栏",
+          "fields": [
+            {
+              "key": "show_duo_feature",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "duo_feature_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "duo_feature_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "duo_feature_rows_text",
+              "label": "非对称双栏条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "value",
+                  "label": "作者 / 年份 / 补充说明"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                }
+              ]
+            }
+          ],
+          "hint": "默认开启（可关）。关闭开关后该布局从首页移除；开启时出现在首页对应位置（在「页面模块布局」中可拖拽调整顺序）。"
+        },
+        {
+          "key": "home-rail-scroll",
+          "label": "横滑卡片轨",
+          "fields": [
+            {
+              "key": "show_rail_scroll",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "rail_scroll_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "rail_scroll_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "rail_scroll_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "rail_scroll_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "rail_scroll_rows_text",
+              "label": "横滑卡片轨条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            }
+          ],
+          "hint": "默认开启（可关）。关闭开关后该布局从首页移除；开启时出现在首页对应位置（在「页面模块布局」中可拖拽调整顺序）。"
+        },
+        {
+          "key": "home-choice-ladder",
+          "label": "阶梯配置卡",
+          "fields": [
+            {
+              "key": "show_choice_ladder",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "choice_ladder_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "choice_ladder_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "choice_ladder_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "choice_ladder_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "choice_ladder_rows_text",
+              "label": "阶梯配置条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            }
+          ],
+          "hint": "默认开启（可关）。关闭开关后该布局从首页移除；开启时出现在首页对应位置（在「页面模块布局」中可拖拽调整顺序）。"
+        },
+        {
+          "key": "home-proof-wall",
+          "label": "客户证言墙",
+          "fields": [
+            {
+              "key": "show_proof_wall",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "proof_wall_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "proof_wall_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "proof_wall_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "proof_wall_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "proof_wall_rows_text",
+              "label": "客户证言墙条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "value",
+                  "label": "作者 / 年份 / 补充说明"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                }
+              ]
+            }
+          ],
+          "hint": "默认开启（可关）。关闭开关后该布局从首页移除；开启时出现在首页对应位置（在「页面模块布局」中可拖拽调整顺序）。"
+        },
+        {
+          "key": "home-step-ribbon",
+          "label": "横向进度带",
+          "fields": [
+            {
+              "key": "show_step_ribbon",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "step_ribbon_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "step_ribbon_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "step_ribbon_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "step_ribbon_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "step_ribbon_rows_text",
+              "label": "横向进度带条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "value",
+                  "label": "作者 / 年份 / 补充说明"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                }
+              ]
+            }
+          ],
+          "hint": "默认开启（可关）。关闭开关后该布局从首页移除；开启时出现在首页对应位置（在「页面模块布局」中可拖拽调整顺序）。"
+        },
+        {
+          "key": "home-link-tiles",
+          "label": "产品磁贴墙（首页）",
+          "fields": [
+            {
+              "key": "show_link_tiles",
+              "label": "显示此区块（全站总开关）",
+              "type": "switch",
+              "hint": "关闭后所有页面的磁贴/入口模块都不显示。"
+            },
+            {
+              "key": "link_tiles_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_rows_text",
+              "label": "磁贴条目（首页）",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ],
+              "hint": "每行：名称|描述|链接|图标。**仅首页**的产品磁贴；其他页面的入口在各自页面的设置项中维护。"
+            }
+          ],
+          "hint": "首页「产品磁贴墙」：产品入口磁贴。其他页面（资讯/公告/文档）的关联入口不在此处，见「内容页面」下各页设置。"
+        },
+        {
+          "key": "home-icon-ribbon",
+          "label": "图标能力条",
+          "fields": [
+            {
+              "key": "show_icon_ribbon",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "icon_ribbon_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "icon_ribbon_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "icon_ribbon_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "icon_ribbon_rows_text",
+              "label": "图标能力条条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            }
+          ],
+          "hint": "默认开启（可关）。关闭开关后该布局从首页移除；开启时出现在首页对应位置（在「页面模块布局」中可拖拽调整顺序）。"
+        },
+        {
+          "key": "home-spec-matrix",
+          "label": "规格对照表",
+          "fields": [
+            {
+              "key": "show_spec_matrix",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "spec_matrix_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "spec_matrix_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "spec_matrix_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "spec_matrix_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "spec_matrix_rows_text",
+              "label": "规格对照表条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "value",
+                  "label": "作者 / 年份 / 补充说明"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                }
+              ]
+            }
+          ],
+          "hint": "默认开启（可关）。关闭开关后该布局从首页移除；开启时出现在首页对应位置（在「页面模块布局」中可拖拽调整顺序）。"
+        },
+        {
+          "key": "home-price-slider",
+          "label": "配置价格对照（价格条）",
+          "fields": [
+            {
+              "key": "show_price_slider",
+              "label": "显示此区块",
+              "type": "switch",
+              "hint": "价格条出现在 13 个产品页；各页的规格档位与价格在「内容页面 → 详情类页面（含 13 个产品页）」中按页维护。"
+            }
+          ],
+          "hint": "价格条用于产品页展示配置档位与价格。此开关为总开关；各产品页的具体规格条目见「内容页面 → 详情类页面」。"
+        },
+        {
+          "key": "home-shared-visibility",
+          "label": "扩充模块可见性",
+          "fields": [],
+          "hint": "留空即保持默认：首页不展示扩充模块，其他页面展示。"
+        }
+      ]
+    },
+    {
+      "key": "sol",
+      "label": "解决方案配置",
+      "items": [
+        {
+          "key": "sol-overview",
+          "label": "方案总览页",
+          "fields": [
+            {
+              "key": "sol_page_title",
+              "label": "页面主标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_page_desc",
+              "label": "页面描述",
+              "type": "textarea",
+              "rows": 3
+            },
+            {
+              "key": "sol_hero_btn_text",
+              "label": "主视觉按钮",
+              "type": "rows",
+              "addLabel": "添加按钮",
+              "hint": "每行：按钮文字|链接。拖拽排序（第 1 个为渐变主按钮），眼睛隐藏后前台不渲染。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "按钮文字",
+                  "placeholder": "按行业选择",
+                  "required": true
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "#industry",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "sol_industry_title",
+              "label": "行业区块标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_industry_desc",
+              "label": "行业区块描述",
+              "type": "text"
+            },
+            {
+              "key": "sol_cards_text",
+              "label": "行业卡片列表",
+              "type": "rows",
+              "addLabel": "添加行业卡片",
+              "hint": "总览页「按行业选择」的卡片；增删行即增删卡片，拖拽调整展示顺序。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "行业名称",
+                  "placeholder": "电商零售",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "rows": 2,
+                  "placeholder": "围绕活动峰值、交易链路和数据运营规划架构。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/solution/ecommerce.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "sol_cta_title",
+              "label": "CTA 标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_cta_desc",
+              "label": "CTA 描述",
+              "type": "text"
+            },
+            {
+              "key": "sol_cta_text",
+              "label": "CTA 按钮",
+              "type": "rows",
+              "addLabel": "添加按钮",
+              "hint": "每行：按钮文字|链接。拖拽排序（第 1 个为渐变主按钮），眼睛隐藏后前台不渲染。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "按钮文字",
+                  "placeholder": "查看云产品",
+                  "required": true
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/cart/goodsList.htm",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "copy_solutions_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            }
+          ],
+          "hint": "方案总览页（/solution.html）：页首、行业卡片（可增删）、行动区与更多服务文案。"
+        },
+        {
+          "key": "sol-ecommerce",
+          "label": "行业 · 电商零售",
+          "fields": [
+            {
+              "key": "sol_ind_ecommerce_hero_title",
+              "label": "页面主标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_ind_ecommerce_hero_desc",
+              "label": "页面描述",
+              "type": "textarea",
+              "rows": 3
+            },
+            {
+              "key": "sol_ind_ecommerce_highlights_text",
+              "label": "行业亮点",
+              "type": "rows",
+              "addLabel": "添加亮点",
+              "hint": "电商零售方案的亮点列表。支持新增、编辑、删除、拖拽排序与隐藏；每行是“标题|描述”。旧版 4 组亮点字段会自动兼容迁移。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "亮点标题",
+                  "placeholder": "高并发承载",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "亮点描述",
+                  "type": "textarea",
+                  "rows": 3,
+                  "placeholder": "填写该行业场景的能力说明。"
+                }
+              ]
+            }
+          ],
+          "hint": "电商零售行业方案页：页首标题/描述与该页亮点条目。该页的共享模块（做法对照、常见问题、客户证言）在各自模块的设置项中统一维护。"
+        },
+        {
+          "key": "sol-finance",
+          "label": "行业 · 金融科技",
+          "fields": [
+            {
+              "key": "sol_ind_finance_hero_title",
+              "label": "页面主标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_ind_finance_hero_desc",
+              "label": "页面描述",
+              "type": "textarea",
+              "rows": 3
+            },
+            {
+              "key": "sol_ind_finance_highlights_text",
+              "label": "行业亮点",
+              "type": "rows",
+              "addLabel": "添加亮点",
+              "hint": "金融科技方案的亮点列表。支持新增、编辑、删除、拖拽排序与隐藏；每行是“标题|描述”。旧版 4 组亮点字段会自动兼容迁移。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "亮点标题",
+                  "placeholder": "高并发承载",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "亮点描述",
+                  "type": "textarea",
+                  "rows": 3,
+                  "placeholder": "填写该行业场景的能力说明。"
+                }
+              ]
+            }
+          ],
+          "hint": "金融科技行业方案页：页首标题/描述与该页亮点条目。该页的共享模块（做法对照、常见问题、客户证言）在各自模块的设置项中统一维护。"
+        },
+        {
+          "key": "sol-game",
+          "label": "行业 · 游戏娱乐",
+          "fields": [
+            {
+              "key": "sol_ind_game_hero_title",
+              "label": "页面主标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_ind_game_hero_desc",
+              "label": "页面描述",
+              "type": "textarea",
+              "rows": 3
+            },
+            {
+              "key": "sol_ind_game_highlights_text",
+              "label": "行业亮点",
+              "type": "rows",
+              "addLabel": "添加亮点",
+              "hint": "游戏娱乐方案的亮点列表。支持新增、编辑、删除、拖拽排序与隐藏；每行是“标题|描述”。旧版 4 组亮点字段会自动兼容迁移。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "亮点标题",
+                  "placeholder": "高并发承载",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "亮点描述",
+                  "type": "textarea",
+                  "rows": 3,
+                  "placeholder": "填写该行业场景的能力说明。"
+                }
+              ]
+            }
+          ],
+          "hint": "游戏娱乐行业方案页：页首标题/描述与该页亮点条目。该页的共享模块（做法对照、常见问题、客户证言）在各自模块的设置项中统一维护。"
+        },
+        {
+          "key": "sol-auto",
+          "label": "行业 · 汽车出行",
+          "fields": [
+            {
+              "key": "sol_ind_auto_hero_title",
+              "label": "页面主标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_ind_auto_hero_desc",
+              "label": "页面描述",
+              "type": "textarea",
+              "rows": 3
+            },
+            {
+              "key": "sol_ind_auto_highlights_text",
+              "label": "行业亮点",
+              "type": "rows",
+              "addLabel": "添加亮点",
+              "hint": "汽车出行方案的亮点列表。支持新增、编辑、删除、拖拽排序与隐藏；每行是“标题|描述”。旧版 4 组亮点字段会自动兼容迁移。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "亮点标题",
+                  "placeholder": "高并发承载",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "亮点描述",
+                  "type": "textarea",
+                  "rows": 3,
+                  "placeholder": "填写该行业场景的能力说明。"
+                }
+              ]
+            }
+          ],
+          "hint": "汽车出行行业方案页：页首标题/描述与该页亮点条目。该页的共享模块（做法对照、常见问题、客户证言）在各自模块的设置项中统一维护。"
+        },
+        {
+          "key": "sol-travel",
+          "label": "行业 · 文化旅游",
+          "fields": [
+            {
+              "key": "sol_ind_travel_hero_title",
+              "label": "页面主标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_ind_travel_hero_desc",
+              "label": "页面描述",
+              "type": "textarea",
+              "rows": 3
+            },
+            {
+              "key": "sol_ind_travel_highlights_text",
+              "label": "行业亮点",
+              "type": "rows",
+              "addLabel": "添加亮点",
+              "hint": "文化旅游方案的亮点列表。支持新增、编辑、删除、拖拽排序与隐藏；每行是“标题|描述”。旧版 4 组亮点字段会自动兼容迁移。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "亮点标题",
+                  "placeholder": "高并发承载",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "亮点描述",
+                  "type": "textarea",
+                  "rows": 3,
+                  "placeholder": "填写该行业场景的能力说明。"
+                }
+              ]
+            }
+          ],
+          "hint": "文化旅游行业方案页：页首标题/描述与该页亮点条目。该页的共享模块（做法对照、常见问题、客户证言）在各自模块的设置项中统一维护。"
+        },
+        {
+          "key": "sol-education",
+          "label": "行业 · 在线教育",
+          "fields": [
+            {
+              "key": "sol_ind_education_hero_title",
+              "label": "页面主标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_ind_education_hero_desc",
+              "label": "页面描述",
+              "type": "textarea",
+              "rows": 3
+            },
+            {
+              "key": "sol_ind_education_highlights_text",
+              "label": "行业亮点",
+              "type": "rows",
+              "addLabel": "添加亮点",
+              "hint": "在线教育方案的亮点列表。支持新增、编辑、删除、拖拽排序与隐藏；每行是“标题|描述”。旧版 4 组亮点字段会自动兼容迁移。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "亮点标题",
+                  "placeholder": "高并发承载",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "亮点描述",
+                  "type": "textarea",
+                  "rows": 3,
+                  "placeholder": "填写该行业场景的能力说明。"
+                }
+              ]
+            }
+          ],
+          "hint": "在线教育行业方案页：页首标题/描述与该页亮点条目。该页的共享模块（做法对照、常见问题、客户证言）在各自模块的设置项中统一维护。"
+        },
+        {
+          "key": "sol-medical",
+          "label": "行业 · 智慧医疗",
+          "fields": [
+            {
+              "key": "sol_ind_medical_hero_title",
+              "label": "页面主标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_ind_medical_hero_desc",
+              "label": "页面描述",
+              "type": "textarea",
+              "rows": 3
+            },
+            {
+              "key": "sol_ind_medical_highlights_text",
+              "label": "行业亮点",
+              "type": "rows",
+              "addLabel": "添加亮点",
+              "hint": "智慧医疗方案的亮点列表。支持新增、编辑、删除、拖拽排序与隐藏；每行是“标题|描述”。旧版 4 组亮点字段会自动兼容迁移。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "亮点标题",
+                  "placeholder": "高并发承载",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "亮点描述",
+                  "type": "textarea",
+                  "rows": 3,
+                  "placeholder": "填写该行业场景的能力说明。"
+                }
+              ]
+            }
+          ],
+          "hint": "智慧医疗行业方案页：页首标题/描述与该页亮点条目。该页的共享模块（做法对照、常见问题、客户证言）在各自模块的设置项中统一维护。"
+        },
+        {
+          "key": "sol-agriculture",
+          "label": "行业 · 智慧农业",
+          "fields": [
+            {
+              "key": "sol_ind_agriculture_hero_title",
+              "label": "页面主标题",
+              "type": "text"
+            },
+            {
+              "key": "sol_ind_agriculture_hero_desc",
+              "label": "页面描述",
+              "type": "textarea",
+              "rows": 3
+            },
+            {
+              "key": "sol_ind_agriculture_highlights_text",
+              "label": "行业亮点",
+              "type": "rows",
+              "addLabel": "添加亮点",
+              "hint": "智慧农业方案的亮点列表。支持新增、编辑、删除、拖拽排序与隐藏；每行是“标题|描述”。旧版 4 组亮点字段会自动兼容迁移。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "亮点标题",
+                  "placeholder": "高并发承载",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "亮点描述",
+                  "type": "textarea",
+                  "rows": 3,
+                  "placeholder": "填写该行业场景的能力说明。"
+                }
+              ]
+            }
+          ],
+          "hint": "智慧农业行业方案页：页首标题/描述与该页亮点条目。该页的共享模块（做法对照、常见问题、客户证言）在各自模块的设置项中统一维护。"
+        }
+      ]
+    },
+    {
+      "key": "content",
+      "label": "内容页面",
+      "items": [
+        {
+          "key": "page-contact",
+          "label": "联系页",
+          "fields": [
+            {
+              "key": "show_contact_cards",
+              "label": "显示联系方式卡片",
+              "type": "switch"
+            },
+            {
+              "key": "contact_cards_text",
+              "label": "联系方式卡片",
+              "type": "rows",
+              "addLabel": "添加卡片",
+              "hint": "每行：标题|描述|图标（可在弹窗中选择图标库图标）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "客服热线",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "工作日 9:00-18:00 提供咨询。"
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                }
+              ]
+            },
+            {
+              "key": "show_contact_service",
+              "label": "显示服务与响应",
+              "type": "switch"
+            },
+            {
+              "key": "contact_service_text",
+              "label": "服务与响应",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：标题|描述。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "响应时间",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "工作日平均 2 小时内响应。"
+                }
+              ]
+            },
+            {
+              "key": "show_faq_board",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "faq_board_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "faq_board_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "faq_board_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "faq_board_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "faq_board_rows_text",
+              "label": "问答条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "value",
+                  "label": "作者 / 年份 / 补充说明"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                }
+              ],
+              "hint": "同一布局在多个页面复用时，用「展示页面」列区分各页内容（* 表示全部页面）。"
+            },
+            {
+              "key": "copy_contact_form_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            }
+          ],
+          "hint": "联系页（/contact.html）。本页专属：联系方式卡片、提交咨询、服务与响应。共享模块：常见问题（「首页配置 → 常见问题折叠板」）、服务口径（「首页配置 → 规格对照表」）、服务能力（「首页配置 → 图标能力条」）。"
+        },
+        {
+          "key": "page-document",
+          "label": "文档中心页",
+          "fields": [
+            {
+              "key": "show_doc_quick",
+              "label": "显示快捷入口",
+              "type": "switch"
+            },
+            {
+              "key": "doc_quick_text",
+              "label": "文档快捷入口",
+              "type": "rows",
+              "addLabel": "添加入口",
+              "hint": "每行：标题|描述|链接。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "新手入门",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "基础流程指引。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "show_doc_guide",
+              "label": "显示使用指引",
+              "type": "switch"
+            },
+            {
+              "key": "doc_guide_text",
+              "label": "使用指引",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：标题|描述。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "善用搜索",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "关键词快速定位内容。"
+                }
+              ]
+            },
+            {
+              "key": "show_doc_shelf",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "doc_shelf_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "doc_shelf_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "doc_shelf_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "doc_shelf_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "doc_shelf_rows_text",
+              "label": "分册条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ],
+              "hint": "同一布局在多个页面复用时，用「展示页面」列区分各页内容（* 表示全部页面）。"
+            }
+          ],
+          "hint": "文档中心页（/document.html）。本页专属：快捷入口、文档搜索与分组、使用指引。共享模块：文档分册（「首页配置 → 文档分册架」）、接入步骤（「首页配置 → 横向进度带」）、常见问题（「首页配置 → 常见问题折叠板」）。"
+        },
+        {
+          "key": "page-news",
+          "label": "新闻资讯页",
+          "fields": [
+            {
+              "key": "show_news_nav",
+              "label": "显示内容导航",
+              "type": "switch"
+            },
+            {
+              "key": "news_nav_text",
+              "label": "内容导航卡片",
+              "type": "rows",
+              "addLabel": "添加导航卡",
+              "hint": "每行：标题|描述|链接。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "官方公告",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "产品动态与重要提醒。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/announce.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "show_news_foot",
+              "label": "显示底部说明",
+              "type": "switch"
+            },
+            {
+              "key": "news_foot_text",
+              "label": "底部说明",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：标题|描述。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "持续更新",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "欢迎定期关注。"
+                }
+              ]
+            },
+            {
+              "key": "copy_news_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_core_listing_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "link_tiles_news_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_news_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_news_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_news_text",
+              "label": "入口条目",
+              "type": "rows",
+              "addLabel": "添加入口",
+              "hint": "每行：名称|描述|链接|图标。**仅本页**显示的入口（不再需要「展示页面」列）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "文档中心",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "接入指南与产品手册"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签",
+                  "placeholder": "可选"
+                }
+              ]
+            }
+          ],
+          "hint": "新闻资讯页（/news.html）。本页专属：内容导航、内容列表、底部说明。共享模块：关联入口（「首页配置 → 产品磁贴墙」）、阅读指引（「首页配置 → 图标能力条」）、列表常见问题（「首页配置 → 常见问题折叠板」）。。（该模块的显示开关在「首页配置 → 产品磁贴墙（首页）」，本页仅维护本页入口条目）"
+        },
+        {
+          "key": "page-announce",
+          "label": "官方公告页",
+          "fields": [
+            {
+              "key": "show_announce_nav",
+              "label": "显示相关入口",
+              "type": "switch"
+            },
+            {
+              "key": "announce_nav_text",
+              "label": "相关入口卡片",
+              "type": "rows",
+              "addLabel": "添加入口卡",
+              "hint": "每行：标题|描述|链接。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "产品动态",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "新功能与产品调整。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/news.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "show_announce_foot",
+              "label": "显示公告说明",
+              "type": "switch"
+            },
+            {
+              "key": "announce_foot_text",
+              "label": "公告说明",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：标题|描述。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "公告效力",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "以实际发布信息为准。"
+                }
+              ]
+            },
+            {
+              "key": "link_tiles_announce_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_announce_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_announce_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_announce_text",
+              "label": "入口条目",
+              "type": "rows",
+              "addLabel": "添加入口",
+              "hint": "每行：名称|描述|链接|图标。**仅本页**显示的入口（不再需要「展示页面」列）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "文档中心",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "接入指南与产品手册"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签",
+                  "placeholder": "可选"
+                }
+              ]
+            }
+          ],
+          "hint": "官方公告页（/announce.html）。本页专属：内容导航、内容列表、底部说明。共享模块：关联入口（「首页配置 → 产品磁贴墙」）、阅读指引（「首页配置 → 图标能力条」）、列表常见问题（「首页配置 → 常见问题折叠板」）。。（该模块的显示开关在「首页配置 → 产品磁贴墙（首页）」，本页仅维护本页入口条目）"
+        },
+        {
+          "key": "page-recruit",
+          "label": "人才招聘页",
+          "fields": [
+            {
+              "key": "show_recruit_benefits",
+              "label": "显示福利与成长",
+              "type": "switch"
+            },
+            {
+              "key": "recruit_benefits_text",
+              "label": "福利与成长",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：标题|描述。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "成长空间",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "双通道发展。"
+                }
+              ]
+            },
+            {
+              "key": "show_recruit_flow",
+              "label": "显示招聘流程",
+              "type": "switch"
+            },
+            {
+              "key": "recruit_flow_text",
+              "label": "招聘流程",
+              "type": "rows",
+              "addLabel": "添加步骤",
+              "hint": "每行：标题|描述。按顺序渲染步骤序号。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "投递咨询",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "注明应聘方向。"
+                }
+              ]
+            },
+            {
+              "key": "copy_core_intro_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            }
+          ],
+          "hint": "人才招聘页（/recruit.html）。本页专属：招聘方向、福利与成长、招聘流程。共享模块：应聘步骤（「首页配置 → 横向进度带」）、团队规模（「首页配置 → 数据带」）、我们看重（「首页配置 → 图标能力条」）。"
+        },
+        {
+          "key": "page-feedback",
+          "label": "反馈页",
+          "fields": [
+            {
+              "key": "show_feedback_channels",
+              "label": "显示反馈渠道",
+              "type": "switch"
+            },
+            {
+              "key": "feedback_channels_text",
+              "label": "反馈渠道",
+              "type": "rows",
+              "addLabel": "添加渠道",
+              "hint": "每行：标题|描述。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "产品建议",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "功能与体验建议。"
+                }
+              ]
+            },
+            {
+              "key": "show_feedback_flow",
+              "label": "显示处理流程",
+              "type": "switch"
+            },
+            {
+              "key": "feedback_flow_text",
+              "label": "处理流程",
+              "type": "rows",
+              "addLabel": "添加步骤",
+              "hint": "每行：标题|描述。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "提交反馈",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "选择类型并描述问题。"
+                }
+              ]
+            },
+            {
+              "key": "copy_core_form_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            }
+          ],
+          "hint": "意见反馈页（/feedback.html）。本页专属：反馈渠道、反馈表单、处理流程。共享模块：常见问题（「首页配置 → 常见问题折叠板」）、受理口径（「首页配置 → 规格对照表」）、受理范围（「首页配置 → 图标能力条」）。"
+        },
+        {
+          "key": "page-activity",
+          "label": "活动页",
+          "fields": [
+            {
+              "key": "show_activity_rules",
+              "label": "显示活动说明",
+              "type": "switch"
+            },
+            {
+              "key": "activity_rules_text",
+              "label": "活动说明",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：标题|描述。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "活动规则",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "以官方公告为准。"
+                }
+              ]
+            },
+            {
+              "key": "copy_core_activities_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_cta_activities_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            }
+          ],
+          "hint": "最新活动页（/activities.html）。本页专属：活动类型、活动说明、行动按钮。共享模块：活动档位（「首页配置 → 阶梯配置卡」）、常见问题（「首页配置 → 常见问题折叠板」）、参与须知（「首页配置 → 规格对照表」）。"
+        },
+        {
+          "key": "page-detail",
+          "label": "详情类页面",
+          "fields": [
+            {
+              "key": "show_detail_rel",
+              "label": "显示相关推荐",
+              "type": "switch"
+            },
+            {
+              "key": "detail_rel_text",
+              "label": "相关推荐卡片",
+              "type": "rows",
+              "addLabel": "添加卡片",
+              "hint": "应用于新闻详情 / 公告详情 / 文档详情 / 文档浏览页。每行：标题|描述|链接。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "文档中心",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "产品手册与常见问题。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "show_page_cta",
+              "label": "显示继续了解",
+              "type": "switch"
+            },
+            {
+              "key": "page_cta_text",
+              "label": "继续了解卡片",
+              "type": "rows",
+              "addLabel": "添加卡片",
+              "hint": "应用于全部详情类页面与新闻分类页。每行：标题|描述|链接。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "产品与服务",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "浏览云服务器等产品。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/cart/goodsList.htm",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "prod_overview_title_text",
+              "label": "产品概览 · 标题与描述",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "页面",
+                  "required": true,
+                  "type": "pages"
+                },
+                {
+                  "key": "title",
+                  "label": "标题"
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|标题|描述」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "prod_overview_items_text",
+              "label": "产品概览 · 条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "placeholder": "cloud / dedicated …",
+                  "hint": "该行属于哪个产品页（页面 key）",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称/问题/项目",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述/回答/说明",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|名称|描述」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "prod_advantages_title_text",
+              "label": "核心优势 · 标题",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "页面",
+                  "required": true,
+                  "type": "pages"
+                },
+                {
+                  "key": "title",
+                  "label": "标题"
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|标题|描述」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "prod_advantages_items_text",
+              "label": "核心优势 · 条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "placeholder": "cloud / dedicated …",
+                  "hint": "该行属于哪个产品页（页面 key）",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称/问题/项目",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述/回答/说明",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|名称|描述」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "prod_scenarios_title_text",
+              "label": "适用场景 · 标题",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "页面",
+                  "required": true,
+                  "type": "pages"
+                },
+                {
+                  "key": "title",
+                  "label": "标题"
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|标题|描述」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "prod_scenarios_items_text",
+              "label": "适用场景 · 条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "placeholder": "cloud / dedicated …",
+                  "hint": "该行属于哪个产品页（页面 key）",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称/问题/项目",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述/回答/说明",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|名称|描述」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "prod_service_title_text",
+              "label": "服务与规格 · 标题",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "页面",
+                  "required": true,
+                  "type": "pages"
+                },
+                {
+                  "key": "title",
+                  "label": "标题"
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|标题|描述」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "prod_service_items_text",
+              "label": "服务与规格 · 计费表",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "页面",
+                  "required": true,
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "项目",
+                  "required": true
+                },
+                {
+                  "key": "tag",
+                  "label": "适用方式"
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|项目|适用方式|说明」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "prod_faq_title_text",
+              "label": "常见问题 · 标题",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "页面",
+                  "required": true,
+                  "type": "pages"
+                },
+                {
+                  "key": "title",
+                  "label": "标题"
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|标题|描述」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "prod_faq_items_text",
+              "label": "常见问题 · 问答",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "placeholder": "cloud / dedicated …",
+                  "hint": "该行属于哪个产品页（页面 key）",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称/问题/项目",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述/回答/说明",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|问题|回答」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "prod_cta_title_text",
+              "label": "行动按钮 · 标题",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "页面",
+                  "required": true,
+                  "type": "pages"
+                },
+                {
+                  "key": "title",
+                  "label": "标题"
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea"
+                }
+              ],
+              "hint": "每行「页面|标题|描述」。13 个产品页各自一套文案，一条设置承载。"
+            },
+            {
+              "key": "copy_core_article_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_cta_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_overview_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_pricing_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_scenarios_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "link_tiles_news_details_title",
+              "label": "新闻详情页 · 模块标题",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_news_details_more_text",
+              "label": "新闻详情页 · 右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_news_details_link",
+              "label": "新闻详情页 · 右上链接",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_news_details_text",
+              "label": "新闻详情页 · 入口条目",
+              "type": "rows",
+              "addLabel": "添加入口",
+              "hint": "每行：名称|描述|链接|图标。**仅本页**显示的入口（不再需要「展示页面」列）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "文档中心",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "接入指南与产品手册"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签",
+                  "placeholder": "可选"
+                }
+              ]
+            },
+            {
+              "key": "link_tiles_announce_details_title",
+              "label": "公告详情页 · 模块标题",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_announce_details_more_text",
+              "label": "公告详情页 · 右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_announce_details_link",
+              "label": "公告详情页 · 右上链接",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_announce_details_text",
+              "label": "公告详情页 · 入口条目",
+              "type": "rows",
+              "addLabel": "添加入口",
+              "hint": "每行：名称|描述|链接|图标。**仅本页**显示的入口（不再需要「展示页面」列）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "文档中心",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "接入指南与产品手册"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签",
+                  "placeholder": "可选"
+                }
+              ]
+            },
+            {
+              "key": "link_tiles_document_details_title",
+              "label": "文档详情页 · 模块标题",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_document_details_more_text",
+              "label": "文档详情页 · 右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_document_details_link",
+              "label": "文档详情页 · 右上链接",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_document_details_text",
+              "label": "文档详情页 · 入口条目",
+              "type": "rows",
+              "addLabel": "添加入口",
+              "hint": "每行：名称|描述|链接|图标。**仅本页**显示的入口（不再需要「展示页面」列）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "文档中心",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "接入指南与产品手册"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签",
+                  "placeholder": "可选"
+                }
+              ]
+            },
+            {
+              "key": "link_tiles_document_view_title",
+              "label": "文档浏览页 · 模块标题",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_document_view_more_text",
+              "label": "文档浏览页 · 右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_document_view_link",
+              "label": "文档浏览页 · 右上链接",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_document_view_text",
+              "label": "文档浏览页 · 入口条目",
+              "type": "rows",
+              "addLabel": "添加入口",
+              "hint": "每行：名称|描述|链接|图标。**仅本页**显示的入口（不再需要「展示页面」列）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "文档中心",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "接入指南与产品手册"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签",
+                  "placeholder": "可选"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_cloud_text",
+              "label": "云服务器 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_dedicated_text",
+              "label": "物理裸机 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_domain_text",
+              "label": "域名注册 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_domain_buy_text",
+              "label": "域名购买指引 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_domain_register_text",
+              "label": "域名查询注册 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_domain_shop_text",
+              "label": "域名商城 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_ssl_text",
+              "label": "SSL 证书 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_sms_text",
+              "label": "短信服务 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_rent_text",
+              "label": "服务器租用 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_trusteeship_text",
+              "label": "服务器托管 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_trademark_text",
+              "label": "商标注册 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_icp_text",
+              "label": "备案办理 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_model_text",
+              "label": "企业云基础能力 · 规格档位",
+              "type": "rows",
+              "addLabel": "添加档位",
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "price_slider_title",
+              "label": "价格条标题",
+              "type": "text"
+            },
+            {
+              "key": "price_slider_desc",
+              "label": "价格条描述",
+              "type": "textarea"
+            },
+            {
+              "key": "price_slider_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "price_slider_more_text",
+              "label": "右上链接文字",
+              "type": "text",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ],
+              "hint": "仅本页的规格档位：名称、规格说明、链接、图标、标签、价格。留空继承公共回退。"
+            },
+            {
+              "key": "price_slider_rows_text",
+              "label": "公共价格回退条目",
+              "type": "rows",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "prod_service_heads_text",
+              "label": "服务与计费表头",
+              "type": "rows",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "first",
+                  "label": "第一列表头"
+                },
+                {
+                  "key": "second",
+                  "label": "第二列表头"
+                },
+                {
+                  "key": "third",
+                  "label": "第三列表头"
+                }
+              ]
+            },
+            {
+              "key": "prod_cta_btn1_text",
+              "label": "产品页主按钮",
+              "type": "rows",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "text",
+                  "label": "按钮文字"
+                },
+                {
+                  "key": "url",
+                  "label": "按钮链接",
+                  "url": true
+                }
+              ]
+            }
+          ],
+          "hint": "详情类页面（新闻/公告/文档详情的正文、相关推荐、延伸阅读）。13 个产品页（云服务器/物理裸机/域名/SSL/短信/租用/托管/商标/备案/模型等）的概览、优势、场景、服务、常见问题、行动按钮文案也集中在此，用「页面」列区分各产品页。。（该模块的显示开关在「首页配置 → 产品磁贴墙（首页）」，本页仅维护本页入口条目）"
+        },
+        {
+          "key": "page-doc-result",
+          "label": "文档搜索页",
+          "fields": [
+            {
+              "key": "show_doc_result",
+              "label": "显示搜索建议",
+              "type": "switch"
+            },
+            {
+              "key": "doc_result_text",
+              "label": "搜索建议",
+              "type": "rows",
+              "addLabel": "添加建议",
+              "hint": "每行：标题|描述|链接。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "检查关键词",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "尝试更通用的关键词。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "copy_core_results_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "link_tiles_document_result_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_document_result_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_document_result_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_document_result_text",
+              "label": "入口条目",
+              "type": "rows",
+              "addLabel": "添加入口",
+              "hint": "每行：名称|描述|链接|图标。**仅本页**显示的入口（不再需要「展示页面」列）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "文档中心",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "接入指南与产品手册"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签",
+                  "placeholder": "可选"
+                }
+              ]
+            }
+          ],
+          "hint": "文档搜索页（/document-result.html）。本页专属：搜索结果、搜索建议、继续了解。共享模块：常用入口（「首页配置 → 产品磁贴墙」）、搜索口径说明（「首页配置 → 规格对照表」）。。（该模块的显示开关在「首页配置 → 产品磁贴墙（首页）」，本页仅维护本页入口条目）"
+        },
+        {
+          "key": "page-classify",
+          "label": "新闻分类页",
+          "fields": [
+            {
+              "key": "show_news_classify_nav",
+              "label": "显示内容导航",
+              "type": "switch"
+            },
+            {
+              "key": "news_classify_nav_text",
+              "label": "内容导航卡片",
+              "type": "rows",
+              "addLabel": "添加导航卡",
+              "hint": "每行：标题|描述|链接。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "全部新闻",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "浏览全部新闻与动态。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/news.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "link_tiles_news_classify_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_news_classify_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_news_classify_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "link_tiles_news_classify_text",
+              "label": "入口条目",
+              "type": "rows",
+              "addLabel": "添加入口",
+              "hint": "每行：名称|描述|链接|图标。**仅本页**显示的入口（不再需要「展示页面」列）。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "文档中心",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "接入指南与产品手册"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/document.html",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon",
+                  "placeholder": "点「选择」挑图标，或填 kefu / mdi:phone / icons8:headset"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签",
+                  "placeholder": "可选"
+                }
+              ]
+            }
+          ],
+          "hint": "新闻分类页（/news-classify.html）。本页专属：分类列表、内容导航、继续了解。共享模块：关联入口（「首页配置 → 产品磁贴墙」）、分类说明（「首页配置 → 图标能力条」）。。（该模块的显示开关在「首页配置 → 产品磁贴墙（首页）」，本页仅维护本页入口条目）"
+        },
+        {
+          "key": "page-404",
+          "label": "404 页",
+          "fields": [
+            {
+              "key": "copy_page404_text",
+              "label": "404 页文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：键|文本。键：desc 描述 / btn1 主按钮文字 / url1 主链接 / btn2 副按钮文字 / url2 副链接；留空用默认。",
+              "cols": [
+                {
+                  "key": "k",
+                  "label": "键",
+                  "placeholder": "desc / btn1 / url1",
+                  "required": true
+                },
+                {
+                  "key": "v",
+                  "label": "文本",
+                  "type": "textarea",
+                  "placeholder": "您访问的页面不存在或已被移除。",
+                  "required": true,
+                  "remainder": true
+                }
+              ]
+            }
+          ],
+          "hint": "404 页按 §12.1 豁免：一屏内说明并给出出口；此处可改说明文案与两个出口按钮。"
+        },
+        {
+          "key": "page-about",
+          "label": "关于页",
+          "fields": [
+            {
+              "key": "show_about_honor",
+              "label": "显示资质与荣誉",
+              "type": "switch"
+            },
+            {
+              "key": "about_honor_text",
+              "label": "资质与荣誉",
+              "type": "rows",
+              "addLabel": "添加荣誉",
+              "hint": "每行：名称|描述|图片链接。默认图片为主题占位素材，可替换为自己的图片地址。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "信息安全管理体系认证",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "认证说明（选填）"
+                },
+                {
+                  "key": "url",
+                  "label": "图片链接",
+                  "placeholder": "/web/cra1/assets/img/ref/sol-data.jpg",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "show_about_partner",
+              "label": "显示合作案例",
+              "type": "switch"
+            },
+            {
+              "key": "about_partner_text",
+              "label": "合作案例",
+              "type": "rows",
+              "addLabel": "添加案例",
+              "hint": "每行：名称|描述|图片链接。图片为主题占位素材，可替换。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "政务云项目",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "项目场景说明（选填）"
+                },
+                {
+                  "key": "url",
+                  "label": "图片链接",
+                  "placeholder": "/web/cra1/assets/img/ref/prod-cloud.jpg",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "show_about_timeline",
+              "label": "显示发展历程",
+              "type": "switch"
+            },
+            {
+              "key": "about_timeline_text",
+              "label": "发展历程",
+              "type": "rows",
+              "addLabel": "添加历程",
+              "hint": "每行：年份|事件。按填写顺序展示。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "年份",
+                  "placeholder": "2024",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "事件",
+                  "placeholder": "平台能力进一步扩展。"
+                }
+              ]
+            },
+            {
+              "key": "show_timeline_road",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "timeline_road_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "timeline_road_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "timeline_road_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "timeline_road_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "show_quote_stage",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "quote_stage_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "quote_stage_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "timeline_road_rows_text",
+              "label": "时间轴条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "value",
+                  "label": "作者 / 年份 / 补充说明"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                }
+              ],
+              "hint": "同一布局在多个页面复用时，用「展示页面」列区分各页内容（* 表示全部页面）。"
+            },
+            {
+              "key": "copy_about_company_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_nodes_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            }
+          ],
+          "hint": "关于页（/about.html）。本页专属：企业信息、资质与荣誉、合作案例、发展历程、关键节点时间轴、主张引用。共享模块：平台规模数据（在「首页配置 → 数据带」中设置）。"
+        },
+        {
+          "key": "page-solution",
+          "label": "行业方案页",
+          "fields": [
+            {
+              "key": "show_solution_extra",
+              "label": "显示更多服务",
+              "type": "switch"
+            },
+            {
+              "key": "solution_extra_text",
+              "label": "更多服务卡片",
+              "type": "rows",
+              "addLabel": "添加卡片",
+              "hint": "应用于全部 8 个行业方案页。每行：标题|描述|链接。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标题",
+                  "placeholder": "选购产品",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "placeholder": "浏览产品配置。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/cart/goodsList.htm",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "show_stack_board",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "stack_board_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "stack_board_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "stack_board_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "stack_board_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "show_compare_split",
+              "label": "显示此区块",
+              "type": "switch"
+            },
+            {
+              "key": "compare_split_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "compare_split_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "compare_split_left",
+              "label": "左栏标题",
+              "type": "text"
+            },
+            {
+              "key": "compare_split_right",
+              "label": "右栏标题",
+              "type": "text"
+            },
+            {
+              "key": "compare_split_rows_text",
+              "label": "对照条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "value",
+                  "label": "作者 / 年份 / 补充说明"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                }
+              ],
+              "hint": "同一布局在多个页面复用时，用「展示页面」列区分各页内容（* 表示全部页面）。"
+            },
+            {
+              "key": "quote_stage_text",
+              "label": "引用语正文",
+              "type": "textarea"
+            },
+            {
+              "key": "quote_stage_author",
+              "label": "署名",
+              "type": "text"
+            },
+            {
+              "key": "quote_stage_role",
+              "label": "署名职位",
+              "type": "text"
+            },
+            {
+              "key": "quote_stage_points_text",
+              "label": "侧栏要点",
+              "type": "rows",
+              "addLabel": "添加要点",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "placeholder": "* 或 about",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea"
+                }
+              ]
+            },
+            {
+              "key": "show_region_ledger",
+              "label": "显示服务覆盖清单",
+              "type": "switch"
+            },
+            {
+              "key": "region_ledger_title",
+              "label": "模块标题",
+              "type": "text"
+            },
+            {
+              "key": "region_ledger_desc",
+              "label": "模块描述",
+              "type": "textarea"
+            },
+            {
+              "key": "region_ledger_link",
+              "label": "右上链接",
+              "type": "text"
+            },
+            {
+              "key": "region_ledger_more_text",
+              "label": "右上链接文字",
+              "type": "text"
+            },
+            {
+              "key": "region_ledger_rows_text",
+              "label": "覆盖条目",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            },
+            {
+              "key": "copy_cta_guarantee_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_document_band_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_support_cards_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_method_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_process_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "copy_workload_text",
+              "label": "模块文案",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "标识",
+                  "required": true,
+                  "hint": "如 title / txt1（模板按此取值，通常无需改动）"
+                },
+                {
+                  "key": "desc",
+                  "label": "文案内容",
+                  "type": "textarea",
+                  "remainder": true
+                }
+              ],
+              "hint": "每行「标识|文案」，一条设置承载该模块全部可配文案。"
+            },
+            {
+              "key": "stack_board_rows_text",
+              "label": "方案分层条目",
+              "type": "rows",
+              "cols": [
+                {
+                  "key": "page",
+                  "label": "展示页面",
+                  "type": "pages"
+                },
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "说明",
+                  "type": "textarea"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "url": true
+                },
+                {
+                  "key": "icon",
+                  "label": "图标",
+                  "type": "icon"
+                },
+                {
+                  "key": "tag",
+                  "label": "标签"
+                },
+                {
+                  "key": "value",
+                  "label": "价格 / 补充内容"
+                }
+              ]
+            }
+          ],
+          "hint": "方案总览页（/solution.html）。本页专属：按行业选择、按工作负载、方法步骤、落地流程、常见问题、行动按钮、更多服务。共享模块：方案分层（「首页配置 → 分层堆叠板」）、做法对照（「首页配置 → 左右对照表」）、客户证言（「首页配置 → 客户证言墙」）。"
+        },
+        {
+          "key": "page-partner-cps",
+          "label": "渠道 · 推广合作页",
+          "fields": [
+            {
+              "key": "show_partner_cps_extra",
+              "label": "显示合作要点模块",
+              "type": "switch"
+            },
+            {
+              "key": "partner_cps_extra_text",
+              "label": "合作权益卡片",
+              "type": "rows",
+              "addLabel": "添加权益卡",
+              "hint": "每行：名称|描述|链接。该页「合作权益」三栏卡片，可自由增删。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "推广素材",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "提供官网与产品推广素材，降低制作成本。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/contact.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "copy_partner_cps_program_text",
+              "label": "合作规则卡（t1~t4 标题 / d1~d4 描述）",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：键|文本。键 t1~t4 卡片标题、d1~d4 对应描述；留空用默认。",
+              "cols": [
+                {
+                  "key": "k",
+                  "label": "键",
+                  "placeholder": "t1 / d1",
+                  "required": true
+                },
+                {
+                  "key": "v",
+                  "label": "文本",
+                  "type": "textarea",
+                  "placeholder": "合作规则",
+                  "required": true,
+                  "remainder": true
+                }
+              ]
+            },
+            {
+              "key": "copy_partner_cps_cta_text",
+              "label": "底部行动区",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：键|文本。键：title / desc / btn / url。",
+              "cols": [
+                {
+                  "key": "k",
+                  "label": "键",
+                  "placeholder": "title / desc / btn / url",
+                  "required": true
+                },
+                {
+                  "key": "v",
+                  "label": "文本",
+                  "type": "textarea",
+                  "placeholder": "合作政策需要单独确认",
+                  "required": true,
+                  "remainder": true
+                }
+              ]
+            }
+          ],
+          "hint": "渠道 · 推广合作页（/partner/cps.html）。本页专属：合作要点、合作权益卡片、合作政策提示。共享模块：合作步骤（「首页配置 → 横向进度带」）、合作收益（「首页配置 → 数据带」）、常见问题（「首页配置 → 常见问题折叠板」）。"
+        },
+        {
+          "key": "page-partner-agent",
+          "label": "渠道 · 代理伙伴页",
+          "fields": [
+            {
+              "key": "show_partner_agent_extra",
+              "label": "显示合作要点模块",
+              "type": "switch"
+            },
+            {
+              "key": "partner_agent_extra_text",
+              "label": "合作权益卡片",
+              "type": "rows",
+              "addLabel": "添加权益卡",
+              "hint": "每行：名称|描述|链接。该页「合作权益」三栏卡片，可自由增删。",
+              "cols": [
+                {
+                  "key": "name",
+                  "label": "名称",
+                  "placeholder": "推广素材",
+                  "required": true
+                },
+                {
+                  "key": "desc",
+                  "label": "描述",
+                  "type": "textarea",
+                  "placeholder": "提供官网与产品推广素材，降低制作成本。"
+                },
+                {
+                  "key": "url",
+                  "label": "链接",
+                  "placeholder": "/contact.html",
+                  "url": true
+                }
+              ]
+            },
+            {
+              "key": "copy_partner_agent_program_text",
+              "label": "合作方式卡（t1~t4 / d1~d4）",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：键|文本。键 t1~t4 卡片标题、d1~d4 对应描述；留空用默认。",
+              "cols": [
+                {
+                  "key": "k",
+                  "label": "键",
+                  "placeholder": "t1 / d1",
+                  "required": true
+                },
+                {
+                  "key": "v",
+                  "label": "文本",
+                  "type": "textarea",
+                  "placeholder": "产品支持",
+                  "required": true,
+                  "remainder": true
+                }
+              ]
+            },
+            {
+              "key": "copy_partner_agent_cta_text",
+              "label": "底部行动区",
+              "type": "rows",
+              "addLabel": "添加条目",
+              "hint": "每行：键|文本。键：title / desc / btn / url。",
+              "cols": [
+                {
+                  "key": "k",
+                  "label": "键",
+                  "placeholder": "title / desc / btn / url",
+                  "required": true
+                },
+                {
+                  "key": "v",
+                  "label": "文本",
+                  "type": "textarea",
+                  "placeholder": "先描述您的合作场景",
+                  "required": true,
+                  "remainder": true
+                }
+              ]
+            }
+          ],
+          "hint": "渠道 · 代理伙伴页（/partner/agent.html）。本页专属：合作要点、合作权益卡片、合作政策提示。共享模块：合作步骤（「首页配置 → 横向进度带」）、合作收益（「首页配置 → 数据带」）、常见问题（「首页配置 → 常见问题折叠板」）。"
+        }
+      ]
+    }
+  ],
+  "footerMenuSeed": "产品|||0\n>云服务器|/cloud.html||0\n>物理裸机|/dedicated.html||0\n>域名注册|/domain.html||0\n>SSL 证书|/ssl.html||0\n方案|||0\n>全部方案|/solution.html||0\n>电商零售|/solution/ecommerce.html||0\n>金融科技|/solution/finance.html||0\n支持|||0\n>文档中心|/document.html||0\n>官方公告|/announce.html||0\n>联系我们|/contact.html||0\n账户|||0\n>管理控制台|/home.htm||0\n>我的订单|/finance.htm||0\n>账户信息|/account.htm||0\n关于|||0\n>公司介绍|/about.html||0\n>新闻资讯|/news.html||0\n>服务保障|/service-guarantee.html||0"
+}

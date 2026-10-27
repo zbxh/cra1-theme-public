@@ -1,0 +1,2682 @@
+@import './header-navigation.css';
+@import './drawer-navigation.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand: var(--cui-brand);
+    --brand-hover: var(--cui-brand-hover);
+    --ink: var(--cui-ink);
+    --body: var(--cui-body);
+    --muted: var(--cui-muted);
+    --surface: var(--cui-surface);
+    --surface-alt: var(--cui-accent);
+    --line: var(--cui-line);
+    --success: #07835e;
+    --warning: #b45309;
+    --danger: #b42318;
+
+    /* 深色 sheet（v2.51：页脚 AWS 化 + Linear/Supabase 式深色区块）
+       登记见 tailwind.config.js 的 night 颜色组；--radius-sheet 为大区块圆角 */
+    --night: var(--cui-night);
+    --night-ink: var(--cui-night-ink);
+    --night-body: var(--cui-night-body);
+    --night-muted: var(--cui-night-muted);
+    --night-line: var(--cui-night-line);
+    --night-brand: var(--cui-highlight);
+    --night-btn-ink: var(--cui-white);  /* 深色页脚里浅色表面（白色描边按钮/二维码砖）上的文字 */
+    --night-raised: var(--cui-night-raised);   /* 深色卡片 hover 抬升底 */
+    --radius-sheet: 1.5rem;
+    --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+    /* 模块进场专用：比 --ease-out-strong 平缓得多。
+       --ease-out-strong 的控制点 y 直接到 1，位移在名义时长的前 1/5 就基本走完
+       （实测 420ms 里 71ms 即过半），主观感受是"一闪而过"。
+       这条 ease-out-quad 把可见位移摊到整个时长，读起来是"稳稳落定"。 */
+    --ease-out-gentle: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    /* 需求 §7.5.1 要求「屏上移动 / 形变」用这条 in-out 曲线，但一直缺定义。
+       补上后用于指示器滑动、光环旋转等"屏上位移"场景；
+       进场/退场仍用 --ease-out-strong，不要混用。 */
+    --ease-inout-strong: cubic-bezier(0.77, 0, 0.175, 1);
+    --duration-fast: 150ms;
+    --duration-base: 200ms;
+    /* 退场统一时长：§7.5.2「exit 必须比 enter 快」，统一压到 enter 的六成 */
+    --duration-out: 120ms;
+
+    /* 卡片阴影：双层结构（柔和中性 + 品牌色低透明度）。
+       单层灰阴影是"便宜"的来源；厂商共识是叠一层品牌色，
+       在浅蓝白底上产生极淡的彩色光晕（阿里云 0 12px 48px -10px #1366ec1c、
+       天翼云 0 0 40px #460ebd1a 都是这个做法）。色值取自 --brand 的分量，
+       不用硬编码十六进制，符合 §8.1「设计令牌单一来源」。 */
+    /* v2.52 质感批次：顶缘内高光（lit-from-above）——linear/family/vercel 卡片
+       共有的「玻璃边缘」层；inset 在最前（画在最上层），贴地/悬浮两层不变（r66 includes） */
+    --shadow-card: var(--cui-shadow-card);
+    --shadow-card-hover: var(--cui-shadow-pop);
+    /* 内发光：给玻璃卡片一点"顶面受光"的厚度感，是低成本高收益的一层 */
+    --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+
+    /* 激活态文字渐变（选项卡/关键标题）。角度与色标按品牌色生成，
+       参考阿里云 246deg 与腾讯云 90deg 的"偏轴渐变"——纯正 90deg 会显得呆板。 */
+    --gradient-text-active: var(--cui-button-gradient);
+    /* 卡片描边扫光：环形渐变的亮段颜色（只用品牌色，避免引入新色） */
+    --ring-sheen: color-mix(in srgb,var(--cui-titanium) 55.0%,transparent);
+
+    /* FAQ 折叠指示器的 chevron（内联 SVG data URI，避免额外请求） */
+    --faq-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  }
+
+  html {
+    scroll-behavior: smooth;
+    letter-spacing: 0;
+  }
+
+  body {
+    padding-top: 4rem;
+    min-height: 100vh;
+    background: var(--cui-accent);
+    color: var(--body);
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: 0;
+    overflow-x: clip;
+  }
+
+  *,
+  *::before,
+  *::after {
+    letter-spacing: 0;
+  }
+
+  [x-cloak] {
+    display: none !important;
+  }
+
+  /* 触控目标 ≥24px（WCAG 2.5.8）。
+     原先只在 <=767px 生效，导致 **768~991 平板档**（iPad 竖屏等触屏设备）不达标——
+     实测 768 档模块右上链接仅 20px。改为**常驻规则**：min-height 只扩展命中区，
+     不影响桌面视觉（桌面鼠标环境下 24px 命中区同样是正向收益）。
+     用 :where() 保持零特异性，便于业务类覆盖。 */
+  :where(main) a[class*="text-brand"],
+  :where(main) a[class*="text-primary"],
+  :where(main) a[class*="card-arrow"],
+  /* 暗色区块内的文字链接（如节点模块的浅蓝链接、CTA 卡的白色链接）同样要达标 */
+  :where(main) a[class*="text-white"],
+  :where(main) a[class*="text-\[\#7fb2ff\]"],
+  :where(main) summary,
+  :where(main) button:not([class*="btn"]):not([class*="node-dot"]):not([class*="float-"]) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+  }
+
+  @media (max-width: 767px) {
+    footer a,
+    footer li,
+    .touch-target {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+    }
+    footer li { display: flex; }
+    footer ul { row-gap: 0.25rem; }
+    /* 模块标题右侧「更多 →」等内联文字链接（含节点模块的浅蓝链接） */
+    main a[class*="text-brand"],
+    main a[class*="text-primary"],
+    main a[class*="card-arrow"],
+    main a[class*="text-[#7fb2ff]"],
+    main a[class*="inline-flex"] {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+  }
+
+  :focus-visible {
+    outline: 3px solid color-mix(in srgb,var(--cui-titanium) 38.0%,transparent);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  /* 图标库（Iconify SVG）可着色渲染：mask 引用本地缓存的 SVG，
+     background-color 用 currentColor —— hover/主题色自动跟随，无需重复取图 */
+  .icon-img {
+    @apply inline-block align-middle;
+    background-color: currentColor;
+    -webkit-mask: var(--icon) no-repeat center / contain;
+    mask: var(--icon) no-repeat center / contain;
+  }
+
+  /* 手机端专用隐藏（<640px，与 sm: 断点对齐）：
+     用于产品列表手机端截断（超过后台配置数量时隐藏，PC 端不受影响）。
+     不用 max-sm: 变体 —— 动态 :class 里的该候选不会被内容扫描器生成。 */
+  @media not all and (min-width: 40rem) {
+    .hide-on-mobile {
+      display: none !important;
+    }
+  }
+
+  .container-page {
+    @apply mx-auto w-full max-w-content px-5 md:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center font-medium;
+    height: 2.75rem;
+    min-height: 2.75rem;
+    border-radius: 0.375rem;
+    /* 按压反馈走 transform 160ms ease-out；属性显式列出，不用 transition: all */
+    transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 160ms ease,
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  .btn-sm,
+  .btn-xs {
+    height: 2.25rem;
+    min-height: 2.25rem;
+  }
+
+  /* 强调按钮：五色流动渐变（蓝→紫→粉→青→蓝循环）+ 白字 + 右箭头 + 胶囊形 + 柔和彩色阴影；
+     首尾同色 + background-size 300% + 0%→150% 位移实现无缝循环流动 */
+
+  /* 禁用态：自写类覆盖了 daisyUI 的 .btn，必须自己接管 disabled 契约。
+     background-image / animation 只有本类定义，框架的 .btn:disabled 管不到，
+     不显式清除会导致「文字变淡但渐变照常鲜艳、动画照常播放」的矛盾状态。 */
+
+  @keyframes gradient-flow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 150% 50%; }
+  }
+
+  @keyframes gradient-hue {
+    to { filter: hue-rotate(360deg); }
+  }
+
+  /* 导航登录／注册按钮由 cra1-shared/src/nav-auth.css 统一维护。 */
+
+  /* 普通按钮：浅灰底 + hover 阴影（不使用上浮） */
+  /* 普通按钮：白底 + 细浅灰描边 + 深色字 + 外链箭头 + 胶囊形，hover 描边变主色 */
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(90deg, var(--cui-titanium), var(--cui-graphite));
+  }
+
+  .badge-soft {
+    @apply inline-flex items-center border border-brand/20 bg-brand/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand;
+    border-radius: 999px;
+  }
+
+  .section-kicker {
+    @apply text-xs font-semibold uppercase tracking-[0.16em] text-brand;
+  }
+
+  .section-title {
+    @apply text-2xl font-semibold leading-tight text-ink md:text-4xl;
+  }
+
+  .section-desc {
+    @apply mt-3 text-sm leading-7 text-body md:text-base;
+  }
+
+  .section-heading {
+    @apply flex flex-col gap-4 md:flex-row md:items-end md:justify-between;
+  }
+
+  .section-heading-copy {
+    @apply max-w-2xl;
+  }
+
+  .page-hero {
+    @apply relative overflow-hidden border-b border-line;
+    background: linear-gradient(180deg, #f3f7ff 0%, #fbfcfe 70%, #ffffff 100%);
+  }
+
+  .page-hero > .container-page {
+    @apply relative;
+  }
+
+  .breadcrumb {
+    @apply flex flex-wrap items-center gap-2 text-sm text-muted;
+  }
+
+  .breadcrumb a {
+    @apply text-body transition-colors;
+  }
+
+  /* 小屏下面包屑链接与分隔符：命中区 ≥24px（WCAG 2.5.8） */
+  @media (max-width: 767px) {
+    .breadcrumb a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+    }
+    .breadcrumb {
+      row-gap: 0.125rem;
+    }
+  }
+
+  .breadcrumb a:hover,
+  .breadcrumb a:focus-visible {
+    @apply text-brand;
+  }
+
+  .band {
+    @apply border-y border-line bg-surface-alt;
+  }
+
+  .product-shell {
+    @apply grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem];
+  }
+
+  .product-shell > * {
+    @apply min-w-0;
+  }
+
+  .cta-band {
+    @apply border border-brand/20 bg-brand px-6 py-10 text-white md:px-10;
+  }
+
+  .info-list {
+    @apply divide-y divide-line border-y border-line;
+  }
+
+  .info-list > * {
+    @apply flex flex-col gap-1 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6;
+  }
+
+  .hero-title {
+    @apply text-4xl font-semibold leading-[1.12] tracking-normal text-ink md:text-6xl;
+  }
+
+  .hero-bar {
+    @apply mt-5 h-1 w-12 bg-brand;
+  }
+
+  .glass-card,
+  .hairline-card {
+    /* 模块 A（动态彩底）中的卡片：白色微透明，让流动彩底透出 */
+  }
+
+  .hairline-card {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: color-mix(in srgb,var(--cui-night) 8.0%,transparent);
+  }
+
+  .hairline-card {
+    background-image:
+      linear-gradient(#fff, #fff),
+      linear-gradient(135deg, rgba(220, 227, 236, 0.9), rgba(220, 227, 236, 0.5));
+  }
+
+  .lift-card {
+    transition: box-shadow var(--duration-base) var(--ease-out-strong),
+      border-color var(--duration-base) ease;
+  }
+
+  /* hover 仅出现边框着色与阴影，不改变卡片背景色/透明度 */
+  @media (hover: hover) and (pointer: fine) {
+    .lift-card:hover {
+      border-color: rgba(43, 140, 255, 0.5);
+      box-shadow: 0 6px 14px color-mix(in srgb,var(--cui-night) 7.0%,transparent), 0 24px 52px -14px color-mix(in srgb,var(--cui-titanium) 38.0%,transparent);
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+     卡片反馈补齐（v2.38）
+     --------------------------------------------------------------------------
+     .feature-item / .glass-card / .article-card 是全站复用最广的三个卡片类
+     （产品页族、行业页、方案页、文档页、招聘页……共约 40 个模板），
+     但它们此前**没有任何 :hover 规则**，只有 37 个模板额外挂 .lift-card 才有反馈，
+     其余页面卡片点上去毫无回应。
+     这里给三者补上与 .lift-card **同款**的表达：边框着色 + 阴影加深。
+
+     刻意不加位移（translateY）：
+       §8.1 明确「按钮上浮 hover 一律禁止」，而卡片规范又要求「hover 上浮」，
+       两条对"上浮"的口径不一致。.lift-card 已确立并验收过的是"边框+阴影"，
+       沿用同一表达可同时满足两条，也避免 40 个模板出现两种 hover 语言。
+
+     .glass-card 是半透明白底（让动态彩底透出），因此 hover 只加深阴影与描边，
+     不动背景色——否则会盖住底下流动的雾气。 */
+
+  /* --------------------------------------------------------------------------
+     按压反馈（v2.38）
+     --------------------------------------------------------------------------
+     需求 §7.5.5 / §10 清单：**所有可点击元素** :active 都要 scale(0.97)。
+     此前只有 .btn 与 .hero-cta 实现了，卡片链接、列表行、选项卡按钮点下去都没有反馈。
+
+     只挂在**真正可点**的元素上（a / button / summary），不对纯展示卡片做缩放：
+     纯 div 卡片按下不会有任何事发生，缩放反而制造"能点"的错觉。
+     0.97 落在 §7.5.5 允许的 0.95–0.98 区间内。 */
+
+  .card-arrow {
+    color: var(--brand);
+    transition: transform var(--duration-base) var(--ease-out-strong), color var(--duration-base) ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .group:hover .card-arrow {
+      transform: translateX(4px);
+      color: var(--brand-hover);
+    }
+  }
+
+  .nav-link {
+    @apply relative whitespace-nowrap px-3 py-2 text-sm text-body;
+    transition: color var(--duration-fast) ease;
+  }
+
+  /* 下拉按钮的字体焦点指示：daisyUI 有一条 `.dropdown > :not(summary):focus`
+     （outline:2px solid transparent，位于样式表末尾）会把 outline 抹成透明。
+     该规则用 :focus 且特异性 (0,2,1)，所以这里必须用**同等或更高特异性 + 更晚位置**覆盖：
+     `.dropdown > .nav-link:focus-visible` 特异性 (0,3,0)，稳在其上。
+     注意不能用 `.nav-link:focus-visible`（(0,2,0) 会被 daisyUI 压过）。 */
+  .dropdown > .nav-link:focus-visible {
+    outline: 3px solid color-mix(in srgb,var(--cui-titanium) 38.0%,transparent);
+    outline-offset: 3px;
+    border-radius: 0.375rem;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0;
+    left: 0.75rem;
+    height: 2px;
+    background: var(--brand);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--duration-base) var(--ease-out-strong);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav-link:hover {
+      color: var(--brand);
+    }
+
+    .nav-link:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  /* 两个搜索框（桌面 + 移动抽屉）都带 .outline-none（去掉鼠标点击时的焦点圈），
+     因此必须显式补回键盘焦点指示，否则键盘用户看不见焦点位置。 */
+  input#cra1-site-search:focus-visible,
+  input#mobile-search:focus-visible {
+    outline: 3px solid color-mix(in srgb,var(--cui-titanium) 38.0%,transparent);
+    outline-offset: 1px;
+  }
+
+  /* 图标按钮（移动端搜索/菜单/关闭）：无边框语言——hover 用底色变化表达，
+     不得出现图标外边框（v2.40 用户需求①；border-transparent 也一并去掉） */
+  .mega-trigger {
+    @apply inline-flex items-center gap-2 px-2.5 text-body;
+    height: 2.25rem;
+    border-radius: 0.375rem;
+    transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .mega-trigger:hover {
+      @apply bg-surface-alt text-brand;
+    }
+  }
+
+  .mega-rail-active {
+    @apply bg-brand/5 text-ink;
+    box-shadow: inset 3px 0 0 var(--brand);
+  }
+
+  /* 产品服务下拉面板左侧分组链接 */
+  .mega-rail-link {
+    @apply block w-full rounded-md px-3 py-2 text-left text-sm text-body;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  .mega-rail-link:hover {
+    @apply bg-white text-ink;
+  }
+
+  .mega-card,
+  .drawer-link,
+  .drawer-sub {
+    transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+  }
+
+  .mega-card:hover,
+  .drawer-link:hover,
+  .drawer-sub:hover {
+    background: var(--cui-accent);
+  }
+
+  .drawer-link {
+    @apply block w-full px-3 py-2.5 text-left font-medium text-ink;
+    border-radius: 0.375rem;
+  }
+
+  .drawer-sub {
+    @apply block px-2.5 py-2 text-body;
+    border-radius: 0.375rem;
+  }
+
+  /* 首页卡片统一视觉：纯白底、12px 圆角、1px 极浅边框、柔和扩散阴影、无硬边。
+     悬停 = 背景微调 + 阴影加深 + 环形扫光（见 .ring-sheen）。 */
+  .product-card {
+    @apply flex h-full flex-col p-5;
+  }
+
+  /* --------------------------------------------------------------------------
+     环形扫光（卡片 hover 时一道高光沿边缘扫一圈）
+     --------------------------------------------------------------------------
+     参考腾讯云产品卡的招牌做法（.tpm-portal-product__card-wrap）。
+     他们的实现是「外层 padding:1px + overflow:hidden + 旋转的大号 conic 方块」，
+     需要额外包一层 DOM；这里改用掩膜实现，**不动模板结构**：
+
+       ::after 用 mask-composite: exclude 把中心挖空，只留 1px 边框ring，
+       conic-gradient 的起始角由 @property 注册后即可用 animation 平滑旋转。
+
+     关键约束（与 r66 的「卡片无渐变」防线共存）：
+       描边画在 ::after 上，卡片**自身**的 background-image 保持 none，
+       因此 r66 的 bgi 断言仍然成立——它们检查的是卡片元素本身，不是伪元素。
+
+     只在 hover 时显示：常驻旋转会让整页同时有几十个动画在跑（§8.2「不得卡顿」）。
+     @property 在旧浏览器上退化为「不旋转但描边可见」，不会整块失效。 */
+  @property --ring-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  .ring-sheen {
+    position: relative;
+  }
+
+  .ring-sheen::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    opacity: 0;
+    background: conic-gradient(
+      from var(--ring-angle),
+      transparent 0deg,
+      transparent 210deg,
+      var(--ring-sheen) 300deg,
+      rgba(75, 123, 236, 0.65) 330deg,
+      var(--ring-sheen) 1turn
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: opacity var(--duration-base) var(--ease-out-strong);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ring-sheen:hover::after {
+      opacity: 1;
+      animation: ring-sheen-spin 4.5s linear infinite;
+    }
+  }
+
+  @keyframes ring-sheen-spin {
+    to {
+      --ring-angle: 360deg;
+    }
+  }
+
+  /* 偏好减少动效时保留描边、去掉旋转（§7.5.8「更轻柔而非完全不动」） */
+  @media (prefers-reduced-motion: reduce) {
+    .ring-sheen:hover::after {
+      animation: none;
+      opacity: 1;
+    }
+  }
+
+  .product-card-price {
+    @apply mt-auto border-t border-line pt-4 text-ink;
+  }
+
+  /* 产品分类侧栏/横滑项 */
+  .rail-link {
+    @apply block w-full border-b border-transparent px-3 text-left text-sm text-body;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    /* box-shadow 必须进过渡列表：激活态靠 inset 2px 品牌条表达，
+       漏了它会让"当前分组"的强调条瞬现而不是滑入（实测只有背景色在动）。
+       不用 font-weight 做过渡——字重是离散值，浏览器逐帧切换会抖，
+       激活态的字重变化保持瞬时（本就是瞬时换档，无中间态可言）。 */
+    transition: color var(--duration-fast) ease,
+      background-color var(--duration-fast) ease,
+      box-shadow var(--duration-base) var(--ease-out-strong);
+  }
+
+  .rail-link:hover {
+    @apply text-ink;
+  }
+
+  .rail-link-active {
+    @apply bg-white font-medium text-ink;
+    box-shadow: inset 2px 0 0 var(--brand);
+  }
+
+  /* 编号式方案列表行 */
+  .solution-row {
+    @apply flex items-start gap-5 border-t border-line py-6;
+    transition: background-color 150ms ease;
+  }
+
+  .solution-num {
+    @apply shrink-0 pt-0.5 text-sm font-semibold tabular-nums text-brand/50;
+    font-variant-numeric: tabular-nums;
+    transition: color 150ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .solution-row:hover .solution-num {
+      color: var(--brand);
+    }
+  }
+
+  /* 移动端抽屉缓动（Ionic drawer curve）
+     ⚠️ 必须双类名匹配，不能只写 `.ease-drawer`：Tailwind 的 `.transition`
+     工具类与它**同特异性 (0,2,0 vs 0,1,0)** 且输出更晚，会把它整条盖掉——
+     实测 `.transition.ease-drawer` 上读到的仍是默认 cubic-bezier(.4,0,.2,1)，
+     也就是说这条曲线自加入起**从未生效过**（抽屉一直在用默认缓动）。
+     抽屉模板里这两个类是同时存在的，故用 `.transition.ease-drawer` 提特异性。
+     同理不能靠调位置解决：两者都在同一个 layer 里，顺序由 Tailwind 决定。 */
+  .transition.ease-drawer,
+  .ease-drawer {
+    transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* --------------------------------------------------------------------------
+     跑马灯品牌墙（连续动效）
+     --------------------------------------------------------------------------
+     参考腾讯云（mask-image 两端渐隐）、阿里云（CSS 变量控速 + hover 暂停）、
+     天翼云（方向反转）、青云（按区块底色做渐隐）。
+
+     做法：轨道内容复制一份，整体 translateX(-50%) 无限循环——首尾天然衔接，
+     不需要 JS 测量宽度（阿里云那套用 --width 变量，模板要写死像素，改内容即失效）。
+     两端用 mask-image 渐隐，避免内容在边缘"切一刀"。
+
+     hover 暂停是厂商标配：让用户能看清某一项。
+     reduced-motion 下**完全停止**（§7.5.8：位移类动效在降级时应去掉位移）——
+     这里不是"变轻柔"，因为持续位移无法只靠改时长变轻柔，必须停。 */
+  .marquee {
+    position: relative;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll var(--marquee-duration, 42s) linear infinite;
+  }
+
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+    /* 停止后不能只显示一半内容：改为可横向滚动，用户仍能看全 */
+    .marquee {
+      overflow-x: auto;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+     首屏旋转光环（连续动效，参考阿里云 ai-ask 的 rotateGlow）
+     --------------------------------------------------------------------------
+     一个缓慢旋转的锥形渐变盘，压在 hero 内容之下。
+     ⚠️ 只允许出现在 hero 内部：能力区↔价格区的**接缝**由 r65 做像素级测量
+     （行间阶跃阈值 2），历史上任何新增光晕层都会破坏它。hero 自成层叠上下文
+     （isolate + z-10），光环被锁在里面，不会影响接缝。 */
+  .hero-aura {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 46rem;
+    height: 46rem;
+    margin: -23rem 0 0 -23rem;
+    pointer-events: none;
+    /* z-index 1：垫在轮播图**之上**（图片不透明，z:0 会被完全盖住、动效白做），
+       内容卡(z-20)与底部选项卡(z-10)之下 */
+    z-index: 1;
+    opacity: 0.85;
+    /* screen 混合：只提亮不压暗，浅色/深色底图上都可感知且不显突兀。
+       强度必须实测：0.5 opacity × 0.22 alpha 在浅色 hero 图上像素 diff <0.3%（不可感知），
+       提到 0.85 + 停点 alpha 0.5/0.35 后才过感知阈值 */
+    mix-blend-mode: screen;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      color-mix(in srgb,var(--cui-titanium) 50.0%,transparent) 90deg,
+      transparent 180deg,
+      rgba(112, 72, 232, 0.35) 270deg,
+      transparent 1turn
+    );
+    filter: blur(56px);
+    animation: hero-aura-spin 34s linear infinite;
+  }
+
+  @keyframes hero-aura-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-aura {
+      animation: none;
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+     光标跟随光斑（参考腾讯云 hero 按钮 / 阿里云 secondary-action）
+     --------------------------------------------------------------------------
+     用 radial-gradient + 两个 CSS 变量定位；JS 只在 pointermove 时写变量，
+     动画本身是纯 CSS 的 opacity 过渡——不引入任何动效库（§7.5.3）。
+     变量默认值 -100px 使光斑初始落在元素外，避免首次 hover 时从左上角"窜入"。 */
+  .spotlight-hover {
+    position: relative;
+    overflow: hidden;
+    --mx: -100px;
+    --my: -100px;
+  }
+
+  .spotlight-hover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 250ms ease;
+    background: radial-gradient(
+      180px circle at var(--mx) var(--my),
+      rgba(255, 255, 255, 0.3),
+      transparent 65%
+    );
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .spotlight-hover:hover::before {
+      opacity: 1;
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+     选项卡指示器：单一指示元素 + scaleX 展开（origin 跟随文字方向）
+     --------------------------------------------------------------------------
+     腾讯云用「先长高再展宽」两级过渡，阿里云用 CSS 变量驱动位移。
+     这里用 scaleX(0)→scaleX(1)：**不需要 JS 测量**（阿里云那套要算 --underline-left），
+     且只动 transform。origin 在左（左对齐文字），右对齐时由模板加 .from-right。 */
+  .tab-underline {
+    position: relative;
+  }
+
+  .tab-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    transform: scaleX(0);
+    transform-origin: left center;
+    background: var(--gradient-text-active);
+    transition: transform var(--duration-base) var(--ease-inout-strong);
+  }
+
+  .tab-underline.is-active::after,
+  .tab-underline[aria-selected="true"]::after {
+    transform: scaleX(1);
+  }
+
+  .tab-underline.from-right::after {
+    transform-origin: right center;
+  }
+
+  /* 激活态文字渐变（腾讯云/阿里云/天翼云都用它表达"当前选中"） */
+  .text-gradient-active {
+    background-image: var(--gradient-text-active);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* --------------------------------------------------------------------------
+     切换动效的**复用类**（配合 Alpine x-transition 的三段式写法）
+     --------------------------------------------------------------------------
+     动效参数集中在这里而不是散落各模板的长属性串：
+       模板只写 x-transition.xxx="fade-up" 三个短属性，
+       以后调整手感只改这一处（此前 6 处模板各自一串 duration/位移，改一次要动六处）。
+
+     命名与参数（全部 ≤300ms，exit 快于 enter，§7.5.2）：
+       fade-up   淡入 + 从下方 6px 落上 —— 面板/抽屉子菜单/成功面板（从触发处展开）
+       fade-down 淡入 + 从上方 4px 落下 —— 搜索结果/下拉（挂在触发器下方，origin 向下）
+       fade      纯淡入                —— 表单提交态等高频轻量切换
+
+     注意写法：Alpine 的 x-transition 阶段类挂在**同一元素**上，
+     因此用「.x-fade-up.x-enter-active」并列选择器（不能用 & 嵌套——
+     本工程的 Tailwind 构建未启用嵌套语法，嵌套会原样输出导致规则失效）。
+
+     之前手写的 duration-180 顺带修正：Tailwind 没有 180 刻度，
+     transition duration-180 实际不生效（回退到 150）。复用类用 CSS 变量表达真实值。 */
+  .x-fade-up,
+  .x-fade-down,
+  .x-fade {
+    --x-in-y: 0px;
+    --x-in-dur: 100ms;
+  }
+
+  .x-fade-up {
+    --x-in-y: 6px;
+    --x-in-dur: 180ms;
+  }
+
+  .x-fade-down {
+    --x-in-y: -4px;
+    --x-in-dur: 200ms;
+  }
+
+  .x-fade-up.x-enter-active,
+  .x-fade-down.x-enter-active,
+  .x-fade.x-enter-active {
+    transition-property: opacity, transform;
+    transition-duration: var(--x-in-dur);
+    transition-timing-function: var(--ease-out-strong);
+  }
+
+  .x-fade-up.x-enter-start,
+  .x-fade-down.x-enter-start,
+  .x-fade.x-enter-start {
+    opacity: 0;
+    transform: translateY(var(--x-in-y));
+  }
+
+  .x-fade-up.x-enter-end,
+  .x-fade-down.x-enter-end,
+  .x-fade.x-enter-end {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+
+  /* leave：统一 --duration-out，快于 enter（§7.5.2）；
+     位移统一归零——退场只做透明度，避免"进出方向打架" */
+  .x-fade-up.x-leave-active,
+  .x-fade-down.x-leave-active,
+  .x-fade.x-leave-active {
+    transition-property: opacity;
+    transition-duration: var(--duration-out);
+    transition-timing-function: ease-out;
+  }
+
+  .x-fade-up.x-leave-start,
+  .x-fade-down.x-leave-start,
+  .x-fade.x-leave-start {
+    opacity: 1;
+  }
+
+  .x-fade-up.x-leave-end,
+  .x-fade-down.x-leave-end,
+  .x-fade.x-leave-end {
+    opacity: 0;
+  }
+
+  /* 特性网格：**3 列**排布，第 4 项跨两列形成非对称节奏。
+     §8.1 明确否决「四格」（4 个等宽同质卡片并排），故不用 lg:grid-cols-4；
+     3+1(宽) 既避开四格，也不构成上下对称。 */
+  .feature-grid {
+    @apply grid gap-4 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .feature-grid > :nth-child(4):last-child {
+    @apply sm:col-span-2 lg:col-span-2;
+  }
+
+  .feature-item {
+    @apply border-l-2 border-brand/30 bg-white px-5 py-4;
+  }
+
+  .spec-table {
+    @apply w-full border-collapse text-left text-sm;
+  }
+
+  .spec-table th,
+  .spec-table td {
+    @apply border-b border-line px-4 py-3;
+  }
+
+  .spec-table th {
+    @apply w-1/3 bg-surface-alt font-medium text-ink;
+  }
+
+  .anchor-nav {
+    @apply sticky top-16 z-30 border-b border-line bg-white/95 backdrop-blur;
+  }
+
+  .anchor-nav a {
+    @apply inline-flex min-h-12 items-center border-b-2 border-transparent px-3 text-sm text-body;
+    transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease;
+  }
+
+  .anchor-nav a:hover,
+  .anchor-nav a:focus-visible {
+    @apply border-brand text-brand;
+  }
+
+  .faq-list {
+    @apply divide-y divide-line border-y border-line;
+  }
+
+  .faq-item summary {
+    @apply flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-medium text-ink;
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* 展开指示器：用 CSS 绘制的 chevron 取代原来的 +/− 文字（v2.38）。
+     文字符无法平滑变形（+ 转 − 只能瞬切），chevron 可以整体旋转 180°，
+     让「开合」有一致的方向语言，也与全站下拉/抽屉的箭头语汇统一。
+     mask 而非 background：mask 用 currentColor 上色，能跟随 summary 的 hover/focus 变色。 */
+  .faq-item summary::after {
+    content: '';
+    flex: 0 0 auto;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: var(--brand);
+    -webkit-mask: var(--faq-chevron) center / contain no-repeat;
+    mask: var(--faq-chevron) center / contain no-repeat;
+    transition: transform var(--duration-base) var(--ease-out-strong);
+  }
+
+  .faq-item[open] summary::after {
+    transform: rotate(180deg);
+  }
+
+  .faq-item .faq-answer {
+    @apply pb-5 text-sm leading-7 text-body;
+  }
+
+  /* --------------------------------------------------------------------------
+     手风琴展开动效（v2.38）
+     --------------------------------------------------------------------------
+     按硬性标准 §7.5.3 / §7.5.10，height / grid-template-rows 等布局属性是**禁止**动画的
+     （会触发 layout + paint，且被列为阻塞项）。但「平滑展开」本质上必须动高度，
+     因此这里采用合规表达：**容器高度瞬时到位，内容本身淡入 + 上浮 8px**。
+     视觉上仍有"内容落进来"的层次，且全程只动 opacity/transform。
+
+     为什么用 @keyframes 而不是 transition：
+       details 关闭时其内容不在渲染树内，从 display:none 变为可见**不会触发 transition**
+       （起始值读不到，会直接跳到终态），动画会被吞掉。animation 则在元素变为显示时
+       从头播放，正是这里要的效果。开启才播、关闭瞬时完成（满足 §7.5.2「exit 快于 enter」）。
+
+     两种模板形态都要覆盖：
+       · 14 个 <页面>/faq.html —— 答案是 details 的直接 <p> 子元素
+       · _shared/faq_board.html —— 答案是 .faq-answer 容器
+       （注意别在 CSS 注释里写出「星号 + 斜杠」的组合，那会提前结束注释）
+     -------------------------------------------------------------------------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .js .faq-item[open] .faq-answer,
+    .js .faq-item[open] > p {
+      animation: faq-answer-in 200ms var(--ease-out-strong) both;
+    }
+  }
+
+  @keyframes faq-answer-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .content-layout {
+    @apply grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px];
+  }
+
+  .article-card {
+    @apply border-b border-line py-5;
+  }
+
+  .empty-state {
+    @apply border border-dashed border-line bg-white px-6 py-14 text-center text-sm text-muted;
+  }
+
+  .skeleton-line {
+    @apply block rounded bg-line/70;
+    animation: cra1-skeleton 1.5s ease-in-out infinite;
+  }
+
+  @keyframes cra1-skeleton {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .form-panel {
+    @apply border border-line bg-white p-5 md:p-7;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px color-mix(in srgb,var(--cui-night) 4.0%,transparent), 0 10px 28px color-mix(in srgb,var(--cui-night) 6.0%,transparent);
+  }
+
+  .mobile-action-bar {
+    @apply fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-line bg-white/95 p-3 backdrop-blur md:hidden;
+  }
+
+  .rich-content {
+    @apply min-w-0 break-words text-[15px] leading-8 text-body;
+  }
+
+  .rich-content h1,
+  .rich-content h2,
+  .rich-content h3,
+  .rich-content h4 {
+    @apply mt-8 mb-3 font-semibold leading-tight text-ink;
+  }
+
+  .rich-content h1 { font-size: 1.6em; }
+  .rich-content h2 { font-size: 1.35em; }
+  .rich-content h3 { font-size: 1.15em; }
+  .rich-content p { margin: 0.9em 0; }
+  /* v2.40 用户需求②：正文链接 hover 变色而非下划线（默认也去掉下划线语言） */
+  .rich-content a { @apply text-brand; }
+  .rich-content a:hover { @apply text-brand-hover; }
+  .rich-content img { max-width: 100%; height: auto; margin: 1em 0; border-radius: 0.375rem; }
+  .rich-content ul, .rich-content ol { margin: 0.9em 0; padding-left: 1.4em; }
+  .rich-content ul { list-style: disc; }
+  .rich-content ol { list-style: decimal; }
+  .rich-content li { margin: 0.4em 0; }
+  .rich-content blockquote { @apply my-5 border-l-2 border-brand bg-brand/5 px-4 py-3 text-body; }
+  .rich-content table { width: 100%; margin: 1.2em 0; border-collapse: collapse; font-size: 14px; }
+  .rich-content th, .rich-content td { @apply border border-line px-3 py-2 text-left; }
+  .rich-content th { @apply bg-surface-alt font-semibold text-ink; }
+  .rich-content code { @apply bg-brand/5 px-1.5 py-0.5 text-brand; }
+  .rich-content pre { @apply overflow-x-auto bg-ink p-4 text-sm text-slate-100; }
+  .rich-content pre code { @apply bg-transparent p-0 text-inherit; }
+
+  .scroll-progress {
+    @apply fixed inset-x-0 top-0 z-[70] h-0.5 origin-left bg-brand;
+    transform: scaleX(0);
+    pointer-events: none;
+  }
+
+  /* --------------------------------------------------------------------------
+     横滑轨控件（v2.38）
+     --------------------------------------------------------------------------
+     移动端有 3 条横滑卡片轨（home/solutions、home/steps、_shared/rail_scroll），
+     此前**只能靠手指滑动**：没有左右按钮、没有位置指示，用户不知道右边还有内容，
+     键盘用户也无法横向滚动（§10.3 要求适当采用左右滑动布局，但需可操作）。
+
+     这些轨在 md 及以上会变成网格（`md:grid`），所以控件必须 md:hidden —— 否则
+     会在桌面留下一排无意义的按钮。 */
+  /* 横滑轨箭头：无边框语言（v2.40 用户需求①）——hover 用底色加深+变色表达 */
+  .rail-nav-btn {
+    @apply inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-surface-alt text-body transition-colors duration-150;
+  }
+
+  .rail-nav-btn:disabled {
+    @apply cursor-default opacity-35;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .rail-nav-btn:not(:disabled):hover {
+      @apply bg-brand/10 text-brand;
+    }
+  }
+
+  .rail-nav-btn:not(:disabled):active {
+    transform: scale(0.97);
+  }
+
+  /* 激活点从 6px 圆点拉长为 16px 药丸：用 scaleX（§7.5.1 只动 transform/opacity），
+     原 @apply transition-all + width 变化是布局属性动画（r78 静态审计捕获后归一） */
+  .rail-dot {
+    @apply h-1.5 rounded-full bg-line duration-200;
+    width: 0.375rem;
+    transition-property: background-color, transform;
+    transition-timing-function: var(--ease-out-strong);
+  }
+
+  .rail-dot-active {
+    @apply bg-brand;
+    transform: scaleX(2.667);
+  }
+
+  /* --------------------------------------------------------------------------
+     长列表展开 / 收起（v2.38）
+     --------------------------------------------------------------------------
+     复用既有 rows 字段，不改数据模型：折叠态只展示前 6 条，其余 `.is-collapsed`
+     隐藏。用 `display:none` 而非高度动画——前者不产生布局抖动，也不需要动画布局属性。
+     展开瞬间补一次与列表一致的入场动画，避免"啪"地全出现。
+     -------------------------------------------------------------------------- */
+  .is-collapsed {
+    display: none !important;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .list-expand-in {
+      animation: list-expand-in 260ms var(--ease-out-strong) both;
+    }
+  }
+
+  @keyframes list-expand-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* 右侧悬浮导航：竖向胶囊（参考设计稿）
+     - 整体离右缘留 12px 间距，不再贴边
+     - 胶囊内条目等宽居中，条目之间 1px 分隔线
+     - 悬停：图标转品牌蓝 + 左侧蓝色标签滑出
+     - 「返回顶部」独立成底部圆形按钮（与胶囊留 8px 间隙），滚动后出现 */
+  .float-dock {
+    /* 竖向锚点：视口中线略偏下（55%），比正中更贴近阅读视线与落点 */
+    top: 55%;
+    right: 0.75rem;
+    /* 容器高度只由胶囊决定（按钮脱离文档流，见 .float-top），
+       因此胶囊位置恒定，按钮显隐不会推动它 */
+    transform: translateY(-50%);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  /* 胶囊容器：承载各条目，圆角取自设计稿的全圆角 */
+  .float-dock-pill {
+    display: flex;
+    flex-direction: column;
+    padding: 0.3rem 0;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 1.75rem;
+    box-shadow: 0 6px 24px -8px color-mix(in srgb,var(--cui-night) 18.0%,transparent), 0 2px 8px color-mix(in srgb,var(--cui-night) 6.0%,transparent);
+  }
+
+  /* 条目：图标在上、名称在下（参考设计稿），故为纵向排列且高度更大 */
+  .float-dock-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    /* 收窄：原先 4rem 宽 + 0.7rem 内边距偏宽，与设计稿的紧凑感不符 */
+    width: 3.25rem;
+    padding: 0.55rem 0.2rem;
+    color: #44536a;
+    border-radius: 9999px;
+    transition: color 150ms ease;
+  }
+
+  .float-dock-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .float-dock-label {
+    font-size: 0.6875rem;
+    line-height: 1.1;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .float-dock-item + .float-dock-item {
+    /* 条目之间用 1px 虚线风格分隔（设计稿为细浅线），随圆角胶囊内缩 */
+    border-top: 0;
+  }
+
+  .float-dock-pill .float-dock-item + .float-dock-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1.85rem;
+    height: 1px;
+    transform: translateX(-50%);
+    background: var(--line);
+  }
+
+  .float-dock-item svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  /* 返回顶部：胶囊下方的独立圆形按钮。
+     绝对定位（脱离文档流）——这是「按钮出现不推动胶囊」的关键：
+     容器高度只由胶囊撑开，按钮出现只是往下「长出来」。 */
+  .float-top {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 三围与胶囊一致，视觉成列 */
+    width: 3.25rem;
+    height: 3.25rem;
+    color: #44536a;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 9999px;
+    box-shadow: 0 6px 24px -8px color-mix(in srgb,var(--cui-night) 18.0%,transparent), 0 2px 8px color-mix(in srgb,var(--cui-night) 6.0%,transparent);
+    transition: color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .float-top svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .float-tip {
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translate(6px, -50%);
+    margin-right: 0.5rem;
+    padding: 0.45rem 0.7rem;
+    border-radius: 0.375rem;
+    background: var(--brand);
+    color: #fff;
+    font-size: 0.75rem;
+    line-height: 1;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 8px 20px color-mix(in srgb,var(--cui-titanium) 28.0%,transparent);
+    transition: opacity 200ms ease, transform 200ms var(--ease-out-strong);
+  }
+
+  /* 悬停反馈：仅**文本与图标变色**（品牌蓝），不做背景填充——
+     整块填充在竖向胶囊里显得过重，也与设计稿的轻量风格不符。 */
+  @media (hover: hover) and (pointer: fine) {
+    .float-dock-item:hover,
+    .float-dock-item:focus-visible,
+    .float-top:hover,
+    .float-top:focus-visible {
+      color: var(--brand);
+    }
+
+    .float-dock-item:hover .float-tip,
+    .float-top:hover .float-tip {
+      opacity: 1;
+      transform: translate(0, -50%);
+    }
+  }
+
+  .nf-num {
+    @apply text-8xl font-bold leading-none text-brand md:text-[12rem];
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .js [data-reveal] {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 300ms var(--ease-out-strong), transform 300ms var(--ease-out-strong);
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+
+    .js [data-reveal].revealed {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+
+    /* 成组交错（v2.38）：
+       §7.5.10 把「该交错进场的成组元素一次性全部出现」列为阻塞项。
+       全站约 150 个模板用裸 data-reveal（只有 2 处手写了 --reveal-delay），
+       卡片墙因此整排同时淡入，读作"闪一下"而不是"依次落位"。
+
+       用**相邻兄弟链**而不是 nth-child：
+         nth-child 会误伤"自己恰好排在第 3 位"的孤立元素（它的兄弟并不是 data-reveal），
+         而链式选择器要求前面真的连续排着 data-reveal 兄弟，孤立元素不匹配、延迟保持 0。
+       链长只写到 6：CSS 取特异性最高者，第 7 项及以后仍匹配 6 链，自然沿用末档（§7.5.2）。
+       步长 70ms 落在 §7.5.4 的 30–80ms 区间内。 */
+    .js [data-reveal] + [data-reveal] { transition-delay: calc(var(--reveal-delay, 0ms) + 70ms); }
+    .js [data-reveal] + [data-reveal] + [data-reveal] { transition-delay: calc(var(--reveal-delay, 0ms) + 140ms); }
+    .js [data-reveal] + [data-reveal] + [data-reveal] + [data-reveal] { transition-delay: calc(var(--reveal-delay, 0ms) + 210ms); }
+    .js [data-reveal] + [data-reveal] + [data-reveal] + [data-reveal] + [data-reveal] { transition-delay: calc(var(--reveal-delay, 0ms) + 280ms); }
+    .js [data-reveal] + [data-reveal] + [data-reveal] + [data-reveal] + [data-reveal] + [data-reveal] { transition-delay: calc(var(--reveal-delay, 0ms) + 350ms); }
+  }
+}
+
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 4.5rem;
+  }
+
+  .hero-title {
+    font-size: 2.125rem;
+  }
+
+  .page-hero {
+    min-height: 220px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   模块级入场动画（按模块形态分配**机制**，映射见 PageModuleRegistry::cra1_module_enter_type）
+   由服务端在 [data-cra1-module] 包裹层注入 data-enter="<type>"，此处按类型播放。
+
+   六类机制互不相同（不是同一种效果改参数）：
+     grid  卡片错落浮起 —— 包裹层只淡入，"动"交给卡片：逐张从下方浮起（stagger 60→340ms）
+     flow  条目依次推进 —— 包裹层只淡入，条目逐个**自左侧**滑入（横向，与 grid 方向正交）
+     list  整块自上落定 —— 包裹层从**上方**落下（方向与前两者相反），长文不逐项跳动
+     zoom  节点逐点亮起 —— 包裹层只淡入，地图节点依次弹出（scale 0.5→1，仅装饰元素）
+     fade  模糊对焦     —— 完全无位移，只用 opacity + blur
+     cta   托起并浮现   —— 包裹层自下方托起 + 内部文案自左侧依次浮现
+
+   设计约束（需求文档 7.5）：
+     - 只动画 transform / opacity（blur 用于交叉淡入，7.5.4 允许且 ≤20px）
+     - 用 transition 而非 @keyframes：可中断，且不干扰验收脚本的 animation-play-state 暂停
+     - 曲线统一 --ease-out-strong；时长 340–520ms；交错 60–90ms 一档，超过 5–6 项沿用末档
+
+   ⚠️ 整屏宽**包裹层**的 transform 红线：只允许纯垂直位移
+     - 水平位移（x>0）→ 右边界越出视口，移动端动画期间横向滚动（实测 408 > 390）
+     - 缩放（scale<1）→ 内部 24px 触控目标被压到 23.x px（实测 24 → 23.78px，破 WCAG 2.5.8）
+     子元素不受此限：自左侧滑入（-x → 0）不产生溢出；但**子元素若是可点链接也不得缩放**。
+
+   与既有 [data-reveal] 的分工：本层作用于模块包裹层（整块进场），
+   data-reveal 作用于内部内容（局部淡入）；子项交错选择器显式排除 [data-reveal] 元素，避免叠加。
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* 包裹层默认：温和曲线 + 较长时长（"稳稳落定"）。
+     grid 在下方覆写回较短时长——它靠卡片交错拉长整体节奏，单张到位快一些反而更利落。 */
+  .js [data-cra1-module][data-enter] {
+    opacity: 0;
+    transition: opacity 620ms var(--ease-out-gentle), transform 620ms var(--ease-out-gentle);
+  }
+
+  .js [data-cra1-module][data-enter].enter-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* 防双重动画：被动画卡片内部的同类元素不再单独动（父已带动子） */
+  .js [data-cra1-module][data-enter] :is(.feature-item, .glass-card, .bento-card, .bento-featured, .product-card, .article-card, .step, .faq-item, .promo-panel) :is(.feature-item, .glass-card, .bento-card, .bento-featured, .product-card, .article-card, .step, .faq-item, .promo-panel) {
+    opacity: inherit;
+  }
+
+  /* ============ grid：卡片错落浮起 ============
+     包裹层只淡入，卡片逐张从下方浮起形成层叠节奏。
+     卡片多为 <a>，只做垂直位移（不缩放，避免压缩触控目标）。 */
+  .js [data-cra1-module][data-enter="grid"].enter-in {
+    transition-duration: 360ms;
+    transition-timing-function: var(--ease-out-strong);
+  }
+  .js [data-cra1-module][data-enter="grid"] :is(.feature-item, .glass-card, .bento-card, .bento-featured, .product-card, .article-card, .step, .faq-item, .promo-panel, .rail-link, .link-card, .honor-card, .partner-card):not([data-reveal]) {
+    opacity: 0;
+  }
+  .js [data-cra1-module][data-enter="grid"].enter-in :is(.feature-item, .glass-card, .bento-card, .bento-featured, .product-card, .article-card, .step, .faq-item, .promo-panel, .rail-link, .link-card, .honor-card, .partner-card):not([data-reveal]) {
+    opacity: 1;
+  }
+
+  /* ============ flow：条目依次推进 ============
+     与 grid 的区别：方向**横向**（自左侧滑入），节奏更慢更整齐，读作"步骤依次点亮"。
+     自左侧进入不会让右边界越界，故横向位移在此安全。 */
+  .js [data-cra1-module][data-enter="flow"].enter-in {
+    transition-duration: 640ms;
+  }
+  .js [data-cra1-module][data-enter="flow"] :is(.feature-item, .glass-card, .bento-card, .bento-featured, .product-card, .article-card, .step, .faq-item, .promo-panel, .rail-link, .link-card, .honor-card, .partner-card):not([data-reveal]) {
+    opacity: 0;
+  }
+  .js [data-cra1-module][data-enter="flow"].enter-in :is(.feature-item, .glass-card, .bento-card, .bento-featured, .product-card, .article-card, .step, .faq-item, .promo-panel, .rail-link, .link-card, .honor-card, .partner-card):not([data-reveal]) {
+    opacity: 1;
+  }
+
+  /* ============ list：整块自上落定 ============
+     方向与 grid/zoom 相反（自上方 -12px 落下）；不逐项交错，长文逐行跳动会显零碎。 */
+  .js [data-cra1-module][data-enter="list"] {
+    transform: translate3d(0, -12px, 0);
+    transition-duration: 640ms;
+  }
+
+  /* ============ zoom：节点逐点亮起 ============
+     包裹层只淡入，地图节点依次弹出。.node-dot 是纯装饰 div（内含 ping/core/name），
+     非交互元素，缩放不触碰触控目标下限。 */
+  .js [data-cra1-module][data-enter="zoom"] {
+    transition-duration: 900ms;
+  }
+  /* 节点入场：只淡入，**不缩放**。
+     早期版本用 scale(0.5) 做"弹出"，但节点现在是 34px 的可点按钮，
+     缩放会让它在可见状态下缩到 17px（实测模块 opacity 已达 0.65~0.97 时仍 17px），
+     用户此刻点击会点不中——触控目标在任何可见瞬间都必须 ≥24px（WCAG 2.5.8）。
+     改用「淡入 + 轻微上浮」保留弹性感，尺寸恒定。 */
+  .js [data-cra1-module][data-enter="zoom"] .node-dot {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 10px));
+    transition: opacity 600ms var(--ease-out-gentle), transform 600ms var(--ease-out-gentle);
+  }
+  .js [data-cra1-module][data-enter="zoom"].enter-in .node-dot {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  .js [data-cra1-module][data-enter="zoom"].enter-in .node-dot:nth-child(3) { transition-delay: 150ms; }
+  .js [data-cra1-module][data-enter="zoom"].enter-in .node-dot:nth-child(4) { transition-delay: 300ms; }
+  .js [data-cra1-module][data-enter="zoom"].enter-in .node-dot:nth-child(5) { transition-delay: 450ms; }
+  .js [data-cra1-module][data-enter="zoom"].enter-in .node-dot:nth-child(6) { transition-delay: 600ms; }
+  .js [data-cra1-module][data-enter="zoom"].enter-in .node-dot:nth-child(7) { transition-delay: 750ms; }
+  .js [data-cra1-module][data-enter="zoom"].enter-in .node-dot:nth-child(n+8) { transition-delay: 900ms; }
+
+  /* ============ fade：模糊对焦 ============
+     完全不做位移，只用 opacity + blur 做"对焦"。表单内部已有焦点动效，不叠加位移。 */
+  .js [data-cra1-module][data-enter="fade"] {
+    filter: blur(6px);
+    transition: opacity 620ms var(--ease-out-gentle), filter 620ms var(--ease-out-gentle);
+  }
+  .js [data-cra1-module][data-enter="fade"].enter-in {
+    filter: blur(0);
+  }
+
+  /* ============ cta：托起并浮现 ============
+     包裹层自下方托起（品牌色收束），内部文案自左侧依次浮现形成引导。 */
+  .js [data-cra1-module][data-enter="cta"] {
+    transform: translate3d(0, 16px, 0);
+    transition-duration: 720ms;
+  }
+  .js [data-cra1-module][data-enter="cta"] :is(h2, h3, p, .btn, .cta-band a) {
+    opacity: 0;
+    transform: translate3d(-14px, 0, 0);
+    transition: opacity 640ms var(--ease-out-gentle), transform 640ms var(--ease-out-gentle);
+  }
+  .js [data-cra1-module][data-enter="cta"].enter-in :is(h2, h3, p, .btn, .cta-band a) {
+    opacity: 1;
+    transform: none;
+  }
+  .js [data-cra1-module][data-enter="cta"].enter-in :is(h2, h3, p, .btn, .cta-band a):nth-child(1) { transition-delay: 200ms; }
+  .js [data-cra1-module][data-enter="cta"].enter-in :is(h2, h3, p, .btn, .cta-band a):nth-child(2) { transition-delay: 370ms; }
+  .js [data-cra1-module][data-enter="cta"].enter-in :is(h2, h3, p, .btn, .cta-band a):nth-child(n+3) { transition-delay: 540ms; }
+
+  /* ==========================================================================
+     第二批六种机制（v2.38）。与首批同样遵守：只动 transform/opacity/filter、
+     用 transition 不用 @keyframes、整屏宽包裹层只做垂直位移、可点元素不缩放。
+     每种仍是**机制级**差异（动的对象 / 方向 / 手段各不相同），不是改参数。
+     ========================================================================== */
+
+  /* ============ rise：层条按层序收敛升起 ============
+     用于「分层堆叠板」：越靠上的层升起距离越小（26→20→14→8px），
+     读作「逐层落位、越往上越贴合」，与 grid（等距 18px 逐张浮起）节奏不同。
+     指纹：同一模块内出现 ≥3 个**不同**的 translateY 值。 */
+  .js [data-cra1-module][data-enter="rise"] .stack-bar {
+    opacity: 0;
+    transition: opacity 560ms var(--ease-out-gentle), transform 560ms var(--ease-out-gentle);
+  }
+  .js [data-cra1-module][data-enter="rise"] .stack-bar:nth-child(1) { transform: translate3d(0, 26px, 0); }
+  .js [data-cra1-module][data-enter="rise"] .stack-bar:nth-child(2) { transform: translate3d(0, 20px, 0); }
+  .js [data-cra1-module][data-enter="rise"] .stack-bar:nth-child(3) { transform: translate3d(0, 14px, 0); }
+  .js [data-cra1-module][data-enter="rise"] .stack-bar:nth-child(n+4) { transform: translate3d(0, 8px, 0); }
+  .js [data-cra1-module][data-enter="rise"].enter-in .stack-bar {
+    opacity: 1;
+    transform: none;
+  }
+  .js [data-cra1-module][data-enter="rise"].enter-in .stack-bar:nth-child(1) { transition-delay: 0ms; }
+  .js [data-cra1-module][data-enter="rise"].enter-in .stack-bar:nth-child(2) { transition-delay: 90ms; }
+  .js [data-cra1-module][data-enter="rise"].enter-in .stack-bar:nth-child(3) { transition-delay: 180ms; }
+  .js [data-cra1-module][data-enter="rise"].enter-in .stack-bar:nth-child(n+4) { transition-delay: 270ms; }
+
+  /* ============ trace：轴线自上而下「描绘」，节点随后点亮 ============
+     用于「时间轴」：装饰轴线 scaleY 0→1 生长，节点逐个亮起。
+     轴线是 aria-hidden 的 1px 装饰线，缩放不涉及触控目标（§7.5.4 允许装饰层缩放）。
+     指纹：出现一个 matrix 里 a=1 而 d<1（纯 scaleY）的元素——与 sweep（scaleX）
+     和 spotlight（等比缩放）都不同。 */
+  .js [data-cra1-module][data-enter="trace"] .timeline-axis {
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 880ms var(--ease-out-gentle);
+  }
+  .js [data-cra1-module][data-enter="trace"].enter-in .timeline-axis {
+    transform: scaleY(1);
+  }
+  .js [data-cra1-module][data-enter="trace"] .timeline-node {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+    transition: opacity 500ms var(--ease-out-gentle), transform 500ms var(--ease-out-gentle);
+  }
+  .js [data-cra1-module][data-enter="trace"].enter-in .timeline-node {
+    opacity: 1;
+    transform: none;
+  }
+  /* 用 nth-of-type 而非 nth-child：轴线 <span> 排在 <ol> 的第一个子位，
+     若按 nth-child 计数，节点会整体错开一位、第一档延迟永远不命中。 */
+  .js [data-cra1-module][data-enter="trace"].enter-in .timeline-node:nth-of-type(1) { transition-delay: 220ms; }
+  .js [data-cra1-module][data-enter="trace"].enter-in .timeline-node:nth-of-type(2) { transition-delay: 400ms; }
+  .js [data-cra1-module][data-enter="trace"].enter-in .timeline-node:nth-of-type(3) { transition-delay: 580ms; }
+  .js [data-cra1-module][data-enter="trace"].enter-in .timeline-node:nth-of-type(n+4) { transition-delay: 760ms; }
+
+  /* ============ shear：两栏自上下相向合拢 ============
+     用于「左右对照表」：左栏自上方落入、右栏自下方升起，在分隔线处对齐。
+     方向成对相反，与 grid（全自下方）/flow（全自左侧）都不同。
+     指纹：同一模块内**同时**存在负值与正值 translateY。
+
+     行延迟用模板写入的 --cmp-delay（不用 nth-child）：表格顶部还有一行表头，
+     按 nth-child 计数会整体错位，且表头若增删即失效。 */
+  .js [data-cra1-module][data-enter="shear"] .cmp-cell {
+    opacity: 0;
+    transition: opacity 520ms var(--ease-out-gentle), transform 520ms var(--ease-out-gentle);
+    transition-delay: calc(var(--cmp-delay, 0) * 1ms);
+  }
+  .js [data-cra1-module][data-enter="shear"] .cmp-cell-left { transform: translate3d(0, -10px, 0); }
+  .js [data-cra1-module][data-enter="shear"] .cmp-cell-right { transform: translate3d(0, 10px, 0); }
+  .js [data-cra1-module][data-enter="shear"].enter-in .cmp-cell {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ============ cascade：斜向波浪（列优先交错） ============
+     用于卡片墙类布局：交错顺序按**列**推进（列序×80 + 行序×40），
+     同排自左向右依次点亮、下一排回到左端，读作横向波浪；
+     与 grid 的「自上而下逐张」在时序上完全不同（DOM 顺序的延迟非单调）。
+     手段上再叠一层 1° 的「扶正」旋转，使机制差异不只在时间参数上。
+     指纹：DOM 顺序的 transition-delay 序列非单调 + 存在旋转分量。 */
+  .js [data-cra1-module][data-enter="cascade"] .cascade-item {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) rotate(-1deg);
+    /* 用 gentle 而非 strong：strong 的可见位移在名义时长前 1/5 就走完（实测 460ms 半程仅 ~76ms），
+       读作"闪一下"而不是"依次点亮"，与波浪的意图相悖。 */
+    transition: opacity 540ms var(--ease-out-gentle), transform 540ms var(--ease-out-gentle);
+    transition-delay: calc(var(--cascade-delay, 0) * 1ms);
+  }
+  .js [data-cra1-module][data-enter="cascade"].enter-in .cascade-item {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ============ count：数字滚动到目标值（位移由 JS 驱动，样式只负责对焦） ============
+     用于「全宽数据带」：数值块淡入后由 JS 从 0 滚到目标值（保留 +/% 与后缀）。
+     其余机制都只动几何位置，这一种动的是**内容本身**，因此天然与其他机制正交。
+     JS 关闭或 reduced-motion 时保持服务端渲染的原值不动（见 app.js）。 */
+  .js [data-cra1-module][data-enter="count"] .count-item {
+    opacity: 0;
+    transition: opacity 520ms var(--ease-out-gentle);
+  }
+  .js [data-cra1-module][data-enter="count"].enter-in .count-item {
+    opacity: 1;
+  }
+  .js [data-cra1-module][data-enter="count"].enter-in .count-item:nth-child(1) { transition-delay: 0ms; }
+  .js [data-cra1-module][data-enter="count"].enter-in .count-item:nth-child(2) { transition-delay: 110ms; }
+  .js [data-cra1-module][data-enter="count"].enter-in .count-item:nth-child(3) { transition-delay: 220ms; }
+  .js [data-cra1-module][data-enter="count"].enter-in .count-item:nth-child(n+4) { transition-delay: 330ms; }
+
+  /* ============ spotlight：引语背后光晕绽放 ============
+     用于「大引用语」：装饰光晕自中心放大点亮，文字只做极短淡入、完全无位移，
+     与 fade（整块 blur 对焦、无装饰层）在手段上不同。
+     光晕是 aria-hidden + pointer-events:none 的装饰层，缩放不涉及触控目标。 */
+  .js [data-cra1-module][data-enter="spotlight"] .spotlight-glow {
+    opacity: 0;
+    transform: scale(0.55);
+    transition: opacity 760ms var(--ease-out-gentle), transform 760ms var(--ease-out-gentle);
+  }
+  .js [data-cra1-module][data-enter="spotlight"].enter-in .spotlight-glow {
+    opacity: 1;
+    transform: none;
+  }
+  .js [data-cra1-module][data-enter="spotlight"] .spotlight-text {
+    opacity: 0;
+    transition: opacity 420ms var(--ease-out-gentle);
+  }
+  .js [data-cra1-module][data-enter="spotlight"].enter-in .spotlight-text {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .js [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* 模块入场动画降级为直接呈现（含子项交错与 blur） */
+  .js [data-cra1-module][data-enter],
+  .js [data-cra1-module][data-enter] :is(.glass-card, .feature-item, .bento-card, .bento-featured, .product-card, .article-card, .step, .faq-item),
+  .js [data-cra1-module][data-enter] :is(h2, h3, p, .btn) {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+  /* node-dot 依赖 translate(-50%,-50%) 定位，降级时须保留该位移 */
+  .js [data-cra1-module][data-enter] .node-dot {
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) !important;
+    filter: none !important;
+    transition: none !important;
+  }
+  /* 第二批机制的专属子元素（层条 / 时间轴节点 / 对照单元格 / 波浪卡 / 数值 / 光晕）
+     同样直接呈现。trace 的轴线依赖 scaleY 表达"已描绘"，降级时置满。 */
+  .js [data-cra1-module][data-enter] :is(.stack-bar, .timeline-node, .cmp-cell, .cascade-item, .count-item, .spotlight-glow, .spotlight-text) {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .js [data-cra1-module][data-enter="trace"] .timeline-axis {
+    transform: scaleY(1) !important;
+    transition: none !important;
+  }
+}
+
+/* CTA 色带内的标题与正文使用白色系，避免深色文字压品牌蓝底（置于 layer 外以覆盖工具类） */
+.cta-band :is(h1, h2, h3, h4) {
+  color: #ffffff;
+}
+
+.cta-band :is(p, dl, ul, ol, time) {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* 下拉菜单：更强的 ease-out 曲线（daisyUI 已提供 200ms + scale(0.95) + origin-top）。
+   ⚠️ 还必须把 visibility 加进过渡属性列表：daisyUI 的 transition-property 里**没有**它，
+   而关闭时 `visibility:hidden` 会**立即**生效，直接把 opacity/scale 的退场吃掉——
+   表现是「展开有动效、关闭瞬间消失」的不对称（实测 transition-property 列表确实不含 visibility）。
+   visibility 是离散属性，浏览器在过渡**结束时**才切换它，加进去即得到完整退场。
+
+   时长按 §7.5.2「exit 必须比 enter 快」分配：
+     基础规则（匹配关闭路径）= 120ms；展开态规则（下面两条，覆盖基础值）= 200ms。
+   用整条 transition 覆盖而不是逐属性列 duration 列表——后者要数属性个数，
+   一旦 daisyUI 改属性顺序就会错位。 */
+.dropdown .dropdown-content {
+  transition: opacity 120ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 120ms cubic-bezier(0.23, 1, 0.32, 1),
+    visibility 120ms cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 120ms ease, background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.dropdown.dropdown-hover:hover .dropdown-content,
+.dropdown:focus-within .dropdown-content,
+.dropdown:not(.dropdown-hover):focus .dropdown-content,
+.dropdown-open .dropdown-content {
+  transition-duration: 200ms;
+}
+
+/* 区块环境光晕：朦胧彩色背景，毛玻璃卡片漂浮其上 */
+.ambient {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ambient::before,
+.ambient::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 42rem;
+  height: 42rem;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.ambient::before {
+  background: radial-gradient(closest-side, rgba(43, 140, 255, 0.3), rgba(43, 140, 255, 0.12) 50%, transparent 75%);
+  top: -12rem;
+  right: 18%;
+}
+
+.ambient::after {
+  background: radial-gradient(closest-side, rgba(14, 159, 110, 0.2), rgba(14, 159, 110, 0.08) 50%, transparent 75%);
+  bottom: -12rem;
+  left: 22%;
+}
+
+/* 「产品与价格」区块的绿色光晕改以顶边（= 与上方双面板区块的接缝）为锚。
+   该光晕高 42rem，动画上移时顶部会升起约 180px 越过接缝；越过部分被本区块
+   overflow:hidden 切断，须由上方区块渲染一份重合的镜像层才能跨缝连续
+   （同 .capability-ambient::before、蓝光晕与雾气的做法）。
+   而 bottom:-12rem 的偏移含本区块高度（区块高度 - 30rem），上方区块无法用纯 CSS
+   得知，镜像必然错位（实测 3s 相位阶跃 5.23，阈值 2）；改 top:0 后偏移为常量即可精确重合。
+   仅本区块需要这样改：.ambient 的通用语义是"底部环境光"，其他区块（如资讯）
+   没有跨接缝的镜像配对，保持 bottom 锚定不动。 */
+.ambient-seam::after {
+  top: 0;
+  bottom: auto;
+}
+
+.ambient-warm::before {
+  background: radial-gradient(circle, rgba(255, 122, 0, 0.16), transparent 62%);
+}
+
+/* 轮播下双面板：与下方「产品与价格」区块拼接成同一个动态背景。
+   两区块各自 overflow:hidden（不会产生横向可滚动溢出），连续感由「镜像图层」实现：
+   本区块用同一尺寸/同一渐变/同一动画渲染光晕(::after)，锚定在自身底部之下，
+   与下方区块的光晕在绝对坐标上完全重合，各自被裁切后拼成一份连续动态背景。
+   雾气同理镜像（.mist-a/.mist-b 重新定位到本区块底部之下）。
+   硬约束：
+   ① 偏移量必须与下方区块保持同步，且都用 rem（不可用 %，否则随高度漂移）；
+   ② 本区块必须保留 isolation:isolate，使 z-index:-1 的图层锁在区块内，
+      否则会逃到祖先背景之下、滚动时盖住顶部固定导航；
+   ③ 不可加 border-b / box-shadow，会重新画出接缝；
+   ④ 两者必须相邻且顺序为 双面板 → 产品与价格。 */
+.capability-ambient {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.capability-ambient::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 42rem;
+  height: 42rem;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(43, 140, 255, 0.3), rgba(43, 140, 255, 0.12) 50%, transparent 75%);
+  right: 18%;
+  /* 与下方区块 ::before（top:-12rem，高 42rem）重合：100% - 42rem + 12rem */
+  bottom: -30rem;
+}
+
+/* 绿色光晕镜像：与下方区块 ::after 同尺寸/同渐变/同动画，锚定在本区块底部之下。
+   下方区块的绿色光晕以 bottom:-12rem 锚定，与接缝的距离 = 区块高度 - 30rem，
+   会随内容高度变化；纯 CSS 读不到兄弟区块高度、无法复现该偏移，
+   动画上移越过接缝的部分就会被其 overflow:hidden 切断（实测 3s 相位阶跃 5.23，阈值 2）。
+   因此该光晕改以接缝为锚（见 .ambient::after 的 top:0），偏移成为常量，本层即可精确重合。 */
+.capability-ambient::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 42rem;
+  height: 42rem;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(14, 159, 110, 0.2), rgba(14, 159, 110, 0.08) 50%, transparent 75%);
+  left: 22%;
+  /* 与下方区块 ::after 的 top:0 重合（100% 即接缝） */
+  top: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .capability-ambient::before {
+    animation: ambient-drift-b 14s ease-in-out infinite alternate;
+  }
+}
+
+/* 雾气镜像：与下方区块的 .mist-a/.mist-b 同尺寸/同动画，锚定在本区块底部之下。
+   雾气在动画中会向上位移 6~11rem 并放大，越过接缝时若只有下方区块渲染，
+   就会被其 overflow:hidden 切断（实测接缝阶跃 2.9~6.7，隐藏雾气后回落 0.5 基线）。 */
+.capability-ambient .mist-a {
+  top: calc(100% + 2.5rem);
+}
+
+.capability-ambient .mist-b {
+  top: calc(100% + 6rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .capability-ambient::after {
+    animation: ambient-drift-a 11s ease-in-out infinite alternate;
+  }
+}
+
+.ambient-violet::after {
+  background: radial-gradient(circle, rgba(122, 90, 248, 0.16), transparent 62%);
+}
+
+/* 光晕雾气流动：雾气云 DOM 化；渐变自带柔和边界（不用 filter:blur，动画仅 transform，走合成器） */
+.mist {
+  position: absolute;
+  z-index: -1;
+  border-radius: 9999px;
+  pointer-events: none;
+  /* 不加 will-change: transform：
+     跨接缝的镜像雾气（capability 与 pricing 各一份）一旦被提升为独立合成层，
+     两层在接缝边界的栅格化差异会显现为一条硬边（实测接缝阶跃在动画中 6~17 波动，
+     去掉后稳定在 3~4）。动画本就只用 transform，浏览器会自动合成，无需手动提示。 */
+}
+
+.mist-a {
+  width: 40rem;
+  height: 40rem;
+  background: radial-gradient(closest-side, rgba(64, 170, 255, 0.5), rgba(64, 170, 255, 0.24) 45%, rgba(64, 170, 255, 0.08) 70%, transparent);
+  /* 纵向用 rem 而非 %：与父容器高度解耦，使跨区块镜像图层能精确对齐 */
+  top: 2.5rem;
+  left: 4%;
+  animation: mist-a 10s ease-in-out infinite alternate;
+}
+
+.mist-b {
+  width: 44rem;
+  height: 44rem;
+  background: radial-gradient(closest-side, rgba(52, 211, 153, 0.4), rgba(52, 211, 153, 0.18) 45%, rgba(52, 211, 153, 0.06) 70%, transparent);
+  /* 同上：由 bottom 锚定改为 top 锚定（原 -8rem 底距 ≈ 6.1rem 顶距） */
+  top: 6rem;
+  right: 6%;
+  animation: mist-b 13s ease-in-out infinite alternate;
+}
+
+.mist-c {
+  width: 36rem;
+  height: 36rem;
+  background: radial-gradient(closest-side, rgba(255, 184, 77, 0.34), rgba(255, 184, 77, 0.14) 45%, rgba(255, 184, 77, 0.05) 70%, transparent);
+  top: 30%;
+  left: 40%;
+  animation: mist-a 15s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes mist-a {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(18rem, 5rem, 0) scale(1.25); }
+  100% { transform: translate3d(-6rem, 12rem, 0) scale(0.88); }
+}
+
+@keyframes mist-b {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-16rem, -6rem, 0) scale(1.18); }
+  100% { transform: translate3d(8rem, -11rem, 0) scale(1.28); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mist {
+    animation: none;
+  }
+}
+
+/* 光晕雾气流动：幅度与速度调至肉眼可辨（reduced-motion 下静止） */
+@media (prefers-reduced-motion: no-preference) {
+  .ambient::before {
+    animation: ambient-drift-a 11s ease-in-out infinite alternate;
+  }
+
+  .ambient::after {
+    animation: ambient-drift-b 14s ease-in-out infinite alternate;
+  }
+}
+
+/* 同上：不提升为独立合成层，避免跨接缝的镜像光晕在边界产生硬边 */
+
+
+@keyframes ambient-drift-a {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(-10rem, 6rem, 0) scale(1.28); }
+  66% { transform: translate3d(4rem, 10rem, 0) scale(1.05); }
+  100% { transform: translate3d(11rem, -5rem, 0) scale(0.88); }
+}
+
+@keyframes ambient-drift-b {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(9rem, -7rem, 0) scale(1.24); }
+  66% { transform: translate3d(-7rem, -4rem, 0) scale(0.95); }
+  100% { transform: translate3d(-11rem, 7rem, 0) scale(1.28); }
+}
+
+/* 轮播文案：Mac 软件窗口样式 */
+.mac-window {
+  border-radius: 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(15, 23, 40, 0.58);
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+  box-shadow: 0 30px 70px -18px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.mac-dot {
+  display: inline-block;
+  width: 0.68rem;
+  height: 0.68rem;
+  border-radius: 9999px;
+}
+
+/* 轮播标题切换条：隐藏滚动条（内容超宽时左右滚动） */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* 能力切换器（非对称布局）：流动彩色朦胧卡 */
+.lumen-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid transparent;
+  border-radius: 1.1rem;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.72)),
+    linear-gradient(120deg, rgba(43, 140, 255, 0.28) 0%, rgba(14, 159, 110, 0.16) 45%, rgba(122, 90, 248, 0.14) 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 20px 48px -14px color-mix(in srgb,var(--cui-titanium) 30.0%,transparent);
+}
+
+.lumen-card::before,
+.lumen-card::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 24rem;
+  height: 24rem;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.lumen-card::before {
+  background: radial-gradient(closest-side, rgba(43, 140, 255, 0.26), rgba(43, 140, 255, 0.1) 50%, transparent 75%);
+  top: -9rem;
+  right: -7rem;
+}
+
+.lumen-card::after {
+  background: radial-gradient(closest-side, rgba(14, 159, 110, 0.2), rgba(14, 159, 110, 0.08) 50%, transparent 75%);
+  bottom: -10rem;
+  left: -8rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lumen-card::before {
+    animation: ambient-drift-b 9s ease-in-out infinite alternate;
+  }
+
+  .lumen-card::after {
+    animation: ambient-drift-a 12s ease-in-out infinite alternate;
+  }
+}
+
+.lumen-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cap-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.95rem 0.5rem 0.8rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb,var(--cui-night) 8.0%,transparent);
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--cui-ink);
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.cap-chip-num {
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: #2b8cff;
+  font-variant-numeric: tabular-nums;
+}
+
+.cap-chip-arrow {
+  width: 0.8rem;
+  height: 0.8rem;
+  color: var(--brand);
+  opacity: 0;
+  transform: translateX(-3px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cap-chip:hover {
+    border-color: rgba(43, 140, 255, 0.45);
+    box-shadow: 0 6px 16px -6px color-mix(in srgb,var(--cui-titanium) 35.0%,transparent);
+  }
+
+  .cap-chip:hover .cap-chip-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 轮播下双面板：左集合入口 + 右三卡连体（百度式），无间隔无圆角。
+   与下方区块同底色连体：不投影、不加边框，避免出现「浮起一条白带」的接缝 */
+.promo-strip {
+  box-shadow: none;
+}
+
+/* ⚠️ v2.52 曾把本面板玻璃卡化（白 60% + backdrop-blur），r65 实测两处红：
+   ① 硬性标准「全局背景渐变必须透过内容区，不得被白底遮挡」；② backdrop-filter
+   改变雾气层合成，接缝像素 diff 从 <2 飙到 15+。已回滚透明面板，不再尝试。 */
+.promo-panel {
+  background: transparent;
+}
+
+.promo-panel-hover:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.promo-entry {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0.95rem 1.4rem;
+  transition: box-shadow 220ms ease;
+}
+
+@media (min-width: 640px) {
+  .promo-entry-divided::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1.2rem;
+    bottom: 1.2rem;
+    width: 1px;
+    background: color-mix(in srgb,var(--cui-night) 8.0%,transparent);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .promo-entry:hover {
+    box-shadow: inset 0 0 0 1px rgba(43, 140, 255, 0.35), 0 12px 28px -12px color-mix(in srgb,var(--cui-titanium) 35.0%,transparent);
+  }
+}
+
+.promo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 0.55rem;
+  transition: transform 200ms var(--ease-out-strong);
+}
+
+.promo-icon svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+/* 功能卡图标底色：三种语义色轮转（v2.42 卡片可增删后不再能逐个写死内联样式）。
+   色调由服务端按序分配（brand/success/warning），此处只映射为既有令牌，不接受任意色值。 */
+.promo-icon-brand {
+  background: color-mix(in srgb, var(--brand) 10%, transparent);
+  color: var(--brand);
+}
+
+.promo-icon-success {
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+  color: var(--success);
+}
+
+.promo-icon-warning {
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  color: var(--warning);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .promo-entry:hover .promo-icon {
+    transform: scale(1.08);
+  }
+}
+
+.cap-quick {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  /* 触屏（默认）：保持 44px 命中区，满足移动端触控目标要求 */
+  min-height: 2.75rem;
+  padding: 0.55rem 0.2rem;
+  font-size: 0.875rem;
+  color: #44536a;
+}
+
+/* 指针设备（桌面）：行高压缩到 32px，仍高于 WCAG 2.5.8 的 24px 下限。
+   仅压缩指针设备，避免牺牲移动端命中区（移动端保持 44px）。 */
+@media (hover: hover) and (pointer: fine) {
+  .cap-quick {
+    min-height: 2rem;
+    padding: 0.25rem 0.2rem;
+  }
+}
+
+/* ------------------------------------------------------------------
+   顶栏账户块与用户下拉面板
+     与会员中心顶栏同构（组件 topMenu.js + cra1-shell.css 的 .cra1-account / .cra1-upanel）：
+     触发块 = 头像 + 名称/联系方式 + chevron；面板 = 阿里云式三段
+     （账号块含退出 / 安全中心 / 财务信息）。数值与会员中心保持一致，便于两端观感统一。
+     ------------------------------------------------------------------ */
+  /* 跳转到主内容：默认移出视口，键盘聚焦时滑入（供键盘/读屏用户跳过导航）。
+     min-height 2.75rem 保证命中区达标（移动端触控目标检查会量到它，即使处于移出状态）。
+     出入场只用 transform（§7.5.1 只动 transform/opacity）；top 是布局属性，禁止过渡。 */
+  .skip-link {
+    position: fixed;
+    top: 0;
+    left: 1rem;
+    z-index: 100;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.625rem 1rem;
+    background: var(--brand);
+    color: #fff;
+    font-size: 0.875rem;
+    border-radius: 0 0 0.5rem 0.5rem;
+    transform: translateY(-110%);
+    transition: transform 150ms ease;
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+/* 不规则卡片拼接（bento）：与首页其他卡片同一视觉语言
+   （纯白底、12px 圆角、1px 极浅边框、柔和扩散阴影、无硬边）。
+   .bento-featured（方案主卡）在模板里不带 .bento-card 类，故在此并列共享同一套样式。 */
+.bento-card,
+.bento-featured {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 1.5rem;
+}
+
+/* v2.52 方案主卡升级为深色焦点卡（linear/supabase 的 feature 卡手法）：
+   深夜实底 + 底部品牌辉光 + 细噪点纹理（::after 单伪元素两层背景，卡片自身
+   background-image 保持 none，r66 的 bgi 防线不破）。
+   白卡 / 深色主卡 / 品牌强调卡形成三级层级（原三张白卡同级无焦点）。 */
+
+/* 内容压在辉光/噪点层之上 */
+.bento-featured > * {
+  position: relative;
+  z-index: 1;
+}
+
+.bento-featured::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bento-featured .text-ink { color: var(--night-ink); }
+.bento-featured .text-body { color: var(--night-body); }
+/* 眉标与箭头文字：夜色品牌 → 渐变裁切（linear 式渐变文字），不支持时回退纯色 */
+.bento-featured .text-brand { color: var(--night-brand); }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .bento-featured .text-brand {
+    background-image: linear-gradient(90deg, var(--night-brand), color-mix(in srgb, var(--night-brand) 55%, #ffffff));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* 强调卡：唯一使用品牌实底的卡片（提示词允许 sparingly 的强调色）；
+   不使用渐变，改为品牌纯色，阴影与圆角与其他卡片一致。
+   色值用 var(--brand) 而非此前的 var(--cui-titanium)——后者与令牌 var(--cui-titanium) 不一致，
+   属 §8.1「禁止硬编码色值」的既有违规（同一页面出现两种"品牌蓝"）。 */
+.bento-cta {
+  background: var(--brand);
+  border-color: rgba(0, 0, 0, 0.04);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bento-cta:hover {
+    background: var(--brand-hover);
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+/* 快速上手步骤：编号圆环 + 桌面端渐变连接线（线不触顶底） */
+.step {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--brand);
+  background: #fff;
+  border: 1.5px solid rgba(43, 140, 255, 0.45);
+  box-shadow: 0 6px 14px -8px color-mix(in srgb,var(--cui-titanium) 55.0%,transparent);
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 1.15rem;
+    left: calc(100% + 0.15rem);
+    width: 1.1rem;
+    height: 2px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, rgba(43, 140, 255, 0.45), rgba(14, 159, 110, 0.3));
+  }
+}
+
+/* 全球节点地图（华为云 earth-2d 式无边框融合）：
+   模块背景即地图底色 #0b1220，点阵图透明底融进背景，零边界感 */
+.node-map {
+  /* 深色底上柔和高光，增强地球体感（跟随点阵图 2:1 比例） */
+  background:
+    radial-gradient(58% 68% at 50% 46%, rgba(37, 62, 108, 0.35) 0%, rgba(37, 62, 108, 0.12) 55%, transparent 78%);
+}
+
+.node-dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  /* 节点是 <button>（键盘可达）；重置浏览器默认外观，只保留坐标与尺寸 */
+  /* 按钮本身即命中盒：34×34（≥24px 触控下限，WCAG 2.5.8）。
+     用 translate(-50%,-50%) 把盒子中心对齐到地图坐标点；
+     视觉上的圆点由内部 .node-core（10px）绘制，因此圆点看起来仍很小，
+     但可点/可聚焦范围是 34px——移动端细手指也点得到。
+     display:flex + center 让 .node-core 与 .node-ping 精确居中于盒子。 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+
+/* 焦点环：深色底上用浅色描边，保证可见（键盘可达性，7.5.5） */
+.node-dot:focus-visible {
+  outline: 2px solid #7fb2ff;
+  outline-offset: 4px;
+  border-radius: 9999px;
+}
+
+/* ⚠️ 层叠提升（关键）：每个 .node-dot 都有 transform，因此**各自创建层叠上下文**；
+   面板自身的 z-index 再高也越不出所属节点，会被 DOM 中靠后的兄弟节点压住
+   （实测 8/17 个面板被压在下面：北京的面板被上海/成都/广州/香港/新加坡/孟买 6 个节点盖住）。
+   正确做法是提升**节点自身**的 z-index——整个节点（含面板）随之升到所有兄弟之上。
+
+   为什么用「类」而不是 :hover：面板的显隐由 Alpine 的 openNode 驱动（点击/聚焦也会打开），
+   仅靠 :hover 会出现"面板已开但层级没升"的错配（实测 z-index 仍为 auto，被悉尼节点压住）。
+   因此由 JS 在开关面板时同步切 .node-active 类，覆盖 hover / click / focus 全部路径。 */
+.node-dot.node-active {
+  z-index: 30;
+}
+
+/* 悬停/聚焦时的节点信息面板（后台「节点列表」的详情列）
+   默认隐藏，由 Alpine 的 openNode 控制显隐；同时用 CSS :hover/:focus-within 兜底，
+   JS 未就绪时鼠标悬停仍可看到面板。 */
+.node-pop {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 4px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: max-content;
+  max-width: 15rem;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  background: rgba(15, 23, 40, 0.96);
+  border: 1px solid rgba(127, 178, 255, 0.32);
+  border-radius: 0.5rem;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.node-pop__title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.node-pop__region {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: #93a7c9;
+}
+
+.node-pop__detail {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #b9c7dd;
+}
+
+.node-pop__stats {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.1rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(127, 178, 255, 0.16);
+}
+
+.node-pop__stat {
+  font-size: 0.6875rem;
+  color: #93a7c9;
+  white-space: nowrap;
+}
+
+.node-pop__stat b {
+  margin-right: 0.15rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #7fb2ff;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 线路标签行：位于节点数/机房数下方（如 CN2线路 / 精品线路 / 国际线路） */
+.node-pop__lines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.45rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(127, 178, 255, 0.16);
+}
+
+.node-pop__line {
+  padding: 0.1rem 0.4rem;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: #9fd0ff;
+  background: rgba(79, 148, 255, 0.14);
+  border: 1px solid rgba(127, 178, 255, 0.28);
+  border-radius: 0.25rem;
+  white-space: nowrap;
+}
+
+/* 指向节点的小箭头 */
+.node-pop__arrow {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 0;
+  height: 0;
+  margin-left: -5px;
+  border: 5px solid transparent;
+  border-top-color: rgba(15, 23, 40, 0.96);
+}
+
+/* 标签已在地点上方的节点（.node-name-above）：面板改到下方，避免与标签叠压。
+   与标签的上下交错规则配对，密集区里两者始终一个在上一个在下。 */
+.node-dot.node-name-above .node-pop {
+  bottom: auto;
+  top: calc(100% + 14px);
+}
+
+.node-dot.node-name-above .node-pop__arrow {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: rgba(15, 23, 40, 0.96);
+}
+
+/* 边界自适应（类由 JS 按节点在地图中的百分比位置添加）
+   深色区块是 overflow:hidden，四角的节点面板若不收边会被裁掉（实测上溢 24px / 右溢 5px）。 */
+
+/* 贴上缘（top<22%）：面板翻到节点下方 */
+.node-pop-flip .node-pop {
+  bottom: auto;
+  top: calc(100% + 14px);
+}
+
+.node-pop-flip .node-pop__arrow {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: rgba(15, 23, 40, 0.96);
+}
+
+/* 贴下缘（top>78%）：强制翻到上方（压过 .node-name-above 的「标签在下」翻转） */
+.node-dot.node-pop-up .node-pop {
+  top: auto;
+  bottom: calc(100% + 14px);
+}
+
+.node-dot.node-pop-up .node-pop__arrow {
+  bottom: auto;
+  top: 100%;
+  border-bottom-color: transparent;
+  border-top-color: rgba(15, 23, 40, 0.96);
+}
+
+/* 贴左缘（left<14%）：面板左对齐节点。
+   箭头仍须指向**节点中心**——面板改左对齐后，节点中心相对面板的位置
+   即「命中盒半宽（17px）+ 节点中心到面板左缘的距离」，用 left:17px 表达。 */
+.node-pop-left .node-pop {
+  left: 0;
+  transform: none;
+}
+
+.node-pop-left .node-pop__arrow {
+  left: 17px;
+  right: auto;
+  margin-left: -5px;
+  margin-right: 0;
+}
+
+/* 贴右缘（left>86%）：面板右对齐节点，箭头同样对准节点中心 */
+.node-pop-right .node-pop {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.node-pop-right .node-pop__arrow {
+  right: 17px;
+  left: auto;
+  margin-right: -5px;
+  margin-left: 0;
+}
+
+.node-core {
+  display: block;
+  position: relative;
+  z-index: 1;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #4f94ff;
+  border: 2px solid rgba(11, 18, 32, 0.9);
+  box-shadow: 0 0 10px rgba(79, 148, 255, 0.65), 0 0 22px rgba(79, 148, 255, 0.3);
+}
+
+.node-ping {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 9999px;
+  background: rgba(79, 148, 255, 0.4);
+  animation: node-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes node-ping {
+  0% { transform: scale(1); opacity: 0.9; }
+  80%, 100% { transform: scale(3.4); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node-ping {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+.node-name {
+  position: absolute;
+  top: 25px;   /* 相对 34px 命中盒：13px 视觉间距 + 盒子自身余量 */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  line-height: 1;
+  color: #93a7c9;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* 相邻节点标签上下交错，避免密集区互相叠压 */
+.node-name-above {
+  top: auto;
+  bottom: 25px;
+}
+
+/* 小屏地图宽度不足以铺开密集区标签（东亚多城重叠），参照华为云移动端仅保留发光圆点 */
+@media (max-width: 1023px) {
+  .node-name {
+    display: none;
+  }
+}
+
+/* 轮播 Mac 窗口内 CTA：文本 + 同尺寸箭头图标，hover 图标右移 */
+.hero-cta {
+  font-size: 0.9375rem;
+  color: #fff;
+  transition: color 200ms ease;
+}
+
+/* 小屏下扩展 CTA 命中区（WCAG 2.5.8 ≥24px） */
+@media (max-width: 767px) {
+  .hero-cta {
+    min-height: 24px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+}
+
+.hero-cta:active {
+  transform: scale(0.97);
+}
+
+.hero-cta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  transform: translateY(1px);
+  transition: transform 200ms var(--ease-out-strong);
+}
+
+.hero-cta-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-cta:hover {
+    color: #8ec5ff;
+  }
+
+  .hero-cta:hover .hero-cta-icon {
+    transform: translateY(1px) translateX(3px);
+  }
+}
+
+/* 轮播标题切换条：透明渐变悬浮在轮播图上（无边界线、无投影） */
+.carousel-tabs {
+  background: linear-gradient(to top, rgba(9, 15, 27, 0.34), rgba(9, 15, 27, 0.1) 55%, transparent);
+}
+
+/* 打字机光标 */
+.type-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: currentColor;
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% { opacity: 0; }
+}
+
+
+/* ==========================================================================
+   v2.51 美化批次（参考 resend/vercel/linear/amie/family/supabase/raycast）
+   ① 页脚 AWS 化：深 navy 圆角 sheet（左上/右上 24px 圆角）+ 顶缘渐变描边
+   ② .footer-night 作用域内重映射语义令牌：页脚里现成的 text-ink / text-body /
+      border-line / hover:text-brand / bg-brand/10 全部自动切深色值，
+      PHP 侧预构建的页脚片段（hooks.php）零改动。
+      注意 Tailwind 的颜色工具类编译为 hex 直出（不读 var），所以工具类
+      （.text-ink 等）需要在下方逐类覆盖；手写类（.btn-outline 等读 var）靠变量重映射生效。
+   ========================================================================== */
+.footer-night {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  background: var(--night);
+  color: var(--night-body);
+  /* 令牌重映射（只影响 footer 内部）：手写 CSS 类读这批变量 */
+  --ink: var(--night-ink);
+  --body: var(--night-body);
+  --muted: var(--night-muted);
+  --line: var(--night-line);
+  --brand: var(--night-brand);
+  --brand-hover: var(--cui-brand-hover);
+  --surface: var(--cui-surface);
+  --surface-alt: var(--cui-accent);
+  /* 顶缘渐变描边（linear 式 hairline）：1px 品牌渐变，两端淡出 */
+  --hairline: linear-gradient(90deg, transparent, rgba(95, 155, 255, 0.5) 28%, rgba(95, 155, 255, 0.14) 72%, transparent);
+}
+
+.footer-night::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: var(--hairline);
+  pointer-events: none;
+}
+
+/* 顶部品牌辉光（resend 式 glow）：从顶缘中央向下弥散，压在内容之下 */
+.footer-night::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: min(56rem, 92%);
+  height: 11rem;
+  transform: translateX(-50%);
+  background: radial-gradient(52% 100% at 50% 0%, color-mix(in srgb,var(--cui-titanium) 20.0%,transparent), transparent 72%);
+  pointer-events: none;
+}
+
+/* Tailwind 颜色工具类是 hex 直出，深色作用域内逐类覆盖 */
+.footer-night .text-ink { color: var(--night-ink); }
+.footer-night .text-body { color: var(--night-body); }
+.footer-night .text-muted { color: var(--night-muted); }
+.footer-night .text-brand { color: var(--night-brand); }
+.footer-night .border-line { border-color: var(--night-line); }
+.footer-night .bg-brand\/10 { background-color: rgba(95, 155, 255, 0.14); }
+.footer-night .hover\:text-brand:hover { color: var(--night-brand); }
+/* 描边按钮（CTA 次按钮）在深色页脚保持「白底深字」（AWS/Linear 式白色按钮）：
+   构建器的主题作用域机制会把 @apply text-ink 的编译结果改写为 var(--night-ink)，
+   白底上不可读，这里显式改回深色字 */
+
+/* ③ 主按钮 hover 辉光（resend 式）：不做位移（§8.1），只做品牌色光晕加深 */
+
+/* ④ 轮播 Ken Burns 缓推（vercel/resend 首图微动）：transform-only，
+   6s 轮播间隔配 6.5s，接近播完；再次激活由 x-show 重放 */
+.hero-slide-img {
+  animation: hero-kenburns 6.5s var(--ease-out-gentle) both;
+}
+
+@keyframes hero-kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.045); }
+}
+
+/* ⑤ 整页淡入（linear/amie 的页面进场感）：opacity-only 动画
+   不产生 containing block，fixed 子元素（悬浮导航/用户面板）不受影响；
+   html.js 门控保证无 JS 时内容直接可见 */
+html.js body {
+  animation: cra1-page-in 240ms var(--ease-out-gentle);
+}
+
+@keyframes cra1-page-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* v2.52 价格条行卡（13 个产品页共用）：白卡语言（圆角/柔影/内高光），
+   hover 边框着色由模板既有 hover:border-brand/35 承担 */
+.price-row {
+  border-radius: 0.75rem;
+  border-color: rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 200ms var(--ease-out-strong), border-color 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .price-row:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+/* 页脚细噪点（linear/supabase 的材质层）：叠在深色底上，强化「实体感」 */
+.footer-night {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* 页脚内容压在 hairline/辉光层之上 */
+.footer-night > .container-page {
+  position: relative;
+  z-index: 1;
+}
+
+/* 文本选区品牌化（vercel 式细节） */
+::selection {
+  background: color-mix(in srgb,var(--cui-titanium) 16.0%,transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide-img { animation: none; }
+  html.js body { animation: none; }
+}
+
+

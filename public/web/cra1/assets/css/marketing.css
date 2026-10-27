@@ -1,0 +1,266 @@
+/* Home and cloud product pilot. Existing theme tokens remain the source of truth.
+   This sheet is loaded before administrator custom CSS and never on other pages. */
+.cra1-marketing {
+  --marketing-radius: .75rem;
+  --marketing-space: clamp(3.5rem, 6vw, 6rem);
+  --marketing-tint: color-mix(in srgb, var(--brand) 7%, var(--surface));
+  --marketing-rule: color-mix(in srgb, var(--brand) 15%, var(--line));
+  background: var(--surface);
+}
+.cra1-marketing .btn {
+  border-radius: .5rem;
+  min-height: 2.75rem;
+  font-weight: 600;
+  text-transform: none;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.cra1-marketing .btn-gradient,
+.cra1-marketing .btn-gradient:hover {
+  color: var(--surface);
+  background: var(--brand);
+  border: 1px solid var(--brand);
+  box-shadow: none;
+  animation: none;
+}
+.cra1-marketing .btn-gradient:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+.cra1-marketing .btn-gradient::after { transform: none; }
+.cra1-marketing .btn-outline { color: var(--brand); border-color: var(--marketing-rule); background: var(--surface); box-shadow: none; }
+.cra1-marketing .btn-outline:hover { color: var(--brand-hover); border-color: var(--brand); background: var(--marketing-tint); }
+.cra1-marketing .btn:disabled { color: var(--muted); background: var(--line); border-color: var(--line); cursor: not-allowed; }
+/* Footer remaps surface/brand. Give its buttons explicit foregrounds. */
+.cra1-marketing .footer-night .btn-gradient,
+.cra1-marketing .footer-night .btn-gradient:hover { color: var(--night-btn-ink); background: var(--night-brand); border-color: var(--night-brand); }
+.cra1-marketing .footer-night .btn-outline,
+.cra1-marketing .footer-night .btn-outline:hover { color: var(--night-ink); background: transparent; border-color: var(--night-muted); }
+.cra1-marketing main .section-title { font-size: clamp(1.6rem, 2.4vw, 2.2rem); line-height: 1.4; font-weight: 650; letter-spacing: -.035em; }
+.cra1-marketing main .section-desc { margin-top: 1rem; line-height: 1.85; }
+.cra1-marketing main :is(.glass-card, .feature-item, .product-card, .bento-card, .bento-featured, .article-card) {
+  border-color: var(--line);
+  border-radius: var(--marketing-radius);
+  box-shadow: none;
+}
+.cra1-marketing main :is(.glass-card, .product-card, .bento-card):hover { box-shadow: none; border-color: var(--marketing-rule); }
+.cra1-marketing .ring-sheen::after { content: none; }
+.cra1-marketing main > [data-cra1-module] > section { padding-top: var(--marketing-space); padding-bottom: var(--marketing-space); }
+.cra1-marketing--home main > [data-cra1-module="capability"] > section { padding: 0; }
+.cra1-marketing main [data-cra1-module] > section[id] { scroll-margin-top: 8rem; }
+
+/* Shared hero proportions; copy and configured media keep separate reading areas. */
+.marketing-hero, .cra1-marketing--product .page-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--marketing-tint);
+  border-bottom: 1px solid var(--marketing-rule);
+}
+.marketing-hero::before, .cra1-marketing--product .page-hero::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: linear-gradient(var(--marketing-rule) 1px, transparent 1px), linear-gradient(90deg, var(--marketing-rule) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(100deg, transparent 30%, var(--ink));
+  opacity: .45;
+  pointer-events: none;
+}
+.marketing-hero-grid, .product-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4rem);
+  min-height: 460px;
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+.marketing-hero-copy { min-width: 0; }
+.marketing-hero h1 {
+  max-width: 9.5em;
+  font-size: clamp(2.1rem, 3.5vw, 3.65rem);
+  line-height: 1.28;
+  letter-spacing: -.045em;
+  font-weight: 700;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.marketing-hero-description { margin-top: 1.4rem; max-width: 31rem; font-size: 1rem; line-height: 1.9; color: var(--body); }
+.marketing-hero-copy > .btn { margin-top: 1.8rem; padding-inline: 1.4rem; }
+.marketing-hero-media {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1.5;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--brand) 12%, var(--surface));
+}
+.marketing-slide-stage { position: absolute; inset: 0; transform-style: preserve-3d; }
+.marketing-slide { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: inherit; }
+.marketing-slide picture { display: contents; }
+.marketing-slide :is(img, video) { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 72% center; }
+.marketing-slide > a { position: absolute; inset: 0; }
+.marketing-slide > a:focus-visible { outline-offset: -5px; }
+.marketing-hero-footer { display: flex; align-items: center; gap: 1rem; border-top: 1px solid var(--marketing-rule); }
+.marketing-tabs { display: flex; flex: 1; min-width: 0; gap: 2rem; overflow-x: auto; scrollbar-width: thin; }
+.marketing-tabs button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: .6rem;
+  min-height: 3.8rem;
+  padding-block: .8rem;
+  color: var(--body);
+  font-size: .8rem;
+  border-bottom: 2px solid transparent;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+.marketing-tabs button[aria-current="true"] { color: var(--brand); border-bottom-color: var(--brand); }
+.marketing-tabs button > span:first-child { font-variant-numeric: tabular-nums; font-size: .7rem; opacity: .65; }
+
+/* Home: a product directory, a catalogue and a scene selector, with different rhythms. */
+.cra1-marketing--home .capability-ambient { background: var(--surface); }
+.cra1-marketing--home .capability-ambient .mist,
+.cra1-marketing--home .capability-ambient::before,
+.cra1-marketing--home .capability-ambient::after,
+.cra1-marketing--home .promo-entry-divided::before { display: none; }
+.cra1-marketing--home .promo-strip { padding: 1.4rem 0; gap: 2rem; border-bottom: 1px solid var(--line); }
+.cra1-marketing--home .promo-panel { border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+.cra1-marketing--home .promo-head { padding-left: 0; }
+.cra1-marketing--home .promo-panel > .grid { padding-left: 0; }
+.cra1-marketing--home .promo-entry { padding: .7rem 1rem; }
+.cra1-marketing--home .promo-icon { background: transparent; color: var(--brand); border: 0; }
+.cra1-marketing--home #pricing { background: var(--surface-alt); }
+.cra1-marketing--home #pricing .mist { opacity: .18; }
+.cra1-marketing--home #pricing::before, .cra1-marketing--home #pricing::after { opacity: .25; }
+.cra1-marketing--home #pricing > .container-page > .grid { display: block; margin-top: 2rem; }
+.cra1-marketing--home #pricing [x-show="productGroups.length"] { display: flex; flex-direction: row; gap: .5rem; overflow-x: auto; padding-bottom: 1.25rem; }
+.cra1-marketing--home .rail-link { width: auto; flex-shrink: 0; border: 1px solid transparent; border-radius: .5rem; padding-inline: 1rem; }
+.cra1-marketing--home .rail-link-active { box-shadow: none; background: var(--surface); color: var(--brand); border-color: var(--marketing-rule); }
+.cra1-marketing--home [x-ref="productGrid"] { grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 1rem; }
+.cra1-marketing--home .product-card { min-height: 230px; padding: 1.5rem; background: var(--surface); }
+.cra1-marketing--home .product-card h3 { overflow: visible; white-space: normal; font-size: 1rem; line-height: 1.5; }
+.cra1-marketing--home .product-card-price { margin-top: auto; padding-top: 1.2rem; gap: .5rem; }
+.cra1-marketing--home .product-card > p { padding-bottom: 1.25rem; }
+.cra1-marketing--home .product-card-price .text-2xl { font-size: 1.85rem; font-variant-numeric: tabular-nums; }
+.cra1-marketing--home .product-card-featured,
+.cra1-marketing--home .product-card-featured:hover { background: var(--night); border-color: var(--night); }
+.cra1-marketing--home .product-card-featured :is(.text-ink, .text-brand) { color: var(--night-ink); }
+.cra1-marketing--home .product-card-featured :is(.text-body, .text-muted) { color: var(--night-body); }
+.cra1-marketing--home .product-card-featured .product-card-price { border-color: var(--night-line); }
+.cra1-marketing--home .product-card-featured .btn { color: var(--night-ink); background: var(--brand); border-color: var(--brand); }
+.cra1-marketing--home [data-cra1-module="solutions"] > section { background: var(--surface); }
+.cra1-marketing--home .bento-featured { padding: 2rem; background: var(--night); border-color: var(--night); }
+.cra1-marketing--home .bento-featured :is(.text-ink, .text-brand) { color: var(--night-ink); }
+.cra1-marketing--home .bento-featured .text-body { color: var(--night-body); }
+.cra1-marketing--home .bento-card { padding: 1.5rem; background: var(--surface-alt); }
+.cra1-marketing--home .bento-card .opacity-0 { opacity: 1; }
+.cra1-marketing--home .bento-cta { background: var(--brand); border-color: var(--brand); }
+.cra1-marketing--home .bento-cta::before { opacity: .1; }
+.cra1-marketing--home [data-cra1-module="steps"] > section { background: var(--surface-alt); border: 0; }
+.cra1-marketing--home .step-num { border: 0; border-radius: 0; color: var(--brand); background: transparent; font-size: 2rem; font-weight: 500; }
+
+/* CRA1 product: resource drawing, numbered capability list, dark capability band,
+   readable billing table and compact questions. No synthetic customer metrics. */
+.cra1-marketing--product .page-hero .container-page { padding-block: 2rem 1.5rem; }
+.cra1-marketing--product .product-hero-grid { padding-block: 1rem 1.8rem; min-height: 380px; }
+.cra1-marketing--product .page-hero h1 { margin-top: 0; font-size: clamp(2.5rem, 4vw, 3.6rem); line-height: 1.25; }
+.cra1-marketing--product .page-hero .section-desc { margin-top: 1.5rem; font-size: 1rem; }
+.cra1-marketing--product .breadcrumb { padding-bottom: .75rem; }
+.cra1-marketing--product .anchor-nav { background: var(--surface); box-shadow: none; border-top: 0; }
+.cra1-marketing--product .anchor-nav .container-page { display: flex; align-items: stretch; flex-wrap: nowrap; gap: 2.1rem; overflow-x: auto; padding-block: 0; }
+.cra1-marketing--product .anchor-nav a { flex: 0 0 auto; padding: .3rem 0; min-height: 3.5rem; white-space: nowrap; }
+.cra1-marketing--product .anchor-nav a.text-primary { color: var(--brand); border-bottom-color: var(--brand); }
+.compute-illustration { position: relative; width: 100%; max-width: 600px; margin-inline: auto; }
+.compute-illustration::before { content: ''; position: absolute; inset: 14% 12%; border-radius: 50%; background: color-mix(in srgb, var(--brand) 9%, transparent); filter: blur(35px); z-index: -1; }
+.compute-illustration svg { width: 100%; height: auto; }
+.compute-orbit { stroke: var(--marketing-rule); stroke-width: 1; }
+.compute-link { stroke: var(--brand); stroke-opacity: .4; stroke-width: 1.5; stroke-dasharray: 4 6; }
+.compute-base { fill: color-mix(in srgb, var(--brand) 10%, var(--surface)); stroke: var(--marketing-rule); }
+.compute-top { fill: var(--surface); stroke: color-mix(in srgb, var(--brand) 35%, var(--line)); stroke-width: 1.2; stroke-linejoin: round; }
+.compute-side { fill: color-mix(in srgb, var(--brand) 9%, var(--surface)); stroke: color-mix(in srgb, var(--brand) 35%, var(--line)); stroke-width: 1.2; stroke-linejoin: round; }
+.compute-front { fill: var(--marketing-tint); stroke: color-mix(in srgb, var(--brand) 35%, var(--line)); stroke-width: 1.2; stroke-linejoin: round; }
+.compute-server .compute-front { fill: var(--brand); stroke: var(--brand-hover); }
+.compute-server .compute-side { fill: var(--brand-hover); stroke: var(--brand-hover); }
+.compute-detail { stroke: var(--night-brand); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.compute-chip { fill: var(--brand); stroke: var(--brand); }
+.compute-light { fill: var(--night-brand); }
+.compute-signal { fill: none; stroke: var(--brand); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: compute-signal 4s ease-in-out infinite; }
+@keyframes compute-signal { 0%, 100% { opacity: .25; transform: scale(.85); } 50% { opacity: .8; transform: scale(1.1); } }
+.cra1-marketing--product #overview { display: grid; grid-template-columns: .83fr 1.17fr; gap: 4rem; }
+.cra1-marketing--product #overview > .feature-grid { margin-top: 0; display: block; counter-reset: feature; }
+.cra1-marketing--product #overview .feature-item { position: relative; counter-increment: feature; padding: 1.3rem 0 1.3rem 3.8rem; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; }
+.cra1-marketing--product #overview .feature-item:first-child { padding-top: 0; }
+.cra1-marketing--product #overview .feature-item::before { content: counter(feature, decimal-leading-zero); position: absolute; left: 0; top: 1.25rem; color: var(--brand); font-size: 1.35rem; font-variant-numeric: tabular-nums; font-weight: 500; }
+.cra1-marketing--product #overview .feature-item:first-child::before { top: 0; }
+.cra1-marketing--product #overview .feature-item h3 { font-size: 1.1rem; }
+.cra1-marketing--product #overview .feature-item p { margin-top: .5rem; }
+.cra1-marketing--product #advantages { background: var(--night); color: var(--night-body); }
+.cra1-marketing--product #advantages .section-title { max-width: 22em; color: var(--night-ink); }
+.cra1-marketing--product #advantages .glass-card { padding: 1.8rem 0 0; border: 0; border-top: 1px solid var(--night-line); border-radius: 0; background: transparent; }
+.cra1-marketing--product #advantages .text-ink { color: var(--night-ink); }
+.cra1-marketing--product #advantages .text-body { color: var(--night-body); }
+.cra1-marketing--product #advantages .grid { gap: 3rem; }
+.cra1-marketing--product #scenarios .feature-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+.cra1-marketing--product #scenarios .feature-item { padding: 1.6rem; background: var(--surface-alt); border: 0; border-top: 3px solid var(--marketing-rule); }
+.cra1-marketing--product #scenarios .feature-item:first-child { border-top-color: var(--brand); }
+.cra1-marketing--product #service { background: var(--surface-alt); }
+.cra1-marketing--product #service .spec-table { border: 1px solid var(--line); border-radius: var(--marketing-radius); }
+.cra1-marketing--product #service thead th { background: var(--ink); color: var(--night-ink); padding: 1.2rem; }
+.cra1-marketing--product #service tbody :is(th, td) { padding: 1.3rem 1.2rem; background: var(--surface); }
+.cra1-marketing--product #service tbody tr:nth-child(even) :is(th, td) { background: var(--surface-alt); }
+.cra1-marketing--product #faq { display: grid; grid-template-columns: .6fr 1.4fr; gap: 3rem; align-items: start; }
+.cra1-marketing--product #faq .faq-list { margin: 0; }
+.cra1-marketing--product #faq .faq-item { margin: 0; padding: .25rem 0; background: transparent; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
+.cra1-marketing--product #faq .faq-item summary { padding: 1.3rem 0; font-size: .95rem; }
+.cra1-marketing--product #faq .faq-item p { margin: 0 0 1.3rem; }
+.cra1-marketing--product .cta-band { position: relative; overflow: hidden; background: var(--brand); border: 0; border-radius: 1rem; padding: 2.8rem; }
+.cra1-marketing--product .cta-band::before { content: ''; position: absolute; width: 22rem; height: 22rem; right: -6rem; top: -9rem; border: 1px solid color-mix(in srgb, var(--surface) 25%, transparent); border-radius: 50%; pointer-events: none; }
+.cra1-marketing--product .cta-band :is(h2, p) { color: var(--surface); }
+.cra1-marketing--product .cta-band p { opacity: .85; }
+.cra1-marketing--product .cta-band .btn { background: var(--surface); color: var(--brand); border-color: var(--surface); }
+.cra1-marketing--product .cta-band .btn-outline { background: transparent; color: var(--surface); border-color: color-mix(in srgb, var(--surface) 50%, transparent); }
+.cra1-marketing--product .mobile-action-bar { padding-bottom: max(.75rem, env(safe-area-inset-bottom)); }
+
+@media (min-width: 768px) {
+  .cra1-marketing--home .bento-cta { grid-column: 1 / -1; }
+}
+@media (max-width: 1023px) {
+  .marketing-hero-grid { grid-template-columns: 1fr 1fr; gap: 1.8rem; min-height: 400px; }
+  .marketing-hero h1 { font-size: 2.5rem; }
+  .marketing-hero-media { aspect-ratio: 1.05; }
+  .marketing-tabs { gap: 1.4rem; }
+  .cra1-marketing--home .promo-strip { gap: 1rem; }
+  .cra1-marketing--product .product-hero-grid { gap: 1.25rem; }
+  .cra1-marketing--product #overview { grid-template-columns: .85fr 1.15fr; gap: 2rem; }
+}
+@media (max-width: 767px) {
+  .marketing-hero-grid, .product-hero-grid { grid-template-columns: 1fr; gap: 2rem; min-height: 0; padding-block: 2.25rem 1.5rem; }
+  .marketing-hero h1 { font-size: clamp(2rem, 8.7vw, 2.9rem); max-width: 10em; }
+  .marketing-hero-description { font-size: .9rem; margin-top: 1rem; min-height: 3.8em; }
+  .marketing-hero-copy > .btn { margin-top: 1.25rem; }
+  .marketing-hero-media { aspect-ratio: 1.8; border-radius: 1rem; }
+  .marketing-hero-footer { gap: .5rem; }
+  .marketing-tabs button { min-height: 3.4rem; font-size: .75rem; }
+  .cra1-marketing--home .promo-strip { padding-block: 1.4rem; }
+  .cra1-marketing--home .promo-panel.hidden { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cra1-marketing--home .promo-entry { padding: .6rem .4rem; }
+  .cra1-marketing--home .promo-entry .truncate { white-space: normal; }
+  .cra1-marketing--home .promo-entry .line-clamp-2 { display: block; -webkit-line-clamp: unset; }
+  .cra1-marketing--home .promo-panel > .grid { padding-right: 0; }
+  .cra1-marketing--home .product-card { min-height: 215px; padding: 1.3rem; }
+  .cra1-marketing--home [x-ref="productGrid"] { gap: .85rem; }
+  .cra1-marketing--product .page-hero .container-page { padding-top: 1.5rem; }
+  .cra1-marketing--product .product-hero-grid { padding-block: .75rem 0; gap: .5rem; min-height: 0; }
+  .cra1-marketing--product .page-hero h1 { font-size: 2.55rem; }
+  .cra1-marketing--product .page-hero .section-desc { margin-top: 1rem; font-size: .9rem; }
+  .cra1-marketing--product .compute-illustration { max-width: 360px; }
+  .cra1-marketing--product .anchor-nav .container-page { gap: 1.6rem; }
+  .cra1-marketing--product #overview, .cra1-marketing--product #faq { grid-template-columns: 1fr; gap: 2rem; }
+  .cra1-marketing--product #overview .feature-item { padding-left: 3rem; }
+  .cra1-marketing--product #advantages .grid { gap: 1.5rem; }
+  .cra1-marketing--product .cta-band { padding: 2rem 1.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .compute-signal { animation: none; opacity: .5; }
+}

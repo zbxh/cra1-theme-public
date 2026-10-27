@@ -1,0 +1,12 @@
+<section class="container-page py-14 md:py-20">
+        <div class="grid gap-6 sm:grid-cols-2">
+            {foreach $data.cra1.sol_ind_auto_highlights as $row}
+            {if ( empty($row.hidden) ) }
+            <div class="glass-card rounded-2xl p-7 cui-card">
+                <div class="font-semibold text-ink">{$row.name}</div>
+                {if ( !empty($row.desc) ) }<p class="mt-2 text-sm leading-6 text-body">{$row.desc}</p>{/if}
+            </div>
+            {/if}
+            {/foreach}
+        </div>
+    </section>

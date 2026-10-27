@@ -1,0 +1,93 @@
+{
+  "format": 1,
+  "recorded_on": "2026-10-19",
+  "scope": "Public HTTPS installation, real interrupted worker recovery, update and rollback; separate site and database.",
+  "system_version": "10.7.4",
+  "modules": {
+    "MfCloud": "4.3.0",
+    "MfDcim": "4.2.1",
+    "IdcsmartCommon": "4.3.1"
+  },
+  "native_dependencies_matched": 315,
+  "public_installer_checks": 27,
+  "real_update_recovery_rollback_checks": 25,
+  "post_rollback_browser_checks": 55,
+  "read_only_compatibility_checks": 3,
+  "native_files_unchanged": 9947,
+  "production_protected_files_unchanged": 14418,
+  "production_configs_and_snapshots_unchanged": 10,
+  "initial_install_candidate": "20261019-lifecycle-v5",
+  "updated_candidate": "20261019-lifecycle-v7",
+  "byte_identical_installer_backend_files": 49,
+  "reproducible_build_outputs": 167,
+  "reproducible_packages": 3,
+  "preflight_seam_used": false,
+  "https_certificate_verification": true,
+  "commercial_release_accepted": false,
+  "remaining_asset_provenance": 153,
+  "full_business_combinations_registered": false,
+  "artifacts": [
+    {
+      "name": "installer-browser-v5-result.json",
+      "sha256": "194f4bd71d5d42c6e183755993779820087615f056d170ef039f4ca9f01d2d92"
+    },
+    {
+      "name": "update-browser-result.json",
+      "sha256": "5bff4f6f6aff7b570072743d990e5d3e022000b9bc09287c3d15900ceae275f7"
+    },
+    {
+      "name": "post-lifecycle-smoke-result.json",
+      "sha256": "6ca5a91390cb86d85e7da25014fe9765d96cd31245176850ecd7d229cefb3efa"
+    },
+    {
+      "name": "compatibility-readonly-browser-result.json",
+      "sha256": "b8ccbd36b9d343acbba5a0a2cd2f3aade73572829329d77c2799966bc853a33d"
+    },
+    {
+      "name": "candidate-installer-lineage.json",
+      "sha256": "74b2377a2b84ae7c112a51d9e0c06e238ee0f2bd45ebe2df8052b5cbeeb7e8d7"
+    },
+    {
+      "name": "packaged-admin-http-v7.json",
+      "sha256": "b54863b3d5b3cb872e863a22b2aef990be610fc4cf43a5327098751afa0212fb"
+    },
+    {
+      "name": "packaged-render-v7.json",
+      "sha256": "979fae439da85a095d966c28e77d3c73f89393ad91c9fb4b67159b03b8fa0a1d"
+    },
+    {
+      "name": "packaged-php-lint-v7.json",
+      "sha256": "13bafe843ffb64b6afc22619c90d45d4b96651c6ac7ebfdf452a6aca0364e0f8"
+    },
+    {
+      "name": "reproducible-v7-result.json",
+      "sha256": "b30732c0f6b6af30dd1f3c0c9306e77185aa8aa7f7664e897d436a3fed69662a"
+    },
+    {
+      "name": "native-files-theme-comparison.json",
+      "sha256": "159311262402f7efd7ca0c1bcb89f209b932b0f4b7ee1cccdf22b015ee393531"
+    },
+    {
+      "name": "production-native-files-final.json",
+      "sha256": "717cb7bb840c26353b20e62dd7046b4bcf8099085d1fadab03943d54bc8ed799"
+    },
+    {
+      "name": "production-boundary-final.json",
+      "sha256": "b9ae3ec7ae4e2baddb41154a54845d7382d7cbc65e8e4eca93b8374b84e8f370"
+    },
+    {
+      "name": "native-theme-settings-final-comparison.json",
+      "sha256": "d72c5c703ea30311cf8bb8d005604dfb2c28b1134c3c23570dc28a6c05b118a0"
+    },
+    {
+      "name": "release-gate-v7.json",
+      "sha256": "4f56e3fd6707b84597eecf908eadc5742b4c953349fe173aa2436b2ae53df486"
+    },
+    {
+      "name": "website-scroll-readonly-v2-result.json",
+      "sha256": "0f108ba69280e0071f21696bb1e0fc3875377c82d5d26df8113f7274de422586"
+    }
+  ],
+  "packaging_note": "This supplementary evidence was recorded after the tested immutable candidates; those ZIP files were not rewritten.",
+  "final_visible_scroll_checks": 7
+}

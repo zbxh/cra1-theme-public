@@ -1,0 +1,18 @@
+<section class="container-page py-12 md:py-16" data-reveal>
+            <div class="">
+                <div class="article-list grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {if ( cra1_content_explicit($data.cra1, 'partner_cps_program_copy') || (( isset($data.cra1.partner_cps_program_copy) && count($data.cra1.partner_cps_program_copy) > 0 )) ) }
+                {foreach [1,2,3,4] as $pgi}
+                {if ( cra1_content_explicit($data.cra1, 'partner_cps_program_copy') || (( isset($data.cra1.partner_cps_program_copy['t' . $pgi]) && $data.cra1.partner_cps_program_copy['t' . $pgi] )) ) }
+                <article class="article-card glass-card p-6 cui-card"><h2 class="text-lg font-semibold text-ink">{$data.cra1.partner_cps_program_copy['t' . $pgi]}</h2><p class="mt-2 text-sm leading-6 text-body">{$data.cra1.partner_cps_program_copy['d' . $pgi]}</p></article>
+                {/if}
+                {/foreach}
+                {else /}
+<article class="article-card glass-card p-6 cui-card"><h2 class="text-lg font-semibold text-ink">合作规则</h2><p class="mt-2 text-sm leading-6 text-body">推广资格、适用产品和审核流程以当前合作政策为准。</p></article>
+                    <article class="article-card glass-card p-6 cui-card"><h2 class="text-lg font-semibold text-ink">数据记录</h2><p class="mt-2 text-sm leading-6 text-body">合作数据和有效订单按平台规则记录，具体口径以后台及协议为准。</p></article>
+                    <article class="article-card glass-card p-6 cui-card"><h2 class="text-lg font-semibold text-ink">推广物料</h2><p class="mt-2 text-sm leading-6 text-body">可用的产品介绍、活动信息与品牌素材以官方提供内容为准。</p></article>
+                    <article class="article-card glass-card p-6 cui-card"><h2 class="text-lg font-semibold text-ink">专属沟通</h2><p class="mt-2 text-sm leading-6 text-body">请提交推广渠道和受众信息，由合作团队确认后续安排。</p></article>
+                {/if}
+                </div>
+            </div>
+        </section>

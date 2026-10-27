@@ -1,0 +1,87 @@
+/* Low-chroma business ink + feathered surfaces. Glyphs stay outside the mask. */
+:root {
+ --cui-icon-compute:#3562a4; --cui-icon-compute-fill:#e5eefb;
+ --cui-icon-security:#19786b; --cui-icon-security-fill:#e2f3ed;
+ --cui-icon-finance:#986221; --cui-icon-finance-fill:#faf0d9;
+ --cui-icon-gold:#896437; --cui-icon-gold-fill:#f4ebdb;
+ --cui-icon-surface:#fff;
+}
+:where(.cui-dark,.cui-card--featured,.product-card-featured,.bento-featured,.bg-night,.footer-night) {
+ --cui-icon-compute:#a5caff; --cui-icon-compute-fill:#2b3b52;
+ --cui-icon-security:#8cdbc7; --cui-icon-security-fill:#253f3b;
+ --cui-icon-finance:#efd093; --cui-icon-finance-fill:#42382a;
+ --cui-icon-gold:#e2c392; --cui-icon-gold-fill:#40382e;
+ --cui-icon-surface:#2a2e32;
+}
+html[data-cra1-theme] .cui-business-icon {
+ --cui-icon-ink:var(--cui-icon-compute); --cui-icon-fill:var(--cui-icon-compute-fill);
+ color:var(--cui-icon-ink);
+}
+html[data-cra1-theme] .cui-business-icon[data-cui-icon-tone="security"] { --cui-icon-ink:var(--cui-icon-security); --cui-icon-fill:var(--cui-icon-security-fill); }
+html[data-cra1-theme] .cui-business-icon[data-cui-icon-tone="finance"] { --cui-icon-ink:var(--cui-icon-finance); --cui-icon-fill:var(--cui-icon-finance-fill); }
+html[data-cra1-theme] .cui-business-icon[data-cui-icon-tone="gold"] { --cui-icon-ink:var(--cui-icon-gold); --cui-icon-fill:var(--cui-icon-gold-fill); }
+html[data-cra1-theme] .cui-icon-well,
+html[data-cra1-theme] .cui-business-icon--tile:is(.text-success,.text-warning,.text-danger) {
+ --cui-icon-fill:color-mix(in srgb,currentColor 10%,var(--cui-icon-surface));
+}
+html[data-cra1-theme] :is(.cui-business-icon--tile,.cui-icon-well) {
+ --cui-icon-feather:7px; --cui-icon-halo-size:5px; --cui-icon-halo-opacity:.18;
+ position:relative; isolation:isolate;
+ background:transparent; border:0; box-shadow:none;
+}
+html[data-cra1-theme] :is(.cui-business-icon--tile,.cui-icon-well)::before {
+ content:""; position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:inherit;
+ background:linear-gradient(145deg,var(--cui-icon-surface),var(--cui-icon-fill));
+ /* Standard 7px feather approved in icon-feather-preview; no image blur. */
+ -webkit-mask-image:linear-gradient(to right,transparent,#000 var(--cui-icon-feather),#000 calc(100% - var(--cui-icon-feather)),transparent),linear-gradient(to bottom,transparent,#000 var(--cui-icon-feather),#000 calc(100% - var(--cui-icon-feather)),transparent);
+ mask-image:linear-gradient(to right,transparent,#000 var(--cui-icon-feather),#000 calc(100% - var(--cui-icon-feather)),transparent),linear-gradient(to bottom,transparent,#000 var(--cui-icon-feather),#000 calc(100% - var(--cui-icon-feather)),transparent);
+ -webkit-mask-composite:source-in; mask-composite:intersect; mask-repeat:no-repeat;
+}
+html[data-cra1-theme] :is(.cui-business-icon--tile,.cui-icon-well)::after {
+ content:""; position:absolute; inset:calc(-1 * var(--cui-icon-halo-size)); z-index:1; pointer-events:none;
+ background:radial-gradient(ellipse at center,color-mix(in srgb,currentColor 45%,transparent),transparent 70%);
+ opacity:var(--cui-icon-halo-opacity); transition:opacity 180ms ease;
+}
+/* Shared wrappers and mask glyphs must sit above the backing and halo too. */
+html[data-cra1-theme] :is(.cui-business-icon--tile,.cui-icon-well) > :is(svg,.cui-icon-art,.cui-icon-mask,.icon-img,img,i) { position:relative; z-index:2; color:inherit; }
+/* Element order-result wells have status-specific backgrounds in cart CSS. */
+html[data-cra1-theme="cart"] .cl-result-icon.cui-icon-well { background:transparent; }
+html[data-cra1-theme] :is(svg.cui-business-icon,.cui-business-icon > svg)[fill="none"] > :is(rect,circle,ellipse,polygon),
+html[data-cra1-theme] :is(svg.cui-business-icon,.cui-business-icon > svg):is(.lucide-cloud,.lucide-shield,.lucide-shield-check,.lucide-shield-alert) > path:first-of-type {
+ fill:var(--cui-icon-fill);
+}
+@media (hover:hover) and (pointer:fine) {
+ html[data-cra1-theme] :is(a,button,.promo-entry):hover > :is(.cui-business-icon--tile,.cui-icon-well)::after { opacity:calc(var(--cui-icon-halo-opacity) + .1); }
+}
+html[data-cra1-theme] :is(a,button):focus-visible > :is(.cui-business-icon--tile,.cui-icon-well)::after { opacity:calc(var(--cui-icon-halo-opacity) + .1); transition:none; }
+@supports not (mask-composite:intersect) {
+ html[data-cra1-theme] :is(.cui-business-icon--tile,.cui-icon-well)::before {
+  -webkit-mask-image:radial-gradient(ellipse at center,#000 24%,transparent 72%);
+  mask-image:radial-gradient(ellipse at center,#000 24%,transparent 72%);
+ }
+}
+@media (prefers-reduced-motion:reduce) {
+ html[data-cra1-theme] :is(.cui-business-icon--tile,.cui-icon-well)::after { transition:none; }
+}
+/* Explicit per-entry settings always win over label-based automatic tones. */
+html[data-cra1-theme] [data-cui-icon-style="1"] { color:var(--cui-icon-manual-ink,var(--cui-icon-ink)); }
+html[data-cra1-theme] [data-cui-icon-style="1"]::before { background:var(--cui-icon-background,linear-gradient(145deg,var(--cui-icon-surface),var(--cui-icon-fill)));opacity:var(--cui-icon-background-opacity,1); }
+html[data-cra1-theme] [data-cui-icon-style="1"] > svg { color:inherit; }
+html[data-cra1-theme] .cui-icon-mask { display:inline-block;flex:none;width:24px;height:24px;background-color:currentColor;-webkit-mask:var(--cui-icon-url) center / contain no-repeat;mask:var(--cui-icon-url) center / contain no-repeat; }
+html[data-cra1-theme] .cui-icon-art { display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;flex:none; }
+html[data-cra1-theme] .cui-icon-art > svg,html[data-cra1-theme] .cui-icon-art > img {width:100%;height:100%;object-fit:contain}
+@media(hover:hover) and (pointer:fine) {
+ html[data-cra1-theme] :is(a,button,.promo-entry):hover > :is(.cui-business-icon--tile,.cui-icon-well)::after,
+ html[data-cra1-theme] :is(.cui-business-icon--tile,.cui-icon-well):hover::after {opacity:calc(var(--cui-icon-halo-opacity,.18) + .22)}
+}
+
+html[data-cra1-theme] .cui-configured-icon {display:inline-flex;vertical-align:middle;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;margin-right:9px;flex:none}
+html[data-cra1-theme] .cui-configured-icon > .cui-icon-art {width:18px;height:18px}
+
+:root{--cui-icon-titanium:#555d67;--cui-icon-titanium-fill:#c9ced4;--cui-icon-graphite:#625c55;--cui-icon-graphite-fill:#d1c9bf;--cui-icon-champagne:#896d46;--cui-icon-champagne-fill:#dacfbb}
+:where(.cui-dark,.cui-card--featured,.product-card-featured,.bento-featured,.bg-night,.footer-night,.ip-sample-dark){--cui-icon-titanium:#d1d7df;--cui-icon-titanium-fill:#3c444e;--cui-icon-graphite:#d7cfc5;--cui-icon-graphite-fill:#413c37;--cui-icon-champagne:#dec9a4;--cui-icon-champagne-fill:#453d31}
+
+html[data-cra1-theme] .cl-heading-icon > .cui-icon-mask{width:18px;height:18px}html[data-cra1-theme] .cra1-primary-item__icon > .cui-icon-mask{width:20px;height:20px}
+
+html[data-cra1-theme] .cra1-nav-configured-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;width:16px;height:16px;font-size:16px;line-height:1}
+html[data-cra1-theme] .cra1-nav-configured-icon > :is(.cui-icon-mask,img){width:16px;height:16px}

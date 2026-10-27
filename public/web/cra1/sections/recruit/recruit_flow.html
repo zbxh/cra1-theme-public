@@ -1,0 +1,10 @@
+{if ( !isset($data.cra1.show_recruit_flow) || $data.cra1.show_recruit_flow == 1 ) }
+        <section class="container-page py-12 md:py-16" data-reveal aria-label="招聘流程">
+            <h2 class="section-title">招聘流程</h2>
+            <div class="feature-grid mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {foreach $data.cra1.recruit_flow as $ri => $row}
+                <div class="feature-item glass-card rounded-xl p-6 cui-card"><span class="step-num">{$row.no}</span><h3 class="mt-3 font-semibold text-ink">{$row.name}</h3><p class="mt-2 text-sm leading-6 text-body">{$row.desc}</p></div>
+                {/foreach}
+            </div>
+        </section>
+        {/if}

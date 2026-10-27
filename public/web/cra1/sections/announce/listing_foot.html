@@ -1,0 +1,11 @@
+{if ( !isset($data.cra1.show_announce_foot) || $data.cra1.show_announce_foot == 1 ) }
+        <section class="band border-y border-white/60 bg-white/50 py-12 md:py-16" data-reveal aria-label="公告说明">
+            <div class="container-page">
+                <div class="grid gap-4 md:grid-cols-2">
+                    {foreach $data.cra1.announce_foot as $row}
+                    <div class="feature-item glass-card rounded-xl p-6 cui-card"><h3 class="font-semibold text-ink">{$row.name}</h3><p class="mt-2 text-sm leading-6 text-body">{$row.desc}</p></div>
+                    {/foreach}
+                </div>
+            </div>
+        </section>
+        {/if}

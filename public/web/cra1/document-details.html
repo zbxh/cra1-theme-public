@@ -1,0 +1,35 @@
+{include file="header"}
+</head>
+
+<body data-page-kind="support" x-data="contentDetail" x-init="initEndpoint('/help', '文档详情')">
+    <!-- 跳转到主内容：必须是 body 内第一个可聚焦元素（header 在 DOM 中先于 main，
+         若放在 main 前会让键盘用户先 Tab 过整条导航）。固定定位使其视觉上仍浮在顶部。 -->
+    <a href="#main-content" class="skip-link">跳转到主内容</a>
+    <header>
+        {include file="public/header"}
+    </header>
+
+    <main id="main-content">
+        <section class="page-hero">
+            <div class="container-page py-12 md:py-16" data-reveal>
+                <nav class="breadcrumb" aria-label="面包屑">
+                    <a href="/">首页</a><span aria-hidden="true">/</span><a href="/document.html">文档中心</a><span aria-hidden="true">/</span><span aria-current="page">文档详情</span>
+                </nav>
+                <div class="mt-8 max-w-3xl">
+                    
+                    <h1 class="mt-4 text-3xl font-bold tracking-tight text-ink md:text-5xl">{if ( cra1_content_explicit($data.cra1, 'page_hero_title') || (( isset($data.cra1.page_hero_title) && $data.cra1.page_hero_title )) ) }{$data.cra1.page_hero_title}{else /}文档详情{/if}</h1>
+
+                </div>
+            </div>
+        </section>
+
+    {$data.cra1.page_modules_html|raw}
+    </main>
+
+        
+    
+
+        
+    
+
+    {include file="footer"}

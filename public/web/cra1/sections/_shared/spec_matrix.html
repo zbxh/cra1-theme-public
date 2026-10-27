@@ -1,0 +1,33 @@
+{if ( isset($data.cra1.show_spec_matrix) && $data.cra1.show_spec_matrix == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'spec_matrix_rows') || (( isset($data.cra1.spec_matrix_rows) && count($data.cra1.spec_matrix_rows) > 0 )) ) }
+<!-- 布局 G：规格对照表——键值表格，用于参数/规格/计费口径（§12.4 明确允许表格形成节奏） -->
+<section class="relative overflow-hidden bg-white py-14 md:py-18">
+    <div class="container-page">
+        <div class="section-heading" data-reveal>
+            <div class="section-heading-copy">
+                <h2 class="section-title">{$data.cra1.spec_matrix_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'spec_matrix_desc') || (( isset($data.cra1.spec_matrix_desc) && $data.cra1.spec_matrix_desc )) ) }
+                <p class="section-desc">{$data.cra1.spec_matrix_desc}</p>
+                {/if}
+            </div>
+            {if ( isset($data.cra1.spec_matrix_link) && $data.cra1.spec_matrix_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'spec_matrix_more_text', '查看文档') != '' ) }<a href="{$data.cra1.spec_matrix_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'spec_matrix_more_text', '查看文档')} →</a>{/if}
+            {/if}
+        </div>
+        <div class="mt-8 overflow-x-auto border border-line" data-reveal>
+            <table class="spec-table min-w-full">
+                <caption class="sr-only">{$data.cra1.spec_matrix_title}</caption>
+                <tbody>
+                    {foreach $data.cra1.spec_matrix_rows as $sm => $sr}
+                    <tr>
+                        <th scope="row">{$sr['name']}</th>
+                        <td class="text-body">{$sr['desc']}{if $sr['value']}<p class="price-note">{$sr['value']}</p>{/if}{if $sr['tag']}<span class="ml-2 inline-flex items-center border border-brand/20 bg-brand/5 px-2 py-0.5 text-[11px] text-brand">{$sr['tag']}</span>{/if}</td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{/if}
+{/if}

@@ -1,0 +1,37 @@
+{if ( isset($data.cra1.show_figure_band) && $data.cra1.show_figure_band == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'figure_band_rows') || (( isset($data.cra1.figure_band_rows) && count($data.cra1.figure_band_rows) > 0 )) ) }
+<!-- 布局 A：全宽数据带——暗色满幅区块 + 大号数字横排，用于把关键规模一次讲清 -->
+<section class="band relative overflow-hidden bg-ink text-white py-12 md:py-16">
+    <div class="mist mist-c" aria-hidden="true"></div>
+    <div class="container-page relative">
+        <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between" data-reveal>
+            <div class="max-w-2xl">
+                <h2 class="text-xl font-semibold leading-tight md:text-3xl">{$data.cra1.figure_band_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'figure_band_desc') || (( isset($data.cra1.figure_band_desc) && $data.cra1.figure_band_desc )) ) }
+                <p class="mt-2 text-sm leading-6 text-white/70 md:text-base">{$data.cra1.figure_band_desc}</p>
+                {/if}
+            </div>
+            {if ( isset($data.cra1.figure_band_link) && $data.cra1.figure_band_link != '' ) }
+            <!-- 暗色带上的链接：全局 24px 触控规则按类名匹配 text-brand/text-primary，
+                 这里的 text-white/85 不命中，故显式 min-h-6 + inline-flex 满足 §10.2 -->
+            {if ( cra1_content_value($data.cra1, 'figure_band_more_text', '了解详情') != '' ) }<a href="{$data.cra1.figure_band_link}" class="inline-flex min-h-6 shrink-0 items-center text-sm font-medium text-white/85 transition-colors duration-150 hover:text-white">{:cra1_content_value($data.cra1, 'figure_band_more_text', '了解详情')} →</a>{/if}
+            {/if}
+        </div>
+        <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-7 md:mt-10 md:grid-cols-3 md:gap-x-8">
+            {foreach $data.cra1.figure_band_rows as $fb => $fr}
+            <!-- count-item：交给 count 机制（数字从 0 滚到目标值）。
+                 data-count-to 携带服务端原值，JS 只做"滚动显示"，
+                 滚动结束写回的就是这个原值（含 +/% 等后缀），因此
+                 无 JS / reduced-motion / 无障碍读屏拿到的始终是真实数值。
+                 这里不用 data-reveal：数值由 count 机制自己淡入。 -->
+            <div class="count-item min-w-0 border-t border-white/15 pt-4">
+                <dt class="text-[11px] uppercase tracking-[0.14em] text-white/55">{$fr['icon_tile']|default=''|raw}{$fr['name']}</dt>
+                <dd class="mt-2 text-3xl font-semibold leading-none tabular-nums md:text-4xl"><span data-count-to="{$fr['value']}">{$fr['value']}</span>{if $fr['tag']}<span class="ml-1 text-sm font-normal text-white/60">{$fr['tag']}</span>{/if}</dd>
+                {if $fr['desc']}<dd class="mt-2 text-xs leading-5 text-white/60">{$fr['desc']}</dd>{/if}
+            </div>
+            {/foreach}
+        </dl>
+    </div>
+</section>
+{/if}
+{/if}

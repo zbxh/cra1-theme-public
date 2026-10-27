@@ -1,0 +1,84 @@
+/* Optional background. Fixed gradients are rasterized once; movement only uses
+   transform/opacity. No global theme selectors or continuous CSS animations. */
+.cui-ambient-host { position: relative; isolation: isolate; }
+.cui-ambient-content { position: relative; z-index: 1; }
+.cui-ambient {
+  --ambient-base: #f9fafb;
+  --ambient-grid: rgb(97 101 107 / 10%);
+  --ambient-silver: rgb(148 163 179 / 28%);
+  --ambient-silver-core: rgb(196 207 218 / 44%);
+  --ambient-gold: rgb(197 167 119 / 25%);
+  --ambient-gold-core: rgb(229 210 176 / 43%);
+  --ambient-focus: rgb(255 255 255 / 75%);
+  --ambient-wire: #85929f;
+  --ambient-wire-gold: #b28e58;
+  --ambient-wire-alpha: .34;
+  position: absolute; inset: 0; z-index: 0;
+  overflow: hidden; border-radius: inherit;
+  pointer-events: none; user-select: none;
+  background: var(--ambient-base);
+  contain: layout paint style;
+}
+.cui-ambient[data-palette="dark"] {
+  --ambient-base: #212327;
+  --ambient-grid: rgb(196 207 218 / 9%);
+  --ambient-silver: rgb(148 163 179 / 17%);
+  --ambient-silver-core: rgb(196 207 218 / 23%);
+  --ambient-gold: rgb(197 167 119 / 14%);
+  --ambient-gold-core: rgb(229 210 176 / 22%);
+  --ambient-focus: rgb(229 210 176 / 12%);
+  --ambient-wire: #b8c4d0;
+  --ambient-wire-gold: #e5d2b0;
+  --ambient-wire-alpha: .36;
+}
+.cui-ambient__grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(var(--ambient-grid) 1px, transparent 1px), linear-gradient(90deg, var(--ambient-grid) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at 70% 44%, #000 7%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse at 70% 44%, #000 7%, transparent 72%);
+}
+.cui-ambient__silver, .cui-ambient__gold, .cui-ambient__focus {
+  position: absolute; aspect-ratio: 1; border-radius: 50%;
+}
+.cui-ambient__silver {
+  left: 10%; top: -12%; width: min(860px, 88%);
+  background: radial-gradient(ellipse, var(--ambient-silver-core) 0%, var(--ambient-silver) 30%, transparent 69%);
+  opacity: .78;
+}
+.cui-ambient__gold {
+  left: 45%; top: 8%; width: min(740px, 76%);
+  background: radial-gradient(ellipse, var(--ambient-gold-core) 0%, var(--ambient-gold) 26%, transparent 68%);
+  opacity: .78;
+}
+.cui-ambient__focus {
+  top: 0; left: 0; width: min(520px, 80vw); opacity: 0;
+  background: radial-gradient(ellipse, var(--ambient-focus), transparent 65%);
+}
+.cui-ambient__structure {
+  position: absolute; left: 72%; top: 44%;
+  width: min(660px, 59vw); aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  opacity: var(--ambient-wire-alpha);
+}
+.cui-ambient__structure svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.cui-ambient__wire { fill: none; stroke: var(--ambient-wire); stroke-width: 1; }
+.cui-ambient__wire--gold { stroke: var(--ambient-wire-gold); stroke-width: 1.2; }
+.cui-ambient__edge {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, var(--ambient-base), transparent 23%), linear-gradient(90deg, var(--ambient-base), transparent 30%);
+  opacity: .72;
+}
+.cui-ambient[data-intensity="gentle"] :is(.cui-ambient__grid, .cui-ambient__structure) { opacity: .17; }
+.cui-ambient[data-ambient-running="true"] :is(.cui-ambient__silver, .cui-ambient__gold, .cui-ambient__focus, .cui-ambient__structure) { will-change: transform, opacity; }
+@media (max-width: 767px) {
+  .cui-ambient__grid { background-size: 48px 48px; }
+  .cui-ambient__silver { top: 5%; left: -30%; width: min(560px, 125%); }
+  .cui-ambient__gold { left: 20%; top: 28%; width: min(540px, 120%); }
+  .cui-ambient__structure { left: 77%; top: 57%; width: min(500px, 98vw); opacity: .19; }
+  .cui-ambient__edge { background: linear-gradient(0deg, var(--ambient-base), transparent 24%); }
+}
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+  .cui-ambient__focus { display: none; }
+  .cui-ambient [style] { will-change: auto; }
+}

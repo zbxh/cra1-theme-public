@@ -1,0 +1,16 @@
+<section id="overview" class="container-page py-12 md:py-16" data-reveal>
+            <div class="max-w-3xl"><h2 class="section-title">{if ( cra1_content_explicit($data.cra1, 'prod_overview_title') || (( isset($data.cra1.prod_overview_title) && $data.cra1.prod_overview_title )) ) }{$data.cra1.prod_overview_title}{else /}把计算资源交给业务节奏{/if}</h2><p class="section-desc">{if ( cra1_content_explicit($data.cra1, 'prod_overview_desc') || (( isset($data.cra1.prod_overview_desc) && $data.cra1.prod_overview_desc )) ) }{$data.cra1.prod_overview_desc}{else /}从单台实例起步，按需调整 CPU、内存、云盘与网络配置。控制台提供实例、镜像、网络和安全组等基础管理能力。{/if}</p></div>
+            <div class="feature-grid mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {if ( cra1_content_explicit($data.cra1, 'prod_overview_items') || (( isset($data.cra1.prod_overview_items) && count($data.cra1.prod_overview_items) > 0 )) ) }
+                {foreach $data.cra1.prod_overview_items as $it}
+                <article class="feature-item glass-card rounded-xl p-5"><h3 class="font-semibold text-ink">{$it['name']}</h3><p class="mt-2 text-sm leading-6 text-body">{$it['desc']}</p></article>
+                {/foreach}
+                {else /}
+                <article class="feature-item glass-card rounded-xl p-5"><h3 class="font-semibold text-ink">弹性配置</h3><p class="mt-2 text-sm leading-6 text-body">根据访问量与任务量选择计算、存储和网络资源。</p></article>
+                <article class="feature-item glass-card rounded-xl p-5"><h3 class="font-semibold text-ink">镜像启动</h3><p class="mt-2 text-sm leading-6 text-body">使用系统或应用镜像，减少环境准备工作。</p></article>
+                <article class="feature-item glass-card rounded-xl p-5"><h3 class="font-semibold text-ink">网络隔离</h3><p class="mt-2 text-sm leading-6 text-body">通过私有网络与安全组管理实例间的访问边界。</p></article>
+                <article class="feature-item glass-card rounded-xl p-5"><h3 class="font-semibold text-ink">资源可观测</h3><p class="mt-2 text-sm leading-6 text-body">结合监控指标观察实例运行状态和资源使用情况。</p></article>
+                {/if}
+            
+            </div>
+        </section>

@@ -1,0 +1,4 @@
+{if $supportItem.showIcon }
+{if $supportItem.icon_img }<span class="cra1-header-support__icon" {$supportItem.icon_style_attrs|default=''|raw}>{:cra1_icon_art($supportItem.icon)}</span>{else /}<svg class="cra1-header-support__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 .5l3-3a5 5 0 0 0-7-7l-2 2M14 11a5 5 0 0 0-7-.5l-3 3a5 5 0 0 0 7 7l2-2"></path></svg>{/if}
+{/if}
+{if $supportItem.showText }<span>{$supportItem.label}</span>{/if}

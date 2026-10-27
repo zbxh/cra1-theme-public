@@ -1,0 +1,49 @@
+{if ( isset($data.cra1.show_proof_wall) && $data.cra1.show_proof_wall == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'proof_wall_rows') || (( isset($data.cra1.proof_wall_rows) && count($data.cra1.proof_wall_rows) > 0 )) ) }
+<!-- 布局 Q：证言墙——三列不等高小卡（左窄高、中宽、右窄），带引用与署名，
+     刻意打破四格/对称（§8.1），内容型页面用它补足社会证明 -->
+<section class="relative overflow-hidden bg-white py-14 md:py-20">
+    <div class="container-page">
+        <div class="section-heading" data-reveal>
+            <div class="section-heading-copy">
+                <h2 class="section-title">{$data.cra1.proof_wall_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'proof_wall_desc') || (( isset($data.cra1.proof_wall_desc) && $data.cra1.proof_wall_desc )) ) }
+                <p class="section-desc">{$data.cra1.proof_wall_desc}</p>
+                {/if}
+            </div>
+            {if ( isset($data.cra1.proof_wall_link) && $data.cra1.proof_wall_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'proof_wall_more_text', '查看更多案例') != '' ) }<a href="{$data.cra1.proof_wall_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'proof_wall_more_text', '查看更多案例')} →</a>{/if}
+            {/if}
+        </div>
+        <!-- 列数不等 + 列内错位：lg 三列（4/5/3 比例），md 两列，移动端单列 -->
+        <!-- expandable：行数 > 6 时折叠前 6 条（客户端折叠，服务端仍输出全部条目，
+             JS 失效时内容完整可读）。行数 ≤ 6 时组件不做任何事。 -->
+        <div class="proof-grid mt-9 grid gap-4 md:grid-cols-2" x-data="expandable(4, 3)" x-ref="list">
+            {foreach $data.cra1.proof_wall_rows as $pw => $pwr}
+            <!-- data-expand-item：标记"参与折叠计数"的条目。
+                 容器里还有折叠按钮等其他子元素，组件只对带此标记的项计数与隐藏。 -->
+            <figure data-expand-item class="cascade-item flex min-w-0 flex-col justify-between border border-line bg-surface-alt/60 p-5 md:p-6 "
+                     style="--cascade-delay:{:($pw % 3) * 80 + intdiv($pw, 3) * 40}">
+                <blockquote class="text-sm leading-7 text-ink">{$pwr['desc']}</blockquote>
+                <figcaption class="mt-5 flex items-center gap-3 border-t border-line pt-4">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand/10 text-xs font-semibold text-brand">{$pwr['name']|mb_substr=0,1,'UTF-8'}</span>
+                    <span class="min-w-0">
+                        <span class="block truncate text-xs font-medium text-ink">{$pwr['name']}</span>
+                        {if $pwr['value']}<span class="block truncate text-[11px] text-muted">{$pwr['value']}</span>{/if}
+                    </span>
+                </figcaption>
+            </figure>
+            {/foreach}
+            <div class="col-span-full mt-2 text-center" x-cloak x-show="collapsed">
+                <button type="button" class="inline-flex min-h-6 items-center gap-1 py-0.5 text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover"
+                        :aria-expanded="expanded ? 'true' : 'false'" @click="toggle()">
+                    <span x-text="label()"></span>
+                    <svg class="h-3.5 w-3.5 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+{/if}
+{/if}

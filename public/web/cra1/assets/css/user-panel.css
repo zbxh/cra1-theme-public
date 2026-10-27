@@ -1,0 +1,399 @@
+/* Generated from public/cra1-shared/src. Edit the source and rebuild. */
+/* Only opt-in cui-* components are styled. Existing system/plugin elements keep their styles. */
+:root {
+  --cui-brand: var(--primary, var(--brand, #1677ff));
+  --cui-brand-hover: var(--brand-hover, #4096ff);
+  --cui-ink: var(--foreground, var(--ink, #1d2129));
+  --cui-body: var(--body, #4e5969);
+  --cui-muted: var(--muted-foreground, #86909c);
+  --cui-line: var(--border, var(--line, #e5e8ed));
+  --cui-surface: var(--surface, #fff);
+  --cui-accent: var(--accent, var(--surface-alt, #f2f3f5));
+  --cui-danger: var(--destructive, var(--danger, #e5484d));
+  --cui-font: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+}
+html[data-cra1-theme="website"], html[data-theme="cra1"] {
+  --cui-brand: var(--brand, #1769e0); --cui-brand-hover: var(--brand-hover, #0f56be);
+  --cui-ink: var(--ink, #162033); --cui-body: var(--body, #536176); --cui-muted: var(--muted, #7d8999);
+  --cui-line: var(--line, #dce3ec); --cui-accent: var(--surface-alt, #f4f7fb); --cui-danger: var(--danger, #b42318);
+}
+.cui-button, .cui-input, .cui-card, .cui-toast, .cui-toast * { box-sizing: border-box; }
+.cui-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0;
+  height: 40px; padding: 0 16px; border: 1px solid transparent; border-radius: 8px;
+  background-color: var(--cui-brand); color: #fff; font: 500 14px/1.5 var(--cui-font);
+  white-space: nowrap; text-decoration: none; cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+.cui-button:hover { background-color: var(--cui-brand-hover); }
+.cui-button:active { transform: scale(.97); }
+.cui-button:focus-visible, .cui-checkbox:focus-visible { outline: 2px solid var(--cui-brand); outline-offset: 2px; }
+.cui-button:disabled { pointer-events: none; opacity: .5; }
+.cui-button svg { width: 16px; height: 16px; flex-shrink: 0; pointer-events: none; }
+.cui-button--outline { border-color: var(--cui-line); background-color: var(--cui-surface); color: var(--cui-ink); }
+.cui-button--outline:hover { background-color: var(--cui-accent); border-color: var(--cui-brand); }
+.cui-button--ghost { background-color: transparent; color: var(--cui-body); }
+.cui-button--ghost:hover { background-color: var(--cui-accent); color: var(--cui-ink); }
+.cui-button--danger { background-color: var(--cui-danger); }
+.cui-button--danger:hover { background-color: var(--cui-danger); filter: brightness(.95); }
+.cui-button--link { height: auto; padding: 0; background-color: transparent; color: var(--cui-brand); text-underline-offset: 4px; }
+.cui-button--link:hover { background-color: transparent; text-decoration: underline; }
+.cui-button--sm { height: 32px; padding: 0 12px; border-radius: 6px; font-size: 13px; }
+.cui-button--sm svg { width: 14px; height: 14px; }
+.cui-button--lg { height: 44px; padding: 0 24px; }
+.cui-button--icon { width: 36px; height: 36px; padding: 0; }
+.cui-input {
+  display: flex; width: 100%; min-width: 0; height: 40px; padding: 8px 12px;
+  border: 1px solid var(--cui-line); border-radius: 8px; background-color: var(--cui-surface); color: var(--cui-ink);
+  font: 400 14px/1.5 var(--cui-font); transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.cui-input::placeholder { color: var(--cui-muted); }
+.cui-input:focus-visible { outline: none; border-color: var(--cui-brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cui-brand) 15%, transparent); }
+.cui-input:disabled { cursor: not-allowed; background-color: var(--cui-accent); color: var(--cui-muted); }
+.cui-input[aria-invalid="true"] { border-color: var(--cui-danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cui-danger) 15%, transparent); }
+.cui-textarea { height: auto; min-height: 100px; resize: vertical; line-height: 24px; padding-top: 10px; padding-bottom: 10px; }
+.cui-select { cursor: pointer; padding-right: 32px; }
+.cui-label { display: block; margin-bottom: 6px; color: var(--cui-body); font: 500 13px/1.5 var(--cui-font); }
+.cui-checkbox { width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; accent-color: var(--cui-brand); }
+.cui-card { border: 1px solid var(--cui-line); border-radius: 8px; background-color: var(--cui-surface); box-shadow: 0 1px 2px rgb(0 0 0 / 4%); }
+.cui-card__header { display: flex; flex-direction: column; gap: 6px; padding: 20px; }
+.cui-card__title { color: var(--cui-ink); font: 600 14px/1.5 var(--cui-font); }
+.cui-card__description { color: var(--cui-muted); font: 400 12px/20px var(--cui-font); }
+.cui-card__content, .cui-card__footer { padding: 0 20px 20px; }
+.cui-card__footer { display: flex; align-items: center; }
+.cui-toasts { position: fixed; z-index: 200; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; width: min(92vw, 352px); pointer-events: none; }
+.cui-toast { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--cui-line); border-radius: 8px; background: var(--cui-surface); color: var(--cui-ink); box-shadow: 0 2px 5px rgb(22 32 51 / 6%), 0 12px 28px rgb(22 32 51 / 12%); pointer-events: auto; animation: cui-toast-in 200ms ease-out; }
+.cui-toast__icon { width: 16px; height: 16px; flex: 0 0 16px; margin-top: 2px; color: var(--cui-brand); }
+.cui-toast__icon svg, .cui-toast__close svg { width: 100%; height: 100%; }
+.cui-toast--success .cui-toast__icon { color: #07835e; }
+.cui-toast--error .cui-toast__icon { color: var(--cui-danger); }
+.cui-toast--warning .cui-toast__icon { color: #b45309; }
+.cui-toast__text { min-width: 0; flex: 1; margin: 0; padding: 0; overflow-wrap: anywhere; font: 400 13px/20px var(--cui-font); }
+.cui-toast__close { display: flex; align-items: center; justify-content: center; flex: 0 0 24px; width: 24px; height: 24px; padding: 4px; border: 0; border-radius: 4px; color: var(--cui-muted); background: transparent; cursor: pointer; }
+.cui-toast__close:hover { color: var(--cui-ink); background: var(--cui-accent); }
+.cui-toast__close:focus-visible { outline: 2px solid var(--cui-brand); outline-offset: 2px; }
+@keyframes cui-toast-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 767px) {
+  .cui-button:not(.cui-button--link) { min-height: 44px; }
+  .cui-button--icon { min-width: 44px; }
+  .cui-input { min-height: 44px; font-size: 16px; }
+  .cui-toasts { top: 12px; right: 12px; width: calc(100vw - 24px); }
+  .cui-toast__close { width: 44px; height: 44px; flex-basis: 44px; padding: 14px; margin: -10px -10px -10px 0; }
+}
+@media (prefers-reduced-motion: reduce) { .cui-button, .cui-input { transition: none; } .cui-toast { animation: none; } }
+/* Explicit visibility wins over display:flex, including plugin pages without a reset. */
+[data-cra1-component="header-search"] [hidden] { display: none !important; }
+/* ==========================================================================
+   user-panel.css — 顶栏用户块 + 用户下拉面板（官网与会员中心共用唯一一套）
+   --------------------------------------------------------------------------
+   官网（public/web/cra1）与会员中心（public/clientarea/template/pc/cra1）
+   的右上角用户头像与下拉面板共用本文件：类名、结构、样式单点维护。
+   头像生成算法同样共用（/web/cra1/assets/js/avatar.js）。
+
+   令牌桥接：两站令牌名不同（官网 --brand/--ink/--line/--surface-alt，
+   会员中心 --primary/--foreground/--border/--muted），且 --muted 两站含义
+   相反（官网=次要文字色，会员中心=浅灰底），因此每个桥接变量都按
+   「官网优先、会员中心兜底」的固定链取值，两边无需各自覆盖。
+   ========================================================================== */
+:root {
+  --up-brand: var(--cui-brand, #1677ff);
+  --up-ink: var(--cui-ink, #1d2129);
+  --up-muted-txt: var(--cui-muted, #86909c);
+  --up-line: var(--cui-line, #e5e8ed);
+  --up-tag-bg: var(--cui-accent, #f2f3f5);
+  --up-accent-bg: var(--cui-accent, #f2f3f5);
+}
+
+/* --------------------------------------------------------------------------
+   顶栏用户块 wrapper
+   注意：wrapper 必须 inline-flex 且锁高，否则内部块级子元素会把顶栏撑高
+   -------------------------------------------------------------------------- */
+.cra1-account--header {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 32px;
+}
+
+.cra1-account__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 3px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--up-ink);
+  cursor: pointer;
+  transition: box-shadow 150ms ease, background-color 150ms ease;
+}
+
+/* 触发块头像：30px 圆形 + 细边框。
+   背景由 avatar.js 注入的生成头像（background-image）铺满；
+   无生成头像时回退为品牌底色 + 首字母。 */
+.cra1-account__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 600;
+  color: #fff;
+  background-color: var(--up-brand);
+  border: 1px solid rgba(220, 227, 236, 0.9);
+  border-color: color-mix(in srgb, var(--up-line) 90%, transparent);
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+/* 悬停门控：仅精确指针设备，防触屏粘滞 */
+@media (hover: hover) and (pointer: fine) {
+  .cra1-account__trigger:hover {
+    background: var(--up-accent-bg);
+  }
+}
+
+/* 键盘焦点可见 */
+.cra1-account__trigger:focus-visible,
+.cra1-upanel__tag:focus-visible,
+.cra1-upanel__mini-btn:focus-visible,
+.cra1-upanel__logout:focus-visible,
+.cra1-upanel__head:focus-visible,
+.cra1-upanel__link:focus-visible {
+  outline: 2px solid var(--up-brand);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   下拉面板（阿里云式三段：账号块 / 安全中心 / 财务信息）
+   挂在触发块下方右侧（绝对定位 + 高层级）；入场 pop（origin 指向触发块）
+   -------------------------------------------------------------------------- */
+.cra1-account--header .cra1-account__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 70;
+}
+
+.cra1-account__menu--rich {
+  width: 300px;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--up-line);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 12px 28px rgba(29, 33, 41, 0.12);
+  transform-origin: top right;
+  animation: cra1-upanel-pop 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes cra1-upanel-pop {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.cra1-upanel__section {
+  position: relative;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--up-line);
+}
+.cra1-upanel__section:last-child { border-bottom: 0; }
+
+/* 账号块 ------------------------------------------------------------------ */
+.cra1-upanel__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 84px;   /* 给右上角退出按钮留位 */
+}
+.cra1-upanel__avatar {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  font-size: 17px;
+}
+.cra1-upanel__id {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+.cra1-upanel__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--up-ink);
+}
+/* 名称旁「账户信息」入口（小铅笔） */
+.cra1-upanel__mini-btn {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  padding: 2px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--up-muted-txt);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.cra1-upanel__mini-btn:hover { background: var(--up-accent-bg); color: var(--up-brand); }
+.cra1-upanel__sub {
+  font-size: 12px;
+  color: var(--up-muted-txt);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cra1-upanel__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.cra1-upanel__tag {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--up-line);
+  border-radius: 999px;
+  background: var(--up-tag-bg);
+  color: var(--up-muted-txt);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.cra1-upanel__tag:hover {
+  background: color-mix(in srgb, var(--up-brand) 8%, transparent);
+  background: rgba(23, 105, 224, 0.08);
+  color: var(--up-brand);
+  border-color: color-mix(in srgb, var(--up-brand) 30%, transparent);
+}
+
+/* 「控制台」按钮：彩色雾状动态背景（多层柔光球流动，胶囊裁切） */
+.cra1-upanel__tag--console {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+  color: #fff;
+  font-weight: 500;
+  isolation: isolate;
+}
+.cra1-upanel__tag--console:hover { color: #fff; border-color: transparent; background: transparent; }
+.cra1-upanel__tag-fog {
+  position: absolute;
+  inset: -60%;
+  z-index: -1;
+  filter: blur(6px) saturate(1.3);
+  /* 五层柔光球：品牌蓝 / 耀金 / 靛蓝 / 芭比粉 / 青（顶层底色压暗保白字对比） */
+  background:
+    radial-gradient(38% 56% at 22% 30%, rgba(23, 119, 255, 0.95) 0%, transparent 70%),
+    radial-gradient(30% 46% at 74% 22%, rgba(255, 185, 35, 0.92) 0%, transparent 68%),
+    radial-gradient(36% 54% at 80% 72%, rgba(99, 102, 241, 0.9) 0%, transparent 70%),
+    radial-gradient(28% 44% at 42% 84%, rgba(244, 92, 166, 0.88) 0%, transparent 66%),
+    radial-gradient(30% 48% at 60% 52%, rgba(6, 182, 212, 0.85) 0%, transparent 70%),
+    linear-gradient(120deg, #1e40af 0%, #312e81 50%, #0e7490 100%);
+  background-size: 200% 200%;
+  animation: cra1-upanel-fog 9s ease-in-out infinite;
+}
+.cra1-upanel__tag-txt { position: relative; z-index: 1; }
+@keyframes cra1-upanel-fog {
+  0%, 100% { background-position: 0% 50%, 100% 0%, 50% 100%, 20% 90%, 50% 0%; }
+  33% { background-position: 60% 30%, 30% 70%, 80% 40%, 0% 40%, 100% 50%; }
+  66% { background-position: 20% 80%, 70% 20%, 20% 60%, 90% 20%, 0% 60%; }
+}
+
+/* 退出登录：绝对定位在账号块右上角 */
+.cra1-upanel__logout {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--up-line);
+  border-radius: 4px;
+  background: var(--background, #fff);
+  color: var(--up-ink);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.cra1-upanel__logout:hover {
+  background: rgba(180, 35, 24, 0.06);
+  border-color: rgba(180, 35, 24, 0.35);
+  color: #b42318;
+}
+
+/* 段落头（带图标 + 箭头，整行可点） */
+.cra1-upanel__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  padding: 2px 0 10px;
+  background: transparent;
+  color: var(--up-ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+.cra1-upanel__head svg { color: var(--up-muted-txt); }
+.cra1-upanel__head .cra1-upanel__chev { margin-left: auto; color: var(--up-muted-txt); }
+.cra1-upanel__head:hover { color: var(--up-brand); }
+
+/* 链接行（v2.40 全站约定：hover 变色、不出下划线） */
+.cra1-upanel__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+.cra1-upanel__link {
+  border: 0;
+  padding: 2px 0;
+  background: transparent;
+  color: var(--up-brand);
+  font-size: 13px;
+  cursor: pointer;
+  transition: opacity 150ms ease, color 150ms ease;
+}
+.cra1-upanel__link:hover { opacity: 0.75; color: var(--up-brand); }
+
+/* 键值行（可用余额 / 我的订单） */
+.cra1-upanel__kv {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  font-size: 13px;
+}
+.cra1-upanel__kv-label { color: var(--up-muted-txt); }
+.cra1-upanel__kv-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--up-ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.cra1-upanel__kv-value .cra1-upanel__link { font-weight: 500; }
+
+/* 减少动态：雾效与面板入场全部停住 */
+@media (prefers-reduced-motion: reduce) {
+  .cra1-account__trigger { transition-duration: 0.001ms; }
+  .cra1-account__menu--rich { animation: none; }
+  .cra1-upanel__tag-fog { animation: none; }
+}

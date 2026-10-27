@@ -1,0 +1,24 @@
+<section class="content-list-section container-page py-12 md:py-16" data-reveal>
+            <div>
+                <div x-ref="listBody" class="article-list compact-article-list" x-cloak x-show="!loading">
+                    <template x-for="item in items" :key="item.id">
+                        <article data-enter-item class="article-card cui-card">
+                            <a :href="'/news-details.html?id=' + item.id" class="group block p-6 md:p-7">
+                                <time class="text-xs text-muted" x-text="timeText(item.create_time)"></time>
+                                <h2 class="mt-4 line-clamp-2 text-lg font-semibold text-ink group-hover:text-primary" x-text="item.title"></h2>
+                                <span class="card-arrow mt-6 inline-block text-sm text-primary">{if ( cra1_content_explicit($data.cra1, 'core_listing_copy.news_read_more') || (( isset($data.cra1.core_listing_copy['news_read_more']) && $data.cra1.core_listing_copy['news_read_more'] )) ) }{$data.cra1.core_listing_copy['news_read_more']}{else /}阅读全文 →{/if}</span>
+                            </a>
+                        </article>
+                    </template>
+                </div>
+                <div x-cloak x-show="!loading && !loadFailed && items.length === 0" class="empty-state content-empty text-center"><svg class="empty-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 4h14v16H5ZM8 8h8M8 12h8m-8 4h5"/></svg><p>{if ( cra1_content_explicit($data.cra1, 'core_listing_copy.txt2') || (( isset($data.cra1.core_listing_copy['txt2']) && $data.cra1.core_listing_copy['txt2'] )) ) }{$data.cra1.core_listing_copy['txt2']}{else /}该分类下暂无新闻{/if}</p><a class="empty-link" href="/announce.html">查看最新公告 →</a></div>
+                <div x-cloak x-show="loading" class="article-list compact-article-list" aria-live="polite" aria-label="{if ( cra1_content_explicit($data.cra1, 'core_listing_copy.loading_label') || (( isset($data.cra1.core_listing_copy['loading_label']) && $data.cra1.core_listing_copy['loading_label'] )) ) }{$data.cra1.core_listing_copy['loading_label']}{else /}分类新闻加载中{/if}">
+                    <div class="article-card glass-card p-7 cui-card"><div class="skeleton-line h-3 w-20"></div><div class="skeleton-line mt-5 h-6 w-3/4"></div></div>
+                    <div class="article-card glass-card p-7 cui-card"><div class="skeleton-line h-3 w-20"></div><div class="skeleton-line mt-5 h-6 w-2/3"></div></div>
+                </div>
+                <div x-cloak x-show="!loading && loadFailed" class="empty-state content-empty text-center" role="status"><p>暂时无法读取内容，请稍后重试</p><button type="button" class="btn btn-sm btn-outline cui-button cui-button--outline cui-button--sm mt-4" @click="load()">重新加载</button></div>
+                <nav class="pagination-bar mt-8 flex items-center justify-center gap-4" x-cloak x-show="!loading && total > limit" aria-label="{if ( cra1_content_explicit($data.cra1, 'core_listing_copy.txt3') || (( isset($data.cra1.core_listing_copy['txt3']) && $data.cra1.core_listing_copy['txt3'] )) ) }{$data.cra1.core_listing_copy['txt3']}{else /}分类新闻分页{/if}">
+                    <button type="button" class="btn btn-sm btn-outline btn-primary cui-button cui-button--outline cui-button--sm" :disabled="page <= 1" @click="prev()">{if ( cra1_content_explicit($data.cra1, 'core_listing_copy.txt6') || (( isset($data.cra1.core_listing_copy['txt6']) && $data.cra1.core_listing_copy['txt6'] )) ) }{$data.cra1.core_listing_copy['txt6']}{else /}上一页{/if}<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></button><span class="text-sm text-muted">第 <span x-text="page"></span> 页</span><button type="button" class="btn btn-sm btn-outline btn-primary cui-button cui-button--outline cui-button--sm" :disabled="page * limit >= total" @click="next()">{if ( cra1_content_explicit($data.cra1, 'core_listing_copy.txt7') || (( isset($data.cra1.core_listing_copy['txt7']) && $data.cra1.core_listing_copy['txt7'] )) ) }{$data.cra1.core_listing_copy['txt7']}{else /}下一页{/if}<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></button>
+                </nav>
+            </div>
+        </section>

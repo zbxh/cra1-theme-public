@@ -1,0 +1,84 @@
+/* Generated from public/cra1-shared/src. Edit the source and rebuild. */
+/* 顶栏搜索：桌面在操作区展开长输入框，手机在顶栏下方展开整行。 */
+.cra1-header-search { position: relative; display: flex; align-items: center; min-width: 0; }
+.cra1-header-search__panel { position: relative; width: clamp(280px, 32vw, 460px); }
+.cra1-header-search__form {
+  display: flex; align-items: center; gap: 4px; width: 100%; height: 34px;
+  padding: 0 5px; border: 1px solid var(--primary, var(--brand, #1769e0)); border-radius: var(--radius, 6px);
+  background: var(--background, var(--surface, #fff)); box-shadow: 0 0 0 2px rgba(23, 105, 224, 0.08);
+}
+.cra1-header-search__input {
+  flex: 1 1 auto; min-width: 0; width: 0; height: 100%; padding: 0 4px;
+  border: 0; outline: 0; box-shadow: none; background: transparent; color: var(--foreground, var(--ink, #162033)); font-size: 13px;
+}
+.cra1-header-search #cra1-site-search:focus-visible { outline: 0; box-shadow: none; }
+.cra1-header-search__input::-webkit-search-cancel-button { display: none; }
+.cra1-header-search__input::placeholder { color: var(--muted-foreground, var(--muted, #7d8999)); }
+.cra1-header-search__search-btn, .cra1-header-search__small-btn, .cra1-header-search__close {
+  display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;
+  width: 28px; height: 28px; padding: 0; border: 0; border-radius: calc(var(--radius, 6px) - 4px);
+  background: transparent; color: var(--muted-foreground, var(--muted, #7d8999)); cursor: pointer;
+}
+.cra1-header-search__search-btn svg, .cra1-header-search__small-btn svg { width: 16px; height: 16px; }
+.cra1-header-search__close { width: 30px; font-size: 10px; }
+.cra1-header-search__close-label { display: none; }
+.cra1-header-search__results {
+  position: absolute; top: calc(100% + 8px); right: 0; width: 100%;
+  max-height: min(540px, calc(100dvh - var(--header-h, 64px) - 32px)); overflow-y: auto;
+  overscroll-behavior: contain; padding: 8px; border: 1px solid var(--border, var(--line, #dce3ec));
+  border-radius: var(--radius, 6px); background: var(--background, var(--surface, #fff)); box-shadow: 0 12px 32px rgba(15, 23, 42, 0.13);
+}
+.cra1-header-search__status { margin: 0; padding: 8px 10px; color: var(--muted-foreground, var(--muted, #7d8999)); font-size: 12px; line-height: 1.6; }
+.cra1-header-search__group + .cra1-header-search__group { margin-top: 8px; border-top: 1px solid var(--border, var(--line, #dce3ec)); padding-top: 6px; }
+.cra1-header-search__group-title { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; margin: 0; padding: 5px 10px; color: var(--muted-foreground, var(--muted, #7d8999)); font-size: 11px; font-weight: 600; }
+.cra1-header-search__group-title span { font-weight: 400; }
+.cra1-header-search__group-title .cra1-header-search__group-label { font-weight: 600; }
+.cra1-header-search__item { display: flex; flex-direction: column; gap: 3px; padding: 9px 10px; border-radius: calc(var(--radius, 6px) - 2px); color: var(--foreground, var(--ink, #162033)); text-decoration: none; }
+.cra1-header-search__item.is-active, .cra1-header-search__item:hover, .cra1-header-search__item:focus-visible { background: var(--accent, var(--surface-alt, #f4f7fb)); color: var(--primary, var(--brand, #1769e0)); }
+.cra1-header-search__item-title { font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.cra1-header-search__item-description { color: var(--muted-foreground, var(--muted, #7d8999)); font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+.cra1-header-search__error { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; color: var(--muted-foreground, var(--muted, #7d8999)); font-size: 12px; }
+.cra1-header-search__error button { border: 0; background: transparent; color: var(--primary, var(--brand, #1769e0)); cursor: pointer; }
+.cra1-header-search button:focus-visible { outline: 2px solid var(--sidebar-ring, var(--brand, #1769e0)); outline-offset: 1px; }
+@media (min-width: 768px) {
+  .cra1-header-search.is-open > .cra1-header__icon-btn { display: none; }
+}
+@media (max-width: 1100px) {
+  .cra1-header.is-search-open .cra1-breadcrumb { display: none; }
+}
+@media (max-width: 767px) {
+  .cra1-header-search__panel { position: fixed; top: calc(var(--header-h, 64px) + 8px); left: 12px; right: 12px; width: auto; z-index: 130; }
+  .cra1-header-search.is-open > .cra1-header__icon-btn { color: var(--primary, var(--brand, #1769e0)); background: var(--accent, var(--surface-alt, #f4f7fb)); }
+  .cra1-header-search__form { height: 44px; }
+  .cra1-header-search__input { font-size: 16px; }
+  .cra1-header-search__search-btn, .cra1-header-search__small-btn, .cra1-header-search__close { width: 36px; height: 40px; }
+  .cra1-header-search__close span { display: none; }
+  .cra1-header-search__close .cra1-header-search__close-label { display: inline; font-size: 12px; }
+  .cra1-header-search__results { max-height: calc(100dvh - var(--header-h, 64px) - 76px); }
+  .cra1-header-search__item { min-height: 44px; justify-content: center; }
+}
+
+.cra1-header-search > .cra1-header__icon-btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; padding: 0; border: 0; border-radius: 4px;
+  background: transparent; color: var(--foreground, var(--ink, #162033)); cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.cra1-header-search > .cra1-header__icon-btn svg { width: 16px; height: 16px; }
+.cra1-header-search > .cra1-header__icon-btn:hover { background: var(--accent, var(--surface-alt, #f4f7fb)); }
+.cra1-header-search [x-cloak] { display: none !important; }
+@media (max-width: 1599px) {
+  .cra1-site-header.is-search-open nav[aria-label="主导航"] { display: none; }
+}
+@media (max-width: 1100px) {
+  .cra1-site-header.is-search-open .site-header-slogan { display: none; }
+}
+@media (max-width: 767px) {
+  .cra1-header-search > .cra1-header__icon-btn { width: 44px; height: 44px; }
+  .cra1-site-header .nav-menu-button { width: 44px; height: 44px; justify-content: center; }
+}
+
+/* Shared primitives adapt to the compact header without adding an inner input border. */
+.cra1-header-search .cui-input { min-height: 0; }
+.cra1-header-search .cui-input:focus-visible { border: 0; outline: 0; box-shadow: none; }
+.cra1-header-search .cui-button { min-height: 0; min-width: 0; }

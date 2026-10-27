@@ -1,0 +1,84 @@
+{
+  "format": 1,
+  "commercial_release_accepted": false,
+  "official_upgrade_completed": true,
+  "production_files_or_database_used": false,
+  "system_install": {
+    "version": "10.7.2",
+    "official_checksum_verified": true,
+    "sha256": "5bb017523087c492e044b164c452e2b882a472a2a68e0381895c9315fc62510e",
+    "upstream_md5": "c6ef804620e7ca1cc8a8153a26a520f3"
+  },
+  "system_upgrade": {
+    "from": "10.7.2",
+    "to": "10.7.4",
+    "official_upgrader": true,
+    "http_status": 200,
+    "business_status": 200,
+    "sha256": "f3009d7add2cf58cc9f5ffb1ad76a4d5e234224a0a5aa5439160c6f5c8339548",
+    "official_md5": "925bb0d2aa3ee79eaf513ab15023219e",
+    "records_sha256": {
+      "install": "b9c2dbf322a81334a99c8f57aa5ed0e2ea0495eed4c1c82d1bdda012d03e416e",
+      "upgrade": "45d45a9167b8f61cb775325eba9621d58a392138abecac92b661bf39a468319c",
+      "original_files": "2a192c3c797f410089aaf1ae85e030a2d87909ad1f0b30fa2540680395b3a73b",
+      "native_pipeline": "342dc2988a0628c0ff245908713d69136bb3f77bca7418c6f05ef5687a1dc91c",
+      "native_module": "924b46e0cfa459c397bd3332511772ce72e5a581ebb6cbb2b35830b58358a2d6",
+      "native_admin_bridge": "a35349d7eb97bf736f07e53db8aab9f91924386bc0988d01f8656301df0c891a",
+      "native_installer_transaction": "2b4bbcb4c69b4625da4cc218e8daa65ad11eeca1abce4c417cdd6dde3b5508fe"
+    }
+  },
+  "modules": {
+    "MfCloud": "4.3.0",
+    "MfDcim": "4.2.1",
+    "IdcsmartCommon": "4.3.1"
+  },
+  "native_pipeline": {
+    "status": "passed",
+    "assertions": 15,
+    "scope": "Real native JWT/session, invalid login, credential challenge before business action, 15 minute server grant, ordinary account redaction, scoped product list",
+    "native_superadmin_bridge_checks": 4
+  },
+  "native_module": {
+    "status": "passed",
+    "checks": 19,
+    "provider_network": "Simulated responses only; no cloud supplier write or live server operation",
+    "scope": "Original module parent methods and ORM transactions, failed disk ownership/remote binding protections, exact flow reset time"
+  },
+  "file_provenance": {
+    "declared_native_dependencies": 315,
+    "same_as_observed_site": 307,
+    "different_from_observed_site": 8,
+    "verified_against_original_upgrade": 315
+  },
+  "remaining_acceptance": [
+    "Asset redistribution evidence for 153 files; current candidate remains blocked",
+    "Additional official module business and upgrade combinations; legacy native announcement plugin view is unsupported by the original resolver",
+    "Complete accepted-manifest HTTPS installer/update lifecycle; transaction seam is verified but public candidates remain blocked"
+  ],
+  "support_claim_created": false,
+  "native_protected_files": {
+    "unchanged_after_theme_fixture": true,
+    "comparison_sha256": "8a7857bfc0221c7b2662bf7e50e79c6bfe251157021614fcd2212be146041972"
+  },
+  "https_installer": {
+    "status": "passed",
+    "checks": 13,
+    "server": "Independent Nginx TLS and PHP 7.4 FastCGI, loopback only",
+    "scope": "Native administrator, CSRF, Secure session, all 314 original dependencies, read-only blocked-candidate preflight and six private paths",
+    "record_sha256": "1e82e8a2a67562e6d07eaddba9ee35c55d905e3bae94528c36b427d5b7aee5b2",
+    "private_path_self_test": true,
+    "production_services_changed": false
+  },
+  "native_installer_transaction": {
+    "status": "passed",
+    "checks": 20,
+    "native_validator_and_model": true,
+    "scope": "Transaction seam on original V10: administrator entry rename, native activation, failure restoration, repeat-install lock and plaintext exclusion; explicit test preflight only",
+    "public_candidate_gates_unchanged": true
+  },
+  "business_acceptance": {
+    "record": "business-acceptance-evidence.json",
+    "record_sha256": "96bff0decdf64c6fb105cda616368bc676daaebbf8369e8c1d6e6c5b7fdb4884",
+    "support_claim_created": false
+  }
+}

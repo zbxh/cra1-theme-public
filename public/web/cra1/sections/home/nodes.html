@@ -1,0 +1,128 @@
+    {if ( isset($data.cra1.show_nodes) && $data.cra1.show_nodes == 1 && isset($data.cra1.nodes) && count($data.cra1.nodes) > 0 ) }
+    <section class="relative overflow-hidden bg-night py-16 md:py-24" x-data="nodesMap" @keydown.escape.window="openNode = null; regionOpen = false">
+        <div class="container-page">
+            <div class="grid items-center gap-10 lg:grid-cols-[20rem_minmax(0,1fr)] lg:gap-14">
+                <div data-reveal>
+                    <h2 class="section-title text-white">{$data.cra1.nodes_title}</h2>
+                    {if ( cra1_content_explicit($data.cra1, 'nodes_desc') || (( isset($data.cra1.nodes_desc) && $data.cra1.nodes_desc )) ) }
+                    <p class="mt-3 text-sm leading-7 text-white/60">{$data.cra1.nodes_desc}</p>
+                    {/if}
+                    <!-- 三项统计：后台可覆盖数值，留空则按节点行自动汇总 -->
+                    <dl class="mt-6 grid max-w-sm grid-cols-3 gap-4" data-reveal>
+                        {foreach $data.cra1.nodes_stat as $st}
+                        <div>
+                            <dd class="text-2xl font-semibold tabular-nums text-white">{$st.value}</dd>
+                            <dt class="mt-1 text-xs text-white/55">{$st.label}</dt>
+                        </div>
+                        {/foreach}
+                    </dl>
+                    <div class="mt-6">
+                        {if ( cra1_content_value($data.cra1, 'nodes_link', '/contact.html') != '' ) }<a href="{:cra1_content_value($data.cra1, 'nodes_link', '/contact.html')}" class="text-sm font-medium text-night-brand transition-colors duration-150 hover:text-white">{:cra1_content_value($data.cra1, 'nodes_more_text', '咨询节点接入')} →</a>{/if}
+                    </div>
+                </div>
+                <div class="node-map-column"><div class="node-map relative" x-ref="map" data-reveal><svg class="node-leaders" x-ref="leaders" aria-hidden="true"></svg>
+                    <picture>
+                        <source srcset="/web/cra1/assets/img/world-dots.webp" type="image/webp">
+                        <img src="/web/cra1/assets/img/world-dots.png" alt="{if ( cra1_content_explicit($data.cra1, 'nodes_copy.txt1') || (( isset($data.cra1.nodes_copy['txt1']) && $data.cra1.nodes_copy['txt1'] )) ) }{$data.cra1.nodes_copy['txt1']}{else /}全球服务地区分布点阵地图{/if}" class="block h-auto w-full" width="1800" height="900" loading="lazy" decoding="async">
+                    </picture>
+                    {foreach $data.cra1.nodes as $ni => $n}
+                    <!-- 地区节点：悬停/聚焦展示详情面板（后台「节点列表」的详情列）。
+                         用 <button> 而非 <div>：键盘可 Tab 到、可聚焦，读屏能读出 aria-label。
+                         面板由 Alpine 的 openNode 控制，同时用 CSS :hover/:focus-within 兜底
+                         （JS 未就绪时鼠标悬停依然可用）。 -->
+                    <!-- :class 的 .node-active 与面板同源（都看 openNode）：
+                         它把该节点整体提到兄弟之上，否则面板会被 DOM 靠后的节点压住。 -->
+                    <button type="button"
+                            class="node-dot"
+                            :class="openNode === {$ni} || selectedNode === {$ni} ? 'node-active' : ''"
+                            style="left:{$n.left}%;top:{$n.top}%"
+                            @click="selectNode({$ni})" :tabindex="compact ? -1 : 0" data-node-index="{$ni}" data-node-x="{$n.left}" data-node-y="{$n.top}"
+                            @pointerenter="hoverNode({$ni}, $event)"
+                            @pointerleave="openNode = null"
+                            @focus="selectNode({$ni})"
+                            @blur="openNode = null"
+                            :aria-expanded="openNode === {$ni} ? 'true' : 'false'"
+                            aria-label="{$n.name}{if $n.region} · {$n.region}{/if}{if $n.detail}：{$n.detail}{/if}">
+                        <span class="node-ping"></span>
+                        <span class="node-core"></span>
+                        <span class="node-name{if ( $ni % 2 == 1 ) } node-name-above{/if}">{$n.name}</span>
+                        {if $n.summary}
+                        <span class="x-fade-down node-pop" x-show="openNode === {$ni}" x-cloak
+x-transition:enter="x-enter-active" x-transition:enter-start="x-enter-start" x-transition:enter-end="x-enter-end"
+                              x-transition:leave="x-leave-active" x-transition:leave-start="x-leave-start" x-transition:leave-end="x-leave-end">
+                            <span class="node-pop__title">{$n.name}{if $n.region }<span class="node-pop__region">{$n.region}</span>{/if}</span>
+                            {if $n.detail}<span class="node-pop__detail">{$n.detail}</span>{/if}
+                            {if $n.nodes !== null || $n.racks !== null}
+                            <span class="node-pop__stats">
+                                {if $n.nodes !== null}<span class="node-pop__stat"><b>{$n.nodes}</b>{:cra1_content_value($data.cra1, 'nodes_unit_node', '节点')}</span>{/if}
+                                {if $n.racks !== null}<span class="node-pop__stat"><b>{$n.racks}</b>{:cra1_content_value($data.cra1, 'nodes_unit_rack', '机房')}</span>{/if}
+                            </span>
+                            {/if}
+                            <!-- 线路标签：优先用该地区自己的（地区列表第 7 段起）；
+                                 未填时回退到「面板文案」里配置的全局线路标签 -->
+                            {if ( cra1_content_explicit($data.cra1, 'nodes_lines') || (( count($n.lines) > 0 || ( isset($data.cra1.nodes_lines) && count($data.cra1.nodes_lines) > 0 ) )) ) }
+                            <span class="node-pop__lines">
+                                {if count($n.lines) > 0}
+                                {foreach $n.lines as $ln}
+                                <span class="node-pop__line">{$ln}</span>
+                                {/foreach}
+                                {else /}
+                                {foreach $data.cra1.nodes_lines as $ln}
+                                <span class="node-pop__line">{$ln}</span>
+                                {/foreach}
+                                {/if}
+                            </span>
+                            {/if}
+                            <span class="node-pop__arrow" aria-hidden="true"></span>
+                        </span>
+                        {/if}
+                    </button>
+                    {/foreach}
+                </div>
+                <div class="node-region-browser">
+                    <label id="node-region-label" class="node-region-label" for="node-region" :for="regionReady ? 'node-region-trigger' : 'node-region'">选择服务地区</label>
+                    <div class="node-region-select">
+                        <!-- Keep the native control available until the themed picker is ready. -->
+                        <select id="node-region" class="cui-input node-region-native" x-ref="regionNative" x-show="!regionReady" x-model.number="selectedNode" @change="selectNode(selectedNode)">
+                            {foreach $data.cra1.nodes as $ni => $n}<option value="{$ni}">{$n.name}{if $n.region} · {$n.region}{/if}</option>{/foreach}
+                        </select>
+                        <div class="node-region-custom" x-show="regionReady" x-cloak
+                             @click.outside="regionOpen = false" @keydown="regionKeydown($event)"
+                             @focusout="if (!$el.contains($event.relatedTarget)) regionOpen = false">
+                            <button id="node-region-trigger" type="button" class="node-region-trigger" x-ref="regionTrigger"
+                                    role="combobox" aria-haspopup="listbox" aria-controls="node-region-options" aria-labelledby="node-region-label node-region-value"
+                                    :aria-expanded="regionOpen ? 'true' : 'false'" :aria-activedescendant="regionOpen ? 'node-region-option-' + activeRegion : null"
+                                    :class="regionOpen ? 'is-open' : ''" @click="toggleRegions()">
+                                <span id="node-region-value" class="node-region-value" x-text="regionLabel()"></span>
+                                <svg class="node-region-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                            </button>
+                            <div id="node-region-options" class="node-region-menu" x-ref="regionMenu"
+                                 role="listbox" aria-labelledby="node-region-label" x-show="regionOpen" x-cloak
+                                 :class="regionAbove ? 'is-above' : ''" :style="{maxHeight: regionMaxHeight + 'px'}">
+                                {foreach $data.cra1.nodes as $ni => $n}
+                                <button id="node-region-option-{$ni}" type="button" class="node-region-option" role="option" tabindex="-1"
+                                        :aria-selected="selectedNode === {$ni} ? 'true' : 'false'"
+                                        :class="{'is-selected': selectedNode === {$ni}, 'is-active': activeRegion === {$ni}}"
+                                        @pointermove="activeRegion = {$ni}" @click="chooseRegion({$ni})">
+                                    <span class="node-region-option-label">{$n.name}{if $n.region}<span class="node-region-option-meta">{$n.region}</span>{/if}</span>
+                                    <svg class="node-region-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" :style="{visibility: selectedNode === {$ni} ? 'visible' : 'hidden'}" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+                                </button>
+                                {/foreach}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="node-region-panels" aria-live="polite">
+                        {foreach $data.cra1.nodes as $ni => $n}
+                        <div class="node-region-panel" {if $ni > 0}x-cloak{/if} x-show="selectedNode === {$ni}">
+                            <h3>{$n.name}{if $n.region}<span>{$n.region}</span>{/if}</h3>
+                            {if $n.detail}<p>{$n.detail}</p>{/if}
+                            {if $n.nodes !== null || $n.racks !== null}<div class="node-region-stats">{if $n.nodes !== null}<span><b>{$n.nodes}</b>{:cra1_content_value($data.cra1, 'nodes_unit_node', '节点')}</span>{/if}{if $n.racks !== null}<span><b>{$n.racks}</b>{:cra1_content_value($data.cra1, 'nodes_unit_rack', '机房')}</span>{/if}</div>{/if}
+                            <div class="node-region-lines">{if count($n.lines) > 0}{foreach $n.lines as $ln}<span>{$ln}</span>{/foreach}{else /}{foreach $data.cra1.nodes_lines as $ln}<span>{$ln}</span>{/foreach}{/if}</div>
+                        </div>
+                        {/foreach}
+                    </div>
+                </div></div>
+            </div>
+        </div>
+    </section>
+    {/if}

@@ -1,0 +1,75 @@
+/* 状态文字与滑块同处轨道内，不再使用设置弹窗或外层卡片。 */
+html[data-cra1-theme="member"] .server-renew-actions {
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; margin-top: 12px;
+}
+html[data-cra1-theme="member"] .server-renew-manual {
+  flex: 1 1 72px; min-height: var(--cui-height-control, 40px);
+}
+html[data-cra1-theme="member"] .server-auto-renew {
+  --ar-height: var(--cui-height-control, 40px);
+  flex: 0 1 220px; width: 220px; min-width: min(220px, 100%); max-width: 100%;
+  font: 500 13px/1 var(--cui-font); box-sizing: border-box;
+}
+html[data-cra1-theme="member"] .server-auto-renew .ar-switch {
+  display: block; width: 100%; padding: 0; margin: 0; border: 0;
+  border-radius: 999px; background: transparent; color: var(--cui-ink);
+  font: inherit; cursor: pointer;
+}
+html[data-cra1-theme="member"] .server-auto-renew .ar-track {
+  display: block; position: relative; width: 100%; height: var(--ar-height);
+  box-sizing: border-box; overflow: hidden; border: 1px solid var(--cui-control-edge);
+  border-radius: 999px; background: linear-gradient(180deg, var(--cui-surface), var(--cui-accent));
+  box-shadow: inset 0 1px 0 var(--cui-white), 0 2px 6px color-mix(in srgb, var(--cui-graphite) 12%, transparent);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+html[data-cra1-theme="member"] .server-auto-renew .ar-label {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  box-sizing: border-box; padding-left: calc(var(--ar-height) + 6px); padding-right: 12px;
+  white-space: nowrap; line-height: 1;
+}
+html[data-cra1-theme="member"] .server-auto-renew .ar-knob {
+  position: absolute; top: 3px; left: 3px; display: grid; place-items: center;
+  width: calc(var(--ar-height) - 8px); height: calc(var(--ar-height) - 8px); border-radius: 50%;
+  background: var(--cui-surface);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--cui-graphite) 12%, transparent), inset 0 1px 0 var(--cui-white);
+  transition: left 180ms ease;
+}
+html[data-cra1-theme="member"] .server-auto-renew .ar-switch[data-on="true"] { color: var(--cui-white); }
+html[data-cra1-theme="member"] .server-auto-renew .ar-switch[data-on="true"] .ar-track {
+  border-color: var(--cui-silver);
+  background: linear-gradient(165deg, var(--cui-silver), var(--cui-titanium));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--cui-white) 16%, transparent), 0 2px 7px color-mix(in srgb, var(--cui-graphite) 12%, transparent);
+}
+html[data-cra1-theme="member"] .server-auto-renew .ar-switch[data-on="true"] .ar-label {
+  padding-left: 12px; padding-right: calc(var(--ar-height) + 6px);
+}
+html[data-cra1-theme="member"] .server-auto-renew .ar-switch[data-on="true"] .ar-knob {
+  left: calc(100% - var(--ar-height) + 5px);
+  background: linear-gradient(145deg, var(--cui-champagne-light), var(--cui-champagne));
+}
+html[data-cra1-theme="member"] .server-auto-renew .ar-loader {
+  width: 16px; height: 16px; color: var(--cui-graphite); animation: auto-renew-spin 900ms linear infinite;
+}
+html[data-cra1-theme="member"] .server-auto-renew .ar-switch:focus-visible {
+  outline: 2px solid var(--cui-gold); outline-offset: 3px;
+}
+html[data-cra1-theme="member"] .server-auto-renew .ar-switch:disabled { cursor: not-allowed; }
+html[data-cra1-theme="member"] .server-auto-renew .ar-switch[aria-busy="true"] { cursor: wait; }
+html[data-cra1-theme="member"] .server-auto-renew .ar-error {
+  margin: 8px 0 0; color: var(--cui-danger); font: 400 12px/1.6 var(--cui-font); overflow-wrap: anywhere;
+}
+@keyframes auto-renew-spin { to { transform: rotate(360deg); } }
+@media (hover: hover) {
+  html[data-cra1-theme="member"] .server-auto-renew .ar-switch:not(:disabled):hover .ar-track {
+    border-color: var(--cui-gold);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--cui-white) 14%, transparent), 0 2px 8px color-mix(in srgb, var(--cui-champagne) 14%, transparent);
+  }
+}
+@media (max-width: 767px), (pointer: coarse) {
+  html[data-cra1-theme="member"] .server-auto-renew { --ar-height: 44px; }
+  html[data-cra1-theme="member"] .server-renew-manual { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-cra1-theme="member"] .server-auto-renew :is(.ar-track, .ar-knob) { transition: none; }
+  html[data-cra1-theme="member"] .server-auto-renew .ar-loader { animation: none; }
+}

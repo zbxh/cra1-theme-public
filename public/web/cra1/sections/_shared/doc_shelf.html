@@ -1,0 +1,35 @@
+{if ( isset($data.cra1.show_doc_shelf) && $data.cra1.show_doc_shelf == 1 ) }
+{if ( cra1_content_explicit($data.cra1, 'doc_shelf_rows') || (( isset($data.cra1.doc_shelf_rows) && count($data.cra1.doc_shelf_rows) > 0 )) ) }
+<!-- 布局 N：文档书架——按栏目分册的竖排卡片（书脊色块 + 篇目数），用于文档/资料类导览 -->
+<section class="relative overflow-hidden bg-gradient-to-b from-white to-surface-alt py-14 md:py-20">
+    <div class="container-page">
+        <div class="section-heading" data-reveal>
+            <div class="section-heading-copy">
+                <h2 class="section-title">{$data.cra1.doc_shelf_title}</h2>
+                {if ( cra1_content_explicit($data.cra1, 'doc_shelf_desc') || (( isset($data.cra1.doc_shelf_desc) && $data.cra1.doc_shelf_desc )) ) }
+                <p class="section-desc">{$data.cra1.doc_shelf_desc}</p>
+                {/if}
+            </div>
+            {if ( isset($data.cra1.doc_shelf_link) && $data.cra1.doc_shelf_link != '' ) }
+            {if ( cra1_content_value($data.cra1, 'doc_shelf_more_text', '进入文档中心') != '' ) }<a href="{$data.cra1.doc_shelf_link}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'doc_shelf_more_text', '进入文档中心')} →</a>{/if}
+            {/if}
+        </div>
+        <div class="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {foreach $data.cra1.doc_shelf_rows as $ds => $dsr}
+            {if $dsr['url']}<a href="{$dsr['url']}" class="cascade-item doc-card group flex min-w-0 gap-4 border border-line bg-white p-5 lift-card" style="--cascade-delay:{:($ds % 3) * 80 + intdiv($ds, 3) * 40}">{else /}<div class="cascade-item doc-card group flex min-w-0 gap-4 border border-line bg-white p-5" style="--cascade-delay:{:($ds % 3) * 80 + intdiv($ds, 3) * 40}">{/if}
+                <span class="h-full w-1 shrink-0 self-stretch bg-brand/25 transition-colors duration-150 group-hover:bg-brand" aria-hidden="true"></span>
+                <span class="min-w-0 flex-1">
+                    <span class="block text-sm font-semibold text-ink">{$dsr['icon_tile']|default=''|raw}{$dsr['name']}</span>
+                    {if $dsr['desc']}<span class="mt-2 block text-xs leading-5 text-body">{$dsr['desc']}</span>{/if}
+                    <span class="mt-3 flex items-center justify-between gap-2 text-[11px] text-muted">
+                        <span>{$dsr['tag']}</span>
+                        {if $dsr['value']}<span class="tabular-nums">{$dsr['value']}</span>{/if}
+                    </span>
+                </span>
+            {if $dsr['url']}</a>{else /}</div>{/if}
+            {/foreach}
+        </div>
+    </div>
+</section>
+{/if}
+{/if}

@@ -1,0 +1,170 @@
+/* 关键：important 让 utility 带 !important。
+   原因：系统的 reset.css（header.php 引入）含【无层级】的
+   `div, form, input { padding: 0; margin: 0 }`，
+   而 CSS 级联中「未分层规则」永远优先于「分层规则」（层级比较先于特异性），
+   导致 Tailwind 的 @layer utilities 里的 p-7 / px-5 等被全部清零。
+   加 important 后 utility 权重最高，绕开该冲突。 */
+@import "tailwindcss" important;
+@import "./ui/controls.css";
+@import "./pages/auth.css";
+@import "./pages/serverPanel/auto-renew.css";
+@import "./pages/product-list.css";
+
+/* 设计令牌：阿里云控制台观感基准（浅灰底 + 白卡描边 + 主蓝） */
+@theme {
+  --color-ink: var(--cui-ink);        /* 主文字/标题 */
+  --color-body: var(--cui-body);       /* 正文 */
+  --color-muted: var(--cui-muted);      /* 辅助灰 */
+  --color-line: var(--cui-line);       /* 1px 描边 */
+  --color-surface: var(--cui-surface);
+  --color-surface-alt: var(--cui-accent); /* 页面底色/悬浮态 */
+  --color-brand: var(--cui-brand);
+  --color-brand-hover: var(--cui-brand-hover);
+  --color-danger: var(--cui-danger);
+  --font-sans: var(--cui-font);
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* shadcn 语义色（与 css/cra1-shell.css 的 :root 保持一致） */
+  --color-background: var(--cui-accent);
+  --color-foreground: var(--cui-ink);
+  --color-card: var(--cui-surface);
+  --color-card-foreground: var(--cui-ink);
+  --color-muted-bg: var(--cui-accent);   /* shadcn bg-muted：浅灰背景 */
+  --color-muted-foreground: var(--cui-muted);
+  --color-accent: var(--cui-accent);
+  --color-accent-foreground: var(--cui-ink);
+  --color-border: var(--cui-line);
+  --color-input: var(--cui-control-edge);
+  --color-ring: var(--cui-gold);
+  --color-primary: var(--cui-brand);
+  --color-primary-foreground: var(--cui-white);
+  --color-secondary: var(--cui-accent);
+  --color-secondary-foreground: var(--cui-ink);
+  --color-destructive: var(--cui-danger);
+  /* 语义色（成功/警示）：状态徽标、安全评分、统计卡图标块共用，
+     色值与 ui/feedback.jsx 的 Badge tones 同源（硬性标准 §8：颜色走令牌） */
+  --color-success: var(--cui-success);
+  --color-warning: var(--cui-warning);
+  /* 圆角尺度（阿里云卡片 8px 基准） */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+  --radius-3xl: var(--cui-radius-card);
+  --color-steel:var(--cui-steel); --color-champagne:var(--cui-champagne); --color-silver:var(--cui-silver);
+  /* ── 单位基准修正（关键）────────────────────────────────────────────
+     系统 js/common/common.js 做了 rem 适配：桌面下 html{font-size: clientWidth/19.2 ≈ 75px}。
+     系统自身的 CSS 用 0.14rem 这类小值适配该基准；但 Tailwind 的 rem 尺度是按 16px 设计的，
+     直接使用会被放大 ~4.7 倍（text-sm 0.875rem → 65px）。
+     因此这里把 Tailwind 的尺度变量全部改写为 px 等值（基准 16px），
+     使 React 内容不依赖根字号，同时不影响外壳（外壳 CSS 全 px）与插件页（Element 体系）。
+     ────────────────────────────────────────────────────────────────── */
+  --spacing: 4px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+}
+
+/* 基础按钮与输入控件由三端共用 cra1-shared.css 提供。 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* 登录页品牌区雾气流动（§8.2 动态背景必须真的在动；
+   仅 transform/opacity，GPU 合成，不引发重排） */
+@keyframes auth-fog-a {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(80px, 60px) scale(1.15); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes auth-fog-b {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-70px, -50px) scale(1.1); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes auth-fog-c {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-50px, 70px) scale(1.12); }
+  100% { transform: translate(0, 0); }
+}
+.auth-fog-a { animation: auth-fog-a 26s ease-in-out infinite; }
+.auth-fog-b { animation: auth-fog-b 32s ease-in-out infinite; }
+.auth-fog-c { animation: auth-fog-c 22s ease-in-out infinite; }
+
+/* 服务器控制面板 aceternity 原语（浅色改良；仅 transform/opacity） */
+@keyframes beam-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes fog-drift-a {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(90px, 50px) scale(1.14); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes fog-drift-b {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-80px, -46px) scale(1.1); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes dot-pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  70% { transform: scale(2.4); opacity: 0; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   浮层动效（对齐主题 7.5：≤300ms、自定义 ease-out、非 scale(0) 进场、exit 更快）
+   -------------------------------------------------------------------------- */
+@keyframes cra1-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes cra1-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes cra1-dialog-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.97); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes cra1-toast-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cra1-pop-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --------------------------------------------------------------------------
+   React 内容区的排版基准（关键）
+   系统的 common.css 给 body 设了 font-size:66.67px / line-height:100px
+   （rem 适配的一部分，桌面 1rem = clientWidth/19.2 ≈ 75px）。
+   React 内容继承这些值后，行盒会被撑到 100px，表现为控件之间出现巨大空隙。
+   这里为内容区重置为正常 Web 排版基准（16px / 1.5），
+   不触碰外壳（外壳 CSS 已全用 px 并自带 line-height）。
+   注意：不用 *{font-size:inherit} 之类的粗暴重置，避免影响 Element 插件页。
+   -------------------------------------------------------------------------- */
+#root,
+#cra1-content-slot {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* 表单控件与可替换元素不参与行盒撑高 */
+#root input,
+#root select,
+#root textarea,
+#root button,
+#cra1-content-slot input,
+#cra1-content-slot select,
+#cra1-content-slot textarea,
+#cra1-content-slot button {
+  line-height: normal;
+}
+

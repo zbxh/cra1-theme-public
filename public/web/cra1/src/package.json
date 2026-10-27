@@ -1,0 +1,20 @@
+{
+  "name": "cra1build",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node -e \"throw new Error('Use a staging build with CRA1_WEB_OUT_DIR; legacy preview CSS is pinned.')\"",
+    "test": "node -e \"console.log('Use the workspace validation commands described in README.md')\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "SEE LICENSE IN ../../../../cra1-theme/LICENSE.txt",
+  "devDependencies": {
+    "daisyui": "^4.12.24",
+    "flowbite": "^2.5.2",
+    "tailwindcss": "^3.4.17"
+  },
+  "private": true
+}

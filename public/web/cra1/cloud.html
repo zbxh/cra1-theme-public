@@ -1,0 +1,35 @@
+{include file="header"}
+</head>
+<body class="cra1-marketing cra1-marketing--product">
+    <!-- 跳转到主内容：必须是 body 内第一个可聚焦元素（header 在 DOM 中先于 main，
+         若放在 main 前会让键盘用户先 Tab 过整条导航）。固定定位使其视觉上仍浮在顶部。 -->
+    <a href="#main-content" class="skip-link">跳转到主内容</a>
+    <header>{include file="public/header"}</header>
+    <main id="main-content">
+        <section class="page-hero">
+            <div class="container-page">
+                <nav class="breadcrumb text-sm text-muted" aria-label="面包屑">
+                    <a href="/" class="hover:text-primary">首页</a><span aria-hidden="true">/</span><a href="/solution.html" class="hover:text-primary">产品服务</a><span aria-hidden="true">/</span><span aria-current="page">云服务器</span>
+                </nav>
+                
+                <div class="product-hero-grid"><div>
+                <h1 class="mt-4 text-3xl font-bold tracking-tight text-ink md:text-5xl">{if ( cra1_content_explicit($data.cra1, 'page_hero_title') || (( isset($data.cra1.page_hero_title) && $data.cra1.page_hero_title )) ) }{$data.cra1.page_hero_title}{else /}云服务器{/if}</h1>
+
+                <p class="section-desc max-w-2xl">{if ( cra1_content_explicit($data.cra1, 'page_hero_desc') || (( isset($data.cra1.page_hero_desc) && $data.cra1.page_hero_desc )) ) }{$data.cra1.page_hero_desc}{else /}按需使用的弹性计算服务，覆盖从官网、应用后端到开发测试的常见业务负载，配置与费用随业务阶段调整。{/if}</p>
+                <div class="mt-7 flex flex-wrap gap-3">
+                    {if ( cra1_content_explicit($data.cra1, 'page_hero_btn1_text') || (( isset($data.cra1.page_hero_btn1_text) && $data.cra1.page_hero_btn1_text )) ) }{if ( cra1_content_value($data.cra1, 'page_hero_btn1_url', '/cart/goodsList.htm') != '' && isset($data.cra1.page_hero_btn1_text) && $data.cra1.page_hero_btn1_text != '' ) }<a href="{:cra1_content_value($data.cra1, 'page_hero_btn1_url', '/cart/goodsList.htm')}" class="btn-gradient btn cui-button cui-button--primary">{$data.cra1.page_hero_btn1_text}<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a>{/if}{else /}<a href="/cart/goodsList.htm" class="btn-gradient btn cui-button cui-button--primary">选购云服务器<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a>{/if}
+                    {if ( cra1_content_explicit($data.cra1, 'page_hero_btn2_text') || (( isset($data.cra1.page_hero_btn2_text) && $data.cra1.page_hero_btn2_text )) ) }{if ( cra1_content_value($data.cra1, 'page_hero_btn2_url', '/contact.html') != '' && isset($data.cra1.page_hero_btn2_text) && $data.cra1.page_hero_btn2_text != '' ) }<a href="{:cra1_content_value($data.cra1, 'page_hero_btn2_url', '/contact.html')}" class="btn btn-outline btn-primary cui-button cui-button--outline">{$data.cra1.page_hero_btn2_text}<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>{/if}{else /}<a href="/contact.html" class="btn btn-outline btn-primary cui-button cui-button--outline">咨询上云方案<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>{/if}
+                </div>
+                </div>
+                {include file="public/compute-illustration"}
+                </div>
+            </div>
+        </section>
+        <nav class="anchor-nav border-y border-base-200 bg-white/70" aria-label="页面导航" x-data="pageSections"><div class="container-page">{if ( cra1_content_explicit($data.cra1, 'page_hero_anchors') || (( isset($data.cra1.page_hero_anchors) && count($data.cra1.page_hero_anchors) > 0 )) ) }{foreach $data.cra1.page_hero_anchors as $pi => $pha}<a href="#{$pha['anchor']}" :class="active === $el.hash.slice(1) ? 'text-primary' : ''" :aria-current="active === $el.hash.slice(1) ? 'location' : null">{$pha['name']}</a>{/foreach}{else /}
+            <a href="#overview" :class="active === 'overview' ? 'text-primary' : ''" :aria-current="active === 'overview' ? 'location' : null">产品概览</a><a href="#advantages" :class="active === 'advantages' ? 'text-primary' : ''" :aria-current="active === 'advantages' ? 'location' : null">核心优势</a><a href="#scenarios" :class="active === 'scenarios' ? 'text-primary' : ''" :aria-current="active === 'scenarios' ? 'location' : null">适用场景</a><a href="#service" :class="active === 'service' ? 'text-primary' : ''" :aria-current="active === 'service' ? 'location' : null">计费与服务</a><a href="#faq" :class="active === 'faq' ? 'text-primary' : ''" :aria-current="active === 'faq' ? 'location' : null">常见问题</a>
+        {/if}</div></nav>
+        {$data.cra1.page_modules_html|raw}
+</main>
+    <div class="mobile-action-bar fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t border-base-200 bg-white/95 p-3 shadow-lg backdrop-blur md:hidden"><a href="/cart/goodsList.htm" class="btn-gradient btn flex-1 cui-button cui-button--primary">选购<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a><a href="/contact.html" class="btn btn-outline btn-primary flex-1 cui-button cui-button--outline">咨询<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a></div><div class="h-20 md:hidden"></div>
+    {include file="footer"}
+</body>

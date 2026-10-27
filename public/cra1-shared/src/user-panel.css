@@ -1,0 +1,318 @@
+/* ==========================================================================
+   user-panel.css — 顶栏用户块 + 用户下拉面板（官网与会员中心共用唯一一套）
+   --------------------------------------------------------------------------
+   官网（public/web/cra1）与会员中心（public/clientarea/template/pc/cra1）
+   的右上角用户头像与下拉面板共用本文件：类名、结构、样式单点维护。
+   头像生成算法同样共用（/web/cra1/assets/js/avatar.js）。
+
+   令牌桥接：两站令牌名不同（官网 --brand/--ink/--line/--surface-alt，
+   会员中心 --primary/--foreground/--border/--muted），且 --muted 两站含义
+   相反（官网=次要文字色，会员中心=浅灰底），因此每个桥接变量都按
+   「官网优先、会员中心兜底」的固定链取值，两边无需各自覆盖。
+   ========================================================================== */
+:root {
+  --up-brand: var(--cui-brand, var(--cui-titanium));
+  --up-ink: var(--cui-ink, #1d2129);
+  --up-muted-txt: var(--cui-muted, #86909c);
+  --up-line: var(--cui-line, #e5e8ed);
+  --up-tag-bg: var(--cui-accent, #f2f3f5);
+  --up-accent-bg: var(--cui-accent, #f2f3f5);
+}
+
+/* --------------------------------------------------------------------------
+   顶栏用户块 wrapper
+   注意：wrapper 必须 inline-flex 且锁高，否则内部块级子元素会把顶栏撑高
+   -------------------------------------------------------------------------- */
+.cra1-account--header {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 32px;
+}
+
+.cra1-account__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 3px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--up-ink);
+  cursor: pointer;
+  transition: box-shadow 150ms ease, background-color 150ms ease;
+}
+
+/* 触发块头像：30px 圆形 + 细边框。
+   背景由 avatar.js 注入的生成头像（background-image）铺满；
+   无生成头像时回退为品牌底色 + 首字母。 */
+.cra1-account__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 600;
+  color: #fff;
+  background-color: var(--up-brand);
+  border: 1px solid rgba(220, 227, 236, 0.9);
+  border-color: color-mix(in srgb, var(--up-line) 90%, transparent);
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+/* 悬停门控：仅精确指针设备，防触屏粘滞 */
+@media (hover: hover) and (pointer: fine) {
+  /* Bridge the gap so a pointer can enter the open menu without leaving its host. */
+  .cra1-account--header.is-open::after {
+    content: ''; position: absolute; top: 100%; right: 0; width: 100%; height: 8px;
+  }
+  .cra1-account__trigger:hover {
+    background: var(--up-accent-bg);
+  }
+}
+
+/* 键盘焦点可见 */
+.cra1-account__trigger:focus-visible,
+.cra1-upanel__tag:focus-visible,
+.cra1-upanel__mini-btn:focus-visible,
+.cra1-upanel__logout:focus-visible,
+.cra1-upanel__head:focus-visible,
+.cra1-upanel__link:focus-visible {
+  outline: 2px solid var(--up-brand);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   下拉面板（阿里云式三段：账号块 / 安全中心 / 财务信息）
+   挂在触发块下方右侧（绝对定位 + 高层级）；入场 pop（origin 指向触发块）
+   -------------------------------------------------------------------------- */
+.cra1-account--header .cra1-account__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 70;
+}
+
+.cra1-account__menu--rich {
+  width: 300px;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--up-line);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 12px 28px rgba(29, 33, 41, 0.12);
+  transform-origin: top right;
+  animation: cra1-upanel-pop 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes cra1-upanel-pop {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.cra1-upanel__section {
+  position: relative;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--up-line);
+}
+.cra1-upanel__section:last-child { border-bottom: 0; }
+
+/* 账号块 ------------------------------------------------------------------ */
+.cra1-upanel__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 84px;   /* 给右上角退出按钮留位 */
+}
+.cra1-upanel__avatar {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  font-size: 17px;
+}
+.cra1-upanel__id {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+.cra1-upanel__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--up-ink);
+}
+/* 名称旁「账户信息」入口（小铅笔） */
+.cra1-upanel__mini-btn {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  padding: 2px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--up-muted-txt);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.cra1-upanel__mini-btn:hover { background: var(--up-accent-bg); color: var(--up-brand); }
+.cra1-upanel__sub {
+  font-size: 12px;
+  color: var(--up-muted-txt);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cra1-upanel__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.cra1-upanel__tag {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--up-line);
+  border-radius: 999px;
+  background: var(--up-tag-bg);
+  color: var(--up-muted-txt);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.cra1-upanel__tag:hover {
+  background: color-mix(in srgb, var(--up-brand) 8%, transparent);
+  background: color-mix(in srgb,var(--cui-titanium) 8%,transparent);
+  color: var(--up-brand);
+  border-color: color-mix(in srgb, var(--up-brand) 30%, transparent);
+}
+
+/* 「控制台」按钮：彩色雾状动态背景（多层柔光球流动，胶囊裁切） */
+.cra1-upanel__tag--console {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+  color: #fff;
+  font-weight: 500;
+  isolation: isolate;
+}
+.cra1-upanel__tag--console:hover { color: #fff; border-color: transparent; background: transparent; }
+.cra1-upanel__tag-fog {
+  position: absolute;
+  inset: -60%;
+  z-index: -1;
+  filter: blur(6px) saturate(1.3);
+  /* 五层柔光球：品牌蓝 / 耀金 / 靛蓝 / 芭比粉 / 青（顶层底色压暗保白字对比） */
+  background:
+    radial-gradient(38% 56% at 22% 30%, rgba(23, 119, 255, 0.95) 0%, transparent 70%),
+    radial-gradient(30% 46% at 74% 22%, rgba(255, 185, 35, 0.92) 0%, transparent 68%),
+    radial-gradient(36% 54% at 80% 72%, rgba(99, 102, 241, 0.9) 0%, transparent 70%),
+    radial-gradient(28% 44% at 42% 84%, rgba(244, 92, 166, 0.88) 0%, transparent 66%),
+    radial-gradient(30% 48% at 60% 52%, rgba(6, 182, 212, 0.85) 0%, transparent 70%),
+    linear-gradient(120deg, #1e40af 0%, #312e81 50%, #0e7490 100%);
+  background-size: 200% 200%;
+  animation: cra1-upanel-fog 9s ease-in-out infinite;
+}
+.cra1-upanel__tag-txt { position: relative; z-index: 1; }
+@keyframes cra1-upanel-fog {
+  0%, 100% { background-position: 0% 50%, 100% 0%, 50% 100%, 20% 90%, 50% 0%; }
+  33% { background-position: 60% 30%, 30% 70%, 80% 40%, 0% 40%, 100% 50%; }
+  66% { background-position: 20% 80%, 70% 20%, 20% 60%, 90% 20%, 0% 60%; }
+}
+
+/* 退出登录：绝对定位在账号块右上角 */
+.cra1-upanel__logout {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--up-line);
+  border-radius: 4px;
+  background: var(--background, #fff);
+  color: var(--up-ink);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.cra1-upanel__logout:hover {
+  background: rgba(180, 35, 24, 0.06);
+  border-color: rgba(180, 35, 24, 0.35);
+  color: #b42318;
+}
+
+/* 段落头（带图标 + 箭头，整行可点） */
+.cra1-upanel__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  padding: 2px 0 10px;
+  background: transparent;
+  color: var(--up-ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+.cra1-upanel__head svg { color: var(--up-muted-txt); }
+.cra1-upanel__head .cra1-upanel__chev { margin-left: auto; color: var(--up-muted-txt); }
+.cra1-upanel__head:hover { color: var(--up-brand); }
+
+/* 链接行（v2.40 全站约定：hover 变色、不出下划线） */
+.cra1-upanel__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+.cra1-upanel__link {
+  border: 0;
+  padding: 2px 0;
+  background: transparent;
+  color: var(--up-brand);
+  font-size: 13px;
+  cursor: pointer;
+  transition: opacity 150ms ease, color 150ms ease;
+}
+.cra1-upanel__link:hover { opacity: 0.75; color: var(--up-brand); }
+
+/* 键值行（可用余额 / 我的订单） */
+.cra1-upanel__kv {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  font-size: 13px;
+}
+.cra1-upanel__kv-label { color: var(--up-muted-txt); }
+.cra1-upanel__kv-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--up-ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.cra1-upanel__kv-value .cra1-upanel__link { font-weight: 500; }
+
+/* 减少动态：雾效与面板入场全部停住 */
+@media (prefers-reduced-motion: reduce) {
+  .cra1-account__trigger { transition-duration: 0.001ms; }
+  .cra1-account__menu--rich { animation: none; }
+  .cra1-upanel__tag-fog { animation: none; }
+}

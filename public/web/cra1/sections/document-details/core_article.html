@@ -1,0 +1,29 @@
+<section class="reading-section container-page min-h-[60vh] py-12 md:py-16" data-reveal>
+            <div class="mx-auto max-w-3xl">
+                <a href="/document.html" class="text-sm text-brand">{:cra1_content_value($data.cra1, 'core_article_copy.txt3', '← 返回文档中心')}</a>
+
+                <div x-cloak x-show="loading" class="mt-8 glass-card p-8 md:p-10 cui-card" aria-live="polite" aria-label="文档加载中">
+                    <div class="skeleton-line h-8 w-2/3"></div><div class="skeleton-line mt-5 h-4 w-1/4"></div>
+                    <div class="skeleton-line mt-8 h-4 w-full"></div><div class="skeleton-line mt-3 h-4 w-full"></div><div class="skeleton-line mt-3 h-4 w-3/4"></div>
+                </div>
+
+                <div x-cloak x-show="!loading && notFound" class="empty-state mt-8 py-20">{:cra1_content_value($data.cra1, 'core_article_copy.txt4', '文档不存在或已删除，可返回文档中心查找其他内容。')}</div>
+
+                <div x-cloak x-show="!loading && loadFailed" class="empty-state mt-8 py-20 text-center" role="status"><p>暂时无法读取内容，请稍后重试</p><button type="button" class="btn btn-sm btn-outline cui-button cui-button--outline cui-button--sm mt-4" @click="retry()">重新加载</button></div>
+                <article data-reading-article x-cloak x-show="!loading && item" class="mt-8 glass-card p-6 md:p-10 cui-card">
+                    <h2 class="text-2xl font-bold leading-snug text-ink md:text-3xl" x-text="item?.title"></h2>
+                    <div class="rich-content reading-content mt-8" x-html="item?.content || ''" x-effect="item && $nextTick(() => prepareReading())" x-cloak x-show="item"
+                          x-transition:enter="transition duration-300 ease-out"
+                          x-transition:enter-start="opacity-0"
+                          x-transition:enter-end="opacity-100"></div>
+                    <div x-cloak x-show="item && attachments(item).length" class="mt-10 border-t border-line pt-6">
+                        <h3 class="text-base font-semibold text-ink">{if ( cra1_content_explicit($data.cra1, 'core_article_copy.txt11') || (( isset($data.cra1.core_article_copy['txt11']) && $data.cra1.core_article_copy['txt11'] )) ) }{$data.cra1.core_article_copy['txt11']}{else /}相关附件{/if}</h3>
+                        <ul class="mt-3 space-y-2 text-sm">
+                            <template x-for="(attachment, aIdx) in attachments(item)" :key="aIdx + '-' + attachmentUrl(attachment)">
+                                <li><a :href="attachmentUrl(attachment)" target="_blank" rel="noopener" class="text-brand"><span x-text="attachmentName(attachment)"></span> ↗</a></li>
+                            </template>
+                        </ul>
+                    </div>
+                </article>
+            </div>
+        </section>

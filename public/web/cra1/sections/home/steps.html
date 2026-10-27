@@ -1,0 +1,76 @@
+    {if ( isset($data.cra1.show_steps) && $data.cra1.show_steps == 1 ) }
+    <section class="border-b border-line bg-white py-14 md:py-16" data-reveal x-data="scrollRail">
+        <div class="container-page">
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <div class="max-w-xl">
+                    <h2 class="text-2xl font-semibold text-ink md:text-3xl">{$data.cra1.band_title}</h2>
+                    <p class="mt-3 text-sm leading-7 text-body">{$data.cra1.band_desc}</p>
+                </div>
+                {if ( cra1_content_value($data.cra1, 'band_link', '/document.html') != '' ) }<a href="{:cra1_content_value($data.cra1, 'band_link', '/document.html')}" class="text-sm font-medium text-brand transition-colors duration-150 hover:text-brand-hover">{:cra1_content_value($data.cra1, 'band_more_text', '查看接入文档')} →</a>{/if}
+            </div>
+            <!-- 滑轨控件：仅小屏（md 起下面容器变三列网格） -->
+            <div class="mt-5 flex items-center justify-between gap-3 md:hidden">
+                <div class="flex items-center gap-1.5" aria-label="浏览位置">
+                    <template x-for="i in pageCount" :key="'td' + i">
+                        <button type="button" class="rail-dot" :aria-label="'浏览第 ' + i + ' 组'" :aria-current="pageIndex === (i - 1) ? 'true' : null" :class="pageIndex === (i - 1) ? 'rail-dot-active' : ''"
+                                @click="goPage(i - 1)"><span aria-hidden="true"></span></button>
+                    </template>
+                </div>
+                <div class="flex shrink-0 items-center gap-2">
+                    <button type="button" class="rail-nav-btn" aria-label="向前浏览" :disabled="atStart" @click="step(-1)">
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+                    </button>
+                    <button type="button" class="rail-nav-btn" aria-label="向后浏览" :disabled="atEnd" @click="step(1)">
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 手机端：步骤横滑；md+ 保持四列。
+             容器在 .container-page 之外以保留移动端贴边的滑动暗示。 -->
+        <ol x-ref="rail" class="step-flow scrollbar-none mt-6 flex snap-x gap-5 overflow-x-auto px-5 pb-2 md:container-page md:mt-10 md:grid md:grid-cols-4 md:overflow-visible md:px-8 md:pb-0">
+                <!-- 步骤：可增删（v2.42）。配置化行数据优先；为空时回退旧 band_item1~4 键（历史配置兼容）。
+                     序号由循环下标生成；md 起三列网格（卡片多于 3 个自动换行）。 -->
+                {if ( cra1_content_explicit($data.cra1, 'band_items') || (( count($data.cra1.band_items) > 0 )) ) }
+                {foreach $data.cra1.band_items as $bi => $bit}
+                <li class="step w-[68%] shrink-0 snap-start md:w-auto">
+                    <span class="step-num">{$bi + 1}</span>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-semibold text-ink">{$bit.name}</h3>
+                        <p class="mt-1.5 text-xs leading-5 text-body">{$bit.desc}</p>
+                    </div>
+                </li>
+                {/foreach}
+                {else /}
+                <li class="step w-[68%] shrink-0 snap-start md:w-auto">
+                    <span class="step-num">1</span>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-semibold text-ink">{$data.cra1.band_item1_title}</h3>
+                        <p class="mt-1.5 text-xs leading-5 text-body">{$data.cra1.band_item1_desc}</p>
+                    </div>
+                </li>
+                <li class="step w-[68%] shrink-0 snap-start md:w-auto">
+                    <span class="step-num">2</span>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-semibold text-ink">{$data.cra1.band_item2_title}</h3>
+                        <p class="mt-1.5 text-xs leading-5 text-body">{$data.cra1.band_item2_desc}</p>
+                    </div>
+                </li>
+                <li class="step w-[68%] shrink-0 snap-start md:w-auto">
+                    <span class="step-num">3</span>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-semibold text-ink">{$data.cra1.band_item3_title}</h3>
+                        <p class="mt-1.5 text-xs leading-5 text-body">{$data.cra1.band_item3_desc}</p>
+                    </div>
+                </li>
+                <li class="step w-[68%] shrink-0 snap-start md:w-auto">
+                    <span class="step-num">4</span>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-semibold text-ink">{$data.cra1.band_item4_title}</h3>
+                        <p class="mt-1.5 text-xs leading-5 text-body">{$data.cra1.band_item4_desc}</p>
+                    </div>
+                </li>
+                {/if}
+            </ol>
+    </section>
+    {/if}

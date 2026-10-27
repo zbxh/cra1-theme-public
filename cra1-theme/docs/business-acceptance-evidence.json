@@ -1,0 +1,170 @@
+{
+  "format": 1,
+  "date": "2026-10-19",
+  "release_candidate": "20261019-acceptance-v1",
+  "commercial_release_accepted": false,
+  "environment": {
+    "system": "10.7.4",
+    "official_install_then_upgrade": true,
+    "php": "7.4.33",
+    "test_database": "independent",
+    "resource_module": "MfCloud 4.3.0",
+    "core_default_official_plugin_source_modified": false,
+    "production_database_writes": 0
+  },
+  "email": {
+    "native_smtp_api_status": 200,
+    "recipient_confirmed_received": true,
+    "recipient_address_distributed": false,
+    "sms_sent": false
+  },
+  "suites": [
+    {
+      "area": "原生账户、邮件与资料",
+      "status": "passed",
+      "checks": 13,
+      "scope": "实际接口；邮件实收由用户确认",
+      "record_sha256": "7281010c4995feeaaa33373df69aad988984f8133086579cd822514cd7488c42"
+    },
+    {
+      "area": "注册登录策略与验证码界面",
+      "status": "passed",
+      "checks": 20,
+      "scope": "实际原生图形验证码与邮箱注册；手机区号及验证码提交使用模拟响应，未发送短信",
+      "record_sha256": "7df606a5ecebdb55b5f74c0187b15e69960cd8642fe08ad5a36715eaba38e3c5"
+    },
+    {
+      "area": "购物车至余额支付与开通",
+      "status": "passed",
+      "checks": 8,
+      "scope": "真实余额支付与已授权供应商测试资源",
+      "record_sha256": "6195181b477c4313b7703874a1e3bbe22d251fe20bbfe1a8ebc6b047834eac53"
+    },
+    {
+      "area": "实例生命周期",
+      "status": "passed",
+      "checks": 5,
+      "scope": "真实关机、开机、重启、重置密码、重装系统",
+      "record_sha256": "52821f2c71236c4e5218f2463970964f6e7ac88053e139c0cbe985e6255c17b2"
+    },
+    {
+      "area": "附加磁盘、续费与财务",
+      "status": "passed",
+      "checks": 10,
+      "scope": "真实余额支付、磁盘创建、到期时间延长及自动续费开关",
+      "record_sha256": "a555f03240d02dcf16039d6d364181396ca8f930e51ee35fb8dbc75ef95bba3e"
+    },
+    {
+      "area": "操作验证",
+      "status": "passed",
+      "checks": 16,
+      "scope": "真实原生身份与服务端十五分钟授权、失效及脱敏",
+      "record_sha256": "33b9c3b7a7a0578483a3d96e71018bb0af2d96592ef36c38d0f4dc29aef16b93"
+    },
+    {
+      "area": "子账户权限",
+      "status": "passed",
+      "checks": 17,
+      "scope": "真实原生子账户；按权限组与产品分配验证",
+      "record_sha256": "3e34ef9f15f2fc83bf05b24cf95ceb19f9661a72cc1390143e88e9d467cdf1d0"
+    },
+    {
+      "area": "空产品分配范围",
+      "status": "passed",
+      "checks": 9,
+      "scope": "空分配不回退为父账户全部产品",
+      "record_sha256": "bd01bf0a041e7399b98c63a3ecb65f0bf35fbe352762259006e0ff41400495a1"
+    },
+    {
+      "area": "产品自定义字段",
+      "status": "passed",
+      "checks": 16,
+      "scope": "原生定义及模型；普通读取脱敏、显式密码读取验证与权限",
+      "record_sha256": "4e9638a8aced35b399a30e809337b83a284f35e1ae6d4ea2c5bd65d3131ee36d"
+    },
+    {
+      "area": "安全组",
+      "status": "passed",
+      "checks": 7,
+      "scope": "真实创建、绑定、读取、解绑和删除；受限子账户拒绝",
+      "record_sha256": "bd4b3d8fd4b1ca7e22f55ebbdc8dee21874f9588352a03f364435774fd704d21"
+    },
+    {
+      "area": "停用退款",
+      "status": "passed",
+      "checks": 15,
+      "scope": "原生报价、到期申请取消、立即申请、管理员批准、真实停用与余额退款",
+      "record_sha256": "77d091417c965b897035c964783fa552478de4b636e614de400bc29a708e048f"
+    },
+    {
+      "area": "在线、组合、授信和线下支付分支",
+      "status": "passed",
+      "checks": 48,
+      "scope": "真实主题收银台与默认主题契约，模拟网关与订单响应；无真实在线付款",
+      "record_sha256": "4d5282b44c1144f65d1afb7f98b924647984a27f9d7d350b403c2fef83116645"
+    },
+    {
+      "area": "业务页面与响应式",
+      "status": "passed",
+      "checks": 83,
+      "scope": "八个代表页面、四档尺寸、验证弹窗、子账户和匿名登录跳转；拦截业务写入",
+      "record_sha256": "b5d08d20f99d13623f1c66f0e0cab14175a593817f0125e74078271a7e72c5ac"
+    },
+    {
+      "area": "退款后产品展示与匿名跳转",
+      "status": "passed",
+      "checks": 16,
+      "scope": "按实际停用状态复核，未恢复资源以满足旧脚本假设",
+      "record_sha256": "261bc8ac39511c611ce829ca8991488762a6314512d5cc94cb0eea1585beef3c"
+    },
+    {
+      "area": "原生插件页面回退",
+      "status": "passed_with_native_limitation",
+      "checks": 21,
+      "scope": "五个插件页面正常；旧公告插件原生解析限制单列",
+      "record_sha256": "2d39ac921130ed15c5f7bf36adee3e6a123fe3cd783b5c44eff0ef5ee685d3ff"
+    }
+  ],
+  "browser": {
+    "widths": [
+      1920,
+      1440,
+      768,
+      390
+    ],
+    "representative_pages": 8,
+    "screenshots": 32,
+    "all_site_visual_coverage_claimed": false
+  },
+  "native_plugin_views": {
+    "verified": {
+      "IdcsmartNews": "4.2.0",
+      "IdcsmartCertification": "4.2.1",
+      "IdcsmartHelp": "3.0.1",
+      "IdcsmartTicket": "4.2.1",
+      "IdcsmartSubAccount": "4.2.1"
+    },
+    "native_limitation": {
+      "plugin": "IdcsmartAnnouncement",
+      "version": "3.0.1",
+      "reason": "原生模板目录不匹配当前 V10 会员页面解析规则；CRA1 和 default 均无法找到视图。未改插件或核心。",
+      "website_announcement_pages_affected": false
+    }
+  },
+  "scope_limits": [
+    "未将 MfCloud 实测结果延伸为 MfDcim、IdcsmartCommon 或其他模块升级组合承诺",
+    "公开 HTTPS 首次安装、更新和回退仍须在可接受发行清单下完成；已有隔离事务接缝不替代最终验收",
+    "153 个运行素材的逐文件可再分发证明仍未完成",
+    "本记录不创建 verified_combinations 或商业发行许可"
+  ],
+  "raw_evidence_distributed": false,
+  "resource_cleanup": {
+    "status": "passed",
+    "native_host_deleted": true,
+    "native_resource_unlinked": true,
+    "native_disk_records_removed": true,
+    "provider_instance_http_404": true,
+    "provider_disk_http_404_count": 2,
+    "record_sha256": "eedfc8997bb121ec3917e73c890c0377bb02cc38a440b08f0e1168844a76213c"
+  }
+}

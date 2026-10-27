@@ -1,0 +1,11 @@
+{
+  "issuer": "填写发行方合法名称",
+  "key_id": "填写发行方公钥标识",
+  "serial": "填写唯一凭证编号",
+  "subject": "填写获得授权的个人或组织",
+  "sites": ["https://example.invalid"],
+  "scope": "商业部署一站；不包含转售和转授权，具体以书面合同为准",
+  "issued_at": "YYYY-MM-DD",
+  "expires_at": null,
+  "signature": "此文件仅为模板，签名由发行方离线生成"
+}

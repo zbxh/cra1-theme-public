@@ -1,0 +1,10 @@
+{if ( !isset($data.cra1.show_about_timeline) || $data.cra1.show_about_timeline == 1 ) }
+        <section class="container-page py-12 md:py-16" data-reveal aria-label="发展历程">
+            <h2 class="section-title">发展历程</h2>
+            <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                {foreach $data.cra1.about_timeline as $row}
+                <div class="feature-item glass-card rounded-xl p-5 cui-card"><span class="text-sm font-bold text-primary">{$row.name}</span><p class="mt-2 text-sm leading-6 text-body">{$row.desc}</p></div>
+                {/foreach}
+            </div>
+        </section>
+        {/if}

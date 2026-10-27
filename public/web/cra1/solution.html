@@ -1,0 +1,18 @@
+{include file="header"}
+</head>
+<body>
+    <!-- 跳转到主内容：必须是 body 内第一个可聚焦元素（header 在 DOM 中先于 main，
+         若放在 main 前会让键盘用户先 Tab 过整条导航）。固定定位使其视觉上仍浮在顶部。 -->
+    <a href="#main-content" class="skip-link">跳转到主内容</a>
+<header>{include file="public/header"}</header>
+    <main id="main-content">
+<section class="page-hero"><div class="container-page py-12 md:py-16" data-reveal><nav class="breadcrumb text-sm text-muted" aria-label="面包屑"><a href="/" class="hover:text-primary">首页</a><span>/</span><span aria-current="page">解决方案</span></nav><div class="service-hero-grid"><div class="service-hero-copy"><h1 class="mt-4 text-3xl font-bold tracking-tight text-ink md:text-5xl">{$data.cra1.sol_page_title}</h1><p class="section-desc max-w-2xl">{$data.cra1.sol_page_desc}</p><div class="mt-7 flex flex-wrap gap-3">{$data.cra1.sol_hero_btn_html|raw}</div></div>{$data.cra1.page_hero_art|default=''|raw}</div></div></section>
+<nav class="anchor-nav border-y border-base-200 bg-white/70" aria-label="页面导航" x-data="pageSections"><div class="container-page">{if ( cra1_content_explicit($data.cra1, 'page_hero_anchors') || (( isset($data.cra1.page_hero_anchors) && count($data.cra1.page_hero_anchors) > 0 )) ) }{foreach $data.cra1.page_hero_anchors as $pi => $pha}<a href="#{$pha['anchor']}" :class="active === $el.hash.slice(1) ? 'text-primary' : ''" :aria-current="active === $el.hash.slice(1) ? 'location' : null">{$pha['name']}</a>{/foreach}{else /}<a href="#industry" :class="active === $el.hash.slice(1) ? 'text-primary' : ''" :aria-current="active === $el.hash.slice(1) ? 'location' : null">按行业</a><a href="#workload" :class="active === $el.hash.slice(1) ? 'text-primary' : ''" :aria-current="active === $el.hash.slice(1) ? 'location' : null">按工作负载</a><a href="#method" :class="active === $el.hash.slice(1) ? 'text-primary' : ''" :aria-current="active === $el.hash.slice(1) ? 'location' : null">方案方法</a><a href="#process" :class="active === $el.hash.slice(1) ? 'text-primary' : ''" :aria-current="active === $el.hash.slice(1) ? 'location' : null">落地流程</a><a href="#faq" :class="active === $el.hash.slice(1) ? 'text-primary' : ''" :aria-current="active === $el.hash.slice(1) ? 'location' : null">常见问题</a>{/if}</div></nav>
+
+    {$data.cra1.page_modules_html|raw}
+</main>
+
+
+<div class="mobile-action-bar fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t border-base-200 bg-white/95 p-3 shadow-lg backdrop-blur md:hidden"><a href="/cart/goodsList.htm" class="btn-gradient btn flex-1 cui-button cui-button--primary">查看产品<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a><a href="/contact.html" class="btn btn-outline btn-primary flex-1 cui-button cui-button--outline">咨询<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a></div><div class="h-20 md:hidden"></div>
+{include file="footer"}
+</body>

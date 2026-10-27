@@ -1,0 +1,33 @@
+{if ( !isset($data.cra1.show_about_honor) || $data.cra1.show_about_honor == 1 ) }
+        <section class="band border-y border-white/60 bg-white/50 py-12 md:py-16" data-reveal aria-label="资质与荣誉">
+            <div class="container-page">
+
+                <h2 class="section-title mt-4">资质与荣誉</h2>
+            </div>
+            <!-- 跑马灯品牌墙（连续动效）：轨道内两份相同内容，translateX(-50%) 无限循环。
+                 间隔用每项的 mr-5 而不是轨道 gap——margin 计入项宽，-50% 恰好等于一份内容宽，首尾无缝；
+                 hover 暂停、reduced-motion 停止并降级为可横向滚动（CSS 内置）。
+                 第二份内容 aria-hidden，屏幕阅读器不读两遍。
+                 时长按条目数缩放（每项约 6s），条目少时不至于转得过快。 -->
+            {if ( cra1_content_explicit($data.cra1, 'about_honor') || (( isset($data.cra1.about_honor) && count($data.cra1.about_honor) > 0 )) ) }
+            <div class="marquee mt-8" style="--marquee-duration: {:max(count($data.cra1.about_honor), 1) * 6}s">
+                <div class="marquee-track items-stretch py-1">
+                    {foreach $data.cra1.about_honor as $row}
+                    <article class="article-card glass-card mr-5 w-64 shrink-0 p-5 cui-card">
+                        <img src="{$row.url}" alt="{$row.name}" class="h-24 w-full rounded-lg object-contain" loading="lazy" decoding="async">
+                        <h3 class="mt-4 text-sm font-medium text-ink">{$row.name}</h3>
+                        {if ( !empty($row.desc) ) }<p class="mt-1 text-xs leading-5 text-body">{$row.desc}</p>{/if}
+                    </article>
+                    {/foreach}
+                    {foreach $data.cra1.about_honor as $row}
+                    <article class="article-card glass-card mr-5 w-64 shrink-0 p-5 cui-card" aria-hidden="true">
+                        <img src="{$row.url}" alt="" class="h-24 w-full rounded-lg object-contain" loading="lazy" decoding="async">
+                        <h3 class="mt-4 text-sm font-medium text-ink">{$row.name}</h3>
+                        {if ( !empty($row.desc) ) }<p class="mt-1 text-xs leading-5 text-body">{$row.desc}</p>{/if}
+                    </article>
+                    {/foreach}
+                </div>
+            </div>
+            {/if}
+        </section>
+        {/if}

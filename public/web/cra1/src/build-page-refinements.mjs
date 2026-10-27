@@ -1,0 +1,23 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const root=process.env.CRA1_WEB_ROOT, release=process.env.CRA1_WEB_RELEASE, base=process.env.CRA1_WEB_BASE;
+if(!root || ![release,base].every(v=>v&&/^[a-z0-9-]+$/.test(v)))throw new Error('Use a staging root and immutable release names.');
+const output=path.join(root,'releases',release);
+if(fs.existsSync(output))throw new Error('Release already exists.');
+const temporary=path.join(root,'src','.page-refinements.min.css');
+const config=path.join(root,'src','.page-refinements.config.cjs');
+fs.writeFileSync(config,'module.exports={content:[],corePlugins:[],plugins:[]}');
+const result=spawnSync(process.execPath,[require.resolve('tailwindcss/lib/cli.js'),'-c',config,'-i',path.join(root,'src/page-refinements.css'),'-o',temporary,'--minify'],{stdio:'inherit'});
+if(result.status!==0)throw new Error('CSS build failed');
+fs.mkdirSync(output,{recursive:true});
+fs.writeFileSync(path.join(output,'app.css'),Buffer.concat([fs.readFileSync(path.join(root,'releases',base,'app.css')),Buffer.from('\n/* Page refinements. */\n'),fs.readFileSync(temporary)]));
+fs.copyFileSync(path.resolve(root,'../../cra1-shared/theme-sources/website/app.js'),path.join(output,'app.js'));
+fs.unlinkSync(temporary);fs.unlinkSync(config);
+const manifest={release,base,files:{}};
+for(const file of ['app.css','app.js']){const bytes=fs.readFileSync(path.join(output,file));manifest.files[file]={bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')};}
+fs.writeFileSync(path.join(output,'manifest.json'),JSON.stringify(manifest,null,2));
+console.log(JSON.stringify(manifest));
