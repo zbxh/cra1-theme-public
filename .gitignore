@@ -12,6 +12,8 @@ __pycache__/
 *.zip
 *.tar
 *.tar.gz
+/docs/installation.html
+/docs/installation.pdf
 
 # Site-specific runtime data and credentials
 .env

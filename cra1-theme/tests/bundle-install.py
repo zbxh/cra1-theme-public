@@ -20,10 +20,12 @@ class DeliveryTest(unittest.TestCase):
         self.root = pathlib.Path(self.temp.name)
         self.source = self.root / 'source'
         self.source.mkdir()
+        self.rendered = self.root / 'rendered'
+        self.rendered.mkdir()
+        (self.rendered / 'installation.html').write_text('<html>Offline guide</html>')
+        (self.rendered / 'installation.pdf').write_bytes(b'%PDF-1.4 example')
         for relative, data in {
             'docs/installation.md': b'![example](images/step.png)',
-            'docs/installation.html': b'<html>Illustrated installation guide</html>',
-            'docs/installation.pdf': b'%PDF-1.4 example',
             'docs/images/step.png': b'example screenshot',
             'docs/private.json': b'must not enter the delivery',
             'cra1-theme/docs/nginx.example.conf': b'# Example directory protection',
@@ -38,6 +40,9 @@ class DeliveryTest(unittest.TestCase):
                          'files': {'public/web/cra1/index.html': {'sha256': bundler.sha(self.payload), 'bytes': len(self.payload)}}}
         self.write_install()
 
+    def bundle(self, output):
+        return bundler.bundle_install(self.install, output, self.source, self.rendered)
+
     def write_install(self, payload=None, extra=None):
         with zipfile.ZipFile(self.install, 'w') as archive:
             archive.writestr('cra1-theme/release.json', json.dumps(self.manifest))
@@ -47,29 +52,30 @@ class DeliveryTest(unittest.TestCase):
 
     def test_version_comes_from_package_and_contents_are_unchanged(self):
         original = self.install.read_bytes()
-        result = bundler.bundle_install(self.install, self.root / 'output', self.source)
-        self.assertEqual(result['path'], 'CRA1-theme-existing-version-1-install-with-guide.zip')
+        result = self.bundle(self.root / 'output')
+        self.assertEqual(result['path'], 'CRA1-theme-existing-version-1.zip')
         with zipfile.ZipFile(self.root / 'output' / result['path']) as archive:
             self.assertEqual(archive.read('cra1-theme-install.zip'), original)
             self.assertEqual(archive.read('安装教程/安装教程.md'), (self.source / 'docs/installation.md').read_bytes())
             self.assertEqual(archive.read('安装教程/images/step.png'), b'example screenshot')
             self.assertIn('603107399', archive.read('开始安装.txt').decode())
             self.assertIn('https://qm.qq.com/q/O3d7bVtcoS', archive.read('开始安装.txt').decode())
+            self.assertIn('同一个 cra1-theme-install.zip', archive.read('开始安装.txt').decode())
             self.assertEqual(len(archive.namelist()), 7)
         self.assertEqual(self.install.read_bytes(), original)
 
     def test_repeatable_and_existing_delivery_not_overwritten(self):
-        first = bundler.bundle_install(self.install, self.root / 'first', self.source)
-        second = bundler.bundle_install(self.install, self.root / 'second', self.source)
+        first = self.bundle(self.root / 'first')
+        second = self.bundle(self.root / 'second')
         self.assertEqual(first['sha256'], second['sha256'])
         with self.assertRaises(FileExistsError):
-            bundler.bundle_install(self.install, self.root / 'first', self.source)
+            self.bundle(self.root / 'first')
 
     def test_assigned_version_labels_delivery_without_changing_resource_id(self):
         self.manifest.update(version='v17.1', release_channel='test')
         self.write_install()
-        result = bundler.bundle_install(self.install, self.root / 'named', self.source)
-        self.assertEqual(result['path'], 'CRA1-theme-v17.1-install-with-guide.zip')
+        result = self.bundle(self.root / 'named')
+        self.assertEqual(result['path'], 'CRA1-theme-v17.1.zip')
         self.assertEqual(result['release'], 'existing-version-1')
         self.assertEqual(result['version'], 'v17.1')
         with zipfile.ZipFile(self.root / 'named' / result['path']) as archive:
@@ -82,23 +88,23 @@ class DeliveryTest(unittest.TestCase):
                 self.manifest['version'] = value
                 self.write_install()
                 with self.assertRaises(ValueError):
-                    bundler.bundle_install(self.install, self.root / 'unsafe', self.source)
+                    self.bundle(self.root / 'unsafe')
         self.assertFalse((self.root / 'unsafe').exists())
 
     def test_tampered_or_unlisted_installer_files_are_rejected(self):
         self.write_install(payload=b'tampered')
         with self.assertRaises(ValueError):
-            bundler.bundle_install(self.install, self.root / 'output', self.source)
+            self.bundle(self.root / 'output')
         self.write_install(extra={'unexpected-private.txt': b'private'})
         with self.assertRaises(ValueError):
-            bundler.bundle_install(self.install, self.root / 'output', self.source)
+            self.bundle(self.root / 'output')
         self.assertFalse((self.root / 'output').exists())
 
     def test_missing_guide_stops_before_delivery(self):
-        (self.source / 'docs/installation.pdf').unlink()
+        (self.rendered / 'installation.pdf').unlink()
         with self.assertRaises(ValueError):
-            bundler.bundle_install(self.install, self.root / 'output', self.source)
-        self.assertFalse((self.root / 'output').exists())
+            self.bundle(self.root / 'output')
+        self.assertFalse(list((self.root / 'output').glob('*.zip')))
 
     def test_guide_traversal_and_symlink_are_rejected(self):
         (self.source / 'docs/installation.md').write_text('![image](../../private.png)')

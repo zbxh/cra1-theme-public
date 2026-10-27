@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build deterministic source/install/update *candidates*. Never touches runtime or live releases."""
 import argparse, hashlib, json, os, pathlib, re, stat, zipfile
-from bundle_install import bundle_install, guide_sources
+from bundle_install import bundle_install, guide_sources, read_source
 ROOT=pathlib.Path(__file__).resolve().parents[2]
 RUNTIME_ROOTS=['cra1-theme/backend','cra1-theme/docs','cra1-theme/licenses','public/web/cra1','public/clientarea/template/pc/cra1','public/clientarea/template/mobile/cra1','public/cart/template/pc/cra1','public/cart/template/mobile/cra1','public/home/template/pc/cra1','public/home/template/mobile/cra1','public/cra1-shared','public/cra1admin','public/cra1-install']
 HELPERS=['lib/cra1_theme_admin.php','lib/cra1_theme_security.php','lib/cra1_theme_media.php','lib/cra1_theme_seo.php','lib/cra1_theme_client_actions.php','bin/cra1-theme-security.php','bin/cra1-theme-media.php','cra1-theme/THIRD_PARTY_NOTICES.md','cra1-theme/scripts/private-path-check.php']
@@ -152,6 +152,10 @@ def main():
     source[rel]=p.read_bytes()
  source['cra1-theme/LICENSE.txt']=(ROOT/'cra1-theme/LICENSE.txt').read_bytes()
  source.update(guides)
+ source['docs/usage.md']=read_source(ROOT,'docs/usage.md')
+ for image in re.findall(r'!\[[^\]]*\]\(([^)]+)\)',source['docs/usage.md'].decode('utf-8')):
+  if not re.fullmatch(r'images/[A-Za-z0-9_-]+\.(?:png|jpg|jpeg|webp)',image):raise RuntimeError('Usage guide images must use reviewed local filenames')
+  source['docs/'+image]=read_source(ROOT,'docs/'+image)
  source['cra1-theme/docs/asset-inventory.json']=(json.dumps(inventory,ensure_ascii=False,indent=2)+'\n').encode()
  for rel in ['public/cra1-shared/README.md','public/clientarea/template/pc/cra1/README.md','public/cra1-shared/package.json','public/cra1-shared/package-lock.json','public/cra1-shared/build.mjs','public/cra1-shared/build-icons.py']:
   if (ROOT/rel).is_file():source[rel]=(ROOT/rel).read_bytes()

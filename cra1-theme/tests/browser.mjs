@@ -51,12 +51,37 @@ try{
  for(const width of [1920,1440,768,390]){
   const context=await browser.newContext({viewport:{width,height:960}}),page=await context.newPage(),errors=[]
   page.on('pageerror',e=>errors.push(e.message))
-  await page.route('**/index.php?*',async route=>{const action=new URL(route.request().url()).searchParams.get('r');if(!['api.release.check','api.release.history'].includes(action))throw Error('Unexpected management request: '+action);const details=page.url().includes('many=1')?{...compatibility,checks:Array.from({length:123},(_,i)=>({id:'file-'+i,status:'unverified',label:'待核验文件 '+(i+1),path:'public/cra1-fixture/file-'+i,detail:'隔离测试'}))}:compatibility;const data=action.endsWith('check')?details:action.endsWith('history')?{current:{},history:[],interrupted:false}:{};await route.fulfill({json:{status:200,data}})})
+  let applications=0
+  await page.route('**/index.php?*',async route=>{
+   const action=new URL(route.request().url()).searchParams.get('r')
+   if(!['api.release.check','api.release.history','api.release.upload','api.release.apply'].includes(action))throw Error('Unexpected management request: '+action)
+   const details=page.url().includes('many=1')?{...compatibility,checks:Array.from({length:123},(_,i)=>({id:'file-'+i,status:'unverified',label:'待核验文件 '+(i+1),path:'public/cra1-fixture/file-'+i,detail:'隔离测试'}))}:compatibility
+   let data=action.endsWith('check')?details:action.endsWith('history')?{current:{},history:[],interrupted:false}:{}
+   if(action.endsWith('upload')){
+    check(route.request().postData().includes('filename="cra1-theme-install.zip"'),`upload uses the same install ZIP ${width}`)
+    data={candidate:'fixture-install',release:'fixture-overlay-v1',version:'v17.1',release_channel:'test',sha256:'a'.repeat(64),signature:'示例安装包',blockers:[],files:[],can_apply:true}
+   }
+   if(action.endsWith('apply')){
+    const body=route.request().postDataJSON()
+    check(body.candidate==='fixture-install'&&body.expectedDigest==='a'.repeat(64),`apply retains confirmed install digest ${width}`)
+    applications++;data={applied:true}
+   }
+   await route.fulfill({json:{status:200,data}})
+  })
   await page.goto(origin+'/management.html');await page.getByText('模块版本待核验',{exact:true}).waitFor()
   check(await page.getByRole('button',{name:'重新检查'}).count()===1,`management loaded ${width}`)
   check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`management no document overflow ${width}`)
   await page.screenshot({path:path.join(output,`management-${width}.png`),fullPage:true})
   await page.getByRole('tab',{name:'安装与更新'}).click();check(await page.locator('input[type=file]').count()===1,`superadmin update upload ${width}`)
+  await page.getByLabel('上传主题安装包 ZIP（最多 80MB）').setInputFiles({name:'cra1-theme-install.zip',mimeType:'application/zip',buffer:Buffer.from('isolated upload fixture; PHP tests validate the real ZIP')})
+  const apply=page.getByRole('button',{name:'确认覆盖更新',exact:true})
+  await apply.waitFor()
+  check(await apply.isEnabled(),`installation preflight allows overwrite ${width}`)
+  page.once('dialog',dialog=>dialog.dismiss());await apply.click()
+  check(applications===0,`cancel leaves installed theme untouched ${width}`)
+  page.once('dialog',dialog=>dialog.accept());await apply.click()
+  await page.getByText('更新完成，请刷新页面加载对应资源。',{exact:true}).waitFor()
+  check(applications===1,`confirmed install submits only once ${width}`)
   check(await page.getByRole('tab').count()===4,`customer management has four tabs ${width}`)
   for(const name of ['版本与兼容','文件明细','安装与更新','备份与回退']){
    await page.getByRole('tab',{name,exact:true}).click()

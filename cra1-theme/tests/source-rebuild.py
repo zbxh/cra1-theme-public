@@ -33,7 +33,7 @@ with tempfile.TemporaryDirectory(prefix='cra1-source-rebuild-') as tmp:
    target=root.joinpath(*p.parts)
    if item.is_dir():target.mkdir(parents=True,exist_ok=True)
    else:target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(archive.read(item))
- for name,rel in [('member','cra1-theme/source/member'),('admin','cra1-theme/source/admin'),('shared','public/cra1-shared'),('website','public/web/cra1/src')]:
+ for name,rel in [('member','cra1-theme/source/member'),('admin','cra1-theme/source/admin'),('shared','public/cra1-shared'),('website','public/web/cra1/src'),('guide','cra1-theme/scripts')]:
   run(['npm','ci','--ignore-scripts','--no-audit','--no-fund'],root/rel,'npm-'+name)
  metadata=json.loads((args.reference/'release.json').read_text())
  stage=out/'rebuilt'

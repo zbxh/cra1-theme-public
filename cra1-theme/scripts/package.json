@@ -1,0 +1,11 @@
+{
+  "name": "cra1-documentation-tools",
+  "private": true,
+  "license": "SEE LICENSE IN ../LICENSE.txt",
+  "type": "module",
+  "engines": {"node": ">=22"},
+  "devDependencies": {
+    "marked": "16.4.1",
+    "playwright": "1.63.0"
+  }
+}

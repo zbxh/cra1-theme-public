@@ -31,7 +31,7 @@ def main():
   packages[kind]=path
  check(set(packages)=={'install','update','source'},'安装、更新及源码包齐全')
  delivery=report.get('delivery',{})
- delivery_name=f"delivery/CRA1-theme-{report.get('version',report['release'])}-install-with-guide.zip"
+ delivery_name=f"delivery/CRA1-theme-{report.get('version',report['release'])}.zip"
  check(delivery.get('path')==delivery_name,'安装交付为包含版本号的单一合集')
  delivery_path=folder/delivery_name
  check(delivery_path.is_file() and delivery_path.stat().st_size==delivery.get('bytes') and sha(delivery_path.read_bytes())==delivery.get('sha256'),'安装合集存在且内容完整')
@@ -44,6 +44,8 @@ def main():
  native=subprocess.run([a.php,'-r',code,str(ROOT),str(packages['update'])],capture_output=True,text=True)
  check(native.returncode==0,'PHP 发行清单、路径、类型、体积及全部负载校验')
  if native.returncode:raise RuntimeError(native.stderr.strip() or 'PHP package inspection failed')
+ native_install=subprocess.run([a.php,'-r',code,str(ROOT),str(packages['install'])],capture_output=True,text=True)
+ check(native_install.returncode==0,'同一安装 ZIP 通过覆盖更新的完整解析与负载校验')
  with zipfile.ZipFile(packages['install']) as install,zipfile.ZipFile(packages['update']) as update,zipfile.ZipFile(packages['source']) as source:
   doc=json.loads(update.read('manifest.json'));files=doc['files']
   check(doc.get('version',doc['release'])==report.get('version',report['release'])==delivery.get('version',delivery.get('release')),'安装合集、更新包及报告使用同一版本号')
@@ -57,7 +59,7 @@ def main():
   repository_docs=['repository-license.json','商业授权.md','发行支持矩阵.md','identity-and-license.md','asset-inventory.json','asset-rights.json','official-baseline-evidence.json','business-acceptance-evidence.json','https-lifecycle-evidence.json']
   check('cra1-theme/LICENSE.txt' not in files and all('cra1-theme/docs/'+name not in files for name in repository_docs) and not any(name.endswith('/Release/LicenseCredential.php') for name in files),'客户安装与更新包无自有许可及内部商业资料')
   check(all('cra1-theme/docs/'+name in source.namelist() for name in repository_docs),'仓库源码保留原始许可与开发记录')
-  check(all(name in source.namelist() for name in ['docs/installation.md','docs/installation.html','docs/installation.pdf','cra1-theme/scripts/bundle_install.py']),'源码包包含安装合集的可复现输入')
+  check(all(name in source.namelist() for name in ['docs/installation.md','docs/usage.md','cra1-theme/scripts/bundle_install.py','cra1-theme/scripts/render-guide.mjs','cra1-theme/scripts/package.json','cra1-theme/scripts/package-lock.json']) and not any(name in source.namelist() for name in ['docs/installation.html','docs/installation.pdf']),'源码包仅保留 Markdown 教程、图片及可复现文档构建输入')
   customer_markers=['商用发行','商业授权','许可证','发行验收','免费商用']
   customer_entries=['public/cra1-install/installer.js','cra1-theme/docs/安装更新与回退.md','cra1-theme/docs/测试版与后续更新.md']
   check(all(not any(marker in install.read(name).decode() for marker in customer_markers) for name in customer_entries),'安装器与客户说明没有内部商业内容')

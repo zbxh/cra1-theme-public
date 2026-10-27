@@ -18,6 +18,7 @@
   <a href="#screenshots">界面预览</a> ·
   <a href="#features">功能特性</a> ·
   <a href="#quick-start">快速安装</a> ·
+  <a href="https://github.com/zbxh/cra1-theme-public/releases/download/v17.1/CRA1-theme-v17.1.zip">主题下载</a> ·
   <a href="#documentation">使用文档</a> ·
   <a href="#community">交流反馈</a>
 </p>
@@ -36,7 +37,7 @@
 
 ## 🖼️ 界面预览
 
-以下为主题界面示例，账户、IP、主机标识和订单等隐私信息已脱敏；登录与注册图使用示例数据。点击图片可查看大图。
+以下按当前版本重新截图。官网、登录与注册页来自匿名页面；会员中心、侧栏、控制面板、通知和后台使用真实主题组件配合示例数据，不包含真实客户资料。点击图片可查看大图。
 
 | 官网首页 | 会员中心 |
 | :---: | :---: |
@@ -44,14 +45,11 @@
 | **服务器控制面板** | **侧边栏导航** |
 | [![服务器控制面板：实例配置、资源与操作入口](docs/images/readme/server-panel.png)](docs/images/preview-server-panel.png) | [![侧边栏导航：多级菜单与产品入口](docs/images/readme/sidebar.png)](docs/images/preview-sidebar.png) |
 
-<details>
-<summary><strong>查看登录与注册页面</strong></summary>
-
 | 登录页面 | 注册页面 |
 | :---: | :---: |
 | [![登录页面：账密登录与验证码登录](docs/images/readme/login.png)](docs/images/preview-login.png) | [![注册页面：账户注册与服务条款](docs/images/readme/register.png)](docs/images/preview-register.png) |
-
-</details>
+| **所有通知** | **主题后台** |
+| [![所有通知：通知列表、搜索与正文阅读](docs/images/readme/notifications.png)](docs/images/preview-notifications.png) | [![主题后台：三个主题与公共设置独立管理](docs/images/readme/admin.png)](docs/images/preview-admin.png) |
 
 <a id="features"></a>
 
@@ -74,12 +72,12 @@
 
 ## 🚀 快速安装
 
-当前提供 **v17.1 测试版**。首次安装与后续更新分别使用对应文件：
+当前提供 **v17.1 测试版**。首次安装和后续手动覆盖更新使用同一份安装包：
 
 | 场景 | 下载与说明 |
 | --- | --- |
-| 首次安装 | [安装包与图文教程合集](https://github.com/zbxh/cra1-theme-public/releases/download/v17.1/CRA1-theme-v17.1-install-with-guide.zip)，包含安装 ZIP、PDF / HTML / Markdown 教程及示意图 |
-| 已安装主题 | [主题更新包](https://github.com/zbxh/cra1-theme-public/releases/download/v17.1/CRA1-theme-v17.1-update.zip)，在主题后台上传更新，无需卸载重装 |
+| 主题下载 | [安装包与图文教程合集](https://github.com/zbxh/cra1-theme-public/releases/download/v17.1/CRA1-theme-v17.1.zip)，包含安装 ZIP、PDF / HTML / Markdown 教程及示意图 |
+| 在线阅读 | [安装图文教程](docs/installation.md) · [主题使用教程](docs/usage.md)，直接在 GitHub 阅读 Markdown |
 | 查看变化 | [版本发布与更新说明](https://github.com/zbxh/cra1-theme-public/releases) |
 
 1. 备份现有网站文件、数据库与配置，下载并在电脑上解压安装合集。
@@ -88,6 +86,8 @@
 4. 完成环境检查，设置主题后台入口与独立账号，安装后进入主题后台编辑页面。
 
 完整步骤见 [安装与更新图文教程](docs/installation.md)。GitHub 自动生成的 **Source code** 压缩包用于源码开发，安装请使用上表中的安装合集。
+
+**已经安装主题：**在电脑上解压同一份合集，到主题后台“主题管理 → 安装与更新”上传里面的 `cra1-theme-install.zip`，预检后确认覆盖更新。保留原配置、后台账号、密钥、媒体、草稿和页面覆盖，无需卸载，也不要在服务器直接解压覆盖。当前不提供单独更新包或在线更新。
 
 <a id="compatibility"></a>
 
@@ -111,7 +111,6 @@
 | 文档 | 内容 |
 | --- | --- |
 | [安装与更新图文教程](docs/installation.md) | 首次安装、目录保护、主题后台设置、更新与回退 |
-| [安装教程 PDF](docs/installation.pdf) | 下载保存或打印阅读 |
 | [主题使用教程](docs/usage.md) | 官网、会员、购物车设置，以及菜单、通知、草稿与自定义代码 |
 | [开发与构建](cra1-theme/docs/开发与构建.md) | 源码目录、依赖安装、构建入口与打包方式 |
 | [版本更新说明](https://github.com/zbxh/cra1-theme-public/releases) | 各版本实际交付的修复与优化 |

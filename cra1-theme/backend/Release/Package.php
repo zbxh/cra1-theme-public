@@ -13,11 +13,19 @@ final class Package
         if($zip->open($archive)!==true)throw new \InvalidArgumentException('无法读取 ZIP 候选包');
         try{
             if($zip->numFiles>Manifest::MAX_FILES+1)throw new \InvalidArgumentException('ZIP 文件数量过多');
-            $manifestStat=$zip->statName('manifest.json');
+            $install=$zip->locateName('manifest.json')===false;
+            $manifestName=$install?'cra1-theme/release.json':'manifest.json';
+            $manifestStat=$zip->statName($manifestName);
             if(!$manifestStat||$manifestStat['size']>8388608)throw new \InvalidArgumentException('发行清单缺失或过大');
-            $raw=$zip->getFromName('manifest.json');
+            $raw=$zip->getFromName($manifestName);
             if(!is_string($raw)||strlen($raw)>8388608)throw new \InvalidArgumentException('发行清单缺失或过大');
-            $doc=Manifest::validate(json_decode($raw,true,512,JSON_THROW_ON_ERROR));
+            $doc=json_decode($raw,true,512,JSON_THROW_ON_ERROR);
+            if(!is_array($doc))throw new \InvalidArgumentException('发行清单格式不支持');
+            if($install){
+                if(!is_array($doc['files']??null)||isset($doc['files'][$manifestName]))throw new \InvalidArgumentException('安装包文件清单无效');
+                $doc['files'][$manifestName]=['sha256'=>hash('sha256',$raw),'bytes'=>strlen($raw)];
+            }
+            $doc=Manifest::validate($doc);
             $seen=[];$bytes=0;
             for($i=0;$i<$zip->numFiles;$i++){
                 $stat=$zip->statIndex($i);$name=$stat['name'];
@@ -25,17 +33,17 @@ final class Package
                 $ops=0;$attrs=0;$zip->getExternalAttributesIndex($i,$ops,$attrs);
                 $type=($attrs>>16)&0170000;
                 if($type!==0&&$type!==0100000)throw new \InvalidArgumentException('ZIP 不允许软链接、目录或特殊文件');
-                if($name==='manifest.json')continue;
-                if(strncmp($name,'payload/',8)!==0)throw new \InvalidArgumentException('ZIP 含清单外内容');
-                $path=Manifest::path(substr($name,8));$row=$doc['files'][$path]??null;
+                if(!$install&&$name==='manifest.json')continue;
+                if(!$install&&strncmp($name,'payload/',8)!==0)throw new \InvalidArgumentException('ZIP 含清单外内容');
+                $path=Manifest::path($install?$name:substr($name,8));$row=$doc['files'][$path]??null;
                 if(!$row||(int)$stat['size']!==$row['bytes'])throw new \InvalidArgumentException('文件不在清单或体积不符：'.$path);
                 $bytes+=(int)$stat['size'];if($bytes>Manifest::MAX_BYTES)throw new \InvalidArgumentException('ZIP 解压体积过大');
                 $stream=$zip->getStream($name);if(!$stream)throw new \RuntimeException('ZIP 文件无法读取');
                 try{$hash=hash_init('sha256');hash_update_stream($hash,$stream,$row['bytes']+1);$actual=hash_final($hash);}finally{fclose($stream);}
                 if(!hash_equals($row['sha256'],$actual))throw new \InvalidArgumentException('文件校验失败：'.$path);
             }
-            if(count($seen)!==count($doc['files'])+1)throw new \InvalidArgumentException('发行包文件缺失');
-            return ['manifest'=>$doc,'sha256'=>hash_file('sha256',$archive),'bytes'=>$bytes];
+            if(count($seen)!==count($doc['files'])+($install?0:1))throw new \InvalidArgumentException('发行包文件缺失');
+            return ['manifest'=>$doc,'sha256'=>hash_file('sha256',$archive),'bytes'=>$bytes,'archive_format'=>$install?'install':'legacy-update'];
         }finally{$zip->close();}
     }
 
@@ -47,7 +55,7 @@ final class Package
         if(!mkdir($dir,0700,true))throw new \RuntimeException('暂存目录不可写');
         $zip=new \ZipArchive();$zip->open($archive);
         try{foreach($checked['manifest']['files']as$path=>$row){
-            $bytes=$zip->getFromName('payload/'.$path);
+            $bytes=$zip->getFromName(($checked['archive_format']==='install'?'':'payload/').$path);
             if(!is_string($bytes)||!hash_equals($row['sha256'],hash('sha256',$bytes)))throw new \RuntimeException('暂存文件校验失败');
             Files::atomic($dir.'/'.$path,$bytes,0600);
         }}finally{$zip->close();}

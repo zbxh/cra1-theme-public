@@ -6,13 +6,14 @@ import json
 import pathlib
 import re
 import stat
+import os
+import shutil
+import subprocess
 import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 GUIDES = {
     'docs/installation.md': '安装教程/安装教程.md',
-    'docs/installation.html': '安装教程/安装教程.html',
-    'docs/installation.pdf': '安装教程/安装教程.pdf',
     'cra1-theme/docs/nginx.example.conf': '安装教程/nginx.example.conf',
 }
 
@@ -43,7 +44,21 @@ def guide_sources(root):
             raise ValueError('Guide images must use local reviewed filenames')
         rel = 'docs/' + image
         files[rel] = read_source(root, rel)
-    if not files['docs/installation.pdf'].startswith(b'%PDF-'):
+    return files
+
+
+def rendered_guide(source, output, rendered=None):
+    """Generated formats are build artifacts, never inputs tracked in Git."""
+    if rendered is None:
+        rendered = output / 'generated-guide'
+        node = os.environ.get('CRA1_NODE_BINARY') or shutil.which('node')
+        if not node:
+            raise ValueError('Node is required to render the offline guide')
+        subprocess.run([node, str(source / 'cra1-theme/scripts/render-guide.mjs'),
+                        '--source', str(source), '--out', str(rendered)], check=True)
+    rendered = pathlib.Path(rendered).resolve()
+    files = {name: read_source(rendered, name) for name in ['installation.html', 'installation.pdf']}
+    if not files['installation.pdf'].startswith(b'%PDF-'):
         raise ValueError('Installation PDF is invalid')
     return files
 
@@ -83,7 +98,7 @@ def install_identity(archive):
     return install_metadata(archive)['release']
 
 
-def bundle_install(install, output, source=ROOT):
+def bundle_install(install, output, source=ROOT, rendered=None):
     install = pathlib.Path(install).resolve()
     source = pathlib.Path(source).resolve()
     output = pathlib.Path(output).resolve()
@@ -92,21 +107,26 @@ def bundle_install(install, output, source=ROOT):
     metadata = install_metadata(install)
     release, version = metadata['release'], metadata['version']
     guides = guide_sources(source)
-    filename = f'CRA1-theme-{version}-install-with-guide.zip'
+    filename = f'CRA1-theme-{version}.zip'
     output.mkdir(parents=True, exist_ok=True)
     target = output / filename
     if target.exists():
         raise FileExistsError('Delivery already exists; refusing to overwrite it')
+    rendered_files = rendered_guide(source, output, rendered)
     files = {'cra1-theme-install.zip': install.read_bytes()}
     for relative, data in guides.items():
         name = GUIDES.get(relative, '安装教程/' + relative.removeprefix('docs/'))
         files[name] = data
+    for name, data in rendered_files.items():
+        files['安装教程/安装教程.' + name.rsplit('.', 1)[1]] = data
     files['开始安装.txt'] = (
         f'酷锐A1主题安装合集\n版本：{version}' + ('（测试版）' if metadata['release_channel'] == 'test' else '') + '\n\n'
         '1. 先在电脑上解压本合集，阅读“安装教程/安装教程.pdf”或“安装教程/安装教程.html”。\n'
         '2. 实际上传网站的是 cra1-theme-install.zip，解压到 V10 网站根目录，与 config.php、vendor 和 public 同级。\n'
         '3. 按教程配置目录保护、完成自检，再使用 V10 超级管理员进入安装向导。\n\n'
-        '本包用于首次安装。已安装主题请使用配套更新包，在主题后台“主题管理 → 安装与更新”操作。\n'
+        '首次安装按上面的步骤操作。已有主题：不要在服务器直接解压覆盖，\n'
+        '请在主题后台“主题管理 → 安装与更新”上传同一个 cra1-theme-install.zip，\n'
+        '预检通过后确认覆盖更新；主题配置、账号、密钥、媒体、草稿和页面覆盖会保留。\n'
         '教程使用示例资料，密码已隐藏或遮盖，请填写自己的信息。\n\n'
         '安装交流 QQ 群：603107399\n加群链接：https://qm.qq.com/q/O3d7bVtcoS\n'
     ).encode('utf-8')
@@ -132,8 +152,9 @@ def main():
     parser.add_argument('--install', required=True, type=pathlib.Path)
     parser.add_argument('--out', required=True, type=pathlib.Path)
     parser.add_argument('--source', default=ROOT, type=pathlib.Path)
+    parser.add_argument('--guide-dir', type=pathlib.Path, help='Pre-rendered external HTML/PDF directory')
     args = parser.parse_args()
-    print(json.dumps(bundle_install(args.install, args.out, args.source), ensure_ascii=False, indent=2))
+    print(json.dumps(bundle_install(args.install, args.out, args.source, args.guide_dir), ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':
