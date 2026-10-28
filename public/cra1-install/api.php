@@ -17,7 +17,10 @@ try{
     $result=\CRA1\Theme\Http\NativeAdmin::run($root,$bearer,static function()use($root,$input,$https){
         $installer=new \CRA1\Theme\Release\Installer($root);$siteOrigin='https://'.(string)$_SERVER['HTTP_HOST'];
         // Native authentication above must succeed before any installer probe writes.
-        if($installer->state()['mode']==='install')\CRA1\Theme\Release\PrivatePaths::ensure($root,$siteOrigin);
+        if($installer->state()['mode']==='install') {
+            try { \CRA1\Theme\Release\PrivatePaths::ensure($root,$siteOrigin); }
+            catch(Throwable $error) { error_log('CRA1 installer environment probe failed: '.get_class($error)); }
+        }
         $preflight=$installer->preflight(['https'=>$https,'origin'=>$siteOrigin]);
         if($input['action']==='check')return ['status'=>200,'data'=>$preflight];
         $model=new \app\common\model\ConfigurationModel();

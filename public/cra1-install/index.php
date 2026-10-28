@@ -11,7 +11,7 @@ $assetVersion=substr(hash('sha256',(string)file_get_contents(__DIR__.'/installer
 ?><!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>酷锐A1主题安装与维护</title><link rel="stylesheet" href="installer.css?v=<?=$assetVersion?>"></head><body>
 <main id="installer" data-csrf="<?=htmlspecialchars($csrf,ENT_QUOTES,'UTF-8')?>">
 <h1>酷锐A1主题安装与维护</h1><p>先在同一浏览器登录 V10 超级管理员账号，再开始检查。安装保留原有系统设置与客户数据。</p>
-<ol><li>验证管理员与环境</li><li>检查兼容与文件</li><li>设置主题后台</li><li>安装并自检</li></ol>
+<ol><li>验证管理员与运行环境</li><li>设置主题后台</li><li>安装完成</li></ol>
 <button type="button" id="check">验证并检查</button><p id="status" role="status"></p><div id="checks"></div>
 <form id="setup" hidden autocomplete="off"><h2>设置主题后台</h2>
 <label>后台地址<input name="entry" pattern="[a-z][a-z0-9]{5,31}" minlength="6" maxlength="32" required placeholder="例如 cra1admin"></label>

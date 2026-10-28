@@ -14,17 +14,16 @@
     if(busy)return;lock(true);status.textContent='正在验证身份并自动检查安装环境…';form.hidden=true;
     try{
       const data=await request({action:'check'}),out=document.getElementById('checks');out.replaceChildren();
-      const labels={pass:'通过',warning:'警告',blocked:'阻断',unverified:'未验证'};
-      const passed=document.createElement('details'),summary=text('summary',`已通过 ${data.checks.filter(row=>row.status==='pass').length} 项检查（展开明细）`);passed.append(summary);
-      for(const row of data.checks){const p=text('p',`${labels[row.status]} · ${row.label}：${row.detail}${row.path?'（'+row.path+'）':''}`);p.dataset.state=row.status;(row.status==='pass'?passed:out).append(p);}
-      out.append(passed);
+      const labels={pass:'通过',warning:'提示',blocked:'请处理',unverified:'待检查'};
+      for(const row of data.checks){const p=text('p',`${labels[row.status]} · ${row.label}：${row.detail}`);p.dataset.state=row.status;out.append(p);}
       if(data.identity){
-        const info=text('p',`${data.identity.display_name} · ${data.version||data.release}${data.release_channel==='test'?'（测试版）':''}`);out.prepend(info);
+        const system=data.environment?.system_version;
+        const info=text('p',`${data.identity.display_name} · ${data.version||data.release}${data.release_channel==='test'?'（测试版）':''}${system?' · V10 '+system:''}`);out.prepend(info);
 
       }
       if(data.mode==='maintenance'){status.textContent='此站已有 CRA1 安装，请从现有主题后台进入“主题管理”。';return;}
       const ready=data.installation_ready===true;
-      status.textContent=ready?'检查完成，请设置主题后台。':'环境或文件检查尚有阻断或未确认项，请处理后重新检查。';form.hidden=!ready;
+      status.textContent=ready?'运行环境检查通过，请设置主题后台。':'运行环境暂不满足，请处理下面提示后重新检查。';form.hidden=!ready;
       form.elements.canonical.value=location.origin;
     }catch(error){status.textContent=error.message;}finally{lock(false);}
   });

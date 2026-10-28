@@ -23,7 +23,7 @@ final class Installer
         $entry=is_file($path)?($record['entry']??null):'cra1admin';
         if(!is_string($entry)||!preg_match('/^[a-z][a-z0-9]{5,31}$/D',$entry))throw new \RuntimeException('主题后台地址记录无效，请从现有主题后台维护');
         $options['entry']=$entry;
-        return Inspector::inspect($this->root,$options)+$this->state();
+        return InstallationEnvironment::inspect($this->root,$options)+$this->state();
     }
 
     /** Both callbacks are native API contracts; tests provide fully isolated implementations. */

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
-require dirname(__DIR__).'/backend/bootstrap.php';
+define('CRA1_THEME_BACKEND',dirname(__DIR__).'/backend');
+require CRA1_THEME_BACKEND.'/bootstrap.php';
 use CRA1\Theme\Release\Installer;
 use CRA1\Theme\Files;
 $base=sys_get_temp_dir().'/cra1-installer-'.bin2hex(random_bytes(6));mkdir($base,0700);$checks=0;
@@ -14,8 +15,8 @@ try{
  $installer=fixture($base.'/fail');$saved=[];
  $inspectionOptions=['https'=>true,'context'=>['database'=>true,'system_version'=>'10.7.4','modules'=>[]]];
  $inspection=$installer->preflight($inspectionOptions+['entry'=>'untrusted']);
- $adminRows=array_values(array_filter($inspection['checks'],static function($row){return $row['id']==='file:public/cra1admin/probe.php';}));
- check(count($adminRows)===1&&$adminRows[0]['status']==='pass','fresh installation checks the packaged admin entry, not a supplied path');
+ check($inspection['scope']==='environment'&&count($inspection['checks'])===6,'fresh installation checks only the six environment groups');
+ check(strpos(json_encode($inspection),'untrusted')===false,'administrator entry comes from the installation record, never supplied inspection options');
  $read=static function()use($previous){return $previous;};
  $save=static function($value)use(&$saved){$saved[]=$value;return count($saved)===1?['status'=>400]:['status'=>200];};
  $rejected=false;try{$installer->install($input,$read,$save,['counts'=>['blocked'=>1,'unverified'=>0]]);}catch(RuntimeException $e){$rejected=true;}
@@ -34,8 +35,7 @@ try{
  check($saved[0]['home_host_theme']===$previous['home_host_theme']&&$saved[0]['cart_instruction_content']==='merchant copy','native unrelated settings preserved');
  check($installer->state()['mode']==='maintenance','installer locked after success');
  $inspection=$installer->preflight($inspectionOptions);
- $adminRows=array_values(array_filter($inspection['checks'],static function($row){return $row['id']==='file:public/cra1admin/probe.php';}));
- check($inspection['mode']==='maintenance'&&count($adminRows)===1&&$adminRows[0]['status']==='pass','maintenance inspection resolves the actual renamed administrator entry');
+ check($inspection['mode']==='maintenance'&&$inspection['scope']==='environment','maintenance revisit preserves the renamed administrator entry without repeating file audits');
  $entryRecord=$base.'/success/runtime/cra1_theme/entry.json';
  Files::putJson($entryRecord,['entry'=>'../outside']);$rejected=false;
  try{$installer->preflight($inspectionOptions);}catch(RuntimeException $e){$rejected=true;}
