@@ -19,6 +19,7 @@ if (!defined('CRA1_THEME_BACKEND')) {
         $noLinks($file);
         if (!is_file($file)) return [];
         if (is_link($file)) throw new \RuntimeException('主题发行清单归属异常');
+        if (!is_readable($file)) throw new \RuntimeException('主题发行记录无法读取，请在网站面板检查主题文件及目录的读取权限');
         $doc = json_decode((string)file_get_contents($file),true);
         if (!is_array($doc) || json_last_error()!==JSON_ERROR_NONE) throw new \RuntimeException('主题发行清单损坏，原文件保留');
         return $doc;

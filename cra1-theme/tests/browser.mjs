@@ -3,7 +3,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
 import {createHash} from 'node:crypto'
-import http from 'node:http'
+import https from 'node:https'
+import {spawnSync} from 'node:child_process'
 import {createRequire} from 'node:module'
 const root=path.resolve(path.dirname(new URL(import.meta.url).pathname),'../..')
 const req=createRequire(path.join(root,'cra1-theme/source/admin/package.json'))
@@ -21,7 +22,9 @@ installer=installer.replace(/<\?=htmlspecialchars\(\$csrf,ENT_QUOTES,'UTF-8'\)\?
 installer=installer.replace(/<\?=\$assetVersion\?>/g,'fixture-current-assets')
 const assetDir=process.env.CRA1_ADMIN_ASSETS
 if(!assetDir)throw Error('Set CRA1_ADMIN_ASSETS to the staged admin release')
-const server=http.createServer((r,s)=>{
+const certificate=spawnSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-days','1','-keyout',path.join(temp,'key.pem'),'-out',path.join(temp,'cert.pem'),'-subj','/CN=127.0.0.1','-addext','subjectAltName=IP:127.0.0.1'],{encoding:'utf8'})
+if(certificate.status!==0)throw Error('Unable to create isolated HTTPS fixture')
+const server=https.createServer({key:fs.readFileSync(path.join(temp,'key.pem')),cert:fs.readFileSync(path.join(temp,'cert.pem'))},(r,s)=>{
  const u=new URL(r.url,'http://fixture.invalid');let file
  if(u.pathname==='/management.html'){s.setHeader('Content-Type','text/html');s.end(`<!doctype html><html><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/admin.css"><body class="p-4"><div id="root"></div><script>window.__CRA1_ADMIN__={role:new URLSearchParams(location.search).get('role')||'super_admin',csrf:'fixture-csrf',base:'/index.php'};</script><script src="/management.js"></script></body></html>`);return}
  if(u.pathname==='/appearance.html'){s.setHeader('Content-Type','text/html');s.end('<!doctype html><html><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/admin.css"><body><div id="root" style="width:min(100%,256px);margin:16px auto"></div><script src="/management.js"></script></body></html>');return}
@@ -43,13 +46,13 @@ const server=http.createServer((r,s)=>{
  s.statusCode=404;s.end('fixture not found')
 })
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve))
-const origin=`http://127.0.0.1:${server.address().port}`
+const origin=`https://127.0.0.1:${server.address().port}`
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});const results=[];let writes=0
 function check(ok,label){if(!ok)throw Error(label);results.push(label)}
 const compatibility={release:'fixture-candidate',context:{system_version:'10.7.4'},compatible:false,counts:{pass:1,warning:0,blocked:1,unverified:1},checks:[{id:'fixture',status:'blocked',label:'模块版本待核验',path:'public/plugins/server/mf_cloud/MfCloud.php',detail:'数据库与源码版本不一致',impact:'增强操作暂不可用',owner:'V10 原文件（只读）'}]}
 try{
  for(const width of [1920,1440,768,390]){
-  const context=await browser.newContext({viewport:{width,height:960}}),page=await context.newPage(),errors=[]
+  const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:960}}),page=await context.newPage(),errors=[]
   page.on('pageerror',e=>errors.push(e.message))
   let applications=0
   await page.route('**/index.php?*',async route=>{
@@ -111,7 +114,7 @@ try{
   ready=true;await page.getByRole('button',{name:'验证并检查'}).click();await page.locator('#setup').waitFor({state:'visible'})
   check(!/商业授权|商用发行|许可证|发行验收|免费商用/.test(await page.locator('body').innerText()),`installer contains only setup steps ${width}`)
   await page.screenshot({path:path.join(output,`installer-${width}.png`),fullPage:true})
-  await page.locator('[name=entry]').fill('fixtureadmin');await page.locator('[name=username]').fill('fixture-admin');await page.locator('[name=password]').fill('Fixture-password-2026!');await page.locator('[name=confirm]').fill('Fixture-password-2026!');await page.locator('[name=canonical]').fill('https://fixture.invalid')
+  await page.locator('[name=entry]').fill('fixtureadmin');await page.locator('[name=username]').fill('fixture-admin');await page.locator('[name=password]').fill('Fixture-password-2026!');await page.locator('[name=confirm]').fill('Fixture-password-2026!');await page.locator('[name=canonical]').fill(origin)
   await page.getByRole('button',{name:'完成安装'}).click();await page.getByText('安装成功，初始化入口已锁定。').waitFor()
   check((await page.locator('#success').innerText()).includes('安装不会自动切换当前网站。'),`installer preserves the current website ${width}`)
   check(await page.getByRole('link',{name:'登录主题后台'}).getAttribute('href')==='/fixtureadmin/index.php',`installer links to independent administrator login ${width}`)
@@ -127,7 +130,7 @@ try{
   await page.screenshot({path:path.join(output,`appearance-narrow-${width}.png`),fullPage:true})
   await context.close()
  }
- const page=await browser.newPage();const errors=[];page.on('pageerror',e=>{errors.push(e.message);console.error('Native dependency error: '+e.message)});await page.goto(origin+'/native.html')
+ const page=await browser.newPage({ignoreHTTPSErrors:true});const errors=[];page.on('pageerror',e=>{errors.push(e.message);console.error('Native dependency error: '+e.message)});await page.goto(origin+'/native.html')
  await page.evaluate(()=>CRA1ModuleDeps.ensure(['batchRenewpage','flowPacket']))
  check(await page.evaluate(()=>typeof asideMenu==='object'&&typeof topMenu==='object'&&typeof batchRenewpage==='object'&&typeof flowPacket==='object'),'real native component bindings loaded')
  await page.evaluate(()=>CRA1ModuleDeps.ensure(['batchRenewpage','flowPacket']));check(errors.length===0,'native loader has no duplicate const or missing shell errors')

@@ -12,6 +12,36 @@ $previous=['admin_theme'=>'default','clientarea_theme'=>'default','cart_theme'=>
 $input=['entry'=>'cloudcustom','username'=>'fixture_admin','password'=>'Isolated-password-123!','canonical'=>'https://fixture.invalid'];$passed=['counts'=>['blocked'=>0,'unverified'=>0]];
 try{
  $noAuth=\CRA1\Theme\Http\NativeAdmin::run($base,'',static function(){throw new RuntimeException('must not run');});check($noAuth['status']===401,'anonymous first visitor cannot create admin');
+ $originInstaller=fixture($base.'/origin');$origin='https://fixture.invalid:8443';
+ $rejected=false;try{$originInstaller->install($input,$passed,$origin);}catch(InvalidArgumentException $e){$rejected=true;}
+ check($rejected&&!is_file($base.'/origin/config/cra1_theme_security.key'),'a different port is rejected before creating credentials');
+ $rejected=false;try{$originInstaller->install(array_replace($input,['canonical'=>'https://other.invalid:8443']),$passed,$origin);}catch(InvalidArgumentException $e){$rejected=true;}
+ check($rejected,'a different hostname cannot lock the new administrator out');
+ $rejected=false;try{$originInstaller->install(array_replace($input,['username'=>['invalid']]),$passed,$origin);}catch(InvalidArgumentException $e){$rejected=true;}
+ check($rejected,'installation fields cannot be coerced from arrays');
+ $result=$originInstaller->install(array_replace($input,['canonical'=>'https://FIXTURE.invalid:8443/']),$passed,$origin);
+ $security=new CRA1ThemeSecurity($base.'/origin');check($security->settings()['canonical_url']===$origin,'equivalent canonical URLs are saved using the actual installation origin');unset($security);
+ foreach(['key','database','marker']as$partial){
+  $dir=$base.'/partial-'.$partial;$incomplete=fixture($dir);
+  $file=$partial==='key'?'/config/cra1_theme_security.key':($partial==='database'?'/runtime/cra1_theme/security.sqlite':'/runtime/cra1_theme/install.json');
+  Files::atomic($dir.$file,'retained partial record');$hash=hash_file('sha256',$dir.$file);$rejected=false;
+  try{$incomplete->state();}catch(RuntimeException $e){$rejected=strpos($e->getMessage(),'不完整')!==false;}
+  check($rejected&&hash_file('sha256',$dir.$file)===$hash,'incomplete '.$partial.' is reported without discarding existing data');
+ }
+ $dir=$base.'/partial-pair';$incomplete=fixture($dir);
+ Files::atomic($dir.'/config/cra1_theme_security.key',random_bytes(32));Files::atomic($dir.'/runtime/cra1_theme/security.sqlite','');$rejected=false;
+ try{$incomplete->state();}catch(RuntimeException $e){$rejected=strpos($e->getMessage(),'不完整')!==false;}
+ check($rejected&&filesize($dir.'/runtime/cra1_theme/security.sqlite')===0,'two files without an initialized account are not mistaken for a completed installation');
+ $dir=$base.'/existing-entry';$preserve=fixture($dir);Files::putJson($dir.'/runtime/cra1_theme/entry.json',['entry'=>'previousadmin']);
+ $entryBytes=file_get_contents($dir.'/runtime/cra1_theme/entry.json');
+ Files::atomic($dir.'/runtime/cra1_theme/cart_theme.json','damaged merchant data');$rejected=false;
+ try{$preserve->install($input,$passed);}catch(RuntimeException $e){$rejected=true;}
+ check($rejected&&file_get_contents($dir.'/runtime/cra1_theme/entry.json')===$entryBytes,'damaged existing configuration is rejected without losing its administrator entry');
+ check(!is_file($dir.'/runtime/cra1_theme/security.sqlite')&&is_dir($dir.'/public/cra1admin'),'invalid pre-existing data is caught before identity creation or administrator rename');
+ unlink($dir.'/runtime/cra1_theme/cart_theme.json');Files::atomic($dir.'/runtime/cra1_theme/attachments.sqlite','damaged existing media store');$rejected=false;
+ try{$preserve->install($input,$passed);}catch(Throwable $e){$rejected=true;}
+ check($rejected&&file_get_contents($dir.'/runtime/cra1_theme/entry.json')===$entryBytes,'late initialization failure restores an existing administrator entry byte for byte');
+ check(is_dir($dir.'/public/cra1admin')&&!is_file($dir.'/runtime/cra1_theme/security.sqlite'),'late failure restores the directory and removes only newly created identities');
  $installer=fixture($base.'/fail');
  $inspectionOptions=['https'=>true,'context'=>['database'=>true,'system_version'=>'10.7.4','modules'=>[]]];
  $inspection=$installer->preflight($inspectionOptions+['entry'=>'untrusted']);

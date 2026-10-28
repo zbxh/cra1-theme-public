@@ -6,6 +6,23 @@ use CRA1\Theme\Files;
 /** Initial installation checks the host environment, independently of business compatibility. */
 final class InstallationEnvironment
 {
+    private static function existingDirectory(string $root,string $relative): string
+    {
+        $path=rtrim($root,'/').'/'.$relative;
+        while(!file_exists($path)&&dirname($path)!==$path)$path=dirname($path);
+        return $path;
+    }
+
+    private static function writableDirectory(string $root,string $relative): bool
+    {
+        $path=rtrim($root,'/').'/'.$relative;
+        try{
+            Files::noLinks($path);
+            $path=self::existingDirectory($root,$relative);
+            return is_dir($path)&&is_writable($path)&&is_executable($path);
+        }catch(\Throwable $error){return false;}
+    }
+
     private static function context(string $root): array
     {
         try {
@@ -44,18 +61,53 @@ final class InstallationEnvironment
 
         $entry = (string)($options['entry'] ?? 'cra1admin');
         if (!preg_match('/^[a-z][a-z0-9]{5,31}$/D',$entry)) throw new \InvalidArgumentException('主题后台地址记录无效');
-        $unwritable = [];
-        foreach (['runtime/cra1_theme','config','public/upload','public','public/'.$entry,'public/cra1-install','cra1-theme/backend'] as $directory) {
-            $path = rtrim($root,'/').'/'.$directory;
-            try {
-                Files::noLinks($path);
-                while (!file_exists($path) && dirname($path) !== $path) $path = dirname($path);
-                if (!is_dir($path) || !is_writable($path)) $unwritable[] = $directory;
-            } catch (\Throwable $error) {
-                $unwritable[] = $directory;
-            }
+        $release = Files::json($root.'/cra1-theme/release.json',true);
+        $current = Files::json($root.'/runtime/cra1_theme/distribution/current.json',true);
+        if (isset($current['manifest']) && is_array($current['manifest'])) $release = $current['manifest'];
+        $unwritable = [];$unreadable=[];$referenceError='';
+        // Program directories and controllers are read-only during initialization.
+        // Only identity/configuration storage and missing native references need writes.
+        foreach(['runtime/cra1_theme','runtime/cra1_theme/distribution','config']as$directory)if(!self::writableDirectory($root,$directory))$unwritable[]=$directory;
+        $references=$release['references']??[];
+        foreach($references as$destination=>$target){
+            if(!is_string($destination))continue;
+            Manifest::path($destination.'/permission-check');
+            if(!file_exists($root.'/'.$destination)&&!is_link($root.'/'.$destination)&&!self::writableDirectory($root,dirname($destination)))$unwritable[]=dirname($destination);
         }
-        $add('directories',$unwritable?'blocked':'pass','目录权限',$unwritable?'请检查这些目录的写入权限：'.implode('、',$unwritable):'主题配置、图片和安装目录可写');
+        // A previous extraction may already contain dependency directories. In
+        // copy mode, check only parents of files that actually need to change.
+        if($references&&References::usesCopies($root,$references)){
+            try{
+                foreach(References::copyPlan($root,$references)as$destination=>$row){
+                    if($row['before']!==$row['after']&&!self::writableDirectory($root,dirname($destination)))$unwritable[]=dirname($destination);
+                }
+            }catch(\Throwable $error){$referenceError='原生页面资源暂时无法准备，请检查安装包是否完整解压后重新检查';}
+        }
+        foreach(['public/cra1-install','public/'.$entry,'cra1-theme/backend']as$directory){
+            $path=$root.'/'.$directory;
+            if(!file_exists($path)&&!is_link($path))continue;
+            try{Files::noLinks($path);if(!is_dir($path)||!is_readable($path)||!is_executable($path))$unreadable[]=$directory;}
+            catch(\Throwable $error){$unreadable[]=$directory;}
+        }
+        foreach(['public/cra1-install/index.php','public/cra1-install/api.php','public/cra1-install/installer.js','public/cra1-install/installer.css','public/'.$entry.'/index.php','cra1-theme/backend/bootstrap.php']as$file){
+            $path=$root.'/'.$file;if(file_exists($path)&&(!is_file($path)||!is_readable($path)))$unreadable[]=$file;
+        }
+        $details=[];$locations=[];
+        foreach($unwritable as$directory){
+            $path=self::existingDirectory($root,$directory);
+            $relative=$path===rtrim($root,'/')?'网站根目录':substr($path,strlen(rtrim($root,'/'))+1);
+            $locations[$relative]=true;
+        }
+        ksort($locations);$parents=[];
+        foreach(array_keys($locations)as$directory){
+            $covered=isset($locations['网站根目录']);
+            foreach($parents as$parent)if(strpos($directory,$parent.'/')===0)$covered=true;
+            if(!$covered||$directory==='网站根目录')$parents[]=$directory;
+        }
+        if($parents)$details[]='PHP 运行用户需要写入：'.implode('、',$parents).'（含需要创建或补齐的子目录），请在网站面板检查属主及写入权限';
+        if($unreadable)$details[]='请检查解压文件是否完整、目录可访问及文件可读：'.implode('、',array_unique($unreadable));
+        if($referenceError!=='')$details[]=$referenceError;
+        $add('directories',$details?'blocked':'pass','目录权限',$details?implode('；',$details).'。无需将整站设为 777':'初始化目录可写，主题程序可读');
 
         $https = $options['https'] ?? (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
         $add('https',$https?'pass':'blocked','HTTPS',$https?'已通过 HTTPS 访问':'请通过本站有效的 HTTPS 地址安装');
@@ -68,9 +120,6 @@ final class InstallationEnvironment
         if (is_file($root.'/runtime/cra1_theme/distribution/pending.json')) {
             $add('interrupted','blocked','安装状态','存在未完成的主题更新，请从现有主题后台恢复后再操作');
         }
-        $release = Files::json($root.'/cra1-theme/release.json',true);
-        $current = Files::json($root.'/runtime/cra1_theme/distribution/current.json',true);
-        if (isset($current['manifest']) && is_array($current['manifest'])) $release = $current['manifest'];
         $identity = isset($release['theme_id']) ? Identity::project($release) : null;
         $counts = ['pass'=>0,'warning'=>0,'blocked'=>0,'unverified'=>0];
         foreach ($rows as $row) $counts[$row['status']]++;
