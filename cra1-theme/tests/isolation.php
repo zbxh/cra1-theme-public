@@ -9,6 +9,13 @@ check(CRA1ThemePublicProjection::code(['css_enabled'=>false,'css'=>'private-disa
 check(strpos(json_encode(CRA1ThemePublicProjection::content(['enabled'=>false,'secret'=>'disabled text'])),'disabled text')===false,'disabled content excluded');
 check(!CRA1ThemeRuntime::project(['recharge_open'=>0,'recharge_notice'=>1,'recharge_money_notice_content'=>'off-secret'],[],'recharge')['features']['recharge_open'],'recharge closed');
 check(strpos(json_encode(CRA1ThemeRuntime::project(['recharge_open'=>0,'recharge_notice'=>1,'recharge_money_notice_content'=>'off-secret'],[],'recharge')),'off-secret')===false,'closed recharge notice excluded');
+$copyright=['copyright_info'=>'© 2026 商家 Cloud Theme · 商家说明','website_name'=>'Cloud Theme 商家站名'];
+$website=CRA1ThemeRuntime::project($copyright,[],'website');
+check($website['common']['copyright_info']==='© 2026 商家 · 商家说明','retired theme name removed only from displayed copyright');
+check($copyright['copyright_info']==='© 2026 商家 Cloud Theme · 商家说明'&&$website['common']['website_name']===$copyright['website_name'],'stored copyright and merchant website name remain intact');
+foreach(['','© 2026 商家版权所有','Cloud ThemeWorks','MyCloud Theme']as$text)check(\CRA1\Theme\Presentation\Footer::copyrightText($text)===$text,'unrelated and explicitly empty copyright remains intact');
+check(\CRA1\Theme\Presentation\Footer::copyrightText('cloud THEME')==='','legacy name matching is case insensitive');
+check(!isset(CRA1ThemeRuntime::project($copyright,[],'login')['common']['copyright_info']),'copyright cleanup does not expand auth projection');
 // Include all CRA1 hooks without a native application; callbacks never run for mycra1.
 $hooks=[];function add_hook($name,$callback){$GLOBALS['hooks'][$name][]=$callback;}
 function runtime_path(){return sys_get_temp_dir().'/cra1-isolation-empty-'.getmypid().'/';}

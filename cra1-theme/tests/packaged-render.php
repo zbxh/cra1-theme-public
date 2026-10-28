@@ -59,7 +59,12 @@ foreach($websitePages as $key=>$page){
     $data['config']=cra1_system_display_config();$data['url']='https://fixture.invalid'.$page['route'];
     $html=packagedRender(IDCSMART_ROOT.'public/web/cra1/'.$tplName.'.html',['data'=>$data,'title'=>'Fixture','keywords'=>'','description'=>''],IDCSMART_ROOT.'public/web/cra1','html');
     packagedCheck(strpos($html,'<html')!==false&&strpos($html,'</html>')!==false,'website document '.$key);packagedAssets($html,'website:'.$key);$pages[]='website:'.$key;
+    if (empty($page['aliasOf'])) packagedCheck(substr_count($html,'>主题：酷锐A1</a>')===1,'one fixed attribution per website footer '.$key);
 }
+$data['cra1']['show_footer_bottom']=0;
+$hidden=packagedRender($headerBase.'/footer.html',['data'=>$data],$headerBase,'html');
+packagedCheck(substr_count($hidden,'>主题：酷锐A1</a>')===1&&strpos($hidden,'https://github.com/zbxh/cra1-theme-public')!==false,'hiding merchant footer content preserves theme attribution and destination');
+packagedCheck(strpos($hidden,'termsServiceUrl()')===false,'merchant footer visibility continues to hide merchant links');
 foreach(['pc','mobile'] as $device){
     $themes=$device.'/cra1';$member=IDCSMART_ROOT.'public/clientarea/template/'.$themes;
     $vars=['title'=>'Fixture','addons'=>[],'template_catalog'=>'clientarea','template_catalog_home'=>'home','template_catalog_cart'=>'cart','themes'=>$themes,'themes_home'=>$themes,'themes_cart'=>$themes,'public_themes'=>$themes,'clientarea_theme_color'=>'default','system_version'=>'10.7.4','lang_home'=>'zh-cn','lang_home_follow_browser'=>0,'lang_home_open'=>0];

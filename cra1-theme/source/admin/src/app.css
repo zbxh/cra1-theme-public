@@ -42,7 +42,11 @@ button:disabled { cursor:not-allowed; }
 .admin-header { display:flex; align-items:center; height:57px; gap:8px; padding:0 20px; border-bottom:1px solid var(--border); background:#fff; position:sticky; top:0; z-index:30; }
 .header-divider { height:18px; width:1px; background:var(--border); margin:0 6px; }
 .admin-content { flex:1; width:100%; max-width:1440px; margin:0 auto; padding:28px 32px 40px; min-width:0; }
-.admin-bottom { display:flex; justify-content:space-between; padding:16px 32px; color:#a1a1aa; font-size:11px; border-top:1px solid var(--border); }
+.admin-attribution { padding:12px 32px 20px; color:var(--muted-foreground); font-size:12px; line-height:1.6; text-align:right; }
+.admin-attribution a { display:inline-flex; align-items:center; min-height:24px; color:inherit; white-space:nowrap; text-decoration:none; transition:color 150ms; }
+.admin-attribution a:focus-visible { color:#80652d; outline:2px solid currentColor; outline-offset:4px; border-radius:2px; }
+@media (hover:hover) { .admin-attribution a:hover { color:#80652d; } }
+@media (pointer:coarse) { .admin-attribution a { min-height:44px; } }
 .sidebar-collapsed .admin-sidebar { width:48px; }
 .sidebar-collapsed .admin-main { margin-left:48px; width:calc(100% - 48px); }
 .sidebar-collapsed .sidebar-brand { padding:8px; }
@@ -82,8 +86,7 @@ button:disabled { cursor:not-allowed; }
  .workspace-savebar button { min-height:44px; font-size:12px; }
  .workspace-tabs { width:100%; }
  .workspace-tabs button { flex:1; padding:0 10px; }
- .admin-bottom { padding:16px; }
- .admin-bottom span { display:none; }
+ .admin-attribution { padding:8px 16px 16px; }
  button[aria-label], [data-drag-handle] { min-width:44px; min-height:44px; }
  .embedded-editor .fixed.w-\[176px\] { width:100%; }
 }

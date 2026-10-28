@@ -7,7 +7,7 @@ foreach (['PageModuleRegistry.php','SeoRegistry.php','HeaderSupport.php','MenuCa
 foreach ($cra1Required as $cra1File) if (!is_file($cra1File)) { error_log('CRA1 theme installation incomplete; hooks skipped'); return; }
 try { require_once dirname(__DIR__,4).'/cra1-theme/backend/bootstrap.php'; }
 catch (\Throwable $e) { error_log('CRA1 release unavailable; hooks skipped'); return; }
-foreach (['Context.php','Files.php','Release/Assets.php','Http/HookBootstrap.php','Http/Routes.php','Http/home/MemberController.php','Http/MemberGuard.php','Http/OperationGuard.php','Http/MemberController.php','Security/OperationVerification.php','Security/NativeAuthorization.php','Compatibility/Capabilities.php','Compatibility/Database.php','Compatibility/runtime.php'] as $cra1File) if (!is_file(CRA1_THEME_BACKEND.'/'.$cra1File)) { error_log('CRA1 backend incomplete; hooks skipped'); return; }
+foreach (['Context.php','Files.php','Presentation/Footer.php','Release/Assets.php','Http/HookBootstrap.php','Http/Routes.php','Http/home/MemberController.php','Http/MemberGuard.php','Http/OperationGuard.php','Http/MemberController.php','Security/OperationVerification.php','Security/NativeAuthorization.php','Compatibility/Capabilities.php','Compatibility/Database.php','Compatibility/runtime.php'] as $cra1File) if (!is_file(CRA1_THEME_BACKEND.'/'.$cra1File)) { error_log('CRA1 backend incomplete; hooks skipped'); return; }
 if (!function_exists('add_hook')) return;
 if(!defined('CRA1_THEME_PREVIEW_DISPLAY_ONLY')||CRA1_THEME_PREVIEW_DISPLAY_ONLY!==true){
     try { \CRA1\Theme\Http\HookBootstrap::register(); }
@@ -616,7 +616,7 @@ function cra1_theme_derived_config(array $merged): array
         if ($merged['footer_icp_text'] !== '') {
             $merged['footer_icp_html'] = '<a href="' . htmlspecialchars($merged['footer_icp_url'] ?: 'https://beian.miit.gov.cn/') . '" target="_blank" rel="nofollow noopener" class="transition-colors duration-150 hover:text-brand">' . htmlspecialchars($merged['footer_icp_text']) . '</a>';
         }
-        $merged['footer_copyright_html'] = $merged['footer_copyright_text'] !== '' ? htmlspecialchars($merged['footer_copyright_text']) : '';
+        $merged['footer_copyright_html'] = htmlspecialchars(\CRA1\Theme\Presentation\Footer::copyrightText((string)$merged['footer_copyright_text']));
 
         // 内容页面模块（rows → 结构化数组；联系卡片 3 列 = 标题|描述|图标）
         $merged['contact_cards'] = cra1_parse_menu_lines($merged['contact_cards_text']);

@@ -1,0 +1,15 @@
+/* Shared by the compiled website stylesheet and its legacy template entry. */
+.website-footer-bottom { display:flex; flex-direction:column; gap:12px; padding:20px 0; color:var(--night-muted); font-size:12px; line-height:1.7; }
+.website-footer-credits { display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; min-width:0; overflow-wrap:anywhere; }
+.footer-night .theme-attribution { display:inline-flex; align-items:center; min-height:24px; color:var(--night-muted); white-space:nowrap; text-decoration:none; transition:color 150ms; }
+.footer-night .theme-attribution:focus-visible { color:var(--night-brand); outline:2px solid currentColor; outline-offset:4px; border-radius:2px; }
+@media (hover:hover) {
+  .footer-night .theme-attribution:hover { color:var(--night-brand); }
+}
+@media (min-width:768px) {
+  .website-footer-bottom { flex-direction:row; align-items:center; justify-content:space-between; }
+  .website-footer-credits { margin-left:auto; justify-content:flex-end; }
+}
+@media (pointer:coarse) {
+  .footer-night .theme-attribution { min-height:44px; }
+}

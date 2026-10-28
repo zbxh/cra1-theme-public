@@ -151,6 +151,7 @@ def main():
    if p.is_file() and not p.is_symlink() and not any(x in p.parts for x in ['node_modules','.git','__pycache__']) and not any(x.startswith('.') for x in p.relative_to(ROOT).parts) and p.suffix not in ['.map','.log','.key','.pem','.sqlite','.pyc']:
     source[rel]=p.read_bytes()
  source['cra1-theme/LICENSE.txt']=(ROOT/'cra1-theme/LICENSE.txt').read_bytes()
+ source['LICENSE']=(ROOT/'LICENSE').read_bytes()
  source.update(guides)
  source['docs/usage.md']=read_source(ROOT,'docs/usage.md')
  for image in re.findall(r'!\[[^\]]*\]\(([^)]+)\)',source['docs/usage.md'].decode('utf-8')):

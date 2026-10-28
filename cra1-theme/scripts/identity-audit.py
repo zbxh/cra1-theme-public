@@ -12,7 +12,11 @@ def audit(root):
     for key,value in expected.items():check(identity.get(key)==value,'正式标识：'+key)
     terms=json.loads((root/'cra1-theme/docs/repository-license.json').read_text())
     text=(root/'cra1-theme/LICENSE.txt').read_text();sha=hashlib.sha256((root/'cra1-theme/LICENSE.txt').read_bytes()).hexdigest()
-    check(terms['version']==2 and terms['file']=='cra1-theme/LICENSE.txt' and text.startswith(terms['title']+'（第 2 版'),'许可证正文与登记版本一致')
+    check(terms['version']==3 and terms['file']=='cra1-theme/LICENSE.txt' and text.startswith(terms['title']+'（第 3 版'),'许可证正文与登记版本一致')
+    check((root/'LICENSE').read_bytes()==(root/'cra1-theme/LICENSE.txt').read_bytes(),'仓库两份许可证正文一致')
+    for marker in ['主题：酷锐A1','官网公共页脚和主题后台主内容底部','明确允许移除底部署名的付费书面授权','不自动包含去署名权利','https://github.com/zbxh/cra1-theme-public']:
+        check(marker in text,'署名约定：'+marker)
+    check('付费书面授权' in '\n'.join(terms['summary']) and '不自动包含去署名权利' in '\n'.join(terms['summary']),'许可摘要保留付费去署名条件')
     for marker in ['全部业务营业收入','100,000 元（含本数）','连续 90 个自然日','80,000 元（含本数）','已结束的完整自然季度','不重新计算宽限期','不采集或上传营业收入','不是允许无限制商用']:
         check(marker in text,'许可约定：'+marker)
     for base in ['cra1-theme/source/admin','cra1-theme/source/member','public/cra1-shared','public/web/cra1/src']:
@@ -36,7 +40,7 @@ def audit(root):
                 for number,line in enumerate(p.read_text(errors='replace').splitlines(),1):
                     if pattern.search(line):findings.append({'path':p.relative_to(root).as_posix(),'line':number,'matches':sorted(set(m.group() for m in pattern.finditer(line)))})
     check(not findings,'当前自有代码无旧主题标识输出')
-    return {'status':'passed' if not failures else 'failed','checks':checks,'failures':failures,'scanned_files':scanned,'old_identity_findings':findings,'license_sha256':sha,'license_version':2,'production_writes':0}
+    return {'status':'passed' if not failures else 'failed','checks':checks,'failures':failures,'scanned_files':scanned,'old_identity_findings':findings,'license_sha256':sha,'license_version':terms['version'],'production_writes':0}
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--root',type=pathlib.Path,default=pathlib.Path(__file__).resolve().parents[2]);p.add_argument('--out',type=pathlib.Path);args=p.parse_args();result=audit(args.root.resolve())

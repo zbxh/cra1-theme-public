@@ -30,12 +30,17 @@
         <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-line py-5 text-sm text-muted"><span>友情链接</span>{foreach $data.friendly_link as $value}<a href="{$value.url}" target="_blank" rel="nofollow noopener" class="transition-colors duration-150 hover:text-brand">{$value.name}</a>{/foreach}</div>
         {/if}
 
-        {if ( !isset($data.cra1.show_footer_bottom) || $data.cra1.show_footer_bottom == 1 ) }
-        <div class="flex flex-col gap-3 py-5 text-xs text-muted md:flex-row md:items-center md:justify-between">
+        <div class="website-footer-bottom">
+            {if ( !isset($data.cra1.show_footer_bottom) || $data.cra1.show_footer_bottom == 1 ) }
             <div class="flex flex-wrap gap-4"><a :href="$store.site.termsServiceUrl()" x-data class="transition-colors duration-150 hover:text-brand">{if ( cra1_content_explicit($data.cra1, 'footer_copy.terms') || (( isset($data.cra1.footer_copy['terms']) && $data.cra1.footer_copy['terms'] )) ) }{$data.cra1.footer_copy['terms']}{else /}用户协议{/if}</a><a :href="$store.site.termsPrivacyUrl()" x-data class="transition-colors duration-150 hover:text-brand">{if ( cra1_content_explicit($data.cra1, 'footer_copy.privacy') || (( isset($data.cra1.footer_copy['privacy']) && $data.cra1.footer_copy['privacy'] )) ) }{$data.cra1.footer_copy['privacy']}{else /}隐私政策{/if}</a>{$data.cra1.footer_icp_html|raw}{if ( !cra1_content_explicit($data.cra1, 'footer_icp_text') && empty($data.cra1.footer_icp_html) && isset($data.config.icp_info) && $data.config.icp_info ) }<a href="{$data.config.icp_info_link|default='https://beian.miit.gov.cn/'}" target="_blank" rel="nofollow noopener" class="transition-colors duration-150 hover:text-brand">{$data.config.icp_info}</a>{/if}</div>
-            <div class="text-left md:text-right">{if ( cra1_content_explicit($data.cra1, 'footer_copyright_text') || !empty($data.cra1.footer_copyright_html) ) }{$data.cra1.footer_copyright_html|raw}{else /}<span x-data x-text="$store.site.pick('copyright_info', '')"></span>{/if}</div>
+            {/if}
+            <div class="website-footer-credits">
+                {if ( !isset($data.cra1.show_footer_bottom) || $data.cra1.show_footer_bottom == 1 ) }
+                <div>{if ( cra1_content_explicit($data.cra1, 'footer_copyright_text') || !empty($data.cra1.footer_copyright_html) ) }{$data.cra1.footer_copyright_html|raw}{else /}<span x-data x-text="$store.site.pick('copyright_info', '')"></span>{/if}</div>
+                {/if}
+                <a class="theme-attribution" href="https://github.com/zbxh/cra1-theme-public" target="_blank" rel="noopener noreferrer">主题：酷锐A1</a>
+            </div>
         </div>
-        {/if}
 
     </div>
 </footer>

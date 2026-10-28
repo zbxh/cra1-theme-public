@@ -33,7 +33,7 @@ try{
  $identity['license']=json_decode(file_get_contents(dirname(__DIR__).'/docs/repository-license.json'),true);$licenseText=file_get_contents(dirname(__DIR__).'/LICENSE.txt');
  $licenseMeta=$identity['license']+['sha256'=>hash('sha256',$licenseText)];
  $identityZip=$base.'/identity.zip';zipFixture($identityZip,['cra1-theme/LICENSE.txt'=>$licenseText],[],['display_name'=>$identity['display_name'],'brand'=>$identity['brand'],'identity'=>$identity,'license'=>$licenseMeta]);
- check(Package::inspect($identityZip)['manifest']['license']['version']===2,'current identity and exact license payload are accepted');
+ check(Package::inspect($identityZip)['manifest']['license']['version']===$licenseMeta['version'],'current identity and exact license payload are accepted');
  $badLicense=$licenseMeta;$badLicense['sha256']=str_repeat('0',64);$identityZip=$base.'/bad-license.zip';zipFixture($identityZip,['cra1-theme/LICENSE.txt'=>$licenseText],[],['display_name'=>$identity['display_name'],'brand'=>$identity['brand'],'identity'=>$identity,'license'=>$badLicense]);
  rejects(static function()use($identityZip){Package::inspect($identityZip);},'license checksum unrelated to payload accepted');
  $identityZip=$base.'/bad-brand.zip';zipFixture($identityZip,['cra1-theme/LICENSE.txt'=>$licenseText],[],['display_name'=>'Other identity','brand'=>$identity['brand'],'identity'=>$identity,'license'=>$licenseMeta]);

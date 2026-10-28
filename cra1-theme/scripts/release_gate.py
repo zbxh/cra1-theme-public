@@ -54,7 +54,7 @@ def main():
   identity=json.loads(install.read('cra1-theme/docs/product-identity.json'))
   license_bytes=source.read('cra1-theme/LICENSE.txt');license_meta=json.loads(source.read('cra1-theme/docs/repository-license.json'))
   check(all(doc.get(k)==identity.get(k) for k in identity),'发行标识与统一登记表一致')
-  check(license_meta.get('version')==2 and license_bytes==(ROOT/'cra1-theme/LICENSE.txt').read_bytes(),'许可原文仅保留于仓库源码且字节不变')
+  check(license_meta.get('version')==3 and license_bytes==source.read('LICENSE')==(ROOT/'LICENSE').read_bytes()==(ROOT/'cra1-theme/LICENSE.txt').read_bytes(),'许可原文仅保留于仓库源码且两份正文一致')
   check(not any(key in doc for key in ['license','commercial_blockers','commercial_release_accepted','test_evidence','verified_combinations']) and 'license' not in identity,'运行清单仅包含运行信息')
   repository_docs=['repository-license.json','商业授权.md','发行支持矩阵.md','identity-and-license.md','asset-inventory.json','asset-rights.json','official-baseline-evidence.json','business-acceptance-evidence.json','https-lifecycle-evidence.json']
   check('cra1-theme/LICENSE.txt' not in files and all('cra1-theme/docs/'+name not in files for name in repository_docs) and not any(name.endswith('/Release/LicenseCredential.php') for name in files),'客户安装与更新包无自有许可及内部商业资料')

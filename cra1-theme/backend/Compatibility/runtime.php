@@ -111,6 +111,7 @@ final class CRA1ThemeRuntime
             $common['lang_home_open'] = 1;
         } else $common['lang_list'] = [];
         if ($page!=='website') foreach(['copyright_info','enterprise_address','enterprise_mailbox','enterprise_name','enterprise_telephone'] as $key)unset($common[$key]);
+        if (isset($common['copyright_info'])) $common['copyright_info'] = \CRA1\Theme\Presentation\Footer::copyrightText((string)$common['copyright_info']);
         $common['lang_home'] = $locale['current'];
         $common['lang_home_follow_browser'] = $on('lang_home_follow_browser') ? 1 : 0;
         $links = [];
