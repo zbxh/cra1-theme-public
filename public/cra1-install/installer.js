@@ -11,7 +11,7 @@
   function text(tag,value){const node=document.createElement(tag);node.textContent=value;return node;}
   function lock(value){busy=value;root.querySelectorAll('button,input').forEach(node=>node.disabled=value);}
   document.getElementById('check').addEventListener('click',async()=>{
-    if(busy)return;lock(true);status.textContent='正在验证身份并只读检查…';form.hidden=true;
+    if(busy)return;lock(true);status.textContent='正在验证身份并自动检查安装环境…';form.hidden=true;
     try{
       const data=await request({action:'check'}),out=document.getElementById('checks');out.replaceChildren();
       const labels={pass:'通过',warning:'警告',blocked:'阻断',unverified:'未验证'};

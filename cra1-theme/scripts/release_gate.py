@@ -38,7 +38,7 @@ def main():
  if delivery_path.is_file():
   with zipfile.ZipFile(delivery_path) as bundle:
    check(bundle.read('cra1-theme-install.zip')==packages['install'].read_bytes(),'安装合集内的安装包与已检查候选包完全一致')
-   guide_files={'安装教程/安装教程.md','安装教程/安装教程.html','安装教程/安装教程.pdf','安装教程/nginx.example.conf','开始安装.txt'}
+   guide_files={'安装教程/安装教程.md','安装教程/安装教程.html','安装教程/安装教程.pdf','开始安装.txt'}
    check(guide_files.issubset(bundle.namelist()) and any(n.startswith('安装教程/images/') for n in bundle.namelist()),'安装合集包含完整图文教程和说明')
  code='define("CRA1_THEME_BACKEND",$argv[1]."/cra1-theme/backend"); require $argv[1]."/cra1-theme/backend/bootstrap.php"; $r=CRA1\\Theme\\Release\\Package::inspect($argv[2]); echo json_encode(["release"=>$r["manifest"]["release"],"files"=>count($r["manifest"]["files"])]);'
  native=subprocess.run([a.php,'-r',code,str(ROOT),str(packages['update'])],capture_output=True,text=True)

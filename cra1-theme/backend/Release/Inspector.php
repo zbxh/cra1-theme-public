@@ -24,7 +24,7 @@ final class Inspector
         $rows=[];
         $add=static function($id,$status,$label,$detail,$path='',$impact='',$scope='installation')use(&$rows){$rows[]=['id'=>$id,'status'=>$status,'label'=>$label,'detail'=>$detail,'path'=>$path,'scope'=>$scope,'owner'=>preg_match('~^(?:app|route|vendor|public/plugins)/|/default/~',$path)?'V10 或原生模块文件（只读）':'CRA1 或运行环境','impact'=>$impact];};
         $add('php',(PHP_MAJOR_VERSION===7&&PHP_MINOR_VERSION===4)?'pass':(version_compare(PHP_VERSION,'7.4','<')?'blocked':'unverified'),'PHP',PHP_VERSION,'','当前适配 PHP 7.4；其他版本请先检查兼容性');
-        foreach(['pdo_mysql','pdo_sqlite','sodium','fileinfo','gd','zip','mbstring','dom']as$ext)$add('extension:'.$ext,extension_loaded($ext)?'pass':'blocked',$ext,extension_loaded($ext)?'已加载':'缺少必要扩展');
+        foreach(['pdo_mysql','pdo_sqlite','sodium','fileinfo','gd','zip','mbstring','dom','curl']as$ext)$add('extension:'.$ext,extension_loaded($ext)?'pass':'blocked',$ext,extension_loaded($ext)?'已加载':'缺少必要扩展');
         $add('password',defined('PASSWORD_ARGON2ID')?'pass':'blocked','密码存储',defined('PASSWORD_ARGON2ID')?'Argon2id 可用':'缺少 Argon2id');
         $context=$options['context']??self::context($root);
         $add('database',!empty($context['database'])?'pass':'blocked','数据库连接',!empty($context['database'])?'只读连接成功':'读取失败，未执行修改');
@@ -74,9 +74,8 @@ final class Inspector
         $add('https',$https?'pass':'blocked','HTTPS',$https?'已通过 HTTPS 访问':'安装需要有效 HTTPS；不信任未经配置的转发请求头');
         // Inspection never makes network requests to localhost or downloads private canaries.
         $proof=Files::json($root.'/runtime/cra1_theme/private-path-check.json',true);
-        $proofValid=!empty($proof['passed'])&&hash_equals(hash('sha256',realpath($root)?:$root),(string)($proof['root_hash']??''))&&($proof['checked_at']??0)>time()-86400&&($proof['checked_at']??0)<=time();
-        if(isset($options['origin']))$proofValid=$proofValid&&rtrim((string)($proof['origin']??''),'/')===rtrim((string)$options['origin'],'/');
-        $add('private-paths',$proofValid?'pass':'unverified','私有文件下载保护',$proofValid?'有本站 24 小时内的安装自检记录':'需运行配套 HTTP 自检；静态目录权限不能证明 Nginx 已阻止下载');
+        $proofValid=PrivatePaths::valid($proof,$root,$options['origin']??null);
+        $add('private-paths',$proofValid?'pass':'unverified','私有文件下载保护',$proofValid?'安装向导已完成本站文件访问检查':'请在安装向导点击“验证并检查”；未通过时确认网站运行目录为 public 后重试');
         $pending=is_file($root.'/runtime/cra1_theme/distribution/pending.json');
         if($pending)$add('interrupted','blocked','中断更新','发现更新恢复记录，请先恢复主题文件');
         $counts=['pass'=>0,'warning'=>0,'blocked'=>0,'unverified'=>0];foreach($rows as$row)$counts[$row['status']]++;

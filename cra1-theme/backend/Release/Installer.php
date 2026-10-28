@@ -30,7 +30,7 @@ final class Installer
     public function install(array $input,callable $readThemes,callable $saveThemes,array $preflight): array
     {
         $ready=$preflight['installation_ready']??(($preflight['counts']['blocked']??1)===0&&($preflight['counts']['unverified']??1)===0);
-        if($ready!==true)throw new \RuntimeException('安装技术预检仍有阻断或未验证项，请先完成兼容与私有路径自检');
+        if($ready!==true)throw new \RuntimeException('安装检查尚未通过，请按向导提示处理后重试');
         return Files::locked($this->root.'/runtime/cra1_theme/install.lock',function()use($input,$readThemes,$saveThemes){
             if($this->state()['mode']!=='install')throw new \RuntimeException('已经安装，禁止重新初始化账号或配置');
             $entry=(string)($input['entry']??'');

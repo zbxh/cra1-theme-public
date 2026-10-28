@@ -14,7 +14,6 @@ import zipfile
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 GUIDES = {
     'docs/installation.md': '安装教程/安装教程.md',
-    'cra1-theme/docs/nginx.example.conf': '安装教程/nginx.example.conf',
 }
 
 
@@ -122,8 +121,9 @@ def bundle_install(install, output, source=ROOT, rendered=None):
     files['开始安装.txt'] = (
         f'酷锐A1主题安装合集\n版本：{version}' + ('（测试版）' if metadata['release_channel'] == 'test' else '') + '\n\n'
         '1. 先在电脑上解压本合集，阅读“安装教程/安装教程.pdf”或“安装教程/安装教程.html”。\n'
-        '2. 实际上传网站的是 cra1-theme-install.zip，解压到 V10 网站根目录，与 config.php、vendor 和 public 同级。\n'
-        '3. 按教程配置目录保护、完成自检，再使用 V10 超级管理员进入安装向导。\n\n'
+        '2. 将 cra1-theme-install.zip 解压到智简魔方 V10 网站根目录，与 config.php、vendor 和 public 同级，同名文件夹合并。\n'
+        '3. 在同一浏览器登录 V10 超级管理员，打开 https://你的域名/cra1-install/，点击“验证并检查”。\n'
+        '4. 设置主题后台地址、账号和密码，点击“安装并启用三个主题”，完成后保存登录资料。\n\n'
         '首次安装按上面的步骤操作。已有主题：不要在服务器直接解压覆盖，\n'
         '请在主题后台“主题管理 → 安装与更新”上传同一个 cra1-theme-install.zip，\n'
         '预检通过后确认覆盖更新；主题配置、账号、密钥、媒体、草稿和页面覆盖会保留。\n'

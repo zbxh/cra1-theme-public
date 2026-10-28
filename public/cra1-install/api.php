@@ -15,7 +15,10 @@ try{
     $input=json_decode($raw,true,32,JSON_THROW_ON_ERROR);if(!is_array($input)||!in_array($input['action']??'',['check','install'],true))throw new RuntimeException('未知安装操作');
     $bearer=(string)($_SERVER['HTTP_AUTHORIZATION']??'');
     $result=\CRA1\Theme\Http\NativeAdmin::run($root,$bearer,static function()use($root,$input,$https){
-        $installer=new \CRA1\Theme\Release\Installer($root);$preflight=$installer->preflight(['https'=>$https,'origin'=>'https://'.(string)$_SERVER['HTTP_HOST']]);
+        $installer=new \CRA1\Theme\Release\Installer($root);$siteOrigin='https://'.(string)$_SERVER['HTTP_HOST'];
+        // Native authentication above must succeed before any installer probe writes.
+        if($installer->state()['mode']==='install')\CRA1\Theme\Release\PrivatePaths::ensure($root,$siteOrigin);
+        $preflight=$installer->preflight(['https'=>$https,'origin'=>$siteOrigin]);
         if($input['action']==='check')return ['status'=>200,'data'=>$preflight];
         $model=new \app\common\model\ConfigurationModel();
         $data=$installer->install($input,static function()use($model){return $model->themeList();},static function($settings)use($model){

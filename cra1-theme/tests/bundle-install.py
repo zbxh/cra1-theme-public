@@ -61,7 +61,10 @@ class DeliveryTest(unittest.TestCase):
             self.assertIn('603107399', archive.read('开始安装.txt').decode())
             self.assertIn('https://qm.qq.com/q/O3d7bVtcoS', archive.read('开始安装.txt').decode())
             self.assertIn('同一个 cra1-theme-install.zip', archive.read('开始安装.txt').decode())
-            self.assertEqual(len(archive.namelist()), 7)
+            self.assertNotIn('安装教程/nginx.example.conf', archive.namelist())
+            self.assertNotIn('目录保护', archive.read('开始安装.txt').decode())
+            self.assertIn('https://你的域名/cra1-install/', archive.read('开始安装.txt').decode())
+            self.assertEqual(len(archive.namelist()), 6)
         self.assertEqual(self.install.read_bytes(), original)
 
     def test_repeatable_and_existing_delivery_not_overwritten(self):
