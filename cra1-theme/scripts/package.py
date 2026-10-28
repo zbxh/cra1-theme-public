@@ -32,6 +32,7 @@ ICON_ROOT='public/cra1-shared/icons/releases/'+ICON_VERSION
 def digest(b):return hashlib.sha256(b).hexdigest()
 def excluded(rel,source=False):
  p=pathlib.PurePosixPath(rel)
+ if p.name=='AGENTS.md':return True
  if not source:
   if rel.startswith('public/') and p.suffix=='.md':return True
   if rel.startswith('cra1-theme/docs/') and p.name not in ['product-identity.json','nginx.example.conf','安装更新与回退.md','测试版与后续更新.md','icon-source-evidence.json']:return True
@@ -148,7 +149,7 @@ def main():
   for p in owned_walk(ROOT/base):
    rel=p.relative_to(ROOT).as_posix()
    # Tests belong to source only. Runtime packages above never include them.
-   if p.is_file() and not p.is_symlink() and not any(x in p.parts for x in ['node_modules','.git','__pycache__']) and not any(x.startswith('.') for x in p.relative_to(ROOT).parts) and p.suffix not in ['.map','.log','.key','.pem','.sqlite','.pyc']:
+   if p.is_file() and not p.is_symlink() and p.name!='AGENTS.md' and not any(x in p.parts for x in ['node_modules','.git','__pycache__']) and not any(x.startswith('.') for x in p.relative_to(ROOT).parts) and p.suffix not in ['.map','.log','.key','.pem','.sqlite','.pyc']:
     source[rel]=p.read_bytes()
  source['cra1-theme/LICENSE.txt']=(ROOT/'cra1-theme/LICENSE.txt').read_bytes()
  source['LICENSE']=(ROOT/'LICENSE').read_bytes()

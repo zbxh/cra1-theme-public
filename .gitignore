@@ -50,3 +50,6 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Local contributor instructions
+AGENTS.md
