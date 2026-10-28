@@ -35,16 +35,37 @@ try{
     $requests=[];
     $wrongOrigin=PrivatePaths::check($base,'https://fixture.invalid','',static function($url)use(&$requests){$requests[]=$url;return ['status'=>404,'error'=>0,'body'=>'Not found'];});
     check(!$wrongOrigin['passed']&&count($requests)===1,'an unrelated origin returning 404 cannot pass or trigger private probes');
+    check($wrongOrigin['outcome']==='inconclusive'&&PrivatePaths::assessment($wrongOrigin,$base,'https://fixture.invalid')['status']==='warning','an unconfirmed origin is advisory rather than evidence of exposure');
+    $fallback=PrivatePaths::check($base,'https://fixture.invalid','',static function($url)use($safe){
+        return strpos($url,'/cra1-install/')!==false?$safe($url):['status'=>200,'error'=>0,'body'=>'<html>V10 home or custom not-found page</html>'];
+    });
+    check($fallback['passed']&&$fallback['outcome']==='protected','a public-root V10 fallback with HTTP 200 does not leak the actual private file');
+    $redirect=PrivatePaths::check($base,'https://fixture.invalid','',static function($url)use($safe){return strpos($url,'/cra1-install/')!==false?$safe($url):['status'=>302,'error'=>0,'body'=>''];});
+    check(!$redirect['passed']&&$redirect['outcome']==='inconclusive','redirects remain unconfirmed instead of being falsely classified as file exposure');
+    check(PrivatePaths::assessment($redirect,$base,'https://fixture.invalid')['status']==='warning','a redirect alone does not block installation');
+    $failure=PrivatePaths::check($base,'https://fixture.invalid','',static function(){return ['status'=>0,'error'=>60,'body'=>''];});
+    check(!$failure['passed']&&$failure['outcome']==='inconclusive','TLS or network failure is not falsely described as safe');
+    check(PrivatePaths::assessment($failure,$base,'https://fixture.invalid')['status']==='warning','a network failure is optional installation information');
+    $calls=0;
+    $cached=PrivatePaths::ensure($base,'https://fixture.invalid',static function()use(&$calls){$calls++;throw new RuntimeException('must reuse the recent diagnostic');});
+    check($cached===$failure&&$calls===0,'install submission reuses a recent inconclusive diagnosis');
+    $retried=PrivatePaths::ensure($base,'https://fixture.invalid',$safe,true);
+    check($retried['passed'],'clicking check explicitly refreshes a cached inconclusive result');
     $exposed=PrivatePaths::check($base,'https://fixture.invalid','',static function($url)use($base,$safe){
         $path=parse_url($url,PHP_URL_PATH);
         if(strpos($path,'/config/cra1-check-')===0)return ['status'=>200,'error'=>0,'body'=>file_get_contents($base.$path)];
         return $safe($url);
     });
-    check(!$exposed['passed'],'exposed private files still block installation');
-    $redirect=PrivatePaths::check($base,'https://fixture.invalid','',static function($url)use($safe){return strpos($url,'/cra1-install/')!==false?$safe($url):['status'=>302,'error'=>0,'body'=>''];});
-    check(!$redirect['passed'],'redirects do not prove private-file protection');
+    check(!$exposed['passed']&&$exposed['outcome']==='exposed','only actual private probe content proves exposure');
+    check(PrivatePaths::assessment($exposed,$base,'https://fixture.invalid')['status']==='blocked','confirmed exposure still blocks initialization');
     $failure=PrivatePaths::check($base,'https://fixture.invalid','',static function(){return ['status'=>0,'error'=>60,'body'=>''];});
-    check(!$failure['passed'],'TLS or network failure cannot be treated as safe');
+    check($failure['outcome']==='exposed'&&isset($failure['last_attempt_at']),'a failed retry cannot erase an earlier confirmed leak');
+    check(PrivatePaths::ensure($base,'https://fixture.invalid',$safe,true)['passed'],'a fresh successful check clears exposure after the real mapping is fixed');
+    $legacy=$exposed;unset($legacy['format'],$legacy['outcome']);
+    check(PrivatePaths::assessment($legacy,$base,'https://fixture.invalid')['status']==='warning','a legacy failed status without content evidence cannot prove exposure');
+    check(PrivatePaths::assessment($exposed,$base,'https://different.invalid')['status']==='warning','an exposure report cannot transfer between sites');
+    Files::atomic($base.'/runtime/cra1_theme/private-path-check.json','malformed diagnostic');
+    check(PrivatePaths::ensure($base,'https://fixture.invalid',$safe)['passed'],'a malformed optional report can be regenerated without touching theme configuration');
     $rejected=false;try{PrivatePaths::check($base,'https://fixture.invalid','',static function(){throw new RuntimeException('isolated transport failure');});}catch(RuntimeException $error){$rejected=true;}
     check($rejected&&temporaryFiles($base)===[],'unexpected transport failure removes probes before returning');
     foreach(['http://fixture.invalid','https://user:pass@fixture.invalid','https://fixture.invalid/path','https://fixture.invalid?target=elsewhere','https://fixture.invalid#fragment']as$origin){

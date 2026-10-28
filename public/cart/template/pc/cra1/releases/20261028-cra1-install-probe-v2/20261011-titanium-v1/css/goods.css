@@ -1,0 +1,52 @@
+.template {
+  height: 100%;
+}
+.main-card {
+  height: 100%;
+}
+.config-box {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.content {
+  flex: 1;
+}
+.goods-item-name {
+  cursor: pointer;
+  padding: 6px 12px;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: 3px;
+  margin-bottom: 30px;
+  display: inline-block;
+}
+.goods-change-box {
+  max-width: 100%;
+}
+.goods-change-box .goods-item-box {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 0.2rem;
+}
+.goods-change-box .goods-item-box .goods-group-item {
+  margin-bottom: 0.3rem;
+}
+.goods-change-box .goods-item-box .goods-group-item .goods-group-name {
+  font-weight: 700;
+  font-size: 0.18rem;
+  margin-bottom: 0.15rem;
+}
+.goods-change-box .goods-item-box .goods-group-item .goods-group-info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-column-gap: 15px;
+  row-gap: 0.1rem;
+}
+.goods-change-box .goods-item-box .goods-group-item .goods-group-info .option-name {
+  cursor: pointer;
+  font-size: 0.14rem;
+}
+.goods-change-box .goods-item-box .goods-group-item .goods-group-info .option-name:hover {
+  color: var(--color-primary);
+}

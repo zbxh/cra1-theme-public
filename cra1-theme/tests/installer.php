@@ -29,7 +29,9 @@ try{
  $installer=fixture($base.'/success');
  Files::putJson($base.'/success/native-theme-settings.json',$previous);$settingsHash=hash_file('sha256',$base.'/success/native-theme-settings.json');
  Files::putJson($base.'/success/runtime/cra1_theme/member_center.json',['version'=>42,'unknown'=>'keep']);$hash=hash_file('sha256',$base.'/success/runtime/cra1_theme/member_center.json');
- $result=$installer->install($input,$passed);
+ $warning=$installer->preflight($inspectionOptions);
+ check($warning['installation_ready']&&$warning['counts']['warning']===1,'a missing optional network diagnostic permits installation');
+ $result=$installer->install($input,$warning);
  check($result['installed']&&$result['password']===$input['password'],'password displayed only on success response');
  check(hash_file('sha256',$base.'/success/runtime/cra1_theme/member_center.json')===$hash,'existing content and unknown fields preserved');
  check(hash_file('sha256',$base.'/success/native-theme-settings.json')===$settingsHash,'installation leaves existing theme selections and native settings unchanged');

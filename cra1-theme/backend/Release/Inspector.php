@@ -73,9 +73,10 @@ final class Inspector
         $https=$options['https']??(!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off');
         $add('https',$https?'pass':'blocked','HTTPS',$https?'已通过 HTTPS 访问':'安装需要有效 HTTPS；不信任未经配置的转发请求头');
         // Inspection never makes network requests to localhost or downloads private canaries.
-        $proof=Files::json($root.'/runtime/cra1_theme/private-path-check.json',true);
-        $proofValid=PrivatePaths::valid($proof,$root,$options['origin']??null);
-        $add('private-paths',$proofValid?'pass':'unverified','私有文件下载保护',$proofValid?'安装向导已完成本站文件访问检查':'请在安装向导点击“验证并检查”；未通过时确认网站运行目录为 public 后重试');
+        try{$proof=Files::json($root.'/runtime/cra1_theme/private-path-check.json',true);}
+        catch(\Throwable $error){$proof=[];}
+        $diagnostic=PrivatePaths::assessment($proof,$root,$options['origin']??null);
+        $add('private-paths',$diagnostic['status'],'文件访问诊断',$diagnostic['detail']);
         $pending=is_file($root.'/runtime/cra1_theme/distribution/pending.json');
         if($pending)$add('interrupted','blocked','中断更新','发现更新恢复记录，请先恢复主题文件');
         $counts=['pass'=>0,'warning'=>0,'blocked'=>0,'unverified'=>0];foreach($rows as$row)$counts[$row['status']]++;

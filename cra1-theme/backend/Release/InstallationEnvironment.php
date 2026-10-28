@@ -60,17 +60,10 @@ final class InstallationEnvironment
         $https = $options['https'] ?? (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
         $add('https',$https?'pass':'blocked','HTTPS',$https?'已通过 HTTPS 访问':'请通过本站有效的 HTTPS 地址安装');
 
-        $proof = Files::json($root.'/runtime/cra1_theme/private-path-check.json',true);
-        $protected = PrivatePaths::valid($proof,$root,$options['origin'] ?? null);
-        $detail = '配置、账号等私有文件无法通过网站下载';
-        if (!$protected) {
-            $checks = $proof['checks'] ?? [];
-            if (!$checks) $detail = '文件访问检查尚未完成，请点击“验证并检查”重试';
-            elseif (empty($checks[0]['passed'])) $detail = '服务器无法正确访问本站 HTTPS 地址，请检查域名解析、证书或回源设置后重试';
-            elseif (empty($proof['passed'])) $detail = '目录访问保护未通过，请确认网站运行目录为 V10 的 public 目录后重试';
-            else $detail = '文件访问检查已过期或站点地址已变化，请重新检查';
-        }
-        $add('private-paths',$protected?'pass':'blocked','文件访问保护',$detail);
+        try {$proof = Files::json($root.'/runtime/cra1_theme/private-path-check.json',true);}
+        catch (\Throwable $error) {$proof = [];}
+        $diagnostic = PrivatePaths::assessment($proof,$root,$options['origin'] ?? null);
+        $add('private-paths',$diagnostic['status'],'文件访问诊断',$diagnostic['detail']);
 
         if (is_file($root.'/runtime/cra1_theme/distribution/pending.json')) {
             $add('interrupted','blocked','安装状态','存在未完成的主题更新，请从现有主题后台恢复后再操作');
