@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-/** Exercise native theme activation in a disposable V10 installation, never a customer site. */
+/** Install and log in without changing native settings in a disposable V10 installation. */
 if (PHP_SAPI !== 'cli') exit(1);
 $root = realpath($argv[1] ?? '');
 $source = realpath(dirname(__DIR__, 2));
@@ -19,7 +19,7 @@ $result = CRA1\Theme\Http\NativeAdmin::run($root, (string)($input['authorization
         $checks[] = $label;
     };
     $runtime = $root.'/runtime/cra1_theme';
-    $paths = ['install.json','install-previous-themes.json','entry.json','config.json','member_center.json','cart_theme.json'];
+    $paths = ['install.json','entry.json','config.json','member_center.json','cart_theme.json','announcements.json','distribution/current.json'];
     $saved = [];
     foreach ($paths as $name) $saved[$name] = is_file($runtime.'/'.$name) ? file_get_contents($runtime.'/'.$name) : null;
     foreach (['runtime/cra1_theme/security.sqlite','config/cra1_theme_security.key','runtime/cra1_theme/attachments.sqlite'] as $path) {
@@ -36,11 +36,6 @@ $result = CRA1\Theme\Http\NativeAdmin::run($root, (string)($input['authorization
         return $rows;
     };
     $originalSettings = $configuration();
-    $saveThemes = static function (array $settings) use ($model): array {
-        $validator = new app\admin\validate\ConfigurationValidate();
-        if (!$validator->scene('theme_update')->check($settings)) return ['status'=>400];
-        return $model->themeUpdate($settings);
-    };
     $references = CRA1\Theme\Files::json($root.'/cra1-theme/release.json')['references'] ?? [];
     $newReferences = [];
     foreach ($references as $path=>$target) {
@@ -55,39 +50,30 @@ $result = CRA1\Theme\Http\NativeAdmin::run($root, (string)($input['authorization
         if (is_file($runtime.'/install.json')) unlink($runtime.'/install.json');
         $installer = new CRA1\Theme\Release\Installer($root);
         $check($installer->state()['mode'] === 'install', 'fresh identity uses initialization mode');
-        $read = static function () use ($model): array { return $model->themeList(); };
-        $attempts = 0;
-        $failedActivation = static function (array $settings) use (&$attempts,$saveThemes): array {
-            $reply = $saveThemes($settings);
-            if ((int)($reply['status'] ?? 0) !== 200) throw new RuntimeException('Native fixture activation contract failed');
-            return ++$attempts === 1 ? ['status'=>400] : $reply;
-        };
-        $rejected = false;
-        try { $installer->install($setup,$read,$failedActivation,$fixturePreflight); }
-        catch (RuntimeException $e) { $rejected = true; }
-        $check($rejected && $attempts === 2, 'failure after native activation invokes native restoration');
-        $check($configuration() === $originalSettings, 'failed activation restores every system setting');
-        $check($installer->state()['mode'] === 'install' && is_dir($adminFrom) && !is_dir($adminTo), 'failed installation restores entry and permits retry');
-        $check(!is_file($root.'/config/cra1_theme_security.key') && !is_file($runtime.'/security.sqlite'), 'failed installation removes only its new identity');
-        $reply = $installer->install($setup,$read,$saveThemes,$fixturePreflight);
-        $check(!empty($reply['installed']) && $reply['password'] === $password, 'native validator and model complete installation');
+        $reply = $installer->install($setup,$fixturePreflight);
+        $check(!empty($reply['installed']) && $reply['password'] === $password, 'installation completes without calling the native theme writer');
         $check($reply['admin_url'] === '/'.$entry.'/index.php' && is_dir($adminTo) && !is_dir($adminFrom), 'renamed admin entry matches success response');
         $current = $model->themeList();
         foreach (['web_theme','clientarea_theme','clientarea_theme_mobile','cart_theme','cart_theme_mobile','home_theme','home_theme_mobile'] as $key) {
-            $check(($current[$key] ?? '') === 'cra1', 'native activation selects '.$key);
+            $check(($current[$key] ?? '') === ($previous[$key] ?? ''), 'native theme selection preserved: '.$key);
         }
         $check(($current['home_host_theme'] ?? []) === ($previous['home_host_theme'] ?? [])
             && ($current['home_host_theme_mobile'] ?? []) === ($previous['home_host_theme_mobile'] ?? []), 'native module detail-theme maps preserved');
-        $allowed = ['web_theme','clientarea_theme','clientarea_theme_mobile','cart_theme','cart_theme_mobile','home_theme','home_theme_mobile','web_switch','clientarea_theme_mobile_switch'];
-        $afterSettings = $configuration();
-        foreach ($allowed as $key) { unset($originalSettings[$key],$afterSettings[$key]); }
-        $check($originalSettings === $afterSettings, 'activation leaves all unrelated system settings unchanged');
+        $check($originalSettings === $configuration(), 'every native system setting remains unchanged');
+        $check(!is_file($runtime.'/install-previous-themes.json'), 'no unused activation backup is created');
         $security = new CRA1ThemeSecurity($root);
         $check($security->checkPassword('fixture-installer',$password) !== null
             && $security->scalar('SELECT COUNT(*) FROM accounts WHERE enabled=1') == 1, 'new independent administrator authenticates');
         $check($security->scalar('PRAGMA quick_check') === 'ok' && is_file($runtime.'/attachments.sqlite'), 'identity and media self-checks pass');
         $rejected = false;
-        try { $installer->install($setup,$read,$saveThemes,$fixturePreflight); }
+        $account=$security->checkPassword('fixture-installer',$password);
+        $token=$security->startSession($account,'127.0.0.1','native-installer-fixture');
+        $check($security->authenticate($token)!==null,'independent administrator can use a session before activating themes');
+        $member=new CRA1\Theme\Storage\MemberCenterStore($root.'/runtime');$config=$member->read();
+        $savedContent=$member->save(['appearance'=>['aside_mobile_expand'=>'all']],'fixture-installer',(int)$config['version']);
+        $check((int)$savedContent['status']===200&&$member->read()['appearance']['aside_mobile_expand']==='all','theme content can be saved before activation');
+        $check($originalSettings===$configuration(),'administrator login and editing leave native theme selections unchanged');
+        try { $installer->install($setup,$fixturePreflight); }
         catch (RuntimeException $e) { $rejected = true; }
         $check($rejected && $installer->state()['mode'] === 'maintenance', 'revisit cannot replace the administrator or configuration');
         $leaked = false;
@@ -96,11 +82,9 @@ $result = CRA1\Theme\Http\NativeAdmin::run($root, (string)($input['authorization
         }
         $check(!$leaked, 'generated plaintext password is absent from persisted installation records');
         return ['status'=>200,'result'=>'passed','checks'=>count($checks),'results'=>$checks,
-            'native_validator_and_model'=>true,'fixture_preflight_only'=>true,'commercial_release_accepted'=>false,'production_writes'=>0];
+            'native_settings_unchanged'=>true,'fixture_preflight_only'=>true,'production_writes'=>0];
     } finally {
         unset($security);
-        $restored = $saveThemes($previous);
-        if ((int)($restored['status'] ?? 0) !== 200) throw new RuntimeException('Fixture system theme settings could not be restored');
         if (is_dir($adminTo) && !rename($adminTo,$adminFrom)) throw new RuntimeException('Fixture entry could not be restored');
         CRA1\Theme\Release\References::removeCreated($root,$newReferences);
         foreach (['security.sqlite','security.sqlite-wal','security.sqlite-shm','attachments.sqlite','attachments.sqlite-wal','attachments.sqlite-shm'] as $name) {

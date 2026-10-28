@@ -30,7 +30,7 @@
   form.addEventListener('submit',async event=>{
     event.preventDefault();if(busy)return;
     const values=Object.fromEntries(new FormData(form));if(values.password!==values.confirm){status.textContent='两次密码不一致';return;}
-    delete values.confirm;lock(true);status.textContent='正在安装并启用主题…';
+    delete values.confirm;lock(true);status.textContent='正在安装主题后台…';
     try{
       const result=await request({...values,action:'install'});form.hidden=true;form.reset();
       const out=document.getElementById('credentials');out.replaceChildren();

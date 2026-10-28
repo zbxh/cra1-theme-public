@@ -23,12 +23,7 @@ try{
         }
         $preflight=$installer->preflight(['https'=>$https,'origin'=>$siteOrigin]);
         if($input['action']==='check')return ['status'=>200,'data'=>$preflight];
-        $model=new \app\common\model\ConfigurationModel();
-        $data=$installer->install($input,static function()use($model){return $model->themeList();},static function($settings)use($model){
-            $validator=new \app\admin\validate\ConfigurationValidate();
-            if(!$validator->scene('theme_update')->check($settings))return ['status'=>400];
-            return $model->themeUpdate($settings);
-        },$preflight);
+        $data=$installer->install($input,$preflight);
         return ['status'=>200,'msg'=>'安装成功','data'=>$data];
     });
 }catch(Throwable $e){error_log('CRA1 installer rejected: '.get_class($e).' at '.basename($e->getFile()).':'.$e->getLine());$result=['status'=>400,'msg'=>$e instanceof RuntimeException||$e instanceof InvalidArgumentException?$e->getMessage():'安装服务暂不可用，请检查环境'];}
