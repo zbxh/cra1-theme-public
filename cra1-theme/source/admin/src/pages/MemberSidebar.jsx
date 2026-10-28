@@ -35,7 +35,7 @@ import { FloatingActions } from '../ui/FloatingActions'
  */
 
 /** 层级徽标：让上下级关系在紧凑行里一眼可辨 */
-const LEVEL_LABELS = { 1: '一级', 2: '二级', 3: '页面' }
+const LEVEL_LABELS = { 1: '一级分组', 2: '二级分组', 3: '三级页面' }
 
 const TYPES = [
   { value: 'system', label: '系统页面', desc: '来自系统导航（如账户、财务、安全中心）' },
@@ -119,6 +119,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
   /* 页头操作区引用：悬浮操作条观察它是否滚出视野（Hook 顺序需稳定，故在所有提前 return 之前声明） */
   const actionsRef = useRef(null)
   const [nodes, setNodes] = useScopedState(workspace, 'sidebar.nodes', [])
+  const [shape, setShape] = useScopedState(workspace, 'sidebar.shape', 3)
   const [original, setOriginal] = useScopedState(workspace, 'sidebar.nodes', [], true)
   const [recent, setRecent] = useScopedState(workspace, 'sidebar.recent', RECENT_DEFAULTS)
   const [recentOriginal, setRecentOriginal] = useScopedState(workspace, 'sidebar.recent', RECENT_DEFAULTS, true)
@@ -133,6 +134,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
   useEffect(() => {
     if (!workspace && member?.sidebar) {
       setNodes(member.sidebar.nodes || [])
+      setShape(member.sidebar.shape || 3)
       setOriginal(JSON.parse(JSON.stringify(member.sidebar.nodes || [])))
       // 最近访问设置：服务端保证白名单字段存在；缺省回落默认值
       const r = { ...RECENT_DEFAULTS, ...(member.sidebar.recent || {}) }
@@ -167,7 +169,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
     try {
       // 菜单结构与最近访问设置一起提交（同一份 sidebar 段、同一个乐观锁版本）；
       // 服务端只更新提供的子段，未变更的 nodes 原样回传不产生误伤
-      const r = await memberApi.saveSidebar({ nodes, recent, version })
+      const r = await memberApi.saveSidebar({ nodes, recent, shape, version })
       if (r.status === 200) {
         toast(r.msg || '已保存，会员中心前台已生效')
         reload()
@@ -188,12 +190,17 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
     workspace?.setBusy(true)
     setSaving(true)
     try {
-      const r = workspace ? await workspaceApi.editorImport(mode,nodes,member?.sidebar?.shape||3) : await memberApi.import({ mode, version, expectedRevision: workspace?.revision })
+      const r = workspace ? await workspaceApi.editorImport(mode, nodes, shape) : await memberApi.import({ mode, version })
       if (r.status === 200) {
         toast(r.msg || '已导入系统导航')
         setConfirmImport(null)
         if (workspace) {
-          setNodes(r.data.nodes)
+          // Release the import lock before the queued draft update. setValues
+          // deliberately rejects ordinary edits while a save/import is pending.
+          workspace.setBusy(false)
+          workspace.setValues((current) => ({ ...current, sidebar: {
+            ...current.sidebar, nodes: r.data.nodes, shape: r.data.shape,
+          } }))
         }
         else reload()
         loadCatalog()
@@ -422,7 +429,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
         <CardHeader>
           <CardTitle>菜单结构</CardTitle>
           <CardDescription>
-            三级结构：一级分组 → 菜单 → 页面。每级都支持新增/编辑/删除与拖拽排序
+            一级分组显示在左侧入口，二级分组显示在展开面板中，三级页面显示为分组内的链接。每级都支持新增/编辑/删除与拖拽排序
             （拖到某一项上可将其变为子级，最多三级）；「显示」开关控制前台是否渲染该项。
             分界线只能放在一级菜单之间，可排序、隐藏或删除。
           </CardDescription>
@@ -434,6 +441,8 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
             getLabel={(n) => n.label}
             renderMeta={(n) => TYPES.find(t=>t.value===n.source_type)?.label || '菜单'}
             isSeparator={isMenuSeparator}
+            levelLabels={LEVEL_LABELS}
+            isBranch={(node) => !isMenuSeparator(node) && nodeLevel(nodes, node.id) < 3 && !node.url}
             onEdit={(node) => setEditing({ ...node, __parentId: findNode(nodes, node.id)?.parentId })}
             onAddChild={(node) => setEditing({ ...emptyNode(), __parentId: node?.id || null, source_type: 'custom' })}
             onDelete={(node) => setConfirmDel(node)}
@@ -523,6 +532,8 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
   const type = value.source_type
   const isSystemLike = type === 'system' || type === 'plugin'
   const allIds = collectIds(nodes)
+  const depth = value.__parentId ? nodeLevel(nodes, value.__parentId) + 1 : 1
+  const isGroup = depth < 3 && type === 'custom'
 
   const navOptions = useMemo(() => {
     const navs = catalog?.navs || []
@@ -548,7 +559,7 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
       className="space-y-4"
       onSubmit={(e) => {
         e.preventDefault()
-        const err = validate(value)
+        const err = validate(value, depth)
         if (err) { alert(err); return }
         const next = { ...value }
         for (const key of ['module', 'res_module', 'select_field']) {
@@ -608,7 +619,7 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
       {type === 'custom' || type === 'embedded' || type === 'module' ? (
         <div>
           <Label className="mb-1.5 block">
-            链接地址 {type === 'module' ? '（可留空，自动进入本分类的产品列表）' : '*'}
+            链接地址 {isGroup ? '（分组可留空）' : type === 'module' ? '（可留空，自动进入本分类的产品列表）' : '*'}
           </Label>
           <LinkPicker label="菜单跳转链接" value={value.url} onChange={v=>set('url',v)}/>
           <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
@@ -648,6 +659,7 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
               const hit = findNode(nodes, id)
               if (!hit) return null
               if (isMenuSeparator(hit.node)) return null
+              if (nodeLevel(nodes, id) >= 3) return null
               // 禁止挂到自己的后代下（会造成环）
               if (findNode(nodes, value.id) && collectDescendants(findNode(nodes, value.id).node).includes(id)) return null
               return <option key={id} value={id}>{hit.node.label}</option>
@@ -678,14 +690,24 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
   )
 }
 
-function validate(v) {
+function nodeLevel(nodes, id, depth = 1) {
+  for (const node of nodes || []) {
+    if (node.id === id) return depth
+    const found = nodeLevel(node.children, id, depth + 1)
+    if (found) return found
+  }
+  return 0
+}
+
+function validate(v, depth = 3) {
   if (!String(v.label || '').trim() && !(v.children || []).length) return '请填写显示名称'
   if ((v.source_type === 'system' || v.source_type === 'plugin') && !v.source_nav_id) {
     return '系统页面/插件页面必须选择来源导航'
   }
   const isSeparator = String(v.label || '').trim() === '分隔符'
   if ((v.source_type === 'custom' || v.source_type === 'embedded')
-      && !String(v.url || '').trim() && !isSeparator && !(v.children || []).length) {
+      && !String(v.url || '').trim() && !isSeparator && !(v.children || []).length
+      && !(v.source_type === 'custom' && depth < 3)) {
     return '请填写链接地址'
   }
   if (v.url && /^\/\//.test(v.url)) return '链接不能以 // 开头'

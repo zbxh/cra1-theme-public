@@ -1895,9 +1895,9 @@ if (strpos($r,'api.')===0) {
         $body   = read_body();
 
         if ($sub === 'get') {
-            // 打开后台即完成一次性分组树迁移（旧两级 → 一级分组/菜单/页面），
-            // 幂等：已迁移（shape=3）时原样返回
+            // 只读投影；用户保存前，不改写历史主配置。
             $migrated = $member->read();
+            $migrated['sidebar'] = $member->sidebarForEditor($migrated['sidebar']);
             json_out([
                 'status' => 200,
                 'msg'    => 'success',
@@ -1927,10 +1927,7 @@ if (strpos($r,'api.')===0) {
                 json_out(['status' => 400, 'msg' => $catalog['error']]);
             }
             $mode = (string) ($body['mode'] ?? 'first');
-            $nodes = $member->importFromSystem($catalog);
-
             $cur = $member->read();
-            $added = 0;
             if (isset($body['expectedRevision'])) {
                 $actual = theme_workspace_revision(['sidebar' => $cur['sidebar']]);
                 if (!hash_equals($actual, (string) $body['expectedRevision'])) {
@@ -1938,33 +1935,21 @@ if (strpos($r,'api.')===0) {
                         'data' => ['values' => ['sidebar' => $cur['sidebar']], 'revision' => $actual, 'version' => $cur['version']]]);
                 }
             }
-            if ((int) ($cur['sidebar']['shape'] ?? 2) >= 3) {
-                $incoming = $member->wrapImportUnderServiceGroup($nodes, ['sidebar' => ['nodes' => []]]);
-                if ($mode === 'merge') {
-                    $nodes = $member->mergeImported($cur['sidebar']['nodes'] ?? [], $incoming, $added);
-                } else {
-                    $keep = array_values(array_filter($cur['sidebar']['nodes'] ?? [], static function ($n) { return ($n['label'] ?? '') !== '产品与服务'; }));
-                    $nodes = $member->mergeImported($keep, $incoming, $added);
-                }
-            } elseif ($mode === 'merge') {
-                $nodes = $member->mergeImported($cur['sidebar']['nodes'] ?? [], $nodes, $added);
-            } else {
-                $counter = function (array $list) use (&$counter): int { $n = 0; foreach ($list as $node) $n += 1 + $counter($node['children'] ?? []); return $n; };
-                $added = $counter($nodes);
-            }
+            $proposal = $member->proposeImport($catalog, $mode, $cur['sidebar']);
+            $nodes = $proposal['nodes']; $added = $proposal['added'];
             if ($mode === 'merge' && $added === 0) {
                 json_out(['status' => 200, 'msg' => '没有新增菜单，配置版本保持不变',
                     'data' => ['config' => $cur, 'added' => 0, 'skipped' => count($catalog['navs'] ?? []), 'failed' => 0]]);
             }
 
-            $errors = $member->validateTree($nodes, (int) ($cur['sidebar']['shape'] ?? 2) >= 3);
+            $errors = $member->validateTree($nodes, true);
             if ($errors) {
                 json_out(['status' => 400, 'msg' => implode('；', array_slice($errors, 0, 5))]);
             }
 
             $res = $member->save([
                 'sidebar' => ['version' => (int) ($cur['sidebar']['version'] ?? 1) + 1,
-                              'imported_at' => time(), 'shape' => (int) ($cur['sidebar']['shape'] ?? 2),
+                              'imported_at' => time(), 'shape' => 3,
                               'nodes' => $nodes],
             ], $operator, isset($body['expectedRevision']) ? (int) $cur['version'] : (int) ($body['version'] ?? $cur['version']));
             $res['data']['added'] = $added;
@@ -1980,14 +1965,14 @@ if (strpos($r,'api.')===0) {
                 json_out(['status' => 400, 'msg' => '缺少 nodes']);
             }
             $cur = $member->read();
-            $errors = $member->validateTree($nodes, (int) ($cur['sidebar']['shape'] ?? 2) >= 3);
+            $errors = $member->validateTree($nodes, true);
             if ($errors) {
                 json_out(['status' => 400, 'msg' => implode('；', array_slice($errors, 0, 5))]);
             }
             $patch = [
                 'version'     => (int) ($cur['sidebar']['version'] ?? 1) + 1,
                 'imported_at' => (int) ($cur['sidebar']['imported_at'] ?? 0),
-                'shape'       => (int) ($cur['sidebar']['shape'] ?? 2),
+                'shape'       => 3,
                 'nodes'       => $nodes,
             ];
             // 最近访问设置（随菜单结构一起提交；未提交时存储层沿用当前值）

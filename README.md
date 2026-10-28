@@ -7,7 +7,7 @@
 钛灰银与香槟金配色 · 可视化页面设置 · 三个主题独立管理
 
 <p>
-  <a href="https://github.com/zbxh/cra1-theme-public/releases/tag/v17.1"><img src="https://img.shields.io/badge/版本-v17.1_测试版-b59a64?style=flat-square" alt="v17.1 测试版"></a>
+  <a href="https://github.com/zbxh/cra1-theme-public/releases/tag/v17.2"><img src="https://img.shields.io/badge/版本-v17.2_测试版-b59a64?style=flat-square" alt="v17.2 测试版"></a>
   <a href="#compatibility"><img src="https://img.shields.io/badge/V10-10.7.4-35383c?style=flat-square" alt="V10 10.7.4"></a>
   <a href="#compatibility"><img src="https://img.shields.io/badge/PHP-7.4-61656b?style=flat-square" alt="PHP 7.4"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/许可-源码可见-b59a64?style=flat-square" alt="源码可见商业许可证"></a>
@@ -18,7 +18,7 @@
   <a href="#screenshots">界面预览</a> ·
   <a href="#features">功能特性</a> ·
   <a href="#quick-start">快速安装</a> ·
-  <a href="https://github.com/zbxh/cra1-theme-public/releases/download/v17.1/CRA1-theme-v17.1.zip">主题下载</a> ·
+  <a href="https://github.com/zbxh/cra1-theme-public/releases/download/v17.2/CRA1-theme-v17.2.zip">主题下载</a> ·
   <a href="#documentation">使用文档</a> ·
   <a href="#community">交流反馈</a>
 </p>
@@ -74,11 +74,11 @@
 
 ## 🚀 快速安装
 
-当前版本为 **v17.1 测试版**，需安装在已有的智简魔方 V10 系统上。首次安装与后续手动更新使用同一份安装包：
+当前版本为 **v17.2 测试版**，需安装在已有的智简魔方 V10 系统上。首次安装与后续手动更新使用同一份安装包：
 
 | 场景 | 下载与说明 |
 | --- | --- |
-| 主题下载 | [安装包与图文教程合集](https://github.com/zbxh/cra1-theme-public/releases/download/v17.1/CRA1-theme-v17.1.zip)，包含安装 ZIP、PDF / HTML / Markdown 图文教程 |
+| 主题下载 | [安装包与图文教程合集](https://github.com/zbxh/cra1-theme-public/releases/download/v17.2/CRA1-theme-v17.2.zip)，包含安装 ZIP、PDF / HTML / Markdown 图文教程 |
 | 安装与使用 | [安装图文教程](docs/installation.md) · [主题使用教程](docs/usage.md)，可直接在 GitHub 阅读 |
 | 更新说明 | [版本发布与更新说明](https://github.com/zbxh/cra1-theme-public/releases) |
 

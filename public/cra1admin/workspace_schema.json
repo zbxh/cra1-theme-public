@@ -60182,7 +60182,8 @@
         "$list": {
           "$ref": "menuNode"
         }
-      }
+      },
+      "import_key": "scalar"
     },
     "ticketNode": {
       "id": "scalar",

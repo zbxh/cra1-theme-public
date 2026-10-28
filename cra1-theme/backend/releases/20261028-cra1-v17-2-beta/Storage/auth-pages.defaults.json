@@ -1,0 +1,40 @@
+{
+  "login": {
+    "title": "欢迎回来",
+    "description": "登录账户，管理您的产品与服务",
+    "logo": "",
+    "brand": {
+      "enabled": 1,
+      "label": "云端工作空间",
+      "title": "让每一份算力，\n连接更多可能。",
+      "description": "从资源部署到日常管理，在这里有序开展您的云上业务。",
+      "image": "",
+      "items": [
+        {"id": "auth-resources", "title": "资源集中管理", "description": "查看产品配置、运行状态与服务信息", "enabled": 1},
+        {"id": "auth-finance", "title": "费用清晰可查", "description": "管理订单、账单及续费安排", "enabled": 1},
+        {"id": "auth-service", "title": "服务随时连接", "description": "通过工单与文档获取所需帮助", "enabled": 1}
+      ]
+    },
+    "support": {"enabled": 0, "label": "联系支持", "url": ""},
+    "footer": ""
+  },
+  "regist": {
+    "title": "创建您的账户",
+    "description": "完成注册，开启您的云上工作空间",
+    "logo": "",
+    "brand": {
+      "enabled": 1,
+      "label": "从这里开始",
+      "title": "下一程，\n从云端启程。",
+      "description": "用一个账户连接产品、服务与支持，让每一步都有清晰的方向。",
+      "image": "",
+      "items": [
+        {"id": "auth-choice", "title": "按需选择资源", "description": "根据业务需求选择适合的产品与配置", "enabled": 1},
+        {"id": "auth-workspace", "title": "统一工作空间", "description": "集中查看产品、账单和服务进展", "enabled": 1},
+        {"id": "auth-control", "title": "账户安全管理", "description": "管理您的登录方式与账户安全设置", "enabled": 1}
+      ]
+    },
+    "support": {"enabled": 0, "label": "联系支持", "url": ""},
+    "footer": ""
+  }
+}

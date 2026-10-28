@@ -229,7 +229,7 @@ final class ThemeWorkspaceStore
         if ($scope['domain'] !== 'website') {
             if ($scope['kind'] === 'custom-code') return ['custom_code' => $raw['custom_code'] ?? ['css'=>'','js'=>'','css_enabled'=>true,'js_enabled'=>true]];
             if ($scope['kind'] === 'member-appearance') return ['appearance' => $raw['appearance']];
-            if ($scope['kind'] === 'member-sidebar') return ['sidebar' => $raw['sidebar']];
+            if ($scope['kind'] === 'member-sidebar') return ['sidebar' => $this->member->sidebarForEditor($raw['sidebar'])];
             $content = [];
             foreach ($scope['keys'] as $key) $content[$key] = $raw['content'][$key] ?? [];
             if ($scope['domain']==='member' && isset($content['product_list']['default'])) {
@@ -354,6 +354,7 @@ final class ThemeWorkspaceStore
     private function applyDomain(array $scope, array $current, array $patch): array
     {
         $section = $scope['kind'] === 'custom-code' ? 'custom_code' : ($scope['kind'] === 'member-appearance' ? 'appearance' : ($scope['kind'] === 'member-sidebar' ? 'sidebar' : 'content'));
+        if ($scope['kind'] === 'member-sidebar') $current['sidebar'] = $this->member->sidebarForEditor($current['sidebar']);
         $this->validateKeys($patch, [$section]);
         if (!isset($patch[$section]) || !is_array($patch[$section])) throw new InvalidArgumentException('配置格式不正确');
         $allowed = $section === 'content' ? $scope['keys'] : array_keys($current[$section]);
@@ -371,7 +372,9 @@ final class ThemeWorkspaceStore
         }
         if($section==='custom_code')foreach($patch[$section]as$key=>$v){if(in_array($key,['css','js'],true)&&(!is_string($v)||strlen($v)>1048576))throw new InvalidArgumentException('自定义代码必须是文本且不超过 1MB');if(in_array($key,['css_enabled','js_enabled'],true)&&!is_bool($v))throw new InvalidArgumentException('代码启用状态必须是开关值');}
         if ($section === 'sidebar' && isset($patch['sidebar']['nodes'])) {
-            $errors = $this->member->validateTree($patch['sidebar']['nodes'], (int) ($current['sidebar']['shape'] ?? 2) >= 3);
+            $shape = (int) ($patch['sidebar']['shape'] ?? $current['sidebar']['shape'] ?? 3);
+            if ($shape !== 3) throw new InvalidArgumentException('菜单编辑器使用三级分组结构');
+            $errors = $this->member->validateTree($patch['sidebar']['nodes'], true);
             if ($errors) throw new InvalidArgumentException(implode('；', array_slice($errors, 0, 5)));
         }
         return [$section => array_replace($current[$section], $patch[$section])];

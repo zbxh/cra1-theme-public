@@ -90,18 +90,11 @@ trait ThemeEditorStore
     public function editorImport(string $mode='merge',?array $draftNodes=null,?int $draftShape=null): array
     {
         $catalog=$this->member->readSystemCatalog();if(!empty($catalog['error']))throw new RuntimeException($catalog['error']);
-        $current=$this->member->read();$incoming=$this->member->importFromSystem($catalog);
-        if(!in_array($mode,['merge','replace','first'],true))throw new InvalidArgumentException('未知导入方式');
-        if($mode==='first')$mode='replace';
+        $current=$this->member->read();
         if($draftNodes!==null)$current['sidebar']['nodes']=$draftNodes;
         if($draftShape!==null)$current['sidebar']['shape']=$draftShape;
-        $added=0;$old=$current['sidebar']['nodes']??[];
-        if((int)($current['sidebar']['shape']??2)>=3){$incoming=$this->member->wrapImportUnderServiceGroup($incoming,['sidebar'=>['nodes'=>[]]]);if($mode==='replace')$old=array_values(array_filter($old,static function($n){return($n['label']??'')!=='产品与服务';}));}
-        elseif($mode==='replace')$old=[];
-        $nodes=$this->member->mergeImported($old,$incoming,$added);$errors=$this->member->validateTree($nodes,(int)($current['sidebar']['shape']??2)>=3);
-        if($errors)throw new InvalidArgumentException(implode('；',$errors));
-        $count=function(array $list)use(&$count):int{$n=0;foreach($list as$item)$n+=1+$count($item['children']??[]);return$n;};
-        return ['status'=>200,'msg'=>$added?'菜单已应用到草稿，保存后生效':'没有新增菜单','data'=>['nodes'=>$nodes,'added'=>$added,'skipped'=>max(0,$count($incoming)-$added),'failed'=>0]];
+        $proposal=$this->member->proposeImport($catalog,$mode,$current['sidebar']);
+        return ['status'=>200,'msg'=>$proposal['added']?'菜单已应用到草稿，保存后生效':'没有新增菜单','data'=>$proposal];
     }
     private function editorPayload(array $editor,array $raw): array
     {

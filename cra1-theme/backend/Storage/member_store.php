@@ -52,7 +52,7 @@ final class MemberCenterStore
     public const MAX_DEPTH = 3;
 
     /** 菜单类型白名单（与系统 saveHomeMenu 契约一致） */
-    private const TYPES = ['system', 'plugin', 'custom', 'module', 'embedded', 'separator'];
+    private const TYPES = ['system', 'plugin', 'custom', 'module', 'res_module', 'embedded', 'separator'];
 
     private string $dir;
     private string $mainFile;
@@ -109,8 +109,8 @@ final class MemberCenterStore
                 'version'    => 1,
                 'imported_at' => 0,
                 // 树形态：2 = 旧两级（根节点即菜单），3 = 分组树（一级分组 → 菜单 → 页面）。
-                // 3 由 migrateToGroupTree() 迁移后写入；公开快照据此下发 nav_shape。
-                'shape'      => 2,
+                // 新配置与后台编辑器统一采用三级；历史两级配置仍按原规则读取。
+                'shape'      => 3,
                 'nodes'      => [],
                 /*
                  * 最近访问设置（前台一级入口，置于「我的资源」上方）。
@@ -534,10 +534,15 @@ final class MemberCenterStore
         // sidebar
         $sb = is_array($data['sidebar'] ?? null) ? $data['sidebar'] : [];
         $rawNodes = is_array($sb['nodes'] ?? null) ? $sb['nodes'] : [];
+        $shape = max(2, min(3, (int) ($sb['shape'] ?? ($rawNodes ? 2 : 3))));
+        // 曾有编辑器保存了三级树，却遗漏 shape。保留节点、修正解释方式；读取不写主配置。
+        foreach ($rawNodes as $root) foreach (is_array($root['children'] ?? null) ? $root['children'] : [] as $child) {
+            if (!empty($child['children'])) $shape = 3;
+        }
         $data['sidebar'] = [
             'version'     => max(1, (int) ($sb['version'] ?? 1)),
             'imported_at' => (int) ($sb['imported_at'] ?? 0),
-            'shape'       => max(2, min(3, (int) ($sb['shape'] ?? 2))),
+            'shape'       => $shape,
             'nodes'       => $this->normalizeNodes($rawNodes),
             'recent'      => $this->normalizeRecent(is_array($sb['recent'] ?? null) ? $sb['recent'] : []),
         ];
@@ -1032,6 +1037,7 @@ final class MemberCenterStore
                 'order'           => $order,
             ];
             if(isset($n['icon_style'])) { $style=cra1_icon_style_clean($n['icon_style']);if($style)$item['icon_style']=$style; }
+            if (preg_match('/^[a-z0-9:-]{1,100}$/D', (string) ($n['import_key'] ?? ''))) $item['import_key'] = $n['import_key'];
             $order++;
             $kids = is_array($n['children'] ?? null) ? $n['children'] : [];
             // 超出 MAX_DEPTH 的子级不在这里静默截断：由 validateTree 明确报错，
@@ -1101,8 +1107,8 @@ final class MemberCenterStore
 
     /**
      * 深度校验：环、重复 ID、缺失来源、URL 合法性。
-     * @param bool $topGroupsOk true = 一级节点允许无 URL（分组树形态下一级是纯容器，
-     *                          新建空分组也应能保存）；false = 旧两级契约（根节点即菜单，必须有链接）
+     * @param bool $topGroupsOk true = 一、二级分组允许无 URL，三级必须是页面；
+     *                          false = 保留旧两级契约。
      * @return string[] 错误列表（空 = 通过）
      */
     public function validateTree(array $nodes, bool $topGroupsOk = false): array
@@ -1150,15 +1156,14 @@ final class MemberCenterStore
                 // URL 要求分四种情况（与系统菜单实际用法对齐）：
                 //   1. 有子级的父节点：URL 可为空（系统里「测试」「其他」就是纯容器，
                 //      链接在子级上），不能强制要求；
-                //   2. 一级分组（shape=3 的根节点）：纯容器，URL 可为空 ——
-                //      新建一个还没有子级的一级分组也应能保存；
+                //   2. 一、二级 custom 分组：URL 可为空，新建空分组可以稍后添加页面；
                 //   3. 「分隔符」：menu_type=custom 且无 URL，表示分组分隔线，合法；
                 //   4. 其余 custom/embedded 叶子节点：必须有可跳转地址。
                 $kids0 = is_array($n['children'] ?? null) ? $n['children'] : [];
                 $isContainer = count($kids0) > 0;
                 $isSeparator = ($label === '分隔符');
-                $isTopGroup = ($depth === 1 && $topGroupsOk);
-                if (!$isContainer && !$isSeparator && !$isTopGroup
+                $isGroup = ($depth < 3 && $topGroupsOk && $type === 'custom');
+                if (!$isContainer && !$isSeparator && !$isGroup
                     && in_array($type, ['custom', 'embedded'], true)
                     && trim((string) ($n['url'] ?? '')) === '') {
                     $errors[] = "菜单项 {$label} 缺少链接地址";
@@ -1343,6 +1348,11 @@ final class MemberCenterStore
         $rows = $catalog['menu'] ?? [];
         $byMenuId = [];
         $out = [];
+        $sourceKeys = [];
+        foreach ($rows as $r) $sourceKeys[(int) $r['menu_id']] = $this->matchKey([
+            'source_nav_id' => $r['source_nav_id'], 'url' => $r['url'], 'label' => $r['label'],
+        ]);
+        $occurrences = [];
 
         // 先建节点（parent 稍后挂）
         foreach ($rows as $r) {
@@ -1359,6 +1369,12 @@ final class MemberCenterStore
             if ($url === '' && in_array($type, ['module', 'res_module'], true)) {
                 $url = 'productList.htm';
             }
+            // The same native page may intentionally appear under two parents.
+            // Its original source position distinguishes those copies, while
+            // retaining identity when a merchant later moves/renames either.
+            $source = ($sourceKeys[(int) $r['parent_menu_id']] ?? 'root') . '/' . ($sourceKeys[(int) $r['menu_id']] ?? '');
+            $occurrence = $occurrences[$source] ?? 0;
+            $occurrences[$source] = $occurrence + 1;
 
             $out[(int) $r['menu_id']] = [
                 'id'              => $id,
@@ -1379,8 +1395,7 @@ final class MemberCenterStore
                 'hidden'          => 0,
                 'order'           => (int) $r['order'],
                 'children'        => [],
-                // 记录来源，便于差异比对
-                '_source_menu_id' => (int) $r['menu_id'],
+                'import_key' => 'system:' . hash('sha256', $source . ':' . $occurrence),
             ];
         }
 
@@ -1596,203 +1611,131 @@ final class MemberCenterStore
         ];
     }
 
-    /**
-     * 把旧两级结构迁移为分组树（一次性，幂等）：
-     *
-     *   旧：根节点 = 菜单（订购产品 / 其他 / 魔方云…），子级 = 菜单
-     *   新：L1 = 一级分组（我的资源 / 产品与服务）
-     *       L2 = 菜单（我的产品 / 魔方云…）
-     *       L3 = 页面（使用中 / 已删除 / 安全概览…，原为前台写死的 SECONDARY_PAGES）
-     *
-     * 播种规则（L3 静态页）：
-     *   - 节点 url 命中 PAGE_SEEDS 即播种；
-     *   - module/res_module 的容器不播（其 productList.htm 是导入兜底地址，
-     *     播了会和「魔方云」组的页面重复）；
-     *   - 有子级的容器播种自身页面后，子级保持为 L3（如 安全中心 = 5 个标签 + 资源中心 + 工单中心）。
-     */
+    /** Stable identities keep read-only legacy projections and editor revisions repeatable. */
+    private static function derivedNode(array $node, string $key): array
+    {
+        $node['id'] = 'cra1-' . substr(hash('sha256', $key), 0, 32);
+        $node['import_key'] = $key;
+        return $node;
+    }
+
+    /** Project a legacy sidebar into the exact three-level editor, without writing. */
+    public function sidebarForEditor(array $sidebar): array
+    {
+        if ((int) ($sidebar['shape'] ?? 2) >= 3) return $sidebar;
+        foreach ($sidebar['nodes'] ?? [] as $root) foreach ($root['children'] ?? [] as $child) {
+            if (!empty($child['children'])) { $sidebar['shape'] = 3; return $sidebar; }
+        }
+        $seed = function (array $node): array {
+            $url = (string) ($node['url'] ?? '');
+            // Plugin IDs are installation-specific; never invent sibling plugin links.
+            $pages = strpos($url, 'plugin/') === false ? (self::PAGE_SEEDS[$url] ?? []) : [];
+            if (in_array($node['source_type'] ?? '', ['module', 'res_module'], true) && !empty($node['children'])) $pages = [];
+            $children = [];
+            foreach ($pages as $i => [$name, $link]) {
+                $children[] = self::derivedNode(self::pageNode($name, $link, $i), 'legacy-page:' . hash('sha256', $node['id'] . ':' . $link));
+            }
+            $node['children'] = array_merge($children, $node['children'] ?? []);
+            return $node;
+        };
+        $products = self::derivedNode(self::groupNode('我的产品', 'icon-a-7', [], 'productList.htm'), 'legacy-products');
+        $order = self::derivedNode(self::groupNode('订购产品', 'icon-a-6', [], 'cart/goodsList.htm'), 'legacy-order');
+        $resources = self::derivedNode(self::groupNode('我的资源', 'icon-a-7', [$seed($products), $seed($order)]), 'legacy-resources');
+        $services = self::derivedNode(self::groupNode('产品与服务', 'icon-a-6', array_map($seed, $sidebar['nodes'] ?? [])), 'system-services');
+        $sidebar['shape'] = 3;
+        $sidebar['nodes'] = [$resources, $services];
+        return $sidebar;
+    }
+
+    /** Retained explicit migration API; ordinary reads only project a draft. */
     public function migrateToGroupTree(): array
     {
         $config = $this->read();
-        if ((int) ($config['sidebar']['shape'] ?? 2) >= 3) {
-            return $config;   // 已迁移
-        }
-
-        $seeds = self::PAGE_SEEDS;
-        $seedPages = function (array $node) use ($seeds): array {
-            $pages = [];
-            $url = (string) $node['url'];
-            $type = (string) ($node['source_type'] ?? 'custom');
-            $isFallback = in_array($type, ['module', 'res_module'], true);
-            // module 容器不播；叶子 module（魔方云）要播（用户示例：魔方云 → 使用中/已删除）
-            if (isset($seeds[$url]) && !($isFallback && !empty($node['children']))) {
-                foreach ($seeds[$url] as $i => [$name, $u]) {
-                    $pages[] = self::pageNode($name, $u, $i);
-                }
-            }
-            return $pages;
-        };
-
-        // 「我的产品」：原来由前台硬编码生成，迁移后成为真实可编辑节点
-        $myProduct = self::groupNode('我的产品', 'icon-a-7', []);
-        foreach ($seeds['productList.htm'] as $i => [$name, $u]) {
-            $myProduct['children'][] = self::pageNode($name, $u, $i);
-        }
-
-        // 归类旧根节点：自身有真实页面（命中 PAGE_SEEDS）的保留为二级菜单，
-        // 其旧子级降为三级页面；自身无页面的纯分组容器（如「测试」「其他」，
-        // 旧两级菜单系统里只当分组用）—— 其子级【提升为二级】、容器本身移除，
-        // 否则它们的子级会被压到三级、三级页面放不进三级以内。
-        $resourceKids = [$myProduct];
-        $serviceKids = [];
-
-        $promote = function (array $child) use ($seedPages): array {
-            $own = $seedPages($child);
-            $child['children'] = is_array($child['children'] ?? null) ? $child['children'] : [];
-            return array_merge($own, $child['children']);
-        };
-
-        foreach ($config['sidebar']['nodes'] as $node) {
-            if (!is_array($node)) {
-                continue;
-            }
-            $label = (string) ($node['label'] ?? '');
-            $url = (string) ($node['url'] ?? '');
-            // 订购入口归「我的资源」；其余根节点归「产品与服务」
-            $target = ($url === 'cart/goodsList.htm' || stripos($label, '订购') === 0) ? 'resource' : 'service';
-
-            $node['children'] = is_array($node['children'] ?? null) ? $node['children'] : [];
-            $ownPages = $seedPages($node);
-
-            if ($ownPages === [] && $node['children'] !== []) {
-                // 纯分组容器：子级提升为二级，容器移除
-                foreach ($node['children'] as $promoted) {
-                    $promoted['children'] = $promote($promoted);
-                    $promoted['order'] = $order;
-                    $order++;
-                    if ($target === 'resource') {
-                        $resourceKids[] = $promoted;
-                    } else {
-                        $serviceKids[] = $promoted;
-                    }
-                }
-                continue;
-            }
-
-            // 自身有页面：保留为二级菜单，自身页面排在前（与前台旧渲染顺序一致）
-            $node['children'] = array_merge($ownPages, $node['children']);
-            $node['order'] = $order;
-            $order++;
-
-            if ($target === 'resource') {
-                $resourceKids[] = $node;
-            } else {
-                $serviceKids[] = $node;
-            }
-        }
-
-        $resource = self::groupNode('我的资源', 'icon-a-7', $resourceKids);
-        $service = self::groupNode('产品与服务', 'icon-a-6', $serviceKids);
-
-        $config['sidebar']['nodes'] = [$resource, $service];
-        $config['sidebar']['shape'] = 3;
-
-        $errors = $this->validateTree($config['sidebar']['nodes'], true);
-        if ($errors) {
-            // 迁移产物必须合法；不合法时保持原状并在错误日志留痕，避免前台拿到坏树
-            if (is_file($this->dir . '/migrate_error.log')) {
-                @file_put_contents($this->dir . '/migrate_error.log', date('c') . "\t" . implode('；', $errors) . "\n", FILE_APPEND);
-            }
-            return $config;
-        }
-
-        $res = $this->save([
-            'sidebar' => [
-                'version'     => (int) $config['sidebar']['version'] + 1,
-                'imported_at' => (int) $config['sidebar']['imported_at'],
-                'shape'       => 3,
-                'nodes'       => $config['sidebar']['nodes'],
-            ],
-        ], 'system:migrate');
-        if (is_file($this->dir . '/migrate_error.log') && ($res['status'] ?? 0) !== 200) {
-            @file_put_contents($this->dir . '/migrate_error.log', date('c') . "\t保存失败\n", FILE_APPEND);
-        }
-        return $this->read();
+        if ((int) ($config['sidebar']['shape'] ?? 2) >= 3) return $config;
+        $sidebar = $this->sidebarForEditor($config['sidebar']);
+        $errors = $this->validateTree($sidebar['nodes'], true);
+        if ($errors) throw new InvalidArgumentException(implode('；', $errors));
+        $sidebar['version']++;
+        $result = $this->save(['sidebar' => $sidebar], 'system:migrate', (int) $config['version']);
+        if ($result['status'] !== 200) throw new RuntimeException($result['msg']);
+        return $result['data']['config'];
     }
 
-    /**
-     * 把导入的系统导航根节点包装进「产品与服务」一级分组（分组树形态专用）。
-     *
-     * 系统导航天然是两级（菜单 → 子菜单），直接作为根节点会破坏
-     * 「一级分组 → 菜单 → 页面」的三级结构；这里把它们整体挂到
-     * 产品与服务分组下（已存在则复用，不存在则创建），
-     * 并按迁移同规则为导入菜单播种静态页面（module 容器除外）。
-     * merge 模式下新增项追加到分组子级末尾。
-     */
+    /** System L1/L2 become theme L2/L3, retaining every parent and its order. */
     public function wrapImportUnderServiceGroup(array $importedRoots, array $current): array
     {
-        $seeds = self::PAGE_SEEDS;
-        $seedPages = function (array $node) use ($seeds): array {
-            $pages = [];
-            $url = (string) ($node['url'] ?? '');
-            $type = (string) ($node['source_type'] ?? 'custom');
-            $isFallback = in_array($type, ['module', 'res_module'], true);
-            if (isset($seeds[$url]) && !($isFallback && !empty($node['children']))) {
-                foreach ($seeds[$url] as $i => [$name, $u]) {
-                    $pages[] = self::pageNode($name, $u, $i);
-                }
+        $group = self::derivedNode(self::groupNode('产品与服务', 'icon-a-6', $importedRoots), 'system-services');
+        // Legacy imports did not record an import identity. Reuse their group,
+        // including a renamed group that still contains imported system entries.
+        foreach ($current['sidebar']['nodes'] ?? [] as $root) {
+            $matches = ($root['import_key'] ?? '') === 'system-services' || ($root['label'] ?? '') === '产品与服务';
+            foreach ($root['children'] ?? [] as $child) foreach ($importedRoots as $incoming) {
+                if ($this->sameImportedNode($child, $incoming)) $matches = true;
             }
-            return $pages;
-        };
-
-        foreach ($importedRoots as &$n) {
-            if (!is_array($n)) {
-                continue;
-            }
-            $own = $seedPages($n);
-            $kids = is_array($n['children'] ?? null) ? $n['children'] : [];
-            $n['children'] = array_merge($own, $kids);
-        }
-        unset($n);
-
-        $groups = is_array($current['sidebar']['nodes'] ?? null) ? $current['sidebar']['nodes'] : [];
-        $service = null;
-        foreach ($groups as $gi => $g) {
-            if (is_array($g) && (string) ($g['label'] ?? '') === '产品与服务') {
-                $service = &$groups[$gi];
+            if ($matches) {
+                $group = array_replace($root, ['children' => $importedRoots, 'import_key' => 'system-services']);
                 break;
             }
         }
-        if ($service === null) {
-            $groups[] = self::groupNode('产品与服务', 'icon-a-6', []);
-            $service = &$groups[count($groups) - 1];
-        }
-        $existing = is_array($service['children'] ?? null) ? $service['children'] : [];
-        // merge 语义由调用方保证（importedRoots 已剔除已存在项），这里直接追加
-        $service['children'] = array_values(array_merge($existing, $importedRoots));
-
-        return $groups;
+        return [$group];
     }
 
-    /** Recursively merge system additions, preserving stable IDs and local customization. */
+    /** Shared proposal contract for the workspace and retained legacy import route. */
+    public function proposeImport(array $catalog, string $mode, array $sidebar): array
+    {
+        if (!empty($catalog['error'])) throw new RuntimeException($catalog['error']);
+        if (!in_array($mode, ['merge', 'replace', 'first'], true)) throw new InvalidArgumentException('未知导入方式');
+        $sidebar = $this->sidebarForEditor($sidebar);
+        $existing = $mode === 'merge' ? ($sidebar['nodes'] ?? []) : [];
+        $incoming = $this->wrapImportUnderServiceGroup($this->importFromSystem($catalog), ['sidebar' => ['nodes' => $existing]]);
+        $added = 0;
+        $nodes = $this->mergeImported($existing, $incoming, $added);
+        $errors = $this->validateTree($nodes, true);
+        if ($errors) throw new InvalidArgumentException(implode('；', $errors));
+        $count = function (array $list) use (&$count): int {
+            $n = 0; foreach ($list as $item) $n += 1 + $count($item['children'] ?? []); return $n;
+        };
+        return ['nodes' => $nodes, 'shape' => 3, 'added' => $added,
+            'skipped' => max(0, $count($incoming) - $added), 'failed' => 0];
+    }
+
+    private function sameImportedNode(array $old, array $incoming): bool
+    {
+        if (!empty($old['import_key']) && !empty($incoming['import_key'])) return $old['import_key'] === $incoming['import_key'];
+        return $this->matchKey($old) === $this->matchKey($incoming);
+    }
+
+    /** Merge globally, so moved entries keep their local parent, identity and custom fields. */
     public function mergeImported(array $existing, array $incoming, int &$added): array
     {
-        foreach ($incoming as $node) {
-            $key = $this->matchKey($node);
-            $found = null;
-            foreach ($existing as $i => $old) {
-                if ($this->matchKey($old) === $key) { $found = $i; break; }
+        $find = function (array $list, array $node, array $path = []) use (&$find): ?array {
+            foreach ($list as $i => $old) {
+                $next = array_merge($path, [$i]);
+                if ($this->sameImportedNode($old, $node)) return $next;
+                $hit = $find($old['children'] ?? [], $node, array_merge($next, ['children']));
+                if ($hit !== null) return $hit;
             }
-            if ($found !== null) {
-                $existing[$found]['children'] = $this->mergeImported(
-                    $existing[$found]['children'] ?? [], $node['children'] ?? [], $added);
-            } else {
-                $count = function (array $nodes) use (&$count): int {
-                    $n = 0; foreach ($nodes as $x) { $n += 1 + $count($x['children'] ?? []); } return $n;
-                };
-                $added += $count([$node]);
-                $existing[] = $node;
+            return null;
+        };
+        $merge = function (array $nodes, array $parent = []) use (&$merge, &$existing, &$added, $find): void {
+            foreach ($nodes as $node) {
+                $path = $find($existing, $node);
+                if ($path === null) {
+                    $target = &$existing;
+                    foreach ($parent as $part) $target = &$target[$part];
+                    $path = array_merge($parent, [count($target)]);
+                    $target[] = array_replace($node, ['children' => []]);
+                    $added++;
+                    unset($target);
+                }
+                $target = &$existing;
+                foreach ($path as $part) $target = &$target[$part];
+                if (!empty($node['import_key']) && empty($target['import_key'])) $target['import_key'] = $node['import_key'];
+                unset($target);
+                $merge($node['children'] ?? [], array_merge($path, ['children']));
             }
-        }
+        };
+        $merge($incoming);
         return array_values($existing);
     }
 
@@ -1803,47 +1746,37 @@ final class MemberCenterStore
     public function diff(array $catalog): array
     {
         $current = $this->read();
-        $existing = [];
-        $walk = function (array $list) use (&$walk, &$existing) {
-            foreach ($list as $n) {
-                if (!is_array($n)) continue;
-                $existing[$this->matchKey($n)] = $n;
-                if (!empty($n['children'])) $walk($n['children']);
+        $flatten = function (array $list) use (&$flatten): array {
+            $out = [];
+            foreach ($list as $node) {
+                if (!is_array($node)) continue;
+                $out[] = $node;
+                $out = array_merge($out, $flatten($node['children'] ?? []));
             }
+            return $out;
         };
-        $walk($current['sidebar']['nodes'] ?? []);
-
-        $incoming = $this->importFromSystem($catalog);
-        $flatIncoming = [];
-        $flat = function (array $list) use (&$flat, &$flatIncoming) {
-            foreach ($list as $n) {
-                if (!is_array($n)) continue;
-                $flatIncoming[$this->matchKey($n)] = $n;
-                if (!empty($n['children'])) $flat($n['children']);
+        $existing = $flatten($current['sidebar']['nodes'] ?? []);
+        $incoming = $flatten($this->importFromSystem($catalog));
+        $used = []; $added = $changed = $removed = [];
+        foreach ($incoming as $node) {
+            $key = $node['import_key']; $found = null;
+            foreach ($existing as $i => $old) {
+                if (!isset($used[$i]) && $this->sameImportedNode($old, $node)) { $found = $i; break; }
             }
-        };
-        $flat($incoming);
-
-        $added = $changed = [];
-        foreach ($flatIncoming as $k => $n) {
-            if (!isset($existing[$k])) {
-                $added[] = ['key' => $k, 'label' => $n['label']];
-                continue;
-            }
-            $old = $existing[$k];
-            if ($old['label'] !== $n['label'] || $old['url'] !== $n['url'] || (int) $old['icon'] !== 0 && $old['icon'] !== $n['icon']) {
-                $changed[] = [
-                    'key' => $k, 'label' => $n['label'],
+            if ($found === null) { $added[] = ['key' => $key, 'label' => $node['label']]; continue; }
+            $used[$found] = true; $old = $existing[$found];
+            if ($old['label'] !== $node['label'] || $old['url'] !== $node['url'] || $old['icon'] !== $node['icon']) {
+                $changed[] = ['key' => $key, 'label' => $node['label'],
                     'from' => ['label' => $old['label'], 'url' => $old['url']],
-                    'to'   => ['label' => $n['label'], 'url' => $n['url']],
-                ];
+                    'to' => ['label' => $node['label'], 'url' => $node['url']]];
             }
         }
-        $removed = [];
-        foreach ($existing as $k => $n) {
-            if (!isset($flatIncoming[$k])) {
-                $removed[] = ['key' => $k, 'label' => $n['label'], 'reason' => '系统导航中已不存在'];
-            }
+        foreach ($existing as $i => $node) {
+            // Manual groups/pages have no system source to lose. Legacy native
+            // page references can still be compared before their first import.
+            $hasSource = strpos((string) ($node['import_key'] ?? ''), 'system:') === 0 || (int) ($node['source_nav_id'] ?? 0) > 0;
+            if (!isset($used[$i]) && $hasSource) $removed[] = ['key' => $node['import_key'] ?? $this->matchKey($node),
+                'label' => $node['label'], 'reason' => '系统导航中已不存在'];
         }
 
         return ['added' => $added, 'changed' => $changed, 'removed' => $removed];

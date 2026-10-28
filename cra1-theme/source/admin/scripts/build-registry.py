@@ -121,7 +121,7 @@ def contract(value):
  return 'scalar'
 contracts={d:{k:contract(v) for k,v in defaults.items() if k in ['appearance','sidebar','content']} for d,defaults in domain_defaults.items()}
 scalar=lambda names:{k:'scalar' for k in names.split()}
-menu_node=scalar('id label source_type source_nav_id url icon second_reminder show_quick_order quick_order_url is_cross_module select_field_set select_field_version hidden order')
+menu_node=scalar('id label import_key source_type source_nav_id url icon second_reminder show_quick_order quick_order_url is_cross_module select_field_set select_field_version hidden order')
 menu_node['icon_style']='icon-style'
 menu_node.update(language={'$map':'scalar'},module={'$list':'scalar'},res_module={'$list':'scalar'},product_id={'$list':'scalar'},select_field={'$list':'scalar'},children={'$list':{'$ref':'menuNode'}})
 ticket_node=scalar('id name type_id template link link_label enabled')
