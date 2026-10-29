@@ -3,6 +3,7 @@
 declare(strict_types=1);
 if(PHP_SAPI!=='cli')exit(1);
 require dirname(__DIR__).'/backend/bootstrap.php';
+require dirname(__DIR__).'/backend/Release/LicenseCredential.php';
 use CRA1\Theme\Files;
 use CRA1\Theme\Release\LicenseCredential;
 $args=$argv;array_shift($args);$cmd=array_shift($args);

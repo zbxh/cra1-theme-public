@@ -233,7 +233,11 @@ if (!function_exists('cra1_icon_url')) {
         $rendered = "";
         $bufferLevel=ob_get_level();
         try {
-            $tpl = new \think\Template();
+            // This hook is retained on rollback; an older selected backend may
+            // predate the storage adapter and must still render its own pages.
+            $cacheType = class_exists('think\\template\\driver\\File') && class_exists(\CRA1\Theme\Presentation\TemplateCache::class)
+                ? \CRA1\Theme\Presentation\TemplateCache::class : 'file';
+            $tpl = new \think\Template(['compile_type' => $cacheType]);
             $tpl->config([
                 "view_path"    => $tplDir,
                 "view_suffix"  => "html",

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__).'/backend/bootstrap.php';
+// Source-only licensing tools are deliberately omitted from runtime releases.
+require dirname(__DIR__).'/backend/Release/LicenseCredential.php';
 use CRA1\Theme\Files;
 use CRA1\Theme\Release\LicenseCredential;
 $dir=sys_get_temp_dir().'/cra1-license-'.bin2hex(random_bytes(6));mkdir($dir,0700);$checks=0;

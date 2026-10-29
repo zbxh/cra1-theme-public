@@ -8,6 +8,8 @@ final class PluginPages
     public static function redirect(string $name, string $view, array $params, int $id): string
     {
         $base='/plugin/'.$id.'/';
+        if ($name==='IdcsmartTicket' && $view==='ticketDetails'
+            && (!is_scalar($params['id']??null) || !preg_match('/^[1-9]\d*$/D',(string)$params['id']))) return $base.'ticket.htm';
         if ($name==='IdcsmartCertification') {
             if (in_array($view,['authentication_person','authentication_company'],true)
                 && (!is_string($params['name']??null) || trim($params['name'])==='')) return $base.'authentication_select.htm';

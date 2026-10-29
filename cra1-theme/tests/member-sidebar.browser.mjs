@@ -25,8 +25,8 @@ const origin=`http://127.0.0.1:${port}`,base=origin+'/cra1admin/index.php',passw
 const id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const node=(n,label,url='',children=[])=>({id:id(n),label,url,source_type:'custom',children})
 const tree=[node(1,'示例业务','',[node(2,'实例管理','',[node(3,'我的服务器','productList.htm')])])]
-execFileSync(php,['-r',`require $argv[1].'/lib/cra1_theme_security.php';CRA1ThemeSecurity::install($argv[1],'fixture-admin',CRA1ThemeSecurity::password($argv[3]),['canonical_url'=>$argv[2],'http_test'=>true,'force_https'=>false]);$s=new CRA1ThemeSecurity($argv[1]);$s->db->exec('UPDATE accounts SET must_change=0');`,root,origin,password])
-execFileSync(php,['-r',"require $argv[1].'/lib/cra1_theme_media.php';new CRA1ThemeMediaStore($argv[1],true);",root])
+execFileSync(php,['-r',`require $argv[1].'/cra1-theme/backend/bootstrap.php';require CRA1_THEME_BACKEND.'/Support/cra1_theme_security.php';CRA1ThemeSecurity::install($argv[1],'fixture-admin',CRA1ThemeSecurity::password($argv[3]),['canonical_url'=>$argv[2],'http_test'=>true,'force_https'=>false]);$s=new CRA1ThemeSecurity($argv[1]);$s->db->exec('UPDATE accounts SET must_change=0');`,root,origin,password])
+execFileSync(php,['-r',"require $argv[1].'/cra1-theme/backend/bootstrap.php';require CRA1_THEME_BACKEND.'/Support/cra1_theme_media.php';new CRA1ThemeMediaStore($argv[1],true);",root])
 const config=path.join(root,'runtime/cra1_theme/member_center.json')
 fs.writeFileSync(config,JSON.stringify({version:1,sidebar:{shape:2,nodes:tree}}))
 const row=(n,parent,name,url,type='custom',nav=0)=>({id:n,parent_id:parent,name,url,type,nav_id:nav,language:'{}',icon:'',second_reminder:0,module:'[]',res_module:'[]',product_id:'[]',show_quick_order:0,quick_order_url:'',is_cross_module:0,select_field:'[]',order:n})

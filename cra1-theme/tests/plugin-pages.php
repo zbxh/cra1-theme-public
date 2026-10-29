@@ -19,6 +19,10 @@ check(PluginPages::redirect('IdcsmartDomain','whois',[],99)==='/plugin/99/domain
 check(PluginPages::redirect('IdcsmartDomain','whois',['domain'=>'example.org'],99)==='','domain retained');
 check(PluginPages::redirect('OtherPlugin','authentication_person',[],77)==='','same view on another plugin untouched');
 check(PluginPages::redirect('IdcsmartAnnouncement','source',[],77)==='','public announcement has no forced redirect');
+foreach ([[],['id'=>null],['id'=>[]],['id'=>'0'],['id'=>'x']] as $params) {
+    check(PluginPages::redirect('IdcsmartTicket','ticketDetails',$params,92)==='/plugin/92/ticket.htm','missing or invalid ticket uses its actual registered list');
+}
+check(PluginPages::redirect('IdcsmartTicket','ticketDetails',['id'=>12],92)==='','valid ticket remains native');
 require CRA1_THEME_BACKEND.'/Compatibility/runtime.php';
 $active=CRA1ThemeRuntime::project([],[['id'=>88,'name'=>'ClientCare','status'=>1]],'home');
 $off=CRA1ThemeRuntime::project([],[['id'=>88,'name'=>'ClientCare','status'=>0]],'home');

@@ -18,18 +18,22 @@ function cra1IntegrationChecks(array $fixture): array
         foreach([$owner,$child]as$id)$db::name('client_login')->insert(['client_id'=>$id,'create_time'=>$now,'last_action_time'=>$now,'last_login_ip'=>'127.0.0.1']);
         $setting=static function(string $key,string $value)use($db){$db::name('configuration')->where('setting',$key)->update(['value'=>$value]);idcsmart_cache(\app\common\logic\CacheLogic::CACHE_CONFIGURATION,null);};
         $setting('home_enforce_safe_method','');$setting('maintenance_mode','0');$setting('home_login_check_ip','0');
-        $requestFor=static function(int $id,string $path,string $method='POST',array $params=[],?string $token=null)use($app){
+        $fixtureLogin=0;
+        $requestFor=static function(int $id,string $path,string $method='POST',array $params=[],?string $token=null)use($app,&$fixtureLogin){
             $request=(new \think\Request())->withServer(['REQUEST_METHOD'=>$method,'REQUEST_URI'=>$path,'REMOTE_ADDR'=>'127.0.0.1','HTTP_HOST'=>'fixture.invalid','HTTPS'=>'on','SERVER_PORT'=>443])->setMethod($method)->setPathinfo(ltrim($path,'/'))->setUrl($path);
             $app->instance('request',$request);
-            if($token===null&&$id>0)$token=create_jwt(['id'=>$id,'name'=>'isolated-fixture','remember_password'=>1]);
+            if($token===null&&$id>0)$token=create_jwt(['id'=>$id,'name'=>'isolated-fixture','remember_password'=>1,'fixture_login'=>++$fixtureLogin]);
             $request->withHeader(['host'=>'fixture.invalid','authorization'=>$token?'Bearer '.$token:'','accept'=>'application/json','content-type'=>'application/json']);
             if($method==='GET')$request->withGet($params);else $request->withInput(json_encode($params+['__isolated_fixture'=>1]));
             return $request;
         };
-        $guard=static function($request,bool $operation=false) {
-            return (new \CRA1\Theme\Http\MemberGuard())->handle($request,static function($request)use($operation){
-                $next=static function(){return json(['status'=>200,'guard_reached'=>true]);};
-                return $operation?(new \CRA1\Theme\Http\OperationGuard())->handle($request,$next):$next();
+        $guard=static function($request,bool $operation=false,?callable $validator=null) {
+            return (new \CRA1\Theme\Http\MemberGuard())->handle($request,static function($request)use($operation,$validator){
+                $next=static function($request)use($validator){
+                    if($validator){$result=$validator($request);if((int)($result['status']??0)!==200)return json($result);}
+                    return json(['status'=>200,'guard_reached'=>true]);
+                };
+                return $operation?(new \CRA1\Theme\Http\OperationGuard())->handle($request,$next):$next($request);
             })->getData();
         };
         $check(\CRA1\Theme\Compatibility\KnownContracts::security(),'reviewed native security combination matches');
@@ -96,9 +100,11 @@ function cra1IntegrationChecks(array $fixture): array
         $db::name('module_mf_cloud_config')->where('product_id',$template['product_id'])->update(['reinstall_sms_verify'=>1]);
         $codeKey='verification_code_verify_86_13900000123';
         $request=$requestFor($owner,"/console/v1/mf_cloud/$host/reinstall",'POST',['code'=>'123456']);
-        (new \app\common\logic\VerificationCodeAttemptLogic())->store($codeKey,'123456');
-        $reply=$guard($request,true);$check($reply['status']===200,'native SMS proof passes both theme guards without a second consume');
-        $reply=$guard($requestFor($owner,"/console/v1/mf_cloud/$host/reinstall",'POST',['code'=>'123456']),true);
+        if(class_exists('app\\common\\logic\\VerificationCodeAttemptLogic'))(new \app\common\logic\VerificationCodeAttemptLogic())->store($codeKey,'123456');
+        else $cache::set($codeKey,'123456',300);
+        $nativeCode=static function($request){return (new \app\common\model\ClientModel())->verifyOldPhone(['code'=>$request->param('code')]);};
+        $reply=$guard($request,true,$nativeCode);$check($reply['status']===200,'native SMS proof passes both theme guards without a second consume');
+        $reply=$guard($requestFor($owner,"/console/v1/mf_cloud/$host/reinstall",'POST',['code'=>'123456']),true,$nativeCode);
         $check($reply['status']===400,'consumed native SMS code cannot be replayed');
         return ['status'=>'passed','checks'=>count($checks),'results'=>$checks,'real_native_auth'=>true,'control_actions'=>'guard sentinel only','production_writes'=>0];
     } finally {$db::rollback();idcsmart_cache(\app\common\logic\CacheLogic::CACHE_CONFIGURATION,null);}

@@ -37,6 +37,9 @@
   }
   function ticketFailure(error, config) {
     if (!ticketRead(config)) return false;
+    // The current native Vue adapter owns inline retry and retains its form.
+    // Older templates without that adapter still use the compatibility panel.
+    if (shared.PluginPages?.handlesTicketRead) return false;
     if (ticketLoaded) return true; // A failed refresh keeps the last valid detail.
     const document = window.document;
     const card = document?.querySelector('.ticket-details .main-card');

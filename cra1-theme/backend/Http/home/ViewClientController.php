@@ -45,7 +45,7 @@ class ViewClientController extends \app\home\controller\ViewClientController
 
     private function renderCRA1(string $file,string $base,string $suffix,array $data): string
     {
-        $tpl=new \think\Template();
+        $tpl=new \think\Template(['compile_type'=>\CRA1\Theme\Presentation\TemplateCache::class]);
         $tpl->config(['view_path'=>$base,'view_suffix'=>$suffix,'cache_path'=>runtime_path().'cra1-plugin-views/']);
         ob_start();
         try {$tpl->fetch($file,$data);return (string)ob_get_clean();}

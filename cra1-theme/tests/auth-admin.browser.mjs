@@ -25,8 +25,8 @@ for(const row of manifest.native_dependencies){
 execFileSync(php,['-r',`require $argv[1].'/cra1-theme/backend/bootstrap.php';$m=CRA1\\Theme\\Files::json($argv[1].'/cra1-theme/release.json');CRA1\\Theme\\Release\\References::apply($argv[1],$m['references']);`,root])
 const socket=net.createServer();await new Promise(r=>socket.listen(0,'127.0.0.1',r));const port=socket.address().port;await new Promise(r=>socket.close(r))
 const origin=`http://127.0.0.1:${port}`,base=origin+'/cra1admin/index.php',password=randomBytes(24).toString('hex')
-execFileSync(php,['-r',`require $argv[1].'/lib/cra1_theme_security.php';CRA1ThemeSecurity::install($argv[1],'fixture-admin',CRA1ThemeSecurity::password($argv[3]),['canonical_url'=>$argv[2],'http_test'=>true,'force_https'=>false]);$s=new CRA1ThemeSecurity($argv[1]);$s->db->exec('UPDATE accounts SET must_change=0');`,root,origin,password])
-execFileSync(php,['-r',`require $argv[1].'/lib/cra1_theme_media.php';new CRA1ThemeMediaStore($argv[1],true);`,root])
+execFileSync(php,['-r',`require $argv[1].'/cra1-theme/backend/bootstrap.php';require CRA1_THEME_BACKEND.'/Support/cra1_theme_security.php';CRA1ThemeSecurity::install($argv[1],'fixture-admin',CRA1ThemeSecurity::password($argv[3]),['canonical_url'=>$argv[2],'http_test'=>true,'force_https'=>false]);$s=new CRA1ThemeSecurity($argv[1]);$s->db->exec('UPDATE accounts SET must_change=0');`,root,origin,password])
+execFileSync(php,['-r',`require $argv[1].'/cra1-theme/backend/bootstrap.php';require CRA1_THEME_BACKEND.'/Support/cra1_theme_media.php';new CRA1ThemeMediaStore($argv[1],true);`,root])
 const log=fs.openSync(path.join(out,'php.log'),'w'),proc=spawn(php,['-S',`127.0.0.1:${port}`,'-t',path.join(root,'public')],{stdio:['ignore',log,log]}),browser=await chromium.launch({headless:true,args:['--no-sandbox']}),checks=[],errors=[]
 const check=(ok,label)=>{assert.ok(ok,label);checks.push(label)}
 const hash=file=>fs.existsSync(file)?createHash('sha256').update(fs.readFileSync(file)).digest('hex'):'missing'

@@ -52,13 +52,169 @@
     });
     return template.innerHTML;
   }
-  shared.PluginPages = {articleHtml: articleHtml};
+  shared.PluginPages = {articleHtml: articleHtml, handlesTicketRead: name === 'IdcsmartTicket' && view === 'ticketDetails' && available(plugin)};
+
+  function certificationStatus(vm) {
+    if (!vm.$el || !vm.$el.querySelector) return;
+    var host = vm.$el.querySelector('.check-mode');
+    if (!host) return;
+    var status = host.querySelector('.cra1-plugin-read-status');
+    if (!status) {
+      status = root.document.createElement('p'); status.className = 'cra1-plugin-read-status';
+      status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite'); host.appendChild(status);
+    }
+    var state = vm.cra1CertificationState, text = state === 'loading' ? '正在加载认证方式…' : state === 'empty' ? '暂未提供可用认证方式，请联系在线客服。' : state === 'error' ? '认证方式暂时无法加载，请稍后重试。' : vm.cra1CertificationConfig === 'error' ? '所选认证方式暂时无法加载，请重试。' : '';
+    status.textContent = text; status.hidden = !text;
+    if (state === 'error' || vm.cra1CertificationConfig === 'error') {
+      var retry = root.document.createElement('button'); retry.type = 'button'; retry.className = 'cui-button cui-button--outline'; retry.textContent = '重新加载';
+      retry.onclick = function () { if (state === 'error') vm.getCertificationInfo(); else vm.getConfig(); }; status.appendChild(retry);
+    }
+    var blocked = state !== 'ready' || vm.cra1CertificationConfig !== 'ready' || !vm.checkedVlue || vm.configLoading;
+    Array.from(vm.$el.querySelectorAll('.next-box button')).forEach(function (button) { button.disabled = blocked; button.setAttribute('aria-disabled', String(blocked)); });
+    Array.from(host.querySelectorAll('.el-select input')).forEach(function (input) { input.disabled = state !== 'ready' || vm.configLoading; });
+  }
+  function ticketStatus(vm) {
+    if (!vm.$el || !vm.$el.querySelector) return;
+    var host = vm.$el.querySelector('.main-card');
+    if (!host) return;
+    var status = host.querySelector('.cra1-plugin-read-status');
+    if (!status) { status = root.document.createElement('p'); status.className = 'cra1-plugin-read-status'; status.setAttribute('role', 'status'); host.appendChild(status); }
+    status.hidden = vm.cra1TicketState !== 'error';
+    status.textContent = '工单详情暂时无法加载，请稍后重试。';
+    if (!status.hidden) {
+      var retry = root.document.createElement('button'); retry.type = 'button'; retry.className = 'cui-button cui-button--outline'; retry.textContent = '重新加载'; retry.onclick = function () { vm.getDetails(); }; status.appendChild(retry);
+    }
+  }
 
   // Patch only the identified native root instances, before Vue initializes
   // methods/data. Child components and other themes retain their own lifecycle.
   root.Vue.mixin({beforeCreate: function () {
     if (!plugin || this.$options.parent) return;
     var methods = this.$options.methods || {};
+    if (name === 'IdcsmartTicket' && view === 'ticketDetails' && methods.getDetails) {
+      var ticketData = this.$options.data;
+      this.$options.data = function () { return Object.assign({}, typeof ticketData === 'function' ? ticketData.call(this) : ticketData, {cra1TicketState: 'loading'}); };
+      this.$options.methods = Object.assign({}, methods, {
+        getDetails: function (automatic) {
+          var vm = this, id = new URLSearchParams(root.location.search).get('id');
+          if (!/^[1-9]\d*$/.test(id || '') || vm._isDestroyed || vm._isBeingDestroyed) return Promise.resolve();
+          if (vm._cra1TicketPending) return vm._cra1TicketPending;
+          var ticket = {}; vm._cra1TicketRead = ticket; vm.id = id;
+          return (vm._cra1TicketPending = read('/ticket/' + id).then(function (data) {
+            if (vm._isDestroyed || vm._cra1TicketRead !== ticket) return;
+            if (!data || !data.ticket || !data.ticket.id) throw new Error('unavailable');
+            var value = Object.assign({}, data.ticket);
+            value.host_ids = Array.isArray(value.host_ids) ? value.host_ids : [];
+            value.replies = (Array.isArray(value.replies) ? value.replies : []).slice().reverse().map(function (reply) { return Object.assign({}, reply, {content: vm.filterContent(String(reply.content || ''))}); });
+            vm.ticketData = value; vm.cra1TicketState = 'ready';
+            vm.baseMsg.status = value.status; vm.baseMsg.title = '#' + value.ticket_num + '-' + value.title; vm.baseMsg.create_time = value.create_time;
+            vm.getTicketType(); vm.getHostList();
+            if (!automatic) vm.$nextTick(function () { if (!vm._isDestroyed) vm.toBottom(); });
+          }).catch(function () { if (!vm._isDestroyed && vm._cra1TicketRead === ticket) vm.cra1TicketState = 'error'; })
+            .finally(function () { if (vm._cra1TicketRead === ticket) vm._cra1TicketPending = null; }));
+        },
+        getTicketType: function () {
+          var vm = this;
+          return read('/ticket/type').then(function (data) {
+            if (vm._isDestroyed) return;
+            vm.ticketTypeList = Array.isArray(data.list) ? data.list : [];
+            var type = vm.ticketTypeList.find(function (item) { return String(item.id) === String(vm.ticketData.ticket_type_id); });
+            vm.baseMsg.type = type ? type.name : '';
+          }).catch(function (failure) { error(vm, failure); });
+        },
+        getHostList: function () {
+          var vm = this;
+          return read('/host', {page: 1, limit: 1000, orderby: 'id', sort: 'desc', keywords: '', status: ''}).then(function (data) {
+            if (vm._isDestroyed) return;
+            vm.hostList = Array.isArray(data.list) ? data.list : [];
+            vm.baseMsg.hosts = vm.hostList.filter(function (item) { return vm.ticketData.host_ids.some(function (id) { return String(id) === String(item.id); }); })
+              .map(function (item) { return {id: item.id, label: item.product_name + ' (' + item.name + ')'}; });
+          }).catch(function (failure) { error(vm, failure); });
+        },
+        autoRefresh: function () {
+          var vm = this;
+          if (vm._cra1TicketTimer) root.clearInterval(vm._cra1TicketTimer);
+          if (!/^[1-9]\d*$/.test(new URLSearchParams(root.location.search).get('id') || '')) return;
+          vm._cra1TicketTimer = root.setInterval(function () { if (!root.document.hidden && vm.cra1TicketState === 'ready') vm.getDetails(true); }, 60000);
+        },
+        doReplyTicket: function () { if (this.cra1TicketState !== 'ready') return; return methods.doReplyTicket.apply(this, arguments); },
+        showClose: function () { if (this.cra1TicketState !== 'ready') return; return methods.showClose.apply(this, arguments); },
+      });
+    }
+    if (name === 'IdcsmartCertification' && view === 'authentication_select' && methods.getCertificationInfo) {
+      var originalData = this.$options.data;
+      this.$options.data = function () { return Object.assign({}, typeof originalData === 'function' ? originalData.call(this) : originalData, {cra1CertificationState: 'loading', cra1CertificationConfig: 'idle'}); };
+      this.$options.methods = Object.assign({}, methods, {
+        getCertificationInfo: function () {
+          var vm = this, ticket = {}; vm._cra1CertificationRead = ticket;
+          vm.cra1CertificationState = 'loading'; vm.checkedVlue = ''; vm.configInfo = {}; vm.cra1CertificationConfig = 'idle';
+          vm.personPluginList = []; vm.companyPluginList = []; vm.custom_fieldsList = [];
+          return read('/certification/info').then(function (info) {
+            if (!info || !info.person || !info.company) throw new Error('unavailable');
+            if (vm._cra1CertificationRead !== ticket || vm._isDestroyed) return null;
+            vm.certificationInfoObj = info;
+            return read('/certification/plugin');
+          }).then(function (data) {
+            if (vm._cra1CertificationRead !== ticket || vm._isDestroyed) return;
+            if (!data || !Array.isArray(data.list)) throw new Error('unavailable');
+            vm.certificationPluginList = data.list;
+            data.list.forEach(function (item) {
+              if (!item || typeof item.name !== 'string' || !item.name) return;
+              var types = Array.isArray(item.certification_type) ? item.certification_type : String(item.certification_type || '').split(',');
+              var option = {value: item.name, label: item.title || item.name};
+              if (types.includes('person')) vm.personPluginList.push(option);
+              if (types.includes('company')) vm.companyPluginList.push(option);
+            });
+            if (Number(vm.certificationInfoObj.company.status) === 1) { root.location.href = 'authentication_status.htm?type=2'; return; }
+            vm.authenticationType = Number(vm.certificationInfoObj.person.status) === 1 ? '2' : '1';
+            vm.custom_fieldsList = vm.authenticationType === '1' ? vm.personPluginList.slice() : vm.companyPluginList.slice();
+            vm.checkedVlue = vm.custom_fieldsList.length ? vm.custom_fieldsList[0].value : '';
+            vm.cra1CertificationState = vm.checkedVlue ? 'ready' : 'empty';
+          }).catch(function () { if (vm._cra1CertificationRead === ticket && !vm._isDestroyed) vm.cra1CertificationState = 'error'; });
+        },
+        clickType: function (type) {
+          if (vmBusy(this) || !['1', '2'].includes(type)) return;
+          var info = this.certificationInfoObj;
+          if (type === '1' && Number(info.person.status) === 1) return;
+          if (type === '2' && !Number(info.certification_company_open)) return;
+          if (type === '2' && Number(info.certification_company_need_person) === 1 && Number(info.person.status) !== 1) return this.$message.warning(this.lang.realname_text88);
+          this.authenticationType = type; this.configInfo = {}; this.cra1CertificationConfig = 'idle'; this._cra1CertificationConfigRead = null;
+          this.custom_fieldsList = (type === '1' ? this.personPluginList : this.companyPluginList).slice();
+          var next = this.custom_fieldsList.length ? this.custom_fieldsList[0].value : '';
+          var same = next && next === this.checkedVlue; this.checkedVlue = next;
+          this.cra1CertificationState = next ? 'ready' : 'empty';
+          if (same) this.getConfig();
+        },
+        getConfig: function () {
+          var vm = this, ticket = {}, selected = vm.checkedVlue, type = vm.authenticationType;
+          vm._cra1CertificationConfigRead = ticket; vm.configInfo = {};
+          if (!selected || !vm.custom_fieldsList.some(function (item) { return item.value === selected; })) { vm.cra1CertificationConfig = 'idle'; return Promise.resolve(null); }
+          vm.cra1CertificationConfig = 'loading';
+          return read('/certification/plugin/config', {name: selected, type: type === '1' ? 'person' : 'company'}).then(function (data) {
+            if (vm._isDestroyed || vm._cra1CertificationConfigRead !== ticket || vm.checkedVlue !== selected || vm.authenticationType !== type) return null;
+            if (!data || !data.order || typeof data.order !== 'object') throw new Error('unavailable');
+            vm.configInfo = data; vm.cra1CertificationConfig = 'ready'; return data;
+          }).catch(function () { if (!vm._isDestroyed && vm._cra1CertificationConfigRead === ticket) vm.cra1CertificationConfig = 'error'; return null; });
+        },
+        goUploadPage: function () {
+          var vm = this;
+          if (vmBusy(vm) || vm.cra1CertificationState !== 'ready' || !vm.checkedVlue) return Promise.resolve();
+          vm._cra1CertificationSubmit = true; vm.configLoading = true;
+          return vm.getConfig().then(function (data) {
+            if (!data || vm._isDestroyed) return;
+            var order = data.order;
+            if (vm.statusArr.includes(order.status)) return;
+            if (order.status === 'Unpaid') { vm.$refs.payDialog.showPayDialog(order.id); return; }
+            if (!order.id && Number(data.pay) === 1) return root.apiCertificationOrder({name: vm.checkedVlue, type: vm.authenticationType === '1' ? 'person' : 'company'}).then(function (response) {
+              var id = response && response.data && response.data.data && response.data.data.order_id;
+              if (!id) throw new Error('unavailable');
+              if (!vm._isDestroyed) vm.$refs.payDialog.showPayDialog(id);
+            });
+            root.location.href = (vm.authenticationType === '1' ? 'authentication_person.htm' : 'authentication_company.htm') + '?name=' + encodeURIComponent(vm.checkedVlue);
+          }).catch(function (failure) { error(vm, failure); }).finally(function () { vm._cra1CertificationSubmit = false; vm.configLoading = false; });
+        },
+      });
+    }
     if (name === 'IdcsmartSubAccount' && view === 'addChildAccount' && methods.getProjectList) {
       this.$options.methods = Object.assign({}, methods, {getProjectList: function () {
         // This optional plugin is absent on many V10 installations. A leftover
@@ -121,7 +277,28 @@
           .catch(function (failure) { error(vm, failure); });
       }});
     }
+  }, mounted: function () {
+    var vm = this;
+    if (!vm.$options.parent && name === 'IdcsmartCertification' && view === 'authentication_select') {
+      // Native templates do not render these additional state fields. Watch
+      // them explicitly so a rejected read also updates the accessible status.
+      vm.$watch(function () { return [vm.cra1CertificationState, vm.cra1CertificationConfig, vm.checkedVlue, vm.configLoading].join(':'); }, function () {
+        vm.$nextTick(function () { if (!vm._isDestroyed) certificationStatus(vm); });
+      }, {immediate: true});
+    }
+    if (!vm.$options.parent && name === 'IdcsmartTicket' && view === 'ticketDetails') {
+      vm.$watch('cra1TicketState', function () {
+        vm.$nextTick(function () { if (!vm._isDestroyed) ticketStatus(vm); });
+      }, {immediate: true});
+    }
+  }, updated: function () {
+    if (!this.$options.parent && name === 'IdcsmartCertification' && view === 'authentication_select') certificationStatus(this);
+    if (!this.$options.parent && name === 'IdcsmartTicket' && view === 'ticketDetails') ticketStatus(this);
+  }, beforeDestroy: function () {
+    if (!this.$options.parent && name === 'IdcsmartCertification' && view === 'authentication_select') { this._cra1CertificationRead = null; this._cra1CertificationConfigRead = null; }
+    if (!this.$options.parent && name === 'IdcsmartTicket' && view === 'ticketDetails') { this._cra1TicketRead = null; if (this._cra1TicketTimer) root.clearInterval(this._cra1TicketTimer); }
   }});
+  function vmBusy(vm) { return vm._cra1CertificationSubmit || vm.configLoading || vm.cra1CertificationState === 'loading' || vm.cra1CertificationState === 'error'; }
 
   if (name !== 'IdcsmartAnnouncement' || !['source', 'news_detail'].includes(view)) return;
   root.Vue.component('cra1-announcement-page', {

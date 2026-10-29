@@ -16,6 +16,13 @@ final class HookBootstrap
         self::$registered = true;
         // AppInit runs before the native HTTP middleware pipeline is resolved.
         \think\facade\Event::listen('HttpRun', static function () {
+            if (\CRA1\Theme\Context::active() && class_exists('think\\template\\driver\\File')) {
+                $view = (array)app()->config->get('view', []);
+                $storage = strtolower(ltrim((string)($view['compile_type'] ?? 'file'), '\\'));
+                if ($storage === '' || $storage === 'file' || $storage === 'think\\template\\driver\\file') {
+                    app()->config->set(['compile_type' => \CRA1\Theme\Presentation\TemplateCache::class], 'view');
+                }
+            }
             if (!\CRA1\Theme\Context::memberActive()) return;
             // Native dispatch resolves this controller through the container.
             // The adapter delegates every other theme/plugin back to V10.
