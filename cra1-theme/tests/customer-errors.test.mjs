@@ -98,11 +98,12 @@ test('native certification navigation outcomes reach their existing consumer onl
  f.env.window.location.pathname='/plugin/72/authentication_thrid.htm'
  await assert.rejects(f.ok({status:200,config:{method:'get',url:'/certification/auth'},data:{status:400,data:{code:10000}}}))
 })
-test('native missing ticket has a local retry state and no active reply form',async()=>{
+test('native missing ticket asks for a browser refresh without a retry button or active reply form',async()=>{
  const f=ticketFixture(),response={status:200,config:{method:'get',url:'/ticket/42'},data:{status:400,msg:'SQLSTATE[HY000] /private/secret'}}
  assert.equal(await f.ok(response),response)
  assert.equal(f.card.children.length,1)
- assert.equal(f.created.find(n=>n.tag==='h2').textContent,'暂时无法读取工单')
+ assert.equal(f.created.find(n=>n.tag==='h2').textContent,'页面错误，请刷新重试')
+ assert.equal(f.created.some(n=>n.tag==='button'),false)
  assert.equal(f.created.some(n=>n.textContent?.includes('SQLSTATE')),false)
  assert.equal(f.created.find(n=>n.tag==='a').href,'ticket.htm')
 })

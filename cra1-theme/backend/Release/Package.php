@@ -39,8 +39,16 @@ final class Package
                 $path=Manifest::path($install?$name:substr($name,8));$row=$doc['files'][$path]??null;
                 if(!$row||(int)$stat['size']!==$row['bytes'])throw new \InvalidArgumentException('文件不在清单或体积不符：'.$path);
                 $bytes+=(int)$stat['size'];if($bytes>Manifest::MAX_BYTES)throw new \InvalidArgumentException('ZIP 解压体积过大');
-                $stream=$zip->getStream($name);if(!$stream)throw new \RuntimeException('ZIP 文件无法读取');
-                try{$hash=hash_init('sha256');hash_update_stream($hash,$stream,$row['bytes']+1);$actual=hash_final($hash);}finally{fclose($stream);}
+                if ($row['bytes'] <= 8388608) {
+                    // PHP 7.4 getStream() reopens the archive for every entry.
+                    // Read small entries by index; keep streaming for large files.
+                    $contents=$zip->getFromIndex($i,$row['bytes']+1);
+                    if(!is_string($contents)||strlen($contents)!==$row['bytes'])throw new \RuntimeException('ZIP 文件无法读取');
+                    $actual=hash('sha256',$contents);unset($contents);
+                } else {
+                    $stream=$zip->getStream($name);if(!$stream)throw new \RuntimeException('ZIP 文件无法读取');
+                    try{$hash=hash_init('sha256');hash_update_stream($hash,$stream,$row['bytes']+1);$actual=hash_final($hash);}finally{fclose($stream);}
+                }
                 if(!hash_equals($row['sha256'],$actual))throw new \InvalidArgumentException('文件校验失败：'.$path);
             }
             if(count($seen)!==count($doc['files'])+($install?0:1))throw new \InvalidArgumentException('发行包文件缺失');

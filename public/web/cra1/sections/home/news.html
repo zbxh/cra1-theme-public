@@ -28,7 +28,7 @@
                             </li>
                         </template>
                     </ul>
-                    <div x-cloak x-show="!loadingNotices && noticesFailed" class="empty-state mt-4 py-8" role="status"><p>暂时无法读取内容</p><button type="button" class="empty-link" @click="loadNews('notices')">重新加载</button></div>
+                    <div x-cloak x-show="!loadingNotices && noticesFailed" class="empty-state mt-4 py-8" role="status"><p>页面错误，请刷新重试</p></div>
                     <div x-cloak x-show="loadingNotices" class="space-y-3 pt-4"><div class="skeleton-line h-4 w-full"></div><div class="skeleton-line h-4 w-4/5"></div><div class="skeleton-line h-4 w-3/5"></div></div>
                     <div x-cloak x-show="!loadingNotices && !noticesFailed && notices.length === 0" class="empty-state mt-4 py-8">暂无公告</div>
                 </div>
@@ -44,7 +44,7 @@
                             </li>
                         </template>
                     </ul>
-                    <div x-cloak x-show="!loadingNews && newsFailed" class="empty-state mt-4 py-8" role="status"><p>暂时无法读取内容</p><button type="button" class="empty-link" @click="loadNews('news')">重新加载</button></div>
+                    <div x-cloak x-show="!loadingNews && newsFailed" class="empty-state mt-4 py-8" role="status"><p>页面错误，请刷新重试</p></div>
                     <div x-cloak x-show="loadingNews" class="space-y-3 pt-4"><div class="skeleton-line h-4 w-full"></div><div class="skeleton-line h-4 w-4/5"></div></div>
                     <div x-cloak x-show="!loadingNews && !newsFailed && news.length === 0" class="empty-state mt-4 py-8">暂无新闻</div>
                 </div>

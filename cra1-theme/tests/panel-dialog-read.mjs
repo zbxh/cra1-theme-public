@@ -80,16 +80,15 @@ try {
       const id = `${type}${options.space ? '-space' : ''}-${width}`
       await page.evaluate(options => { fixture.fail = true; fixture.empty = false; renderFixture(options) }, { type, ...options, key: ++key })
       const dialog = page.getByRole('dialog')
-      await dialog.getByRole('button', { name: '重新加载', exact: true }).waitFor()
+      await dialog.getByText('页面错误，请刷新重试', { exact: true }).waitFor();assert.equal(await dialog.getByRole('button', { name: '重新加载', exact: true }).count(), 0, id + ' has no retry control')
       assert.equal(unsafe.test(await dialog.innerText()), false, id + ' hides diagnostic details')
       assert.equal(await dialog.getByText(/暂无|未加入任何|未开放|未配置可调整/).count(), 0, id + ' is not a false empty state')
       const button = dialog.getByRole('button', { name: submit, exact: true })
       assert.equal(await button.count() === 0 || await button.isDisabled(), true, id + ' cannot submit before read')
       await page.screenshot({ path: path.join(out, id + '-failure.png'), fullPage: true })
-      await page.evaluate(() => { fixture.fail = false })
-      await dialog.getByRole('button', { name: '重新加载', exact: true }).click()
+      await page.reload();await page.waitForFunction(() => typeof window.renderFixture === 'function');await page.evaluate(options => {fixture.fail = false;renderFixture(options)}, {type,...options,key:++key})
       await page.waitForTimeout(650)
-      assert.equal(await dialog.getByRole('button', { name: '重新加载', exact: true }).count(), 0, id + ' retry succeeds')
+      assert.equal(await dialog.getByRole('button', { name: '重新加载', exact: true }).count(), 0, id + ' refresh allows a clean read')
       assert.equal(unsafe.test(await dialog.innerText()), false, id + ' recovered copy is safe')
       await page.screenshot({ path: path.join(out, id + '-recovered.png'), fullPage: true })
       await page.keyboard.press('Escape')
@@ -98,7 +97,7 @@ try {
       await page.waitForTimeout(250)
       assert.equal(await page.getByRole('dialog').getByRole('button', { name: '重新加载', exact: true }).count(), 0, id + ' genuine empty is not failure')
       await page.keyboard.press('Escape')
-      report.checks.push(id + ': failure, retry, empty, cancel')
+      report.checks.push(id + ': failure without retry, refresh, empty, cancel')
     }
   }
   await page.evaluate(() => { fixture.resolvers = {}; renderFixture({ race: true, resource: 'old' }) })

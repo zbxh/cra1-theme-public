@@ -130,7 +130,7 @@ export default function CredentialForm({ kind = 'login', association = false }) 
       onError:error=>{setOauthBusy(false);setError(error.message)},
     })
   }
-  if(runtime.error)return <Alert tone="error">页面暂时无法加载，请刷新重试<Button variant="link" onClick={()=>location.reload()}>重新读取</Button></Alert>
+  if(runtime.error)return <Alert tone="error">页面错误，请刷新重试</Alert>
   if(done)return <><Alert tone="success">密码已重置，请使用新密码登录</Alert><Button className="mt-4 w-full" onClick={()=>location.href='/login.htm'}>返回登录</Button></>
   const labels={password:'账密登录','phone-code':'验证码登录',email:'邮箱',phone:'手机号'}
   const providers=loginPage?(policy.providers||[]).filter(p=>p.name):[]

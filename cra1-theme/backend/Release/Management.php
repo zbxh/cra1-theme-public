@@ -8,10 +8,11 @@ final class Management
     public static function run(string $action,array $p): array
     {
         $root=$GLOBALS['ROOT'];$actor=theme_actor();
-        theme_require_role(in_array($action,['check','history'],true)?['admin','super_admin']:['super_admin']);
+        theme_require_role(in_array($action,['check','history','diagnostics'],true)?['admin','super_admin']:['super_admin']);
         $updater=new Updater($root,$GLOBALS['SLUG']);$dir=$root.'/runtime/cra1_theme/distribution';
         switch($action){
             case 'check': $data=Inspector::inspect($root,['entry'=>$GLOBALS['SLUG'],'https'=>!empty($GLOBALS['THEME_NETWORK']['https']),'origin'=>$GLOBALS['THEME_SETTINGS']['canonical_url']??'']);$data['nginx_rules']=ServerRules::nginx($GLOBALS['SLUG']);break;
+            case 'diagnostics': $data=Diagnostics::collect($root,$GLOBALS['SLUG'],['https'=>!empty($GLOBALS['THEME_NETWORK']['https'])]);break;
             case 'history': $data=$updater->history();break;
             case 'local.list': $data=(new LocalPackages($root))->listing();break;
             case 'upload':

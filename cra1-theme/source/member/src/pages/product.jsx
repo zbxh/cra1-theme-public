@@ -158,7 +158,7 @@ function HostDetailPage({ hostId }) {
               }))
             }
           })
-          .catch((error) => {setReadError(error.message || '产品信息暂时无法读取，请重试');setHost(null)})
+          .catch(() => {setReadError('页面错误，请刷新重试');setHost(null)})
           .finally(() => setLoading(false))
       })
     return () => { alive = false }
@@ -211,9 +211,9 @@ function HostDetailPage({ hostId }) {
           <CardContent className="p-5">
             <EmptyState
               icon={Server}
-              title={readError ? '产品信息暂时无法读取' : '产品不存在'}
-              description={readError || '该产品可能已被删除，或不属于当前账户。'}
-              action={<><Button size="sm" variant="outline" onClick={() => location.reload()}>重新读取</Button><Button size="sm" onClick={() => { window.location.href = '/productList.htm' }}>返回我的产品</Button></>}
+              title={readError || '产品不存在'}
+              description={readError ? '' : '该产品可能已被删除，或不属于当前账户。'}
+              action={<Button size="sm" onClick={() => { window.location.href = '/productList.htm' }}>返回我的产品</Button>}
             />
           </CardContent>
         </Card>
@@ -310,7 +310,7 @@ function HostDetailPage({ hostId }) {
                   <EmptyState
                     icon={Server}
                     title="该产品暂无可管理的内页"
-                    description="暂时无法打开管理页面，请稍后重试或联系客服。"
+                    description="请返回产品列表或联系客服。"
                   />
                 </CardContent>
               </Card>

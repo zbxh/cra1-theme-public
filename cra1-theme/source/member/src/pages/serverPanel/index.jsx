@@ -740,8 +740,7 @@ function UpgradeMenu({ module, caps, host, setDlg }) {
 /* ---------------- 实时占用（RadialBar × 2） ---------------- */
 function ResourceReadState({ label, error, onRetry }) {
   return <div className="py-4 text-center text-xs text-muted-foreground" role="status">
-    <p>{error ? `暂时无法读取${label}，请稍后重试` : `正在读取${label}…`}</p>
-    {error && <Button size="sm" variant="outline" className="mt-2" onClick={onRetry}>重试</Button>}
+    <p>{error ? '页面错误，请刷新重试' : `正在读取${label}…`}</p>
   </div>
 }
 

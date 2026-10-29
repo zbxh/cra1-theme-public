@@ -33,7 +33,7 @@ try{
    }
    if(p==='/fixture/vendor-boot.js'){
     if(failNext){failNext=false;return route.abort()}
-    return route.fulfill({contentType:'text/javascript',body:'const thirdPartyVM=new Vue({el:".third-party-module",data:{plan:"标准版",bought:0}});window.vendorMounts=(window.vendorMounts||0)+1;'})
+    return route.fulfill({contentType:'text/javascript',body:'const launchThirdParty=()=>{const thirdPartyVM=new Vue({el:".third-party-module",data:{plan:"标准版",bought:0}});window.vendorMounts=(window.vendorMounts||0)+1;};const fixtureId=document.querySelector(".third-party-module").dataset.pid;if(fixtureId==="502")window.onload=launchThirdParty;else if(fixtureId==="503")document.addEventListener("DOMContentLoaded",launchThirdParty,{once:true});else launchThirdParty();'})
    }
    return route.continue()
   })
@@ -43,6 +43,8 @@ try{
    await page.waitForFunction(id=>{const v=document.querySelector('.template')?.__vue__;return v&&v.selectedProductId===id&&v.configState==='ready'},id,{timeout:45000})
    const frame=page.frameLocator('.cl-config-frame')
    await frame.getByRole('heading',{name:'原生模块 '+id,exact:true}).waitFor()
+   await page.waitForFunction(()=>document.querySelector('.template').__vue__.railState==='fallback')
+   check(!await page.getByRole('complementary',{name:'价格计算器',exact:true}).count(),'unknown module never leaves a duplicate loading calculator '+width)
    return frame
   }
   let frame=await ready(501)
@@ -55,7 +57,7 @@ try{
    const confirm=page.locator('.el-message-box__btns .el-button--primary')
    if(await confirm.isVisible().catch(()=>false))await confirm.click()
   }
-  for(const id of [502,501]){
+  for(const id of [502,503,501]){
    await choose(id)
    frame=await ready(id)
    check(await frame.locator('body').evaluate(()=>window.vendorMounts===1),'A-B-A creates a fresh module script context '+width+' '+id)
@@ -68,10 +70,10 @@ try{
   if(mobile){
    failNext=true
    await choose(502)
-   await page.getByRole('button',{name:'重试',exact:true}).waitFor()
-   check(await page.locator('.cl-config-error').isVisible(),'failed native script is reported as a retryable configuration failure')
-   await page.getByRole('button',{name:'重试',exact:true}).click();await ready(502)
-   check(true,'retry really reruns the native boot script')
+   await page.getByText('页面错误，请刷新重试',{exact:true}).waitFor();check(await page.getByRole('button',{name:'重试',exact:true}).count()===0,'configuration failure has no retry control')
+   check(await page.locator('.cl-config-error').isVisible(),'failed native script asks for browser refresh')
+   await page.reload();await ready(502)
+   check(true,'browser refresh reruns the native boot script')
    delayNext=true
    await choose(503)
    await page.waitForTimeout(70)

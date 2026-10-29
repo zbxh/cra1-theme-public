@@ -9,11 +9,11 @@
   "shared_global": "CRA1Shared",
   "member_api_prefix": "/console/v1/cra1-theme/",
   "session_cookie": "CRA1THEMEID",
-  "release": "20261029-cra1-v17-3",
+  "release": "20261030-cra1-history-retention-v1",
   "release_channel": "test",
   "security_epoch": 1,
   "version": "v17.3",
-  "backend_root": "cra1-theme/backend/releases/20261029-cra1-v17-3",
+  "backend_root": "cra1-theme/backend/releases/20261030-cra1-history-retention-v1",
   "installation_combinations": [
     {
       "system": "10.7.4",
@@ -76,12 +76,12 @@
   ],
   "release_blockers": [],
   "asset_bases": {
-    "member": "/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3",
-    "native": "/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3",
-    "cart": "/cart/template/pc/cra1/releases/20261029-cra1-v17-3",
-    "shared": "/cra1-shared/releases/20261029-cra1-v17-3",
-    "website": "/web/cra1/releases/20261029-cra1-v17-3",
-    "admin": "assets/releases/20261029-cra1-v17-3"
+    "member": "/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1",
+    "native": "/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1",
+    "cart": "/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1",
+    "shared": "/cra1-shared/releases/20261030-cra1-history-retention-v1",
+    "website": "/web/cra1/releases/20261030-cra1-history-retention-v1",
+    "admin": "assets/releases/20261030-cra1-history-retention-v1"
   },
   "references": {
     "public/cart/template/mobile/cra1/api": "public/cart/template/pc/cra1/api",
@@ -169,24 +169,24 @@
     "public/clientarea/template/pc/cra1/lang/zh-cn/index.js": "public/clientarea/template/pc/default/lang/zh-cn/index.js",
     "public/clientarea/template/pc/cra1/lang/zh-hk/element-lang.js": "public/clientarea/template/pc/default/lang/zh-hk/element-lang.js",
     "public/clientarea/template/pc/cra1/lang/zh-hk/index.js": "public/clientarea/template/pc/default/lang/zh-hk/index.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/account.js": "public/clientarea/template/pc/default/api/account.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/certification.js": "public/clientarea/template/pc/default/api/certification.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/goods.js": "public/clientarea/template/pc/default/api/goods.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/goodsList.js": "public/clientarea/template/pc/default/api/goodsList.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/home.js": "public/clientarea/template/pc/default/api/home.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/orderDetail.js": "public/clientarea/template/pc/default/api/orderDetail.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/product.js": "public/clientarea/template/pc/default/api/product.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/security.js": "public/clientarea/template/pc/default/api/security.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/security_group.js": "public/clientarea/template/pc/default/api/security_group.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/shopping.js": "public/clientarea/template/pc/default/api/shopping.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/template.js": "public/clientarea/template/pc/default/api/template.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/withdraw.js": "public/clientarea/template/pc/default/api/withdraw.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/components/resetAuth/resetAuth.css": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.css",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/components/resetAuth/resetAuth.js": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/components/resetAuth/resetAuth.less": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.less",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/components/unsubscribe/unsubscribe.css": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.css",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/components/unsubscribe/unsubscribe.js": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.js",
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/components/unsubscribe/unsubscribe.less": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.less",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/account.js": "public/clientarea/template/pc/default/api/account.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/certification.js": "public/clientarea/template/pc/default/api/certification.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/goods.js": "public/clientarea/template/pc/default/api/goods.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/goodsList.js": "public/clientarea/template/pc/default/api/goodsList.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/home.js": "public/clientarea/template/pc/default/api/home.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/orderDetail.js": "public/clientarea/template/pc/default/api/orderDetail.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/product.js": "public/clientarea/template/pc/default/api/product.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/security.js": "public/clientarea/template/pc/default/api/security.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/security_group.js": "public/clientarea/template/pc/default/api/security_group.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/shopping.js": "public/clientarea/template/pc/default/api/shopping.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/template.js": "public/clientarea/template/pc/default/api/template.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/withdraw.js": "public/clientarea/template/pc/default/api/withdraw.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/components/resetAuth/resetAuth.css": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.css",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/components/resetAuth/resetAuth.js": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/components/resetAuth/resetAuth.less": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.less",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/components/unsubscribe/unsubscribe.css": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.css",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/components/unsubscribe/unsubscribe.js": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.js",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/components/unsubscribe/unsubscribe.less": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.less",
     "public/clientarea/template/pc/cra1/theme": "public/clientarea/template/pc/default/theme",
     "public/clientarea/template/pc/cra1/utils/directive.js": "public/clientarea/template/pc/default/utils/directive.js",
     "public/clientarea/template/pc/cra1/utils/util.js": "public/clientarea/template/pc/default/utils/util.js",
@@ -3691,247 +3691,271 @@
       "sha256": "a60a48a4e39b70f87def1805eb1a0472f0e8c8ca7f2e835117b701c74f623e59",
       "bytes": 2803
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Announcements/Endpoint.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Announcements/Endpoint.php": {
       "sha256": "055a9e49f29eb39c8a09c52302e43c82bd70d841c9c025ec73ce3bb55cb712a6",
       "bytes": 2893
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Announcements/LegacyMigration.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Announcements/LegacyMigration.php": {
       "sha256": "84e5e47f742955e9a816afc8cdc50582bc0d6aafa7c1e04d5e34831134dc3657",
       "bytes": 7377
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Announcements/NativeMember.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Announcements/NativeMember.php": {
       "sha256": "69f32a1bc5c083fcbf616a27b622ad98a3664236d1ea02a869123abb63195466",
       "bytes": 2200
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Announcements/PageCatalog.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Announcements/PageCatalog.php": {
       "sha256": "7c0d7773fa9486b25a630b563939e27940a787b87ba67cfa1a2a275bd62ece20",
       "bytes": 7742
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/Capabilities.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/Capabilities.php": {
       "sha256": "b98d7cc539e14bbebf56d35646c5144563bfdf0eae4cb212bdf56bdbf9a17392",
       "bytes": 2209
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/Database.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/Database.php": {
       "sha256": "1f48da973d366c8ad732b7c192a070e4ee6c33822925f72a3201a41db3be5ca6",
       "bytes": 761
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/HomeProducts.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/HomeProducts.php": {
       "sha256": "7763e887e2d6be985868a8dc3170ad6e99ff25908ca00e8c6dd17c1cbf936311",
       "bytes": 3447
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/KnownContracts.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/KnownContracts.php": {
       "sha256": "96653324856dc02fc65dcf3c94ed8142ea8974bf2c487b6b189cc3799cc80002",
       "bytes": 2828
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/MenuAccess.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/MenuAccess.php": {
       "sha256": "7f2c416bac86c8c45bf5c37c8e24fd459186c5c943b726cd5a305f1a7b340e2a",
       "bytes": 1074
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/MfCloudAdapter.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/MfCloudAdapter.php": {
       "sha256": "999abc52b74ecec762771f0b1a7ba8d94827ac43f4e372de3cf96dc6bf878680",
       "bytes": 4381
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/ModuleAdapter.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/ModuleAdapter.php": {
       "sha256": "c16cb902e1142917fd6775e0262906070ccb072b2ca8e7f65e19a35d84eaf2b8",
       "bytes": 4897
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/PanelDiskState.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/PanelDiskState.php": {
       "sha256": "480c48b7b4ffb6a7e5c4d0e1cd6bf01d63cc313a4f4ba75b96ea625de9d701a8",
       "bytes": 3153
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/PanelFlowTime.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/PanelFlowTime.php": {
       "sha256": "2cc9d83345a53670eab1bb6e28f101495bf31c4b258f4ecbfb7ad31da5a45b54",
       "bytes": 1105
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/PluginPages.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/PluginPages.php": {
       "sha256": "ce05ecf4333a8848846a9debc4216e9bcd9236f4ae65c4e5ac28fb6b8fab43b8",
       "bytes": 1322
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/native-contracts.json": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/native-contracts.json": {
       "sha256": "911e79d037804486a5aa5d7827c28923d186323b14a72e558ab45e265f4ff831",
       "bytes": 6781
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Compatibility/runtime.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Compatibility/runtime.php": {
       "sha256": "14e1e401d2a9d3fdd8054a66966f85af3119e7491486523d8058799112cfa6cf",
       "bytes": 21233
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Context.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Context.php": {
       "sha256": "e0bb284114b22d822f59592103f80efc7f833b9f1134a2b9f96e419b673f4052",
       "bytes": 1330
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Files.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Files.php": {
       "sha256": "fe1193c8761ddef4295b7f238aad2fd94daea78bf717b6e901d45cbf846c5bb1",
       "bytes": 3356
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Http/CustomerError.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Http/CustomerError.php": {
       "sha256": "1204334b83e296611b900253cade6e2a97bc62588479f98aee1865f7c9b9c5ba",
       "bytes": 3988
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Http/HookBootstrap.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Http/HookBootstrap.php": {
       "sha256": "16692bd5693906c178b27d8c985a3da7363f37d50ca2c288c8027108d51adbaa",
       "bytes": 2082
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Http/MemberController.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Http/MemberController.php": {
       "sha256": "c1ee3ac4dad17ba3e2e3a56b9a123ea1e1a61e9384bf411de840df334d5f8ada",
       "bytes": 5979
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Http/MemberGuard.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Http/MemberGuard.php": {
       "sha256": "f6568910364b08da9c5190e4aa5687be328ce4ff152fd1c18b9a0d3dec4b3495",
       "bytes": 4613
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Http/NativeAdmin.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Http/NativeAdmin.php": {
       "sha256": "4e598b2d86830d43b0eb12a711b2341702488eb8747aa2e330bec1314c2c2526",
       "bytes": 1896
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Http/OperationGuard.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Http/OperationGuard.php": {
       "sha256": "a359ac8aa24d2b3a86aae61acb8a3f61ed604ee3e514de501287640df1b9ee26",
       "bytes": 950
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Http/Routes.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Http/Routes.php": {
       "sha256": "317afb4b6806c590eff21aa59d304d18bd456274b545ed9d32f3879b3c131339",
       "bytes": 1272
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Http/home/MemberController.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Http/home/MemberController.php": {
       "sha256": "bfd0f577e474bfe3ecb06532d8b00449b3385d5c8b78e5fac02d1fd237a94c06",
       "bytes": 1330
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Http/home/ViewClientController.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Http/home/ViewClientController.php": {
       "sha256": "20ec788f778a4b51aef686cfb7af3020b86db369050effcb9664efc3a17ca5fe",
       "bytes": 3323
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Presentation/Footer.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Presentation/Footer.php": {
       "sha256": "50d2183c74c28aeaa060fc1f310a258445f934bfd33802585faf1bbf6c3a28c7",
       "bytes": 461
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Presentation/TemplateCache.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Presentation/TemplateCache.php": {
       "sha256": "148c6d1615e2e49515344b299eba17d4cdb7ea2f58d5cd803f132f56d3487443",
       "bytes": 2001
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/Assets.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/Assets.php": {
       "sha256": "74802ef3183781631c1016afe54078c387e06c8e153598328810ef7bc191baf6",
       "bytes": 3059
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/CustomerData.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/CustomerData.php": {
       "sha256": "f32998300c6be13074ec77d13faa2a7f1778bf11b65d61d92c6fb13b2c13262b",
       "bytes": 1718
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/Identity.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/Diagnostics.php": {
+      "sha256": "cac83f038cae6429b1f80004cc00f820cd477b4291880cc36486fe1276ae4a28",
+      "bytes": 5455
+    },
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/Identity.php": {
       "sha256": "d2359472fa99241c4ac5f85fa8ba84409c297f2e115081167382d8575743327c",
       "bytes": 893
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/Inspector.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/Inspector.php": {
       "sha256": "9fcbce644958ebf030d578b0f4603caad17df0993a3c3c16371d76edc75d2e69",
       "bytes": 11740
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/InstallationEnvironment.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/InstallationEnvironment.php": {
       "sha256": "2833dfd9570aca6f4c7a8d149ed3f36aa30d5a8d667888fe89908137b5b1f880",
       "bytes": 8615
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/Installer.php": {
-      "sha256": "309d9104bb249081e837db18235ce071eefb372daacda9fda0e5e85cb8bc66d2",
-      "bytes": 11058
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/Installer.php": {
+      "sha256": "9518ae15d8a7bece35542e391fb7768a2faa8e31fe481d9bd5210e4236094901",
+      "bytes": 11427
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/LocalPackages.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/LocalPackages.php": {
       "sha256": "d52f63d6cc8a069505a8d02b6daeabe28334b0bb595d3157c6f9ccea0d06f1f5",
       "bytes": 4228
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/Management.php": {
-      "sha256": "c6c9d00905885ad1b06571306ba9e24cbc9953580ca790b16fd080b861dba835",
-      "bytes": 4325
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/Management.php": {
+      "sha256": "a2e548ccf33061ce0ecdfa5255db56546c7357458b71d7684220fc6e7b13abba",
+      "bytes": 4483
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/Manifest.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/Manifest.php": {
       "sha256": "3be95b8c0c14265a49f41855b112c76a5348602d26a5aaf79e6557ac1f07d022",
       "bytes": 13001
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/Package.php": {
-      "sha256": "ec9541143cff6954deb7fceff49fa1b297f2e2041328bff12acf1d9acd3e3605",
-      "bytes": 4583
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/Package.php": {
+      "sha256": "c4044cba138e9eb62394d09e777e78476ef6c336c78fee078fefbf209b85826d",
+      "bytes": 5122
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/PrivatePaths.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/PrivatePaths.php": {
       "sha256": "7bb858cab41c6a18caea3caa89705c950f6be641e6cea5c61cacf1415dc7ad4b",
       "bytes": 7619
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/References.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/References.php": {
       "sha256": "2d1f51306ba0af5c4b5cef89260997e22710b1b50b70689acefd50348fd6b6b0",
       "bytes": 10949
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/ServerRules.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/ServerRules.php": {
       "sha256": "ecc5de06ec2d0e3c9b6e09485ac51cb145451d0c9e55dc8306bb869000919194",
       "bytes": 519
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Release/Updater.php": {
-      "sha256": "646c733335255bd21883e984d4b50f4a54202ab255b2adec23a55ff293884e37",
-      "bytes": 21189
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Release/Updater.php": {
+      "sha256": "a2d714ef98ba2960754f03bf7f1eb5deb2faf04d65c0e8d9f301d935ccaa9b54",
+      "bytes": 21670
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Security/AdminRecovery.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Security/AdminRecovery.php": {
       "sha256": "8fa75147862adb66fbd7bea24d9bf14283b2a69c4fcb746a817edeb921a9215b",
       "bytes": 8675
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Security/NativeAuthorization.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Security/NativeAuthorization.php": {
       "sha256": "229f7ba6d0bbeecdd05b903a89ff6bbf0cd2112565f03c5609355ecd8aa9afa7",
       "bytes": 3033
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Security/OperationVerification.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Security/OperationVerification.php": {
       "sha256": "b0d0c925143519d807f64edb85bfb0313594b09894125e02f2563764468798da",
       "bytes": 18730
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Security/RecoveryMailer.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Security/RecoveryMailer.php": {
       "sha256": "1cf10895435d12fb35f02d387797466e715996d4dd62a266789ca5f3bded2e49",
       "bytes": 1685
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Storage/AnnouncementStore.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/AnnouncementStore.php": {
       "sha256": "e4517cca178d0455c58a4e3af2b6cab40b64e60b80f2317ad6ad969585830c93",
       "bytes": 16642
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Storage/AuthAppearance.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/AuthAppearance.php": {
       "sha256": "2a1ad7fd3d38ec0e63d96e0c478110e6de3781d8a03403204dc9d73e30b2924b",
       "bytes": 3594
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Storage/auth-pages.defaults.json": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/ConfigurationDiff.php": {
+      "sha256": "8de20295f20fd0481cb39fc9e0e908d2885e3984a0dfa0b177de8d55a5ca3c42",
+      "bytes": 4759
+    },
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/ConfigurationMedia.php": {
+      "sha256": "cb9ce8b8e9201e55129e154c352cec253787bee01860b8214bb6bfcf0af95550",
+      "bytes": 9998
+    },
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/ConfigurationTransfer.php": {
+      "sha256": "fdbc2e64643b19a9a5136462865b42ece1b67c7891026790b37b1957cb31438d",
+      "bytes": 22672
+    },
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/MenuTransfer.php": {
+      "sha256": "db8bdd787d6332d9a26349bb02dcd89c9f080342362dd1b0e718d2602fe2327d",
+      "bytes": 18961
+    },
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/auth-pages.defaults.json": {
       "sha256": "2bf1127dec1ec78326762f4b1928457a455fd7e7d7f83636320b266e82e9217d",
       "bytes": 1838
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Storage/cart_store.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/cart_store.php": {
       "sha256": "5a1e5a822c05d092e18d2edbd65fa0888db8f4de150dca21c883a7137467ddfd",
       "bytes": 35879
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Storage/editor_store.php": {
-      "sha256": "e7f08129dab57f837a3f331e733b2e709ed62115574ec36cd7abdaf4e54b6c60",
-      "bytes": 16640
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/editor_store.php": {
+      "sha256": "d3b36e9c155a690c08448e626704918b1772db4d51e76d13ac0dfb4f9655fb84",
+      "bytes": 16695
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Storage/member_store.php": {
-      "sha256": "f127173c776e94f64f0a5762da29b24617f248e73fd0c864f0af5f6de522721c",
-      "bytes": 90825
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/member-menu.defaults.json": {
+      "sha256": "0abe0d22c1dc3fd5fb2c67ffddc45427ff214f0d7d01634f33da6d04e6d05459",
+      "bytes": 37901
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Storage/workspace_schema.json": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/member_store.php": {
+      "sha256": "42f1d556a8ddf75610b3b103e1fa1ef2ee42657583f9050372d9d00b193a4269",
+      "bytes": 91202
+    },
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/workspace_schema.json": {
       "sha256": "d7afa81f62ffbffe60215faf32d8bfb33c852fb01d143cca9fe0915a6e8ef6fe",
       "bytes": 2505833
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Storage/workspace_store.php": {
-      "sha256": "58fb05486e6b26116449f59fe55cf9a7e95ef231bdabd34f52a0a9cb32be5477",
-      "bytes": 38160
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Storage/workspace_store.php": {
+      "sha256": "f6be7bc583c46e3abf39c0b2db82fb9b97ddb3a6ae1abda8eaddcd4b41c95c7a",
+      "bytes": 39268
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Support/cra1_theme_admin.php": {
-      "sha256": "78b1fda8059eab71609fd8ea6943b74cb9536b2edc0c03e2d9b2f7f77c65ea49",
-      "bytes": 29133
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Support/cra1_theme_admin.php": {
+      "sha256": "c8079a6fe6eb0f06ed3c7d136333ca74e5a37a1d815c16461ebe521f65dd5897",
+      "bytes": 30352
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Support/cra1_theme_client_actions.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Support/cra1_theme_client_actions.php": {
       "sha256": "de787a0221025cba9f62c6af7721cfbf59edd178d52139a874f7d8684031e431",
       "bytes": 9705
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Support/cra1_theme_media.php": {
-      "sha256": "76a21a4967e746765f1619035cd4493296c487b908599f333b63f74832d671fd",
-      "bytes": 18582
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Support/cra1_theme_media.php": {
+      "sha256": "83010343d8c20c01c5762b0776667789c471c734e99fa292593faa1101e81802",
+      "bytes": 19336
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Support/cra1_theme_security.php": {
-      "sha256": "e73b80d8cad1c14fbff185d183b946923fa5eb215b28bc2581583be49320a36e",
-      "bytes": 36931
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Support/cra1_theme_security.php": {
+      "sha256": "cd63359dc61ec58540b4cf2afa9be36d21e4215ae7096d582e70b1f533333b35",
+      "bytes": 37021
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Support/cra1_theme_seo.php": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Support/cra1_theme_seo.php": {
       "sha256": "ec4a74bd2f396f3323fc8bcef52d26c3a3693853ec70a61ae5216a5e8e913a1f",
       "bytes": 4251
     },
-    "cra1-theme/backend/releases/20261029-cra1-v17-3/Views/announcement.html": {
+    "cra1-theme/backend/releases/20261030-cra1-history-retention-v1/Views/announcement.html": {
       "sha256": "77ad7547514390fd3c5d83ed323bde07e314d4b289954245e7453bcb90126bcb",
       "bytes": 563
     },
@@ -5212,8 +5236,8 @@
       "bytes": 3826
     },
     "public/cart/template/pc/cra1/goodsList.php": {
-      "sha256": "0f6731234777b95d803d47079a57fff73a0972dd6e3737cf2a23d28c14609b31",
-      "bytes": 66115
+      "sha256": "62e36a7af62b1d6ed64e70add9ad49e8791d0ffaf26eadc53f597f8d06bfa013",
+      "bytes": 65822
     },
     "public/cart/template/pc/cra1/goods_embed.php": {
       "sha256": "5eec4597bfb916324048306a0275886917b1c7f2112f3ec3e2e0f9937df1e483",
@@ -5263,95 +5287,95 @@
       "sha256": "cc59e75cabf072c3209d6fc6eae75ea8c33874e9b1cd560e3ef75b18c432c782",
       "bytes": 2728
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261011-titanium-v1/css/cart-theme.css": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261011-titanium-v1/css/cart-theme.css": {
       "sha256": "9080e4dd8bdc89f30617c354a969f01ae96d0dd10079db06817a5d84c647552a",
       "bytes": 66908
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261011-titanium-v1/css/goods.css": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261011-titanium-v1/css/goods.css": {
       "sha256": "1acc7094a81fba6ddd8ea35328f0abfd174e1b509a5bd6af7e697564c4c3cf83",
       "bytes": 1154
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261011-titanium-v1/css/goodsList.css": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261011-titanium-v1/css/goodsList.css": {
       "sha256": "236709e7094feed720036a8ea5ef87c10df2d02a3c5cb7f6a8194506375f4888",
       "bytes": 30835
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261011-titanium-v1/css/goods_embed.css": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261011-titanium-v1/css/goods_embed.css": {
       "sha256": "e22b0664b90921d007340e205e57e8fdf307413aaed546ed39ea4aeb6fd0431d",
       "bytes": 20799
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261011-titanium-v1/css/goods_iframe.css": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261011-titanium-v1/css/goods_iframe.css": {
       "sha256": "84a7997be014a0e3e21bade8faaa6e3e36dd7a38892eabaaf816adf9b7e76056",
       "bytes": 471
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261011-titanium-v1/css/settlement.css": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261011-titanium-v1/css/settlement.css": {
       "sha256": "769e86e7554548d5aeb9e1a5e1d2c10f6562b777f9a41cf3e9d3a427fc0b3d66",
       "bytes": 5123
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261011-titanium-v1/css/shoppingCar.css": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261011-titanium-v1/css/shoppingCar.css": {
       "sha256": "7718622d4cd93b866e7f658cb683cded969b77cf10ad0e49980bb6fb1ed32388",
       "bytes": 4812
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261012-cart-entry-v1/js/goods.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261012-cart-entry-v1/js/goods.js": {
       "sha256": "8ecf07d4b9bd69d48b90e075cee4784d74d24f517d4ac06be808f7efa0eb3969",
       "bytes": 9147
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261012-cart-entry-v1/js/goodsList.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261012-cart-entry-v1/js/goodsList.js": {
       "sha256": "00ead8386e5d49fbdf6209348bf33a96eb2e97fa1ee72f4f268175b469baf439",
       "bytes": 84652
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261012-cart-entry-v1/js/goods_embed.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261012-cart-entry-v1/js/goods_embed.js": {
       "sha256": "63a2a47de1a3b1c5727425313b0a692464bb0330ce623d678c264673e331d291",
       "bytes": 15352
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261012-cart-entry-v1/js/shoppingCar.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261012-cart-entry-v1/js/shoppingCar.js": {
       "sha256": "e4aa06958a6a48e3ed54d40b9d84b8940db8c28a4d43fa9e3cf6f968d7322119",
       "bytes": 22817
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261012-icon-suite-v1/css/cart-theme.css": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261012-icon-suite-v1/css/cart-theme.css": {
       "sha256": "0cd43fb03b0f2c47638a69e80b312802e1547c15d29baa92612423ef1f3059c7",
       "bytes": 92725
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261012-icon-suite-v1/js/cart-config.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261012-icon-suite-v1/js/cart-config.js": {
       "sha256": "4ba4de6bfffc3c81a6d6a5244526869d0f492a20f8af7996c25f3bdee7b065e7",
       "bytes": 1730
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261012-icon-suite-v1/js/cart-controls.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261012-icon-suite-v1/js/cart-controls.js": {
       "sha256": "2bbf2772d7a6744909809a6e9a415e0e8f499fe150b4105e137cfe70575da70d",
       "bytes": 32153
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261012-icon-suite-v1/js/goods.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261012-icon-suite-v1/js/goods.js": {
       "sha256": "096a9931e4078fa1f5e9388d5e01cce9d87b9664957328ea32e0d23c2729072d",
       "bytes": 8593
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261012-icon-suite-v1/js/goodsList.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261012-icon-suite-v1/js/goodsList.js": {
       "sha256": "b8a7cc2b7545082c8df670a891862bcb2f65ebf0dc2b82e6f15c64f11dca8c81",
       "bytes": 81296
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261013-security-snapshot-v1/js/cart-config.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261013-security-snapshot-v1/js/cart-config.js": {
       "sha256": "4ba4de6bfffc3c81a6d6a5244526869d0f492a20f8af7996c25f3bdee7b065e7",
       "bytes": 1730
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261017-compat-v3/css/purchase-pages.css": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261017-compat-v3/css/purchase-pages.css": {
       "sha256": "28dcb7180a445188430ad38ac16d15441932c89d8a0f5280b0a2b3fab6ca8edf",
       "bytes": 9233
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261017-compat-v3/css/purchase-theme.css": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261017-compat-v3/css/purchase-theme.css": {
       "sha256": "0fa48eeaacb73ed1d8dec4dad664ac5fe246ae4b0240e7d7fe5e9007d82cd491",
       "bytes": 76142
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261017-compat-v3/js/goodsList.js": {
-      "sha256": "d1ea45f057563f3e5624110da70cb30693e499edb241d11a14fb10aa4ba4a17c",
-      "bytes": 87913
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261017-compat-v3/js/goodsList.js": {
+      "sha256": "28c71518fbe2036917d8812e5819b513a8ecb2eb548cbfba0abf2eeea3d9caa1",
+      "bytes": 87955
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261017-compat-v3/js/goods_embed.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261017-compat-v3/js/goods_embed.js": {
       "sha256": "3cd7491082b5bb79bd894b6ba7d4609a2a29b49a38a4ba96423278346cc3da65",
       "bytes": 17995
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261017-compat-v3/js/orderResult.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261017-compat-v3/js/orderResult.js": {
       "sha256": "ab018d96209cc2d1170e18262be8c2efa6179d198c96a43932089581973eb318",
       "bytes": 6075
     },
-    "public/cart/template/pc/cra1/releases/20261029-cra1-v17-3/20261017-compat-v3/js/settlement.js": {
+    "public/cart/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261017-compat-v3/js/settlement.js": {
       "sha256": "a1b09e2ab76e21def553c874ddbaccebe42a6f4e7389d85e15b63d5846e1f621",
       "bytes": 18028
     },
@@ -5360,8 +5384,8 @@
       "bytes": 15312
     },
     "public/cart/template/pc/cra1/shoppingCar.php": {
-      "sha256": "8de7497478ae508e7c78e6439c93d62fc5ae1db00f7d9e6a6b44f384140e9316",
-      "bytes": 22360
+      "sha256": "fc6543e518546e43401c3b8dc05478747b66f13d898507e1c72681197956d7b7",
+      "bytes": 22145
     },
     "public/cart/template/pc/cra1/theme.jpg": {
       "sha256": "6a2712615061635af2bb9ffa0f0438326dacadb8e68611e086807d351c6503e2",
@@ -6112,12 +6136,12 @@
       "bytes": 1089
     },
     "public/clientarea/template/pc/cra1/components/asideMenu/asideMenu.js": {
-      "sha256": "9012f65d890d960741b04f88daa23ee5a7a00e0b9d94f795fb0d34e99647dc26",
-      "bytes": 66887
+      "sha256": "839ee8a76e9e1c675309fc00a7204c4a43d374961010299aea9ca10746bf4bf3",
+      "bytes": 67180
     },
     "public/clientarea/template/pc/cra1/components/payDialog/payDialog.js": {
-      "sha256": "0b7375daaee7050e7e5d5f77c6216a03d2f13370b587e4f63519076b21d0be6b",
-      "bytes": 66509
+      "sha256": "db5f507881f2b45e9a69b6260c15b84d23ea487c5256519a78bae7b0d9b3c582",
+      "bytes": 66318
     },
     "public/clientarea/template/pc/cra1/components/topMenu/topMenu.js": {
       "sha256": "367c7b0ffbf9787f5942e4f26c61db605192e41037c5f96423bb06a58a8dba96",
@@ -6160,12 +6184,12 @@
       "bytes": 1965
     },
     "public/clientarea/template/pc/cra1/js/module-deps.js": {
-      "sha256": "2949152b7b881c592cd6c42f63731ba743a5a69744650350ffd6f86e9ccbf964",
-      "bytes": 15896
+      "sha256": "32c4da59473a4ac5641a498df83b873ee94faee59fabf823d4dfa3178f2d5e07",
+      "bytes": 20254
     },
     "public/clientarea/template/pc/cra1/js/plugin-pages.js": {
-      "sha256": "4297ca10b94c96bb196b0b0dae741d067bdc828f4e563599246fa6cea1e54420",
-      "bytes": 28011
+      "sha256": "5ac072f5d4e23f341167219268a8c9666bd691fb02d762c03af724c91c89f9bc",
+      "bytes": 27161
     },
     "public/clientarea/template/pc/cra1/js/shell.js": {
       "sha256": "86f0c5d91c4aef0b84919fb2475f33932785c42a55c5631f884d1c077443c125",
@@ -6223,431 +6247,431 @@
       "sha256": "2c7681af5af25fe8a3a43af18bafa13d49b066070f9ad2a5711e9b307d48cc75",
       "bytes": 674
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/20261012-nav-auth-v1/css/cra1-shell.css": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/20261012-nav-auth-v1/css/cra1-shell.css": {
       "sha256": "7d64055e5df17d1a0d1c42702253b9fb54a5c1a22ea6cbb7172d5828d5028da7",
       "bytes": 102966
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/common.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/common.js": {
       "sha256": "6bdc73c5c3e0a32c5901b4ad9cace43940190078528044a6355b399d0d12aac7",
       "bytes": 12662
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/api/finance.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/api/finance.js": {
       "sha256": "f1b61810d5d35ca2700bccd4437afd09c698013e5fd9d46e26b3f0444cd41f79",
       "bytes": 4400
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/css/AvatarEditor.css": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/css/AvatarEditor.css": {
       "sha256": "267386b19f6935c98845e8b57e60d06268242726326b1abe30c152ccc9d8dce4",
       "bytes": 3168
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/css/app.css": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/css/app.css": {
       "sha256": "c8107e26a8895605a3cf44bd52c76761d41097b78ba9eaef65b0f88f561c93e6",
       "bytes": 102363
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/css/cashier.css": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/css/cashier.css": {
       "sha256": "751e633e03563b8d719e162a1bc6d8fcbe6476bda5263aaf5b9c12b608bc50eb",
       "bytes": 13279
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/404.js": {
-      "sha256": "2ca0266812232e37bb0d55a54a2bc2fc1395ed84384da857eb555ce6dc0e9c33",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/404.js": {
+      "sha256": "af25fb925bedfcdc47fc210d61911e8237282e26ce46bd45474ed63d125a91a2",
       "bytes": 265
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/account.js": {
-      "sha256": "928942f0b03fab6e42fb1abb3099fb2b8de2432d23707e0c10ef2db93fd73925",
-      "bytes": 30639
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/account.js": {
+      "sha256": "3c73f2af93c1be2932502f32df44cd9fed9181d5606d4694eb619464ff68fab6",
+      "bytes": 30536
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/agreement.js": {
-      "sha256": "7229fdf84e6b459e5f62a3db8c462131b296cb324c0bf98c36d7fd4dc76ab3a0",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/agreement.js": {
+      "sha256": "5babdf23af0d9261f3b8d7550ca1621e68cefa01c264a8eb7c3b947c204d2eea",
       "bytes": 5920
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/cashier.js": {
-      "sha256": "8e9812f4858bccfa2248d49272d212865e79f18b8e6e5dec2a02fc9f25c532db",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/cashier.js": {
+      "sha256": "97a3adf701f98b0d71a2b18723fa6a7b5970188a08ac81a43c18b8f647129b78",
       "bytes": 8254
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/AvatarEditor-DfbFkyMS.js": {
-      "sha256": "e839366c932364b2244a55c8cf15c207822aefb0bc2228223c0b0079ebf24b8b",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/AvatarEditor-BwVOJp7G.js": {
+      "sha256": "08220ad506b76077f19398b756f314e99c4f7d4c9e3bf6f4ed1b132a4da495d4",
       "bytes": 6328
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/app-DimUJ34a.js": {
-      "sha256": "4348eef07bff5f9b1a5c4d72e14f259bc725acda63d287b2ada77f123b5c3c62",
-      "bytes": 305175
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/app-BPDTDAxU.js": {
+      "sha256": "f0a5f387e42e2bb6f307afe24812d105955d1c630d19cac09155efbc8d4c2e41",
+      "bytes": 305081
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/arrow-left-BDfsMfmO.js": {
-      "sha256": "f90f654e815020b8f2353978dc1aa907645b186bd87fdde5a3d85dbf44830d48",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/arrow-left-N0C4ygNc.js": {
+      "sha256": "986ee32148934e9b778718b6bf6b70119e559874ce33b19e7365797c463f1a7d",
       "bytes": 164
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/arrow-right-Cy7efc7D.js": {
-      "sha256": "f3406295f227edba6d52b1a81ca037e093268ba74b0f781a05f06b4dbaeb78a1",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/arrow-right-DQ7lg0RY.js": {
+      "sha256": "7eea9e52124df48a7be09d597739af44f041a06f0e96791923111a5abc131327",
       "bytes": 164
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/arrow-up-right-V-x-V9ys.js": {
-      "sha256": "5d9a9646801c3333aaf4ffd2edb66534904085ab5492356ead5fc59b2c287529",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/arrow-up-right-CSQX-gMl.js": {
+      "sha256": "11e7912ce92606e2c5c017d0ff1571b329baea1ff8dcdf0d418f4bd3c4870158",
       "bytes": 166
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/authLayout-CTMOidJW.js": {
-      "sha256": "0de542178a3f81eb7bf0416c5464fb1201c584afab57b9331eee6aadcc4d404c",
-      "bytes": 26447
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/authLayout-B3YKv9KL.js": {
+      "sha256": "c8a2e459e610001ddee2aeffed9778e096d13769bd813d31742925bb8d29447e",
+      "bytes": 26294
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/button-BF_5eMNp.js": {
-      "sha256": "f531c2d9ea8243c3aacc929e9632012625fd7595496bf22aa0636bc19d4c16a9",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/button-PA4V9yRv.js": {
+      "sha256": "b8aa6db3cafa3c8c39570fb4215984f3095301b8e3bee0a15a98ef3592944c10",
       "bytes": 1326
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/calendar-CPP9Rg8L.js": {
-      "sha256": "da303ed0a57c6c8eb54aa0a68ac9e52dd83047f0a2e29c62ccdcd50ce2aa2153",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/calendar-BCcGE-Vp.js": {
+      "sha256": "847936f171be74c5a24125428a5b1d13ccd7cfd495bf8ab97b945b355e426f8a",
       "bytes": 256
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/captcha-B_F31bS2.js": {
-      "sha256": "835755e145203bf2ccd31982b69c61545b08372b3429da025bc164f85fb0890e",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/captcha-B2ZchP-b.js": {
+      "sha256": "e568ee202a0c3e77cc886f383840f0fe3f806de90e99efd973006e471af7de2f",
       "bytes": 2953
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/card-5jTtZre6.js": {
-      "sha256": "12e234565e45600ec1146cad1e32a1001cfba991324827866819ad73b31ec200",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/card-BDJg_YzJ.js": {
+      "sha256": "fa6cb75c7cf7a94993ce72eff86a78e3acf96d38d6721cffa32e6bf111d7ca4d",
       "bytes": 1496
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/check-Dvx5twC6.js": {
-      "sha256": "8fddac2b5c92aab4f2ceebf1b6ec8bb0914a2d6db75223154383502321641443",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/check-qMqg7Prv.js": {
+      "sha256": "d91d72cc7df66c369b289055398b8fe5dcc10ffec06faed297184d822650f5d9",
       "bytes": 118
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/circle-check-CCNODs-h.js": {
-      "sha256": "f05ef74778562c3d600284e095406ea8505af1328d0b27c9737cf995d3d13ae3",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/circle-check-BfqTcmBS.js": {
+      "sha256": "e3d60992035665079eb943bf1a73b590e7dc1bf4da3e4fbcb7308a5342ec4fe3",
       "bytes": 172
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/clock-D-78JP8Y.js": {
-      "sha256": "33277efd09870eac4ed68d755b08f715c07630c483ac655c9f7fc760d8b5bc1f",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/clock-Be0IN3LN.js": {
+      "sha256": "1b7db05b794a43251f4467c60bb324739ce61f9eb51b6a4e807bcded57792c83",
       "bytes": 163
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/compat-u5qYtgxC.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/compat-u5qYtgxC.js": {
       "sha256": "55b270ab86745e0146a7e21db1eea3a479c33ffbbd0bcccade1f15d2c6be6f20",
       "bytes": 2175
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/credit-card-Pf3pn_mg.js": {
-      "sha256": "d830bf5ae365fde47c582f84254637fec9572e56b93c8727b30770fe56e99e29",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/credit-card-BqQpFl_A.js": {
+      "sha256": "ff20f0a4c58d7471447a97fe6a4d3fa3980ede9d792ea4ae0c15de89f4d85174",
       "bytes": 206
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/data-table-1ToG0ajL.js": {
-      "sha256": "23f26b5db36ebbfd8836d8fe952b8e113893e210e9934bf43c9d85d7396fbce3",
-      "bytes": 4836
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/data-table-ChhCOAX0.js": {
+      "sha256": "b8c2df46bca69dc7fd93bc54efd6d106b640d9e0823b95e97bc93aca866d63d1",
+      "bytes": 4516
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/dialog-DOA226gk.js": {
-      "sha256": "99bd91fd2af7d7e7e002a9123856abfa37a25bea1a06a0b8dfcce4bf275f6948",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/dialog-AYmQ79ZT.js": {
+      "sha256": "1d4bd62976170134091d33cab14cc3fbcbe8f2d2a3b3bdd0a6a6eef3ef016284",
       "bytes": 7609
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/dialogs-DFh7E3A5.js": {
-      "sha256": "4eaa2ec6466e66764a291f2e215afc8a4460624c9c2f83eeb01f2ddb50b983fc",
-      "bytes": 139452
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/dialogs-B6YfNxVl.js": {
+      "sha256": "ebeec5b909191498e7c7ed6fd36fb6f367f09f6a4af121791284e22020e9500a",
+      "bytes": 138791
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/errors-DON6Xw-S.js": {
-      "sha256": "d6cf1d96e44c15dff452973e7353134e2e54f1529315672d76cd769d97c198c8",
-      "bytes": 3844
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/errors-BaNmn_1C.js": {
+      "sha256": "e0eeddef122c0403af35280d1940a80c84a1892c252e17a2437d27deb86de3d6",
+      "bytes": 3670
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/external-link-B4nlzAPw.js": {
-      "sha256": "8e91eb2832ccb06bd6345d2b1d5b7cc90553c5b1cf0b48c0930eea58d57ffd82",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/external-link-CL9LeOAQ.js": {
+      "sha256": "e577894ff72718f08ce517a10eda2823806414633f9f193b989551efc4416cd8",
       "bytes": 250
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/eye-BxlFVCA7.js": {
-      "sha256": "236e0f8d6bd16f8086ed9d5b4db7d1b4b6b1c374eee46507653712c77675c8bf",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/eye-DgsssvYt.js": {
+      "sha256": "592ee8d5c6a4df8d9756e954842b357e2f97bf0e4b73490a269db25c3d1675f7",
       "bytes": 250
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/feedback-k9JRteIg.js": {
-      "sha256": "a2aad89e4b4a1588d2c75d90545848cd9db31a638f151a7abaa9979269e77064",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/feedback-CB1Cd70s.js": {
+      "sha256": "26f57b7723b2824195e9da787878efd679f65879b2acd38c88c9716cae92ba9e",
       "bytes": 1367
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/file-text-D5jH483E.js": {
-      "sha256": "de4c157b61b0a2bcc544d5a60341a988f03223f3d5f59cfd6e013a2cb85ea733",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/file-text-IoXKJDE0.js": {
+      "sha256": "a28cc23937076fe92dc82f73e3505a55693b560c943839e53501f8617384efa3",
       "bytes": 332
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/index-B3SF5U8b.js": {
-      "sha256": "db2f0ce7aeced210be5f90e34d21e14d5bae1fc2532c94ff20e7a3ab18c570e5",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/index-B5nZfj5P.js": {
+      "sha256": "7493c68463be695832901f77034c1aa21a4ded801b46c9cf9dea37553299fee5",
       "bytes": 27070
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/index-CMBclsTt.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/index-CMBclsTt.js": {
       "sha256": "90cbaa1deaf6cecb5fbb6b35accb0cbf31ded55870e7cffd024a255623ab7b55",
       "bytes": 34053
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/index-DT6vQThv.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/index-DT6vQThv.js": {
       "sha256": "91bfa9cfc9449ccd30c96b78f19f5a4b7ebc388dc76f656b9efce0fc2dfe0692",
       "bytes": 4267
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/index-DZmnWcjM.js": {
-      "sha256": "310e563c8b486732d89c709157c52fb5bae912276dabc2f6d5ca54445eddd916",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/index-Dj0rahNV.js": {
+      "sha256": "065295239ca1c73dd58e6c4203f4229a91ef1636fbcb53dd24d183728f74c6f0",
       "bytes": 4907
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/index-DxfGiVoV.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/index-DxfGiVoV.js": {
       "sha256": "e55e226040a8a9f544b31cb50c3eb45ab17a8a5e98d018e0e55047b3249acc33",
       "bytes": 7857
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/info-BDxi97C5.js": {
-      "sha256": "df0ef5e0b7183ee2c25be9324f810e92b3e8744f8600d2b98d55d1380e22d03d",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/info-NifEdfaH.js": {
+      "sha256": "5a9b05c9959fcd0b9fd300a0dfc0d728ceb0fc243858e9776fc2f9d9b7908479",
       "bytes": 198
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/input-BOi6D75j.js": {
-      "sha256": "f4b1250fab05df586112f560f1c85a7283a4ca847daa212cbd92dac2eaa33e61",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/input-9YH0bw3b.js": {
+      "sha256": "441998a53ab899865e8007a519fc367fad7bf0c67d7bf59fd6e03356ed0e55fe",
       "bytes": 1221
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/key-round-CUuPFKZs.js": {
-      "sha256": "9d1ce298b5c3e92da771a172e8ca0061a1acc9139b9085e4930201957d0f86dc",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/key-round-Bovq8X07.js": {
+      "sha256": "cf8c2e6f437db60e2ad6e127d868a5aea383551032151d68ff3e74bae1268677",
       "bytes": 349
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/layers-BZHk9Fu3.js": {
-      "sha256": "69fa59a0faa56008b93abdb4138e9ad79814df2e2905a655d53cba5a07dbc70c",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/layers-BZV22n1Q.js": {
+      "sha256": "984f1b5c1d2a3fe59794cc4ff3d369dee1d8ef8caebd02cd67f119a7ad38a26f",
       "bytes": 420
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/life-buoy-lSGconZj.js": {
-      "sha256": "ff5d596d6bc717e65e63d31193e23bd2ec116ebe6643b79535acb36296bf0a0f",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/life-buoy-CHZKJhgo.js": {
+      "sha256": "29603b5b31d462d9a037be82ec28ad9129b2b2d36d717ab5dc00a01f10435bb9",
       "bytes": 678
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/lock-CgZkhZzf.js": {
-      "sha256": "d374260c17455086f74486bba7e469342db720926b72fd9ae8ff23dc51f9bf95",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/lock-BuIBX4yY.js": {
+      "sha256": "852ce4886def455ada5b410957e61a1c63c350f301cd8e6bb8451abb3f9674dd",
       "bytes": 200
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/member-navigation-vYXzk_Cg.js": {
-      "sha256": "ef91fca253ac9f64510a2959fb562bfa0fd322688f18679e27bfc136389861a0",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/member-navigation-CRLOkQpr.js": {
+      "sha256": "456a33f43d4bf796bdca236936c3d2581fed6986eb4919b55629f86cffcdd925",
       "bytes": 2934
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/network-CozxuDGw.js": {
-      "sha256": "8468d25ab88f5e084a9897a7967d0ddf2366268432ba06e5f4f73117c40b9c9a",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/network-DT8E64XE.js": {
+      "sha256": "750f783e9af759a67ccd3609fc42d17ccc3547adb0f2811732c756e0dead244d",
       "bytes": 571
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/newspaper-G1y6cJpk.js": {
-      "sha256": "67842f6b56d7f1c16afe28f63209fa0ad1176bc2f772aeba3e25dba51791083a",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/newspaper-CL7X_GGq.js": {
+      "sha256": "affea3ceb7df60310ebd27207cca8f572d174d15ab73056f26cc0ac200b8f8ef",
       "bytes": 343
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/oauth-flow-KroM9LY4.js": {
-      "sha256": "8b461f7e5215e3b9e30ffd2fd5b9cb073949b5c3e49a99fe6d7eaa465577a6f9",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/oauth-flow-CoVhK24M.js": {
+      "sha256": "855c51b7ce169a9912047f4db5c07879ec51efae5094611230255f6e2ed5b16d",
       "bytes": 3259
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/operate-password-dialog-DCG108Zh.js": {
-      "sha256": "b1d17b47db25e31fd9ebfc7002e6d110062fcfd82a638e5782186108f0511627",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/operate-password-dialog-Cic2YCGQ.js": {
+      "sha256": "56d31c86a978401a8edd6314c35161a39655e4ab00ee1ac47e6021481eaac7c2",
       "bytes": 2366
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/package-VR5Rd_Pq.js": {
-      "sha256": "5d7e2859f96dbaba0b432e91f38fbfcc77e7c54f814f0a47af27256716430c45",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/package-BNBaVS2-.js": {
+      "sha256": "54499badffb687cc0cfffbd1a0def0a94d31f4354ea17752fa807d971e913ba6",
       "bytes": 371
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/pencil-B25EYT9z.js": {
-      "sha256": "e775c38a2e7306833489814513bd310a4fa8943162d149c3906ea5ee6f278647",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/pencil-D4KNekEz.js": {
+      "sha256": "12d68c997eb2c87ae65930c760952091179a801c07b4a4c0aa15ca825a74b67b",
       "bytes": 275
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/plus-D1y_crIl.js": {
-      "sha256": "0c5ca14c033f32138691c62e00216ac87ee311e778b0e1ae94cf61c986330ae0",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/plus-CLS36ZlF.js": {
+      "sha256": "15b63493ba934193b007fd28a66d591c79155bb15517eba37a82f0418ad1d1cc",
       "bytes": 152
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/preload-helper-PPVm8Dsz.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/preload-helper-PPVm8Dsz.js": {
       "sha256": "0bcb72f8ec0d95f592f3a84b3554b9ef5a5325ff5416a9114d6913e03c1c9eb4",
       "bytes": 1232
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/product-7uHSfgZs.js": {
-      "sha256": "ff9c40b30ee71853755dd036e92ee098798144669c37c35eae1ca48c97aecf4d",
-      "bytes": 109413
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/product-DHvPeqsy.js": {
+      "sha256": "4dcb3fb19e5f2bd31996b2f5c28a7f56117a7c6afefa09a0ce17e6c9d85dab49",
+      "bytes": 108566
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/productList-CB-bDI01.js": {
-      "sha256": "8272ba13f9ba8596d4fda645e54fb8c5e0695805449cd1b9acdef9d9bae0b252",
-      "bytes": 74660
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/productList-MUzZ3RqO.js": {
+      "sha256": "4b8a68593f8fa68b1aa3daa05cb438b838046635ca9fdb8b0991aac06b2041aa",
+      "bytes": 74296
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/receipt-Bd9AfNcG.js": {
-      "sha256": "a7bc114c318c1f9d0032088c80e14bc9ae4009c48c3f772351a22206656a851c",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/receipt-DGu8ldyX.js": {
+      "sha256": "aecaf8b4800651ba39f0bb262120beaa4bb4a3d42a473ca386e4af0f7022bdf8",
       "bytes": 291
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/refresh-cw-DVXTKXT7.js": {
-      "sha256": "2a04e79574a8a983d527c9f7c2fbca23192292eded809198be951d208eebd8aa",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/refresh-cw-BWZDcsFx.js": {
+      "sha256": "d921462822f1c77f703f910fc3b1478c97f6fbe5650d69e502e5a2c64f765480",
       "bytes": 320
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/search-17W2IJ63.js": {
-      "sha256": "9713a27fd2daa81171195b9cf2b6a8ed16c8d4ea0130b7bb611cde8b891773f5",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/search-ZnCAUGYC.js": {
+      "sha256": "192e919d30dc97692436a2bf06f7347e491c76ced0447c243990adf095174a84",
       "bytes": 534
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/search-x-B-AXyBPF.js": {
-      "sha256": "07cb9648348916e5f53e1f75293dd522c0c0cf6de178c8d2c221d07a8e28de7c",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/search-x-CHIHgd9c.js": {
+      "sha256": "fd72a2a39955d51368361fb13723889b768e9c8d257c955c4e3032bc73f157da",
       "bytes": 256
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/security-DH8Wt-N3.js": {
-      "sha256": "1d13a8aa63ba799a6bcb304269ae59f37f706ce50696e2cae93ce1cea660a2cf",
-      "bytes": 32528
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/security-C0lCX3Vs.js": {
+      "sha256": "62c109e7d93cf4071e3779d61dcf7fb982f85c5deec4ccb437f53c1d6c22ad14",
+      "bytes": 33025
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/select-DAFlGpdI.js": {
-      "sha256": "7f95fd335015ed5f1ea41a42f6c4fa6b3557c2d659bb4d861c450c67ac7f35a4",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/select-qKZue0Ma.js": {
+      "sha256": "92094ae17cf5437c3809a7fe4f02f3752a7fd4d2519d8d4fbed7fdc71e29445d",
       "bytes": 21649
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/server-IUQiLspJ.js": {
-      "sha256": "1b38941a1e0d9b1feffb8d5b753f9b197619d78c43b0aa80b53625a103acd8f4",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/server-DdrQWvHM.js": {
+      "sha256": "644b3a7d66a91425ed109aa57c1957fa894dd1b5034dbd9a0ec042096b05a7d8",
       "bytes": 337
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/shield-Di2KtK3h.js": {
-      "sha256": "2f220269d1d635b8e7cd25419ea9525f3cb0e82973d860128f34b33322ce36e7",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/shield-C_GPxCjh.js": {
+      "sha256": "4a1fe0a1cafd184150086641eb7ce01977f3efb1215807c5123668c3830409dd",
       "bytes": 266
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/shield-alert-BIqGpzhK.js": {
-      "sha256": "71835a9cbb6bde477da63f425b1c188b7aef4ec5f959a5627681b7dc35a975f1",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/shield-alert-Fq4biFo9.js": {
+      "sha256": "d19fa1bd1087038a01f00ab6bf82dababec5243921ddc328640b1ae4b624102a",
       "bytes": 352
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/shield-check-D1xn1GLz.js": {
-      "sha256": "0d772ce1f71eb1cf38608999a25e1885cdd794d048843da56990b065991cb347",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/shield-check-Bwri-r4I.js": {
+      "sha256": "6e8cd3b65a351c330a61605313238fbe2ab50bb405b5670ce4816a44c71a06ee",
       "bytes": 314
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/shopping-cart-DY72TrDK.js": {
-      "sha256": "9688b149c21055f63a3932da12eb88bcb5d827fdf23df04b251be16c6f0c6546",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/shopping-cart-D5R6gGck.js": {
+      "sha256": "1868c8040a27da40186080ee2939b60dd4dbe2d8f63d82733595b8d63caee31d",
       "bytes": 286
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/stat-card-DWBUuDJd.js": {
-      "sha256": "64236df9fada65a5e095249727fdd63619024323e35de5d3354e1204f80f6257",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/stat-card-Ds8TP3s3.js": {
+      "sha256": "efd0b740988e0763de143cb8009bee71c95cda54ba22acce58e1d14f8879e4c2",
       "bytes": 2206
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/tabs-DbZc8TWf.js": {
-      "sha256": "6c75048726a1ea5fec955c60ff4ca0bcedb8062122c7c31a477fb44c2cdcc783",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/tabs-BegLLJqz.js": {
+      "sha256": "92248ac39506ad768eae523c41e72814444490f92f42045bdd7ae8fd986bc1af",
       "bytes": 2989
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/trash-2-O7OfWsAH.js": {
-      "sha256": "ae15a6f83340491a21ffa80a1d2f80a7818c394d18dc56f09f0a6c282546b3f0",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/trash-2-B8iDZn9H.js": {
+      "sha256": "a417c09a64f534b1d30dd508a0771a859e66bb344ed17cab60e94da23ec2db8e",
       "bytes": 327
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/triangle-alert-4xkjWwtm.js": {
-      "sha256": "25ddc9036b7810e1b885218d27e87d324f767d806f4119c8a8abfd8efa873887",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/triangle-alert-M9WTOX7K.js": {
+      "sha256": "22b10535636dbeae23c7430c9a3ca9174389f48c70706600e6ace6394023ca20",
       "bytes": 264
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/usePageTab-CiqX-WI0.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/usePageTab-CiqX-WI0.js": {
       "sha256": "0bee85771762134a02790013aed2abd85633a8a49fe739742027ec508c82e370",
       "bytes": 556
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/vendor-motion-CPP2Ij1U.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/vendor-motion-CPP2Ij1U.js": {
       "sha256": "a010171563f3137f3eda198fae7a7896876f9bdeee4f4a7a9e43d679bd7beaa4",
       "bytes": 128242
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/vendor-recharts-DyxwEn9b.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/vendor-recharts-DyxwEn9b.js": {
       "sha256": "9bd9efc0a8d758ffb0345b8be19b416d9a21f0716c7a836f0dd486961a09c8a9",
       "bytes": 386743
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/wallet-DQ94jdHJ.js": {
-      "sha256": "f4292dd999235c3d8f630e727900d56a16dafc7ecdf855202f738cd2f7b317da",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/wallet-CdmGvB6O.js": {
+      "sha256": "ea157b10aeb4e2b66189fcd801d6ce4553f769bb1d4c47dae2d2898ef67510a3",
       "bytes": 285
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/chunks/x-Csm8Tbix.js": {
-      "sha256": "0f5044db7ca9df08ec34c3d72ece642726b27b69fce9b28a3b71f7c5d3a0c48c",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/chunks/x-CRk8Oh3f.js": {
+      "sha256": "39c6d8d975a43512fa0ff7f5ba556e9c0027267b9fb4853e16b047292d7c60a0",
       "bytes": 153
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/crossModule.js": {
-      "sha256": "519a5cfbf3595a4810262399c3b43146d959e42dc4d5eb53103b193dcd198835",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/crossModule.js": {
+      "sha256": "5f747bff25225581c73786e83dd796cabd7dac580e295945e002d6532797529c",
       "bytes": 8019
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/finance.js": {
-      "sha256": "5c266b7f383daeb0e5cd774c2f9c41bbbee043a11f693a8ae712e20f9bf561ce",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/finance.js": {
+      "sha256": "46bac3b2444d80ab94ca97972c17c8d09fd9ab6b2f1c88de26044dd4c3c01d04",
       "bytes": 14994
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/forget.js": {
-      "sha256": "da4758ed300d5b5323450b49ed4ac7bcd75d59da12b8bb95706def1c63ea2cc4",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/forget.js": {
+      "sha256": "0b49acddd95492758a179ccac686c8f3216ff0da26a4f018a6b08bddbc3a99f8",
       "bytes": 985
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/group_rules.js": {
-      "sha256": "0494d7987e3f31345d9a5e894a2d326852a1371fe51ca38955c8a7ef8d85eef6",
-      "bytes": 11148
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/group_rules.js": {
+      "sha256": "e315114cd4a9dd32f2cc811ef6439d4fc9bf691ed522de2617b6c2386381787d",
+      "bytes": 12018
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/home.js": {
-      "sha256": "48115fc162eabc7287766d94358a6f2ff09e3bf599e499ec107d435793863bc7",
-      "bytes": 44178
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/home.js": {
+      "sha256": "fd072fc6041e5486714bf2602270914d45d1abbd48c41cb88d3fa5dc9cab24d8",
+      "bytes": 43414
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/login.js": {
-      "sha256": "67ae61aecf6e1a050b9f1e67bcfce6db6a428d63529a69477db64edc77059c99",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/login.js": {
+      "sha256": "678a1cd9903c1d5ea30f48bc3301c3687a744c426b877bfafc76cd69206cbca5",
       "bytes": 904
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/networkErro.js": {
-      "sha256": "f39b943e4a10eb375718cb107dd848486764cdc4df8dd897224bc7e685575734",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/networkErro.js": {
+      "sha256": "b0b0b4e0e24cdf8f07f74bcd5769243b8a6b8968ee8affd4e52af340ab3c9f51",
       "bytes": 265
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/newsView.js": {
-      "sha256": "1a692cc894b37dfd7df1dfd44983ea298548e61ea6fb25c4bc4d15e0a1bb45e3",
-      "bytes": 4711
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/newsView.js": {
+      "sha256": "c03a547c7540c5653d8b706008b4dc2a68521dae7b6f9eba0401dc56aa8b89f3",
+      "bytes": 4536
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/noPermissions.js": {
-      "sha256": "5d13adf99bb233bc6b36995baab6752aab120d6989399d0e1e02d40248da92be",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/noPermissions.js": {
+      "sha256": "b75c6862d017743c1f41c98a87b8ea8f4eeb0b6c302fb77ed03aae2424c36ba3",
       "bytes": 265
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/oauth.js": {
-      "sha256": "811039dd05b3d566d9b95d659d464da0f6985950f7c2b803df223d704a90ebaf",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/oauth.js": {
+      "sha256": "3ad658643b111e7e46af62dae1800958960433752ab714623f99d0ea67a3576e",
       "bytes": 1890
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/orderDetail.js": {
-      "sha256": "8506fbbde80e75eb8bece9d9b1cfd6dbdef3f4199f13990df96a88a29ef5a2e3",
-      "bytes": 8699
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/orderDetail.js": {
+      "sha256": "0b1e2e4084dd66965a7bd4ae7439b2707c2f968e21077e7f84a830cd03791d03",
+      "bytes": 8450
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/product.js": {
-      "sha256": "0bba0f678306deab3ce724bcf551f8ba1e4c2d1b78fee8516ba2f192f686102f",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/product.js": {
+      "sha256": "676622d575e54828a5471d0c516129717803d328de2dea360629779e292f2a37",
       "bytes": 1646
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/productList.js": {
-      "sha256": "38f6ef2bc15ffd5e20c82a7b7e406e3b176517addf0d8c00935e0fb05a4cfe94",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/productList.js": {
+      "sha256": "6b20d8dc4d9e9f623b2cb58c17a6ec47ea8f30017024ce4540c8dcdd6f8958ea",
       "bytes": 983
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/product_list.js": {
-      "sha256": "d635df80eab89b741a641491c334ebbd9fe856a7e0f97fd33e960f674eef8cee",
-      "bytes": 5233
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/product_list.js": {
+      "sha256": "5b3c2436282dddedec80a5047d046f7e1ab5c478bd3b5975536ca5ac18bc4877",
+      "bytes": 4788
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/productdetail.js": {
-      "sha256": "cbfc2646fee3166a4baf8d5762abb7f4ddda5ab957484cd3e25323242e42952c",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/productdetail.js": {
+      "sha256": "0b3ded68947523e4c2cf483d07bf42877cf393b891bfa45a9c2915449d58955e",
       "bytes": 1643
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/recharge.js": {
-      "sha256": "c91543d78d72c956cbc77fa00d8353bcd569ad20fb7a013036c13d6f24e54531",
-      "bytes": 11388
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/recharge.js": {
+      "sha256": "73800001396e0ba1ce61541cea9ef7e1882df22c60b6c311e4b34f22c3f956f2",
+      "bytes": 11351
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/regist.js": {
-      "sha256": "75195a068b1f990ffd2153b5fa5295be767bfc595b403f90ac0f6eb34207cbac",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/regist.js": {
+      "sha256": "7d1242dc8715aed51167917476241fafd0ff60150629ddc0372e3b2c45b1df4f",
       "bytes": 861
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/security.js": {
-      "sha256": "6464e5c16bd26205108ba9454084c26dc83dfd49f93d01eb46f0a8d4a43aca38",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/security.js": {
+      "sha256": "33eeb6774ee05f399ffc97a8cf4f03d48f5e343c0309bf5a92db7a221a0f55a9",
       "bytes": 1091
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/security_group.js": {
-      "sha256": "91e492107f3b93294a1c5a2ce4ce85439dbaf8d2d6d58ecadb14dc556ee501f8",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/security_group.js": {
+      "sha256": "c493d95324db95c182bd2c9c47597b1ece7d123101ac26f285886391f77b38b4",
       "bytes": 1088
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/security_log.js": {
-      "sha256": "5ac0a52ad3a4a8ce23da8a27455ccf640c982e14d468745340d9e7832d2b688f",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/security_log.js": {
+      "sha256": "458b6e38b7d65376215c71548dd37497a287b66ebc405d6f42db771bc2a798cc",
       "bytes": 1086
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/security_ssh.js": {
-      "sha256": "b88758ab2f62cc66e57c689d2739680ce560255a8cc78408b566838cd779df7d",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/security_ssh.js": {
+      "sha256": "b5b9047d0fdb4e4a0be2baf5eb10d4292a1778cb18144ac71521f9870932980a",
       "bytes": 1086
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/template.js": {
-      "sha256": "917dbdfd4469125ee7dd2997f3e12a5722e25e6d0939585d241d1bfbbdeb8ec7",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/template.js": {
+      "sha256": "c95c269d5d00aee320d8416c5a7709b973ee1df0c5f3416018b9bbf6a552eecf",
       "bytes": 7191
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/transfer.js": {
-      "sha256": "2824b11e017ad34887a956824539849782bdab1c9945b395c2aecb088027eb77",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/transfer.js": {
+      "sha256": "82edc5da85d12fe24f5339f3024bf76e6e527167c554285e5d653c5fbc8e2178",
       "bytes": 4562
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/assets/js/withdrawal.js": {
-      "sha256": "144253a9e61d953d30ed5671504aca82187ff31b3f1bac1ee752acd530bf7c38",
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/assets/js/withdrawal.js": {
+      "sha256": "f7b34f0d8323150df943265bc9ea044770f94d46e3f29bff073c8e316486bbf6",
       "bytes": 10807
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/components/asideMenu/asideMenu.js": {
-      "sha256": "9012f65d890d960741b04f88daa23ee5a7a00e0b9d94f795fb0d34e99647dc26",
-      "bytes": 66887
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/components/asideMenu/asideMenu.js": {
+      "sha256": "839ee8a76e9e1c675309fc00a7204c4a43d374961010299aea9ca10746bf4bf3",
+      "bytes": 67180
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/components/payDialog/payDialog.js": {
-      "sha256": "0b7375daaee7050e7e5d5f77c6216a03d2f13370b587e4f63519076b21d0be6b",
-      "bytes": 66509
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/components/payDialog/payDialog.js": {
+      "sha256": "db5f507881f2b45e9a69b6260c15b84d23ea487c5256519a78bae7b0d9b3c582",
+      "bytes": 66318
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/components/topMenu/topMenu.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/components/topMenu/topMenu.js": {
       "sha256": "367c7b0ffbf9787f5942e4f26c61db605192e41037c5f96423bb06a58a8dba96",
       "bytes": 23435
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/js/embedded.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/js/embedded.js": {
       "sha256": "64ab38a826fc0760c3cd9d1bef6b5c9becd6e58413464a112f864e7c7c3d1401",
       "bytes": 1965
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/js/module-deps.js": {
-      "sha256": "2949152b7b881c592cd6c42f63731ba743a5a69744650350ffd6f86e9ccbf964",
-      "bytes": 15896
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/js/module-deps.js": {
+      "sha256": "32c4da59473a4ac5641a498df83b873ee94faee59fabf823d4dfa3178f2d5e07",
+      "bytes": 20254
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/js/plugin-pages.js": {
-      "sha256": "4297ca10b94c96bb196b0b0dae741d067bdc828f4e563599246fa6cea1e54420",
-      "bytes": 28011
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/js/plugin-pages.js": {
+      "sha256": "5ac072f5d4e23f341167219268a8c9666bd691fb02d762c03af724c91c89f9bc",
+      "bytes": 27161
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/js/shell.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/js/shell.js": {
       "sha256": "86f0c5d91c4aef0b84919fb2475f33932785c42a55c5631f884d1c077443c125",
       "bytes": 3113
     },
-    "public/clientarea/template/pc/cra1/releases/20261029-cra1-v17-3/js/ticket-assist.js": {
+    "public/clientarea/template/pc/cra1/releases/20261030-cra1-history-retention-v1/js/ticket-assist.js": {
       "sha256": "028210702eee920cdeddc438af4dac5712526f291f9b0398a8009a15da22cc3d",
       "bytes": 33954
     },
@@ -10723,53 +10747,53 @@
       "sha256": "0b5af92cad63922f5a67037078f3aec3ad4d23b2b5b5ea1446a9aa82bc39eac9",
       "bytes": 11138
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/announcements-preview.js": {
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/announcements-preview.js": {
       "sha256": "0baf7ad7d8f3b3a9007aaadf5240195f52249099deedb5dd50acb24034a80f0c",
       "bytes": 26916
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/cra1-shared.css": {
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/cra1-shared.css": {
       "sha256": "258324cae70653e1f0f224a82785be769837a4569ed5db6975604ae7065f6ae7",
       "bytes": 131913
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/cra1-shared.js": {
-      "sha256": "5d1b6bc728dcbb095bbbd9cb05e85af7cc70fabf248460cde676b24c47996735",
-      "bytes": 175553
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/cra1-shared.js": {
+      "sha256": "0b9e6c31eb537b5928b3ebaaad442fbec2280500c8c631ea03626567419ac803",
+      "bytes": 175098
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/manifest.json": {
-      "sha256": "0c35e7ea356a8c52e68cc5e911df8daa4580f7484899013fa2a26a6e60ca5440",
-      "bytes": 770
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/manifest.json": {
+      "sha256": "d8f4001f13bccff5553ea3637f1978b1567bc32e8572e6d3da8d60b5f82a5024",
+      "bytes": 785
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/member-session.js": {
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/member-session.js": {
       "sha256": "7ac073dbbc4f5020dac435c8b1a0cacbee3109c564dd4af3b4ad448f8df4dfac",
       "bytes": 16105
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/preview-runtime.js": {
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/preview-runtime.js": {
       "sha256": "0b5af92cad63922f5a67037078f3aec3ad4d23b2b5b5ea1446a9aa82bc39eac9",
       "bytes": 11138
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/preview/member/home.js": {
-      "sha256": "4f9f57ce7fb3c225c60cb3a8e13e3ddc77125d5223b45dafac9225e72f621818",
-      "bytes": 901516
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/preview/member/home.js": {
+      "sha256": "31f02e7c15fa240c6187d5f27907288a444ae9c16401f29c7f6c36a7f4ef9860",
+      "bytes": 900530
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/preview/member/login.js": {
-      "sha256": "7e99741fe3dc006b44f07ac91721edd010ea44ceea69adecbc513a391e9cd9fe",
-      "bytes": 907457
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/preview/member/login.js": {
+      "sha256": "a2d6c1cef5bca75653747d971d5d1eaba1f81fa8f9649a36b6959c9011d41f82",
+      "bytes": 907285
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/preview/member/productList.js": {
-      "sha256": "aebfb6c7b61281cc2a0a589099de837f915367c689697348f534e78978d09f6b",
-      "bytes": 1152876
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/preview/member/productList.js": {
+      "sha256": "dbe6dc08193a4747c1a84f981f3c365f95abb3c8ee9e915e61e5aad387882b5f",
+      "bytes": 1151789
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/preview/member/productdetail.js": {
-      "sha256": "d0ea583b939f2612ea295bf55ad9e75e7e5dbd3d304bb0c901267697358067e7",
-      "bytes": 1310674
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/preview/member/productdetail.js": {
+      "sha256": "42d1155a8b5c2ae446d163321d895b77b908160775800424a90adccd7cdd5f05",
+      "bytes": 1308580
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/preview/member/regist.js": {
-      "sha256": "c4268e90bf5f881442ba105d386ddbce62ab4bbd121ce1547ebef638dda75b99",
-      "bytes": 907415
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/preview/member/regist.js": {
+      "sha256": "cc00e4b796f73221a404a4fc2d9ca8b47cfc39c2e7abde034782ca2ec1d1e450",
+      "bytes": 907243
     },
-    "public/cra1-shared/releases/20261029-cra1-v17-3/v10-axios.js": {
-      "sha256": "4a0a9522101234394545ecb220691a373dc2ddeb5e4c6b314db9d785fc1b95d2",
-      "bytes": 7865
+    "public/cra1-shared/releases/20261030-cra1-history-retention-v1/v10-axios.js": {
+      "sha256": "f07b8b2acf6c5a234f6659df42a1d879a6661e9c66610cf136d140b4e748176c",
+      "bytes": 7634
     },
     "public/cra1-shared/runtime.php": {
       "sha256": "e8dcbf9245ab601d28bbe47c38c4f6fe0520d38c40c7533a75f5101426de00ee",
@@ -10839,143 +10863,147 @@
       "sha256": "7aed76249c82ae09e8028196fc8fa88623a26154e0b1a682ceaf9d646c3d5a8c",
       "bytes": 590171
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/admin.css": {
-      "sha256": "89152b4d84eeb84ab63994aeded21b444063c25fa9b8fac6c54e7cd3d5fe8b16",
-      "bytes": 61078
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/admin.css": {
+      "sha256": "212fc49f159c91751254fba229a60f9aa1230970d5cdefcb8fe5dcbcec10e12a",
+      "bytes": 61765
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/admin.js": {
-      "sha256": "115184526de4fdab64b7c38405dbe69007d35ae926686c1a9b638bf31844dc08",
-      "bytes": 802788
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/admin.js": {
+      "sha256": "3cf5ae8e19f76623d7c232840c2c94f0bfb6b06197523efa540b94c2f725e6fe",
+      "bytes": 803523
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/admin2.css": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/admin2.css": {
       "sha256": "035c68b8e70144ae2b4b59a31b48e271ab068c0a99f1cacb36a1173dd7568b04",
       "bytes": 4990
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/admin3.css": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/admin3.css": {
       "sha256": "244b168daf6d9e7555ca4c4974cb8cabecf7e5af987ea6bd89af06c3d05aff7b",
       "bytes": 4824
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/admin4.css": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/admin4.css": {
       "sha256": "0b75695ccbd30ad01d68b7078523843d49a3957991845a512855baea65e4d42d",
       "bytes": 3081
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/admin5.css": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/admin5.css": {
       "sha256": "93551bd80d5ea59d32cf8bc2748f767772b41a5645dea602eaad5aeff3458374",
       "bytes": 14840
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/admin6.css": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/admin6.css": {
       "sha256": "fd471a155f1641af824cfc87f62432a0c4ac805a389ef25b266eff4f87274bb1",
       "bytes": 3714
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/admin7.css": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/admin7.css": {
       "sha256": "5bb19da576c066ac24185c4866526c34c27ecc404a663be73dde592c391cec3f",
       "bytes": 2154
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/Announcements-uIWSl5_C.js": {
-      "sha256": "5f8bd9ff28d30c6241db87da928027258455e4a2da989bfb19151b01256661a2",
-      "bytes": 20720
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/Announcements-IycA9jFt.js": {
+      "sha256": "798a2bd61ac6802efe295cde4aab669f4c84ad739dda28131cade76720bffc7e",
+      "bytes": 20700
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/Attachments-BFrn9VIf.js": {
-      "sha256": "a8efeb08156eb02e9bba46be64994cbd674ea2743961e90e4455f7350b889308",
-      "bytes": 11555
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/Attachments-6y6-PDVK.js": {
+      "sha256": "0d9c288847812cfe0bddf7ebe1bdc77c5f576cd4ab503b956811e3e8ab3aaa80",
+      "bytes": 11398
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/CartContent-DeDPE4kM.js": {
-      "sha256": "c27bbceb3aaf5948bc2a9f0984da356ef6b5673d71b5b2277e417dd82710bbbc",
-      "bytes": 23877
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/CartContent-CXoIBYKm.js": {
+      "sha256": "05b905942fa1451951b4bbb59649c87daec245ebedaad7fccd2b35b044d22943",
+      "bytes": 23753
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/FloatingActions-ASLEGbV4.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/FloatingActions-ASLEGbV4.js": {
       "sha256": "22a29c564031a0254525ab65bb3d6d1add83b6326961a507e3c9d5b940462b3b",
       "bytes": 2348
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/IconPicker-iPpRy7Fr.js": {
-      "sha256": "65131cef032d85fa5b2ef3a4d4153f46b50aff9b37b3c61a078dee93b7078ce7",
-      "bytes": 22155
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/IconPicker-Bi_x4QJm.js": {
+      "sha256": "5fc74281747f528aa2a2e93304b8c72d20a3745b7a87187becff3fe5f75e3ef6",
+      "bytes": 22040
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/MediaPicker-BrAvLtgw.js": {
-      "sha256": "e9e97e9b085ef94d55618473e96766e76c27b573b29c1e5298167d938054bf80",
-      "bytes": 3506
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/MediaPicker-Cy_n8ahr.js": {
+      "sha256": "8f2d4437eb44668fb8339c33cf7aa0d486fbb219d69ef7b4ee81b54bb63a6f94",
+      "bytes": 3462
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/MemberAppearance-SPZVj4uz.js": {
-      "sha256": "56797c98e4f2b1c68bd3bd70bf8cd566f5c1f3feb59f8bc2197f650f85b8f563",
-      "bytes": 4279
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/MemberAppearance-CyHE1ZsN.js": {
+      "sha256": "0ef7766e5a23dbd024b019406c02e19282687d391210e9856591328953bf05f8",
+      "bytes": 4285
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/MemberAuth-DD-7i4l1.js": {
-      "sha256": "e136715cc3eb4a0a03752d2a549d2d1810fedf949f2f2edbb5eca649d018ab0d",
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/MemberAuth-BFYTHF13.js": {
+      "sha256": "c9dbec0094653dd0cfbc6a09ef818dcc69eee046eac58277d009db5b931fe6b1",
       "bytes": 8216
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/MemberContent-ClND6lVA.js": {
-      "sha256": "c502aed6eae97bcd9ce90ff2e292d695061336075b422ed45ae9cddbfc5111aa",
-      "bytes": 36945
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/MemberContent-BbTP5X60.js": {
+      "sha256": "1cb7f10822b830171600551127a5f98efafce96b4cf50c5a37922cb3bc26ee58",
+      "bytes": 36817
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/MemberSidebar--YYtmj7j.js": {
-      "sha256": "6a59bff81ae96b57fdf030a817141c38c4c9530a842af7b78ac527ccbfeb40d5",
-      "bytes": 23983
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/MemberSidebar-CkZaycd2.js": {
+      "sha256": "7b6d461e5345d110954015b7c5720c024a7c9cb90b1f9e2e4cf4dbbfbba759b4",
+      "bytes": 29506
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/RichText-CEeKcP7z.js": {
-      "sha256": "1a6c5f903c1ca92e0eaf4e45a5f60e4dae931c71faa0bc95960411c584d53a6f",
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/MenuTransfer-DMODGZKp.js": {
+      "sha256": "1bdc3417a62a335de4a358536a186555602b928390969cd67753262afbcfaf58",
+      "bytes": 9176
+    },
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/RichText-NuwxfZ-7.js": {
+      "sha256": "710d769bb8f7b326439917e8a46bf518fadd875e9bd83c508ef63277eedb21a5",
       "bytes": 7058
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/Security-DFZOKGWb.js": {
-      "sha256": "fab73c629274efaa02e49ea1762880301d3255f94fbf2cab9239df2b394847ea",
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/Security-DP9S6Yxx.js": {
+      "sha256": "5cb7abaca5e369d3c9990e8fcc4686de5f024f4c3a54b5de4add92c7aac1edc4",
       "bytes": 27052
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/Switch-XXrm42Ig.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/Switch-XXrm42Ig.js": {
       "sha256": "8e39716ee1e5a9541009d04673aad4e7c0851b918b9d7ab770bf562c936a74a3",
       "bytes": 1054
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/ThemeManagement-CMH33hwd.js": {
-      "sha256": "9b5347091f0a213ffc398116652d8f77390bc96165045b78abe4e83987df41f2",
-      "bytes": 11194
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/ThemeManagement-E9RktDBB.js": {
+      "sha256": "37439cdcb4dce29777a37d7df276a41b0126987a4a3bc88bbb1d8fc37238a6dd",
+      "bytes": 22971
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/VisualWebsite-BSxFpXsr.js": {
-      "sha256": "55cc7cfa571d4c268569762b4bb0e5c217112a2b0ce682ef7a1b3e95f9b64d9d",
-      "bytes": 60399
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/VisualWebsite-C9AOLvRx.js": {
+      "sha256": "68a5b802888cd0aa7f4687e5ef99efe10c678d4b2e0f738cf28d837e7ca315b8",
+      "bytes": 60335
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/arrow-up-CIaiC9p0.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/arrow-up-CIaiC9p0.js": {
       "sha256": "af044875a98f400b54cfb23d7c67bc5265ac0a80fa1506caa8ebd89058087311",
       "bytes": 272
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/copy-CEHYMEpa.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/copy-CEHYMEpa.js": {
       "sha256": "6ecbf0f29a6491e8ca5287c34040a1e75ac18f497d571c83978e53a1b59cfd61",
       "bytes": 224
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/download-BUPAhhBN.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/download-BUPAhhBN.js": {
       "sha256": "d4d069c2dea1e1f381dd463495ee71aa4e991fd73857c400b4b6e382e6952429",
       "bytes": 225
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/dragSort-CfsaOghE.js": {
-      "sha256": "32861e274cadac8aa1a611f6b74679522ab99a5f75ef23deb37965b7d6285ce7",
-      "bytes": 11065
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/dragSort-DQwDhk5A.js": {
+      "sha256": "76dc443fd95f552e31e910889fccb7e6983d802a5e7ef748b12312b6cd3ba5a0",
+      "bytes": 10967
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/plus-CmeVDO6e.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/plus-CmeVDO6e.js": {
       "sha256": "110f821695819db9f5142a0415df10744c005800970139ca251f3f8238e5f8e1",
       "bytes": 146
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/power-BJKKdnNy.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/power-BJKKdnNy.js": {
       "sha256": "d1286a54c63a9bfa4da460d360f2a4cf6235677154ce2f284808af6a4b9cce76",
       "bytes": 166
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/qrcode-5IewWFXk.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/qrcode-5IewWFXk.js": {
       "sha256": "2970b32cca017d3a139d8d57ce77710f95c68a448624447be30ef9ffe2664099",
       "bytes": 21140
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/select-OVm8DBrc.js": {
-      "sha256": "da12fbe853c97ef3118b4086258c95ba6b940b1500cd1a3f8716a0265b55861e",
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/select-DmOHX1Rd.js": {
+      "sha256": "de5ae256be167bee882b9a8a02f0ade63fa03b5425c13c75753440987e3780e2",
       "bytes": 55377
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/trash-2-YuKx9CWf.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/trash-2-YuKx9CWf.js": {
       "sha256": "8121dfea5f75138debb7ae6c4e8f2b8f8cbc61f06e8122bf37f5f4459d7df1e5",
       "bytes": 549
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/treeSort-DtLmJHU3.js": {
-      "sha256": "6cf6653e0ecee41e246d4e5f9823e1fbab4b51d2240985aaf2e169a40d7ff627",
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/treeSort-jU8SrGbk.js": {
+      "sha256": "a74af63860875388338869555d41595a37b58cb9bcb5b9e8cc22f5edffbd43c6",
       "bytes": 9300
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/undo-2-C-G8STX7.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/undo-2-C-G8STX7.js": {
       "sha256": "7622ff554867367aa6f240fa9f5ec2ef7a26e5f6c6ddd9e76d904f2c5854e1a3",
       "bytes": 201
     },
-    "public/cra1admin/assets/releases/20261029-cra1-v17-3/chunks/upload-tdFTTbq8.js": {
+    "public/cra1admin/assets/releases/20261030-cra1-history-retention-v1/chunks/upload-tdFTTbq8.js": {
       "sha256": "90ea4d8c39dbd22544ac9b774937252b63d3282aa891a8f7c4a59df304d45adf",
       "bytes": 223
     },
@@ -10992,8 +11020,8 @@
       "bytes": 303
     },
     "public/cra1admin/index.php": {
-      "sha256": "1637867e5d1222dff37f0a36372b93846d4d1b66e2e9739242d70645f3199cda",
-      "bytes": 142660
+      "sha256": "b389fc533665d130e7bf00cb627d5a0e1d0a85ff0b134ac9532daad82b68a89f",
+      "bytes": 146690
     },
     "public/cra1admin/login.js": {
       "sha256": "dcec47b70175780787360b53092d73ffeb7206d7ed94e839a37d84def208f952",
@@ -11026,14 +11054,6 @@
     "public/cra1admin/workspace_store.php": {
       "sha256": "d6bab8a998291b86306ccfb1b2cce2ec2b6506257abf8d651ed1c3bb48072be0",
       "bytes": 469
-    },
-    "public/home/template/pc/cra1/home.php": {
-      "sha256": "6507debd4ee0a4db162b7683653c26fcd69c4e04eaf6443b0a9a76bea8e95b25",
-      "bytes": 3964
-    },
-    "public/home/template/pc/cra1/theme.jpg": {
-      "sha256": "6a2712615061635af2bb9ffa0f0438326dacadb8e68611e086807d351c6503e2",
-      "bytes": 55203
     },
     "public/web/cra1/404.html": {
       "sha256": "7eb7984e0f3f2ef8e98eaa8cf49f2328d89c8470c51e20dc276c06a732dcebf8",
@@ -14839,35 +14859,35 @@
       "sha256": "0586f9c94ae8ed0c8b9563c5b0c68151aa570e1ea116bd4c1a5c4f7f98163f64",
       "bytes": 1630
     },
-    "public/web/cra1/releases/20261029-cra1-v17-3/20261011-business-icons-v1/manifest.json": {
+    "public/web/cra1/releases/20261030-cra1-history-retention-v1/20261011-business-icons-v1/manifest.json": {
       "sha256": "b997404db7d2b23a71a9a8703e5dc96f776bf732a6205a4138ffa325e422bc1f",
       "bytes": 197
     },
-    "public/web/cra1/releases/20261029-cra1-v17-3/20261011-business-icons-v1/marketing.css": {
+    "public/web/cra1/releases/20261030-cra1-history-retention-v1/20261011-business-icons-v1/marketing.css": {
       "sha256": "db71026e0b87123b2a9d111022ec21a12c65ff0efa1ce38abff98acac2711bd7",
       "bytes": 20633
     },
-    "public/web/cra1/releases/20261029-cra1-v17-3/20261014-theme-fixes-v1/app.css": {
+    "public/web/cra1/releases/20261030-cra1-history-retention-v1/20261014-theme-fixes-v1/app.css": {
       "sha256": "e3b8cf2afd3b8521a1b6a83f7f083910dc6aeaab0321bc68ed2e4888d437d85b",
       "bytes": 282250
     },
-    "public/web/cra1/releases/20261029-cra1-v17-3/20261014-theme-fixes-v1/app.js": {
+    "public/web/cra1/releases/20261030-cra1-history-retention-v1/20261014-theme-fixes-v1/app.js": {
       "sha256": "583169724f618edf6bc1d9a743f30791f325490d806e8e7472d743e60bd95374",
       "bytes": 97718
     },
-    "public/web/cra1/releases/20261029-cra1-v17-3/20261014-theme-fixes-v1/manifest.json": {
+    "public/web/cra1/releases/20261030-cra1-history-retention-v1/20261014-theme-fixes-v1/manifest.json": {
       "sha256": "b363a325b07d3386fa5f9456268e250f31a22988f3ae69deb77fc39b303c78a6",
       "bytes": 318
     },
-    "public/web/cra1/releases/20261029-cra1-v17-3/20261017-compat-v3/app.js": {
+    "public/web/cra1/releases/20261030-cra1-history-retention-v1/20261017-compat-v3/app.js": {
       "sha256": "6cd8a79ee8d33756d4761d31fa607ca67c38f282efb261fab0fc7722da677f93",
       "bytes": 99087
     },
-    "public/web/cra1/releases/20261029-cra1-v17-3/app.css": {
+    "public/web/cra1/releases/20261030-cra1-history-retention-v1/app.css": {
       "sha256": "ec494ecbba16d3abac4be8e9d4bca1843821cbdc99c5feab22bb195bfd2a63fb",
       "bytes": 190748
     },
-    "public/web/cra1/releases/20261029-cra1-v17-3/app.js": {
+    "public/web/cra1/releases/20261030-cra1-history-retention-v1/app.js": {
       "sha256": "6cd8a79ee8d33756d4761d31fa607ca67c38f282efb261fab0fc7722da677f93",
       "bytes": 99087
     },
@@ -14976,8 +14996,8 @@
       "bytes": 1299
     },
     "public/web/cra1/sections/announce-details/core_article.html": {
-      "sha256": "c19db467516b4035567b49e8d3ce8d9a2c36e803cdb1029689429371dd820d19",
-      "bytes": 4638
+      "sha256": "0675a42c7f91a1c7322c51a4f3ddeb7e36affbb20a6d7f3605d4d2f3376df36e",
+      "bytes": 4484
     },
     "public/web/cra1/sections/announce-details/detail_rel.html": {
       "sha256": "0be5c92b0c105da12486be659d25dc50b001d4ed75f13a70bb097f505bfee803",
@@ -14988,8 +15008,8 @@
       "bytes": 997
     },
     "public/web/cra1/sections/announce/core_listing.html": {
-      "sha256": "87f030c40b3c01402b3d95b5dc7d57197d410e2a4bac835aebe2763a7f7b268f",
-      "bytes": 3997
+      "sha256": "07d27f3c7dcd6bf43e9bdb70f1d005a25598eabdc8704665113f9eba451f8415",
+      "bytes": 3844
     },
     "public/web/cra1/sections/announce/listing_foot.html": {
       "sha256": "7f1648a1bd39fb5a9f2c7ac2edcdca8e86affdd8dfd2a4125250c772c32e6277",
@@ -15060,8 +15080,8 @@
       "bytes": 2700
     },
     "public/web/cra1/sections/document-details/core_article.html": {
-      "sha256": "12617f6764bb6a348705ee0f7b73ad107ed7ecd94b6a1796d8d97552ecea0064",
-      "bytes": 2867
+      "sha256": "34e5a0cd2ba6ce60f6a5a4cb33e49becd4b4e728b7c0c861685a6660ca863ea8",
+      "bytes": 2713
     },
     "public/web/cra1/sections/document-details/detail_rel.html": {
       "sha256": "0be5c92b0c105da12486be659d25dc50b001d4ed75f13a70bb097f505bfee803",
@@ -15084,8 +15104,8 @@
       "bytes": 997
     },
     "public/web/cra1/sections/document-view/core_article.html": {
-      "sha256": "12617f6764bb6a348705ee0f7b73ad107ed7ecd94b6a1796d8d97552ecea0064",
-      "bytes": 2867
+      "sha256": "34e5a0cd2ba6ce60f6a5a4cb33e49becd4b4e728b7c0c861685a6660ca863ea8",
+      "bytes": 2713
     },
     "public/web/cra1/sections/document-view/detail_rel.html": {
       "sha256": "0be5c92b0c105da12486be659d25dc50b001d4ed75f13a70bb097f505bfee803",
@@ -15220,16 +15240,16 @@
       "bytes": 9339
     },
     "public/web/cra1/sections/home/news.html": {
-      "sha256": "b5cd3af2dac72bda943262ca9d24111da6bfe0c7c60a32273684c1a14d44d617",
-      "bytes": 6344
+      "sha256": "568922540c509c3094643f954c4141711722efb2e1d0cb2e9994a0410711ffae",
+      "bytes": 6177
     },
     "public/web/cra1/sections/home/nodes.html": {
       "sha256": "708170b2af9a76058f5ae0bd74ea7e9966cd77039f81a5353e963a15a97b157e",
       "bytes": 11399
     },
     "public/web/cra1/sections/home/pricing.html": {
-      "sha256": "bcb214e787b07ec27d938a21fd6df24313389de4104707b9abb8e8225140a941",
-      "bytes": 7337
+      "sha256": "51d879efc8fc4961d4ba2518ebed60cc7f303412d1b36647542dc65dfbf76450",
+      "bytes": 7239
     },
     "public/web/cra1/sections/home/solutions.html": {
       "sha256": "a92530e04476c2582ad692a421e68ffbc70fad0c684b3fdb543668aab87f7ac8",
@@ -15288,8 +15308,8 @@
       "bytes": 2733
     },
     "public/web/cra1/sections/news-classify/core_listing.html": {
-      "sha256": "1c2a97ffbe7479445f42cfa6b94e13756b760eac5bb46e9b4295acd0735c8283",
-      "bytes": 4338
+      "sha256": "de57280f4168fcb70504704235462cd776f74cf7ddab003976f421ebbad574b2",
+      "bytes": 4185
     },
     "public/web/cra1/sections/news-classify/news_classify_nav.html": {
       "sha256": "c9c675414badb1969bb5a1e6f7a9c539650e8a9439d960dcaf04f5064a596568",
@@ -15300,8 +15320,8 @@
       "bytes": 997
     },
     "public/web/cra1/sections/news-details/core_article.html": {
-      "sha256": "6386b612be8d6ab12de3c3c75c3af6eb301c1b000e45a2fbef6b643e8204324f",
-      "bytes": 4485
+      "sha256": "b7bb5da430d61a5cc9331d4940d5f858cbd75db1958fd7b41e7bbb0cb74a0f33",
+      "bytes": 4331
     },
     "public/web/cra1/sections/news-details/detail_rel.html": {
       "sha256": "0be5c92b0c105da12486be659d25dc50b001d4ed75f13a70bb097f505bfee803",
@@ -15312,8 +15332,8 @@
       "bytes": 997
     },
     "public/web/cra1/sections/news/core_listing.html": {
-      "sha256": "66ad44f0a5c11b058ac3072cc44a6ee7b9cca593188abf05eda87ee8adb803fc",
-      "bytes": 4040
+      "sha256": "66f31e1dbf116487cbac4a54c437e5aa470908a87f63ad82c45183f155536e2d",
+      "bytes": 3887
     },
     "public/web/cra1/sections/news/listing_foot.html": {
       "sha256": "d7c35c373781dd5b1dfc50855a1a9057e08dcdd3ae4e9883f7013c71a252d244",

@@ -469,15 +469,7 @@
       global.addEventListener('cra1:recent-visits-clear', this.clearRecentItems)
       // 默认展开/收起：用户本机手动切换过（localStorage 有记录）以本机为准；
       // 无记录时读后台「外观设置 → 侧边栏默认展开」（此前恒 false，该开关是幽灵字段）
-      try {
-        const saved = localStorage.getItem('cra1_aside_collapsed')
-        if (saved === '0' || saved === '1') {
-          this.collapsed = saved === '1'
-        } else {
-          const ap0 = (window.__CRA1_MEMBER_SNAPSHOT__ || {}).appearance || {}
-          this.collapsed = Number(ap0.sidebar_default_open) !== 1
-        }
-      } catch (e) {}
+      this.applyAsideDefault(global.__CRA1_MEMBER_SNAPSHOT__)
       // 收藏功能已下线：清掉遗留的本地数据，避免误导
       try { localStorage.removeItem('cra1_user_favorites') } catch (e) {}
       // v20：手机端二级菜单折叠档位（后台 appearance.aside_mobile_expand）
@@ -513,6 +505,20 @@
       },
     },
     methods: {
+      applyAsideDefault(snapshot) {
+        if (this._cra1AsideDefaultApplied) return
+        try {
+          const saved = localStorage.getItem('cra1_aside_collapsed')
+          if (saved === '0' || saved === '1') {
+            this.collapsed = saved === '1'
+            this._cra1AsideDefaultApplied = true
+            return
+          }
+        } catch (e) {}
+        if (!snapshot || !snapshot.appearance) return
+        this.collapsed = Number(snapshot.appearance.sidebar_default_open) !== 1
+        this._cra1AsideDefaultApplied = true
+      },
       publishNavState() {
         global.__CRA1_NAV_OPEN__ = this.navOpen === true
         global.dispatchEvent(new CustomEvent('cra1:aside-state', { detail: { open: this.navOpen === true } }))
@@ -1129,6 +1135,7 @@
         return global.__cra1FeatureFlags().then(function (feat) {
           menu = self.stripGatedEntries(menu, feat || {})
           self.snapshotAppearance = snap.appearance || {}
+          self.applyAsideDefault(snap)
           // 首页最近访问展示策略；open_first 保留旧存储兼容，已不影响侧栏。
           if (snap.recent && typeof snap.recent === 'object') {
             self.recentCfg = {

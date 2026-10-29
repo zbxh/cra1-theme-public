@@ -16,7 +16,7 @@ with tempfile.TemporaryDirectory(prefix='cra1-release-http-') as tmp:
  (root/'config.php').write_text('<?php // Isolated fixture: no system database connection.\n')
  (public/'cra1admin').rename(public/'testadmin')
  sock=socket.socket();sock.bind(('127.0.0.1',0));port=sock.getsockname()[1];sock.close();origin='http://127.0.0.1:'+str(port);base=origin+'/testadmin/index.php'
- php_code='require $argv[1]."/lib/cra1_theme_security.php"; CRA1ThemeSecurity::install($argv[1],"fixture-root",CRA1ThemeSecurity::password("Fixture-release-only-2026!"),["canonical_url"=>$argv[2],"http_test"=>true,"force_https"=>false]);$s=new CRA1ThemeSecurity($argv[1]);foreach(["fixture-manager"=>"admin","fixture-worker"=>"operator"]as$n=>$r)$s->createAccount($s->account(1),["username"=>$n,"password"=>"Fixture-release-only-2026!","role"=>$r]);$s->db->exec("UPDATE accounts SET must_change=0");'
+ php_code='require $argv[1]."/cra1-theme/backend/bootstrap.php";require CRA1_THEME_BACKEND."/Support/cra1_theme_security.php"; CRA1ThemeSecurity::install($argv[1],"fixture-root",CRA1ThemeSecurity::password("Fixture-release-only-2026!"),["canonical_url"=>$argv[2],"http_test"=>true,"force_https"=>false]);$s=new CRA1ThemeSecurity($argv[1]);foreach(["fixture-manager"=>"admin","fixture-worker"=>"operator"]as$n=>$r)$s->createAccount($s->account(1),["username"=>$n,"password"=>"Fixture-release-only-2026!","role"=>$r]);$s->db->exec("UPDATE accounts SET must_change=0");'
  subprocess.run([args.php,'-r',php_code,str(root),origin],check=True,capture_output=True)
  runtime=root/'runtime/cra1_theme';(runtime/'entry.json').write_text('{"entry":"testadmin"}')
  for file in ['config.json','member_center.json','cart_theme.json']:(runtime/file).write_text('{}')
@@ -63,12 +63,18 @@ echo json_encode(['new_admin'=>isset($_SESSION['cra1_admin']),'new_csrf'=>isset(
   check(api(opener(),'invalid','release.history')['status']==401,'anonymous release history denied')
   check(api(s,'invalid','release.history')['status']==403,'release API requires CSRF')
   reply=api(manager,mcsrf,'release.check');check(reply['status']==200 and reply['data']['read_only'],'manager compatibility check is read-only')
+  check(api(opener(),'invalid','release.diagnostics')['status']==401,'anonymous diagnostics denied')
+  check(api(s,'invalid','release.diagnostics')['status']==403,'diagnostics require CSRF')
+  check(api(worker,wcsrf,'release.diagnostics')['status']==403,'operator diagnostics denied')
+  safe=api(manager,mcsrf,'release.diagnostics')
+  check(safe['status']==200 and safe['data']['report']['schema']==1,'manager can copy allowlisted diagnostics')
+  check(str(root) not in json.dumps(safe) and origin not in json.dumps(safe) and 'fixture-root' not in json.dumps(safe),'diagnostics omit paths, origins and accounts')
   baseline={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in runtime.glob('*.json')}
-  api(s,csrf,'release.check');check(baseline=={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in runtime.glob('*.json')},'compatibility check does not change config, snapshots or JSON records')
+  api(s,csrf,'release.check');api(manager,mcsrf,'release.diagnostics');check(baseline=={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in runtime.glob('*.json')},'compatibility check does not change config, snapshots or JSON records')
   check(api(worker,wcsrf,'release.history')['status']==403,'operator cannot read distribution details')
   for action in ['upload','apply','rollback','recover','license.save']:
    check(api(manager,mcsrf,'release.'+action)['status']==403,'non-superadmin denied '+action)
-  check(api(s,csrf,'release.apply',{'candidate':'0'*32})['code']=='REAUTH_REQUIRED','superadmin applying update requires scoped reauthentication')
+  check(api(s,csrf,'release.apply',{'candidate':'0'*32})['status']!=200 and api(s,csrf,'release.apply',{'candidate':'0'*32}).get('code')!='REAUTH_REQUIRED','update validates candidate without a repeated password prompt')
   # Keep a real prepared recovery journal, and partially changed theme file.
   dist=runtime/'distribution';backup=dist/'history'/'fixture-interrupted';path='public/web/cra1/fixture-state.txt';before='before interruption';after='half applied'
   saved=backup/'files'/path;saved.parent.mkdir(parents=True,exist_ok=True);saved.write_text(before)
@@ -80,12 +86,10 @@ echo json_encode(['new_admin'=>isset($_SESSION['cra1_admin']),'new_csrf'=>isset(
   check(request(opener(),origin+'/cra1-shared/snapshot.php?domain=member')[0]==503,'snapshot paused during update')
   fresh,fcsrf=login('fixture-root');check(api(fresh,fcsrf,'release.history')['data']['interrupted'],'admin can login and inspect an interrupted update')
   check(api(fresh,fcsrf,'workspace.editor.save',{})['code']=='THEME_UPDATE_PENDING','ordinary writes denied while update is pending')
-  challenge=api(fresh,fcsrf,'auth.reauth',{'password':'Fixture-release-only-2026!','action':'release.recover','target':'website:all'})
-  check(challenge['status']==200,'recovery reauthentication available while pending')
-  cap=challenge['data']['credential'];reply=api(fresh,fcsrf,'release.recover',{'_reauth':cap})
-  check(reply['status']==200 and reply['data']['restored'] and target.read_text()==before,'authenticated HTTP recovery restores partial file')
+  check(api(fresh,fcsrf,'release.diagnostics')['status']==200,'safe diagnostics remain available during interrupted updates')
+  reply=api(fresh,fcsrf,'release.recover')
+  check(reply['status']==200 and reply['data']['restored'] and target.read_text()==before,'authenticated HTTP recovery restores partial file without repeated password')
   check(not (dist/'pending.json').exists(),'HTTP recovery clears marker after restoration')
-  check(api(fresh,fcsrf,'release.recover',{'_reauth':cap})['code']=='REAUTH_REQUIRED','recovery proof cannot be replayed')
   check(request(opener(),origin+'/fixture-page.php')[0]==200,'frontend resources available after recovery')
   # Never persist a real system token or customer record in this fixture.
   result={'status':'passed','checks':len(checks),'results':checks,'production_writes':0,'fixture':'packaged backend, fresh SQLite accounts; no V10 DB'}

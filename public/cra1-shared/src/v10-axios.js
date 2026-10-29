@@ -49,18 +49,15 @@
     panel.setAttribute('role', 'alert');
     panel.style.cssText = 'padding:24px;display:grid;gap:16px';
     const title = document.createElement('h2');
-    title.textContent = '暂时无法读取工单';
+    title.textContent = '页面错误，请刷新重试';
     const detail = document.createElement('p');
-    detail.textContent = error.message;
+    detail.textContent = '';
     const actions = document.createElement('div');
     actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px';
-    const retry = document.createElement('button');
-    retry.type = 'button'; retry.className = 'cui-button cui-button--primary';
-    retry.textContent = '重新加载'; retry.onclick = () => window.location.reload();
     const back = document.createElement('a');
     back.className = 'cui-button cui-button--outline'; back.href = 'ticket.htm';
     back.textContent = '返回工单列表';
-    actions.append(retry, back); panel.append(title, detail, actions);
+    actions.append(back); panel.append(title, detail, actions);
     card.replaceChildren(panel);
     return true;
   }

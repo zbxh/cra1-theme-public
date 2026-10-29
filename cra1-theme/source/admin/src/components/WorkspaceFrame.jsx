@@ -38,7 +38,7 @@ export default function WorkspaceFrame({ domain, scopeId, editorId, title, saveD
   const [conflictOpen, setConflictOpen] = useState(false)
   useEffect(() => { if (w.remote) setConflictOpen(true) }, [w.remote])
   if (w.loading) return <div className="space-y-3 p-6" role="status"><div className="h-8 w-48 animate-pulse rounded bg-surface-alt" /><div className="h-48 animate-pulse rounded bg-surface-alt" />正在读取配置…</div>
-  if (w.error || !w.data) return <Alert tone="error"><p>{w.error || '配置加载失败'}</p><Button className="mt-3" variant="outline" onClick={() => w.reload().catch(() => {})}>重试读取</Button></Alert>
+  if (w.error || !w.data) return <Alert tone="error"><p>页面错误，请刷新重试</p></Alert>
   return <section className="workspace-frame">
     <div className="workspace-savebar"><div className="min-w-0"><p className="truncate text-sm font-medium">{title || w.data.scope.label}</p><p className="text-xs text-muted-foreground">{w.dirty ? '有未保存修改' : '已保存'} · {saveDescription||(editorId?'保存本配置页的全部修改':'只保存此处修改')}</p></div>
       <div className="flex flex-wrap gap-2">{editorId&&<DraftPreview workspace={w} editorId={editorId}/>}<Button variant="outline" disabled={w.saving || !w.dirty} onClick={w.revert}><RotateCcw className="size-4" />撤销当前页修改</Button><Button disabled={w.saving || !w.dirty || !!w.remote} onClick={w.save}><Save className="size-4" />{w.saving ? '保存中…' : `保存${title || w.data.scope.label}`}</Button></div>

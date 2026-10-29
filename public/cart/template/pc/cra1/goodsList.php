@@ -89,12 +89,11 @@
             </div>
             <div class="main-title" v-else>{{ pageTitle || lang.new_goods }}</div>
             <div class="main-subtitle" v-if="pageSubtitle">{{ pageSubtitle }}</div>
-            <div class="main-content-box" :class="{'has-rail': isNormal && first_group_list.length}">
+            <div class="main-content-box" :class="{'has-rail': isNormal && first_group_list.length && railState === 'bridged'}">
               <div class="cl-shop">
                 <div class="cl-shop-main">
                   <div v-if="catalogError" class="cui-alert cui-alert--error cra1-cart-read-error" role="alert">
-                    <span>{{ catalogError }}</span>
-                    <button type="button" class="cui-button cui-button--secondary" @click="retryCatalog">重新加载</button>
+                    <span>页面错误，请刷新重试</span>
                   </div>
                   <!-- 顶部横排导航：搜索 + 一级/二级（层级标题读 v10 first/second_navigation，v6 统一蓝条标题样式） -->
                   <div class="cl-shop-nav" v-if="isNormal && first_group_list.length" role="tablist" :aria-label="navFirstLabel || '商品分组导航'">
@@ -251,8 +250,7 @@
                         <div class="cl-skel-buttons"><span class="cl-skel-btn" v-for="n in 5" :key="'cs'+n"></span></div>
                       </div>
                       <div class="cl-config-error" v-else-if="configState === 'error'">
-                        <el-empty :description="configErrorText || '配置加载失败'">
-                          <el-button type="primary" @click="reloadConfig">重试</el-button>
+                        <el-empty description="页面错误，请刷新重试">
                           <el-button @click="openStandalone">在独立页打开</el-button>
                         </el-empty>
                       </div>
@@ -269,7 +267,7 @@
                 </div>
               </div>
             </div>
-<aside class="cl-rail" v-if="isNormal && first_group_list.length && !isMobileCart" aria-label="价格计算器">
+<aside class="cl-rail" v-if="isNormal && first_group_list.length && !isMobileCart && railState === 'bridged'" aria-label="价格计算器">
                 <div class="cl-rail-card">
                   <div class="cl-sec-tit">
                     <cra1-cart-heading-icon label="配置费用" icon-id="price"></cra1-cart-heading-icon>
@@ -331,7 +329,6 @@
                   </template>
                   <div class="cl-rail-empty" v-else-if="selectedProduct && railState === 'fallback'">
                     <p>{{railFallbackText || '请在左侧配置商品参数，价格将在此实时计算。'}}</p>
-                    <el-button size="small" type="primary" plain @click="railRetryBridge">{{lang.rerun || '重试'}}</el-button>
                   </div>
                   <div class="cl-rail-empty" v-else>
                     <p>{{ selectedProduct ? (lang.goods_loading || '加载中…') : (lang.goodsList_select_first || '请先在上方选择商品型号，价格将在此实时计算。') }}</p>

@@ -223,11 +223,84 @@
     })
   }
 
+  // Config fragments arrive after the document's load event. Replay only hooks
+  // registered by the fragment's own scripts; dispatching a global load event
+  // would mount the surrounding V10 page a second time.
+  function lateLifecycle(signal) {
+    var watched=new Set(), listeners=[], restorers=[], propertyHandler=null, replaying=false
+    if(document.readyState!=='complete')return {watch:function(){},unwatch:function(){},replay:function(){},restore:function(){}}
+    function owned(){return replaying||watched.has(document.currentScript)}
+    ;[window,document].forEach(function(target){
+      var add=target.addEventListener,remove=target.removeEventListener
+      function capture(options){return typeof options==='boolean'?options:!!(options&&options.capture)}
+      target.addEventListener=function(type,listener,options){
+        if(owned()&&(type==='load'&&target===window||type==='DOMContentLoaded'&&target===document)&&listener){
+          if(!listeners.some(function(row){return !row.removed&&row.target===target&&row.type===type&&row.listener===listener&&row.capture===capture(options)}))
+            listeners.push({target:target,type:type,listener:listener,capture:capture(options),signal:options&&options.signal})
+          return
+        }
+        return add.apply(this,arguments)
+      }
+      target.removeEventListener=function(type,listener,options){
+        listeners.forEach(function(row){if(row.target===target&&row.type===type&&row.listener===listener&&row.capture===capture(options))row.removed=true})
+        return remove.apply(this,arguments)
+      }
+      restorers.push(function(){target.addEventListener=add;target.removeEventListener=remove})
+    })
+    var descriptor=Object.getOwnPropertyDescriptor(window,'onload'),owner=window,accessor=descriptor
+    while(!accessor&&owner){owner=Object.getPrototypeOf(owner);if(owner)accessor=Object.getOwnPropertyDescriptor(owner,'onload')}
+    if(accessor&&accessor.get&&accessor.set&&(!descriptor||descriptor.configurable)){
+      Object.defineProperty(window,'onload',{configurable:true,enumerable:accessor.enumerable,
+        get:function(){return owned()?propertyHandler:accessor.get.call(window)},
+        set:function(value){if(owned())propertyHandler=typeof value==='function'?value:null;else accessor.set.call(window,value)}})
+      restorers.push(function(){if(descriptor)Object.defineProperty(window,'onload',descriptor);else delete window.onload})
+    }
+    function invoke(target,type,listener){
+      if(signal&&signal.aborted)throw aborted()
+      var event=new Event(type)
+      Object.defineProperties(event,{target:{value:target},currentTarget:{value:target}})
+      if(typeof listener==='function')listener.call(target,event)
+      else if(listener&&typeof listener.handleEvent==='function')listener.handleEvent(event)
+    }
+    return {
+      watch:function(node){watched.add(node)},unwatch:function(node){watched.delete(node)},
+      replay:function(){
+        replaying=true
+        try{
+          ;['DOMContentLoaded','load'].forEach(function(type){
+            for(var i=0;i<listeners.length;i++){
+              if(i>1000)throw new Error('模块初始化未完成，请重试')
+              var row=listeners[i]
+              if(row.type===type&&!row.removed&&!(row.signal&&row.signal.aborted)){row.removed=true;invoke(row.target,type,row.listener)}
+            }
+            if(type==='load'&&propertyHandler)invoke(window,'load',propertyHandler)
+          })
+        }finally{replaying=false}
+      },
+      restore:function(){restorers.reverse().forEach(function(restore){restore()});watched.clear()}
+    }
+  }
+
+  // A fragment owns its temporary lifecycle bridge until all of its scripts
+  // finish. Serialize fragments in this document; different module iframes
+  // keep their independent queues. An aborted selection never starts its turn.
+  var mountQueue=Promise.resolve()
+  function mountScripts(host,options) {
+    var task=mountQueue.then(function(){
+      if(options&&options.signal&&options.signal.aborted)throw aborted()
+      if(!host.isConnected)return
+      return mountFragment(host,options)
+    })
+    mountQueue=task.catch(function(){})
+    return task
+  }
+
   /** Execute native declarations once; page boot scripts still execute per mount. */
-  async function mountScripts(host, options) {
+  async function mountFragment(host, options) {
     options = options || {}
     var signal=options.signal, enabled=options.enabled || function(){return true}
-    var scripts=Array.from(host.querySelectorAll('script'))
+    var scripts=Array.from(host.querySelectorAll('script')),lifecycle=lateLifecycle(signal)
+    try {
     // Vue must not compile inert script nodes. Keep their order outside its root.
     scripts.forEach(function(node){node.remove()})
     var declared=scripts.filter(function(node){return component(node.getAttribute('src'))})
@@ -260,6 +333,8 @@
       if(deps.length)await observe(ensure(deps),signal)
       await execute(node,!!source && !!options.once && options.once(source))
     }
+    lifecycle.replay()
+    } finally { lifecycle.restore() }
     async function execute(old, once) {
       var src=old.getAttribute('src')||'',type=(old.type||'').toLowerCase()
       if(type&&!['text/javascript','application/javascript','module'].includes(type)){
@@ -288,6 +363,7 @@
           else next.text=text
           function finish(error){
             clearTimeout(timer);window.removeEventListener('error',failed);if(signal)signal.removeEventListener('abort',cancel)
+            lifecycle.unwatch(next)
             next.onload=next.onerror=null;next.remove()
             ;(error||executionError)?reject(error||executionError):resolve()
           }
@@ -301,6 +377,7 @@
           if(signal)signal.addEventListener('abort',cancel,{once:true})
           timer=setTimeout(function(){finish(new Error('模块资源加载超时，请重试'))},15000)
           window.addEventListener('error',failed)
+          lifecycle.watch(next)
           document.head.appendChild(next)
           if((!url||options.fetchScripts)&&type!=='module')finish()
         })

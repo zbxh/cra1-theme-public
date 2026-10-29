@@ -445,6 +445,13 @@ final class MemberCenterStore
      * 递归投影侧栏树为前台快照。
      * 只保留渲染必需字段；URL 为相对路径（前台自行拼 /）。
      */
+    /** Administrator previews use the exact live visibility and capability projection. */
+    public function sidebarPreview(array $nodes,?array $capabilities=null): array
+    {
+        $data=CRA1ThemePublicProjection::member(['sidebar'=>$this->publicTree($nodes)],$capabilities??CRA1ThemePublicProjection::capabilities($this->pdo()));
+        return $data['sidebar'];
+    }
+
     private function publicTree(array $nodes, int $depth = 1): array
     {
         $out = [];

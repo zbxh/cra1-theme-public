@@ -9,9 +9,9 @@
   var payload={items:[]},received=0,selected=new URL(root.location.href).searchParams.get('notice')||'',query='',loadState='loading',timer=null,expiry=null,flight=null,generation=0,destroyed=false,session=shared.NotificationSession;
   var toolbar=node('div','cra1-notification-center__toolbar'),search=node('input','cra1-notification-center__search'),total=node('span','cra1-notification-center__total');
   search.type='search';search.placeholder='搜索通知标题或内容';search.setAttribute('aria-label','搜索通知');total.setAttribute('role','status');toolbar.append(search,total);
-  var layout=node('div','cra1-notification-center__layout'),list=node('nav','cra1-notification-center__list'),detail=node('section','cra1-notification-center__detail'),message=node('p','cra1-notification-center__message'),retry=node('button','cra1-notice-reader__all','重新加载');
+  var layout=node('div','cra1-notification-center__layout'),list=node('nav','cra1-notification-center__list'),detail=node('section','cra1-notification-center__detail'),message=node('p','cra1-notification-center__message');
   var hint=node('p','cra1-notification-center__message'),login=node('a','cra1-notice-reader__all','登录后查看更多通知');login.href='/login.htm';login.onclick=function(){try{root.sessionStorage.setItem('redirectUrl',root.location.href);}catch(error){}};hint.append(login);hint.hidden=true;
-  list.setAttribute('aria-label','所有通知');retry.type='button';retry.hidden=true;layout.append(list,detail);host.replaceChildren(toolbar,message,retry,layout,hint);
+  list.setAttribute('aria-label','所有通知');layout.append(list,detail);host.replaceChildren(toolbar,message,layout,hint);
   function currentItems(){var elapsed=performance.now()-received;return(payload.items||[]).filter(function(it){return it.expires_in==null||elapsed<it.expires_in*1000;});}
   function render(moveFocus){
    var items=currentItems(),filtered=items.filter(function(it){return !query||(it.title+' '+(it.summary||'')+' '+textOf(it.detail)).toLocaleLowerCase().includes(query);});
@@ -19,7 +19,7 @@
    total.textContent=loadState==='ready'?(query?'找到 '+filtered.length+' 条通知':'共 '+items.length+' 条通知'):'';
    hint.hidden=loadState!=='ready'||payload.member_authenticated!==false;
    list.replaceChildren();detail.replaceChildren();layout.hidden=!filtered.length;
-   message.hidden=!!filtered.length;message.textContent=loadState==='error'?'通知暂时无法加载，请重试。':loadState==='loading'?'正在加载通知…':query?'没有找到匹配的通知。':'暂无生效中的通知。';retry.hidden=loadState!=='error';
+   message.hidden=!!filtered.length;message.textContent=loadState==='error'?'页面错误，请刷新重试':loadState==='loading'?'正在加载通知…':query?'没有找到匹配的通知。':'暂无生效中的通知。';
    filtered.forEach(function(item){
     var entry=node('a','cra1-notification-center__entry'),tag=node('span','cra1-notice-reader__entry-label',item.label||'通知'),title=node('span','cra1-notice-reader__entry-title',item.title),summary=node('span','cra1-notice-reader__entry-summary',item.summary||textOf(item.detail));
     var href=new URL(root.location.href);href.searchParams.set('notice',item.id);entry.href=href;entry.setAttribute('aria-current',current&&current.id===item.id?'true':'false');entry.append(tag,title,summary);
@@ -45,7 +45,7 @@
     if(destroyed||ticket!==generation)return;payload={items:[]};loadState='error';root.clearTimeout(expiry);render(false);
    }).finally(function(){root.clearTimeout(deadline);if(destroyed||ticket!==generation)return;flight=null;host.setAttribute('aria-busy','false');if(!doc.hidden)timer=root.setTimeout(refresh,Math.max(1,Math.min(30,Number(payload.refresh_after)||30))*1000);});
   }
-  search.oninput=function(){query=search.value.trim().toLocaleLowerCase();render(false);};retry.onclick=refresh;
+  search.oninput=function(){query=search.value.trim().toLocaleLowerCase();render(false);};
   root.addEventListener('popstate',function(){selected=new URL(root.location.href).searchParams.get('notice')||'';render(false);});
   doc.addEventListener('visibilitychange',function(){if(doc.hidden)clearSession();else refresh();});
   root.addEventListener('pagehide',function(){destroyed=true;clearSession();});

@@ -28,6 +28,7 @@ const server=http.createServer((req,res)=>{
   if(!retries++){res.writeHead(503);res.end();return}
   res.setHeader('content-type','text/javascript');res.end('window.retryReady=true');return
  }
+ if(u.pathname==='/hook-a.js'||u.pathname==='/hook-b.js'){const name=u.pathname.includes('hook-a')?'A':'B';setTimeout(()=>{res.setHeader('content-type','text/javascript');res.end('window.onload=function(){window.hook'+name+'=(window.hook'+name+'||0)+1}')},name==='A'?80:160);return}
  if(u.pathname==='/slow.js'){setTimeout(()=>{res.setHeader('content-type','text/javascript');res.end('window.staleBoot=true')},400);return}
  let file=u.pathname==='/deps.js'?path.join(root,'public/clientarea/template/pc/cra1/js/module-deps.js'):u.pathname==='/runtime.js'?path.join(root,'public/cra1-shared/src/runtime.js'):u.pathname.startsWith('/native/')?path.join(native,'public/clientarea/template/pc/default',u.pathname.slice(8)):null
  if(!file||!fs.existsSync(file)){res.writeHead(404);res.end();return}
@@ -56,6 +57,24 @@ try{
   host.innerHTML=html;await CRA1ModuleDeps.mountScripts(host)
  })
  check(await page.evaluate(()=>boots===2&&futureLoads===1&&shellIntact&&futureAvailable==='future-native'),'unlisted declared components fall back to native dependencies and load once; per-page boot runs again; theme shell survives')
+ const lifecycle=await page.evaluate(async()=>{
+  window.existingLoadCalls=0
+  const original=window.onload=()=>{window.existingLoadCalls++}
+  const host=document.getElementById('host')
+  host.innerHTML='<div id="late-module"></div><script>const previousPageLoad=window.onload;window.onload=function(){window.lateProperty=(window.lateProperty||0)+1;if(previousPageLoad)previousPageLoad()};document.addEventListener("DOMContentLoaded",function(){window.lateReady=(window.lateReady||0)+1},{once:true});window.addEventListener("load",function(){window.lateListener=(window.lateListener||0)+1},{once:true});</scr'+'ipt>'
+  await CRA1ModuleDeps.mountScripts(host)
+  return {property:window.lateProperty||0,ready:window.lateReady||0,listener:window.lateListener||0,outer:window.existingLoadCalls,restored:window.onload===original}
+ })
+ check(lifecycle.property===1&&lifecycle.ready===1&&lifecycle.listener===1,'late-loaded module receives only its own missed lifecycle callbacks')
+ check(lifecycle.outer===0&&lifecycle.restored,'late module initialization never replays the existing page load handler')
+ check(await page.evaluate(async()=>{
+  const a=document.createElement('div'),b=document.createElement('div');document.body.append(a,b)
+  const originalLoad=window.onload,originalAdd=window.addEventListener
+  a.innerHTML='<script src="/hook-a.js"></scr'+'ipt>';b.innerHTML='<script src="/hook-b.js"></scr'+'ipt>'
+  await Promise.all([CRA1ModuleDeps.mountScripts(a),CRA1ModuleDeps.mountScripts(b)])
+  a.remove();b.remove()
+  return window.hookA===1&&window.hookB===1&&window.onload===originalLoad&&window.addEventListener===originalAdd
+ }),'overlapping fragment requests restore lifecycle hooks without replaying or losing either initialization')
  const retry=await page.evaluate(async()=>{
   const host=document.getElementById('host'),html='<script src="/retry.js"></scr'+'ipt>'
   host.innerHTML=html;let failed=false

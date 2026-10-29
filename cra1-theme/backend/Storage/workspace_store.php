@@ -65,6 +65,21 @@ final class ThemeWorkspaceStore
 
     public function catalog(): array { return $this->catalog; }
 
+    /** Use the same editor contracts for complete configuration migration. */
+    public function validateTransfer(string $domain,array $values): void
+    {
+        $allowed=$domain==='member'?['appearance','sidebar','content','custom_code']:['content','custom_code'];
+        $this->validateKeys($values,$allowed);
+        foreach($allowed as$key){
+            if(!is_array($values[$key]??null))throw new InvalidArgumentException('完整配置缺少必要分区');
+            if($key==='custom_code'){
+                $this->validateKeys($values[$key],['css','js','css_enabled','js_enabled']);
+                foreach(['css','js']as$field)if(!is_string($values[$key][$field]??null)||strlen($values[$key][$field])>1048576)throw new InvalidArgumentException('自定义代码格式不正确或超过 1MB');
+                foreach(['css_enabled','js_enabled']as$field)if(!is_bool($values[$key][$field]??null))throw new InvalidArgumentException('自定义代码开关格式不正确');
+            }else $this->validateContract($values[$key],$this->catalog['contracts'][$domain][$key],$key);
+        }
+    }
+
     /** Legacy forms keep their existing payloads while preserving explicit page rules. */
     public function applyLegacyPatch(array $raw, array $patch): array
     {

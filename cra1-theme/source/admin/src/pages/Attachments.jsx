@@ -54,7 +54,7 @@ export default function Attachments() {
         if (targetPage > lastPage) { redirected = true; scrollToList.current = true; setPage(lastPage) }
         else setItems(r.data.items)
       }
-    } catch (e) { if (n === seq.current && e.name !== 'AbortError') setError(e.name === 'TypeError' ? '附件暂时无法读取，请检查网络后重试。' : e.message || '附件读取失败，请重试。') }
+    } catch (e) { if (n === seq.current && e.name !== 'AbortError') setError('页面错误，请刷新重试') }
     finally { if (n === seq.current && !redirected) setLoading(false) }
   }
   useEffect(() => {
@@ -133,7 +133,7 @@ export default function Attachments() {
       <div className="attachments-search"><Search className="size-4" /><Input aria-label="搜索附件" value={search} onChange={e => { invalidate(); scrollToList.current = false; setPage(1); setSearch(e.target.value) }} placeholder={kind === 'avatar' ? '搜索名称或会员 ID' : '搜索附件名称'} /></div>
     </div>
     {trash && <Alert>回收站中的文件已停止公开访问，可在这里恢复。</Alert>}
-    {error && <Alert tone="error">{error}<Button variant="ghost" onClick={() => load()}>重试</Button></Alert>}
+    {error && <Alert tone="error">{error}</Alert>}
     <div className="attachments-grid" ref={grid} role="region" aria-label="附件列表" aria-busy={loading} tabIndex={-1}>{items.map(f => <article key={f.id} className="attachment-card">
       <button type="button" className="attachment-image" disabled={!!f.deleted_at} onClick={() => pick('detail', f)} aria-label={'查看附件：' + f.name}>
         {f.deleted_at ? <div className="attachment-trash-image"><Image /><span>已移入回收站</span></div> : <AttachmentImage file={f} />}

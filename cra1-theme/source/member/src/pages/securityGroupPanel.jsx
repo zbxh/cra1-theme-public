@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { ShieldCheck, Plus, Trash2, Pencil, Server, Network, Layers } from 'lucide-react'
 import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input, Field } from '../ui/input'
-import { Badge, EmptyState } from '../ui/feedback'
+import { Badge, Alert, EmptyState } from '../ui/feedback'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, ConfirmDialog } from '../ui/dialog'
 import { DataTable } from '../ui/data-table'
 import { StatCard, StatGrid } from '../ui/stat-card'
@@ -26,20 +26,55 @@ export function SecurityGroupPanel() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [keywords, setKeywords] = useState('')
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
   const [editing, setEditing] = useState(null)
   const [busy, setBusy] = useState(false)
   const [confirmDel, setConfirmDel] = useState(null)
+  const requestId = useRef(0)
+  const limit = 50
 
   const load = useCallback(() => {
+    const current = ++requestId.current
     setLoading(true)
     setError('')
-    get('/security_group', { page: 1, limit: 50, keywords })
-      .then((res) => setRows(res.data?.list || []))
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
-  }, [keywords])
+    setRows([])
+    get('/security_group', { page, limit, keywords })
+      .then((res) => {
+        if (current !== requestId.current) return
+        const count = Number(res.data?.count) || 0
+        const lastPage = Math.max(1, Math.ceil(count / limit))
+        setTotal(count)
+        if (page > lastPage) { ++requestId.current; setPage(lastPage); return }
+        setRows(res.data?.list || [])
+      })
+      .catch(() => {
+        if (current !== requestId.current) return
+        setTotal(0)
+        setError('页面错误，请刷新重试')
+      })
+      .finally(() => { if (current === requestId.current) setLoading(false) })
+  }, [page, keywords])
 
-  useEffect(load, [load])
+  useEffect(() => {
+    load()
+    return () => { ++requestId.current }
+  }, [load])
+
+  function search(value) {
+    ++requestId.current
+    setRows([])
+    setLoading(true)
+    setPage(1)
+    setKeywords(value)
+  }
+
+  function changePage(value) {
+    ++requestId.current
+    setRows([])
+    setLoading(true)
+    setPage(value)
+  }
 
   async function save(e) {
     e.preventDefault()
@@ -109,11 +144,11 @@ export function SecurityGroupPanel() {
   return (
     <>
       <StatGrid>
-        <StatCard label="安全组" value={loading ? '—' : rows.length} hint="当前账户"
+        <StatCard label="安全组" value={loading || error ? '—' : total} hint={keywords ? '搜索结果' : '当前账户'}
                   sub="可分别绑定到不同实例" icon={ShieldCheck} />
-        <StatCard label="规则总数" value={loading ? '—' : totalRules} hint="合计"
+        <StatCard label="本页规则数" value={loading || error ? '—' : totalRules} hint="本页合计"
                   sub="入站与出站规则" icon={Network} />
-        <StatCard label="关联实例" value={loading ? '—' : totalHosts} hint="合计"
+        <StatCard label="本页关联实例" value={loading || error ? '—' : totalHosts} hint="本页合计"
                   sub="一个实例可绑定多个安全组" icon={Server} />
         <StatCard label="默认放行" value="全部出站" hint="建议保持"
                   sub="入站按最小权限开放" icon={Layers} />
@@ -121,14 +156,17 @@ export function SecurityGroupPanel() {
 
       <Card className="mt-4">
         <CardContent className="p-5">
-          <DataTable
+          {error ? <Alert tone="error">{error}</Alert> : <DataTable
             columns={columns}
             rows={rows}
             loading={loading}
-            error={error}
             search={keywords}
-            onSearchChange={setKeywords}
+            onSearchChange={search}
             searchPlaceholder="安全组名称"
+            page={page}
+            total={total}
+            limit={limit}
+            onPageChange={changePage}
             actions={<Button size="sm" onClick={() => setEditing({ name: '', description: '' })}>
               <Plus className="size-3.5" />新建安全组
             </Button>}
@@ -142,7 +180,7 @@ export function SecurityGroupPanel() {
                 </Button>}
               />
             }
-          />
+          />}
         </CardContent>
       </Card>
 

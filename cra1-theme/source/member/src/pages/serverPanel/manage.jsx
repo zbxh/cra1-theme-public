@@ -59,17 +59,11 @@ export function CopyText({ value, className }) {
  * 除重试外提供「联系支持」引导：重试无效时用户需要求助出口
  * （工单入口取自主题后台「首页快捷入口」配置里的工单项，未配置则用插件默认路径）。
  */
-function LoadError({ onRetry, label = '加载失败', supportUrl }) {
+function LoadError({ supportUrl }) {
   return (
     <div className="flex flex-col items-center gap-2 py-6 text-center">
-      <p className="text-xs text-muted-foreground">{label}，请稍后重试</p>
+      <p className="text-xs text-muted-foreground">页面错误，请刷新重试</p>
       <div className="flex items-center gap-2">
-        {onRetry ? (
-          <Button size="sm" variant="outline" className="h-7 px-2.5 text-xs" onClick={onRetry}>
-            <RefreshCw className="size-3.5" />
-            重试
-          </Button>
-        ) : null}
         <Button
           size="sm" variant="ghost" className="h-7 px-2.5 text-xs text-muted-foreground"
           onClick={() => { window.location.href = supportUrl || pluginLink('ticket') }}

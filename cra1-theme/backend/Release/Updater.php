@@ -22,14 +22,17 @@ final class Updater
         $info=Package::inspect($archive);$doc=$info['manifest'];$files=[];$permissions=[];$warnings=[];$blockers=$doc['release_blockers']??[];
         if(!is_array($blockers))throw new \InvalidArgumentException('更新包检查规则无效');
         $context=($this->contextReader)();
-        if(!Inspector::runtimeMatch($doc,$context)||empty($context['database']))$blockers[]='当前系统与模块组合没有已核验的原生运行基线';
+        if(empty($context['database']))$blockers[]='无法读取系统信息，请确认数据库连接后重试';
+        if(!Inspector::runtimeMatch($doc,$context))$warnings[]='当前系统或模块组合尚未完整验证，可更新主题文件；具体业务能力仍按实际可用性及接口契约检查。';
         // SQL query compatibility belongs to the native business diagnostics;
         // replacing theme files never changes this database setting.
         if(in_array('ONLY_FULL_GROUP_BY',explode(',',strtoupper((string)($context['database_sql_mode']??''))),true))$warnings[]='当前数据库分组规则可能影响部分 V10 原生产品查询；本次主题更新不修改数据库设置，可在版本与兼容中查看。';
         $dependencies=[];
         foreach($doc['native_dependencies']??[] as $dependency){
             $row=Inspector::nativeDependency($this->root,$dependency,$doc['integration_profiles']??[]);$dependencies[]=$row;
-            if($row['status']!=='pass')$blockers[]=$row['path'].'：'.$row['detail'];
+            // Missing reference targets are still rejected by References::inspect.
+            // A changed native hash is a compatibility observation, not permission to overwrite it.
+            if($row['status']!=='pass')$warnings['native-contract']='部分原生依赖尚未确认兼容；本次仅更新主题自有文件，不修改系统或插件。对应功能请在更新后检查。';
         }
         $current=Files::json($this->dir.'/current.json',true);
         if(isset($doc['maintenance'])){
@@ -61,7 +64,7 @@ final class Updater
         if($permissions)$blockers[]='以下目录内有需要更新的主题文件，但 PHP 运行用户无写入权限：'.implode('、',array_keys($permissions)).'。请在网站面板调整这些目录的属主或写入权限后重新上传，无需将整站设为 777。';
         try{References::inspect($this->root,$doc['references']??[],$this->entry);References::checkCopies($this->root);}catch(\Throwable $e){$blockers[]=$e->getMessage();}
         if(is_file($this->dir.'/pending.json'))$blockers[]='有未完成的更新，请先恢复';
-        return $info+['release_channel'=>$doc['release_channel']??'candidate','files'=>$files,'native_dependencies'=>$dependencies,'blockers'=>$blockers,'warnings'=>$warnings,'can_apply'=>!$blockers,'signature'=>'请核对更新包来源及 SHA-256 校验值'];
+        return $info+['release_channel'=>$doc['release_channel']??'candidate','files'=>$files,'native_dependencies'=>$dependencies,'blockers'=>$blockers,'warnings'=>array_values($warnings),'can_apply'=>!$blockers,'signature'=>'请核对更新包来源及 SHA-256 校验值'];
     }
     public static function purpose(string $path): string
     {

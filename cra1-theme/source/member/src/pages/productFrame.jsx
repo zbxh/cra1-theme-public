@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-  ShoppingCart, ExternalLink, RefreshCw, AlertTriangle, ShieldCheck, Package,
+  ShoppingCart, ExternalLink, AlertTriangle, ShieldCheck, Package,
 } from 'lucide-react'
 import { PageHeader, Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Button } from '../ui/button'
@@ -48,7 +48,7 @@ export default function ProductListFramePage() {
         const token = tokenRes.data?.token
         if (!url || !token) {
           setState('unavailable')
-          setReason('当前商品暂时无法打开，请稍后重试。')
+          setReason('页面错误，请刷新重试')
           return
         }
         // 只允许 https，避免 token 在明文连接上泄露
@@ -67,7 +67,7 @@ export default function ProductListFramePage() {
       .catch(() => {
         if (!alive) return
         setState('unavailable')
-        setReason('商品配置暂不可用，请稍后重试或从商品列表继续选购。')
+        setReason('页面错误，请刷新重试')
       })
     return () => { alive = false }
   }, [id])
@@ -84,9 +84,6 @@ export default function ProductListFramePage() {
             </Button>
             {state === 'ready' && (
               <>
-                <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
-                  <RefreshCw className="size-3.5" />重新加载
-                </Button>
                 <Button size="sm" onClick={() => window.open(frameUrl, '_blank', 'noopener')}>
                   <ExternalLink className="size-3.5" />新窗口打开
                 </Button>
@@ -109,9 +106,8 @@ export default function ProductListFramePage() {
         <>
           <Alert tone="warning">
             <span className="inline-flex items-center gap-1.5 font-medium">
-              <AlertTriangle className="size-3.5" aria-hidden="true" />暂时无法打开商品配置
+              <AlertTriangle className="size-3.5" aria-hidden="true" />{reason}
             </span>
-            <span className="mt-1 block">{reason}</span>
           </Alert>
 
           <Card>

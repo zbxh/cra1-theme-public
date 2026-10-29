@@ -112,6 +112,7 @@
       },
       data() {
         return {
+          __viewportW: window.innerWidth,
           isShowView: false,
           // 购物车主题后台文案（快照合并；空 = 多语言默认）
           pageTitle: "",

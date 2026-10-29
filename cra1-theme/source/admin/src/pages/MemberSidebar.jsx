@@ -18,6 +18,8 @@ import { memberDisplayFields } from '../lib/member-fields'
 import LinkPicker from './LinkPicker'
 import { TreeSortEditor, countTree, findNode, replaceNode, removeNode, collectDescendants } from '../ui/treeSort'
 import { FloatingActions } from '../ui/FloatingActions'
+import MenuTransfer from '../components/MenuTransfer'
+import MenuPreview from '../components/MenuPreview'
 
 /**
  * 会员中心侧边栏导航（独立副本）
@@ -273,7 +275,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
     <div className="space-y-4">
       <PageHeader
         title="侧边栏导航"
-        description="首次从系统导航导入一份独立副本；之后在这里增删改与排序，不影响系统导航"
+        description="管理独立的三级菜单，支持排序、导入和导出，不影响系统导航"
         actions={
           <div ref={actionsRef} data-page-actions className="flex flex-wrap items-center gap-2">
             {dirty && <Badge tone="warning">有未保存修改</Badge>}
@@ -297,6 +299,12 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
       />
 
       {workspace && <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={() => setEditing({ ...emptyNode() })}><Plus className="size-4" />新增菜单</Button><Button variant="outline" onClick={addSeparator} disabled={workspace.saving}><Minus className="size-4" />新增分界线</Button></div>}
+      {bootInfo.role!=='operator'&&<Card><CardHeader><CardTitle>菜单导入与导出</CardTitle><CardDescription>可选择一级分组、二级分组、三级页面和最近访问设置；跨站导入后请复核商品关联。</CardDescription></CardHeader><CardContent><MenuTransfer sidebar={{shape,nodes,recent}} disabled={saving||workspace?.saving} onBusy={value=>{setSaving(value);workspace?.setBusy(value)}} onApply={next=>{
+        if(workspace){workspace.setBusy(false);workspace.setValues(current=>({...current,sidebar:{...current.sidebar,...next}}))}
+        else {setNodes(next.nodes);setShape(next.shape);setRecent(next.recent)}
+        toast('已应用到菜单草稿，请检查后保存')
+      }}/></CardContent></Card>}
+      <MenuPreview sidebar={{shape,nodes,recent}} disabled={saving||workspace?.saving}/>
       {/* 系统导航导入区 */}
       <Card>
         <CardHeader>
@@ -312,9 +320,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
             <Skeleton className="h-14 w-full" />
           ) : !cat || cat.error ? (
             <Alert tone="warning">
-              无法读取系统导航：{cat?.error || '接口不可用'}
-              。这通常是数据库连接问题；你仍可手动新增菜单。
-              <Button variant="outline" className="ml-3" onClick={loadCatalog}>重试系统导航</Button>
+              页面错误，请刷新重试
             </Alert>
           ) : (
             <>

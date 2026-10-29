@@ -53,8 +53,7 @@ function FieldError({ msg }) {
 
 function DialogReadError({ onRetry }) {
   return <Alert tone="error">
-    暂时无法读取内容，请稍后重试
-    <Button variant="outline" size="sm" className="ml-3" onClick={onRetry}>重新加载</Button>
+    页面错误，请刷新重试
   </Alert>
 }
 
@@ -631,7 +630,7 @@ function ReinstallDialog({ api, cloud, host, module, caps, close, refreshStatus,
   const [step, setStep] = useState(1)
   const [imageType, setImageType] = useState('public') // public | market
   const [images, setImages] = useState(null)
-  const [imageError, setImageError] = useState(''), [imageAttempt, setImageAttempt] = useState(0)
+  const [imageError, setImageError] = useState('')
   const [imageId, setImageId] = useState(cloud?.image?.id || 0)
   const [imageQuote, setImageQuote] = useState(null)
   const [quoteAttempt, setQuoteAttempt] = useState(0)
@@ -694,7 +693,7 @@ function ReinstallDialog({ api, cloud, host, module, caps, close, refreshStatus,
       })
       .catch(err => { if (!controller.signal.aborted) { setImages([]); setImageError(err.message || '镜像读取失败，请重试') } })
     return () => controller.abort()
-  }, [imageType, imageAttempt, host.product_id]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [imageType, host.product_id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const controller = new AbortController(), request = ++imageRequest.current
@@ -862,7 +861,7 @@ function ReinstallDialog({ api, cloud, host, module, caps, close, refreshStatus,
                 </button>
               ))}
             </div>}
-            {imageError && <Alert tone="error">{imageError}<Button size="sm" variant="outline" onClick={() => setImageAttempt(value => value + 1)}>重新读取镜像</Button></Alert>}
+            {imageError && <Alert tone="error">页面错误，请刷新重试</Alert>}
             {images === null ? (
               <Skeleton className="h-48 w-full" />
             ) : (
@@ -1132,7 +1131,7 @@ function PackageUpgradeDialog({ api, close, onOpenPay, onOpDone, embedded = fals
           <DialogDescription>切换到其他套餐，费用按比例结算。</DialogDescription>
         </DialogHeader>}
         {embedded && <p className="mb-3 text-xs text-muted-foreground">切换到其他套餐，费用按比例结算。</p>}
-        {loadErr ? <div role="alert" className="space-y-2"><p className="text-sm text-danger">{loadErr}</p><Button variant="outline" onClick={() => setLoadKey(key => key + 1)}>重试读取套餐</Button></div> : list === null ? (
+        {loadErr ? <div role="alert" className="space-y-2"><p className="text-sm text-danger">页面错误，请刷新重试</p></div> : list === null ? (
           <Skeleton className="h-40 w-full" />
         ) : list.length === 0 ? (
           <EmptyState title="暂无可升级的套餐" />
@@ -1346,7 +1345,7 @@ function ElasticUpgradeDialog({ api, cloud, host, close, onOpenPay, onOpDone, em
         </DialogHeader>}
         {embedded && <p className="mb-3 text-xs text-muted-foreground">当前：{[cur.cpu && `${cur.cpu}核`, cur.memory && `${cur.memory}${memUnit}`, cur.bw && `${cur.bw}M`].filter(Boolean).join(' · ') || '--'}；选择目标配置后自动询价。</p>}
         {loadErr ? (
-          <div className="space-y-2" role="alert"><p className="text-sm text-danger">{loadErr}</p><Button variant="outline" onClick={() => setLoadKey(k => k + 1)}>重试读取配置</Button></div>
+          <div className="space-y-2" role="alert"><p className="text-sm text-danger">页面错误，请刷新重试</p></div>
         ) : pageCfg === null ? (
           <Skeleton className="h-40 w-full" />
         ) : (
@@ -1536,7 +1535,7 @@ function LoginInfoDialog({ api, ips, cloud, close }) {
       setRemote(response.data)
       const until = Number(response.data?.verification_expires_at)
       if (until) expires = window.setTimeout(() => { if (alive) { setRemote(null); setShow(false); setError('安全验证已过期，请重新验证后查看') } }, Math.max(0, until * 1000 - Date.now()))
-    }).catch(error => { if (alive) setError(error.message || '登录信息读取失败，请重试') })
+    }).catch(() => { if (alive) setError('页面错误，请刷新重试') })
       .finally(() => { if (alive) setLoading(false) })
     return () => { alive = false; controller.abort(); window.clearTimeout(expires) }
   }, [api, attempt])
@@ -1579,7 +1578,7 @@ function LoginInfoDialog({ api, ips, cloud, close }) {
           <DialogTitle>登录信息</DialogTitle>
           <DialogDescription>点击信息文本可直接复制该项（敏感信息，请勿泄露）</DialogDescription>
         </DialogHeader>
-        {loading ? <p role="status">正在读取登录信息…</p> : error ? <div role="alert"><p>{error}</p><Button variant="outline" onClick={() => setAttempt(value => value + 1)}>重新验证并读取</Button></div> : rows.length === 0 ? (
+        {loading ? <p role="status">正在读取登录信息…</p> : error ? <div role="alert"><p>{error}</p></div> : rows.length === 0 ? (
           <EmptyState title="暂无登录信息" description="实例可能未开通完成，稍后刷新重试。" />
         ) : (
           <div className="space-y-2">
@@ -2491,7 +2490,7 @@ function FlowPacketDialog({ api, close, onOpenPay, onOpDone }) {
           <DialogDescription>流量包用于抵扣当月超出套餐的流量。</DialogDescription>
         </DialogHeader>
         {loadError ? (
-          <div className="py-5 text-center"><p className="mb-3 text-sm text-danger" role="alert">流量包加载失败：{loadError}</p><Button size="sm" variant="outline" onClick={() => setRetry(n => n + 1)}>重试</Button></div>
+          <div className="py-5 text-center"><p className="mb-3 text-sm text-danger" role="alert">页面错误，请刷新重试</p></div>
         ) : list === null ? (
           <Skeleton className="h-32 w-full" />
         ) : list.length === 0 ? (
@@ -3658,7 +3657,7 @@ function UnsubscribeDialog({ api, host, caps, close, refreshStatus }) {
             {page === null ? (
               <Skeleton className="h-24 w-full" />
             ) : page.error ? (
-              <Alert tone="error">{page.error}<Button variant="link" onClick={()=>retry(n=>n+1)}>重新读取</Button></Alert>
+              <Alert tone="error">页面错误，请刷新重试</Alert>
             ) : caps?.unsubscribe === false || ![0, 1].includes(Number(page.allow_refund)) ? (
               <EmptyState title="该产品不支持自助退订" description="请联系客服处理。" />
             ) : (

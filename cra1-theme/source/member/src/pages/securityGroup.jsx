@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   ShieldCheck, Plus, Trash2, Pencil, ArrowLeft, ArrowDownLeft, ArrowUpRight,
   Layers, Server, Network, SearchX,
@@ -251,6 +251,7 @@ export function GroupRulesPage() {
   const groupId = new URLSearchParams(location.search).get('id') || ''
   const [group, setGroup] = useState(null)
   const [groupChecked, setGroupChecked] = useState(false)  // 详情是否已确认（区分「加载中」与「不存在」）
+  const [groupError, setGroupError] = useState('')
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -260,32 +261,67 @@ export function GroupRulesPage() {
   const [editing, setEditing] = useState(null)
   const [busy, setBusy] = useState(false)
   const [confirmDel, setConfirmDel] = useState(null)
+  const requestId = useRef(0)
   const limit = 20
 
   useEffect(() => {
+    let alive = true
+    setGroup(null)
+    setGroupError('')
+    setGroupChecked(false)
     if (!groupId) { setLoading(false); setGroupChecked(true); return }
     get(`/security_group/${groupId}`)
       // 组不存在时后端返回 status:200 + security_group:{}，用 id 判定
       .then((res) => {
+        if (!alive) return
         const g = res.data?.security_group
         setGroup(g && g.id ? g : null)
       })
-      .catch(() => setGroup(null))
-      .finally(() => setGroupChecked(true))
+      .catch(() => { if (alive) setGroupError('页面错误，请刷新重试') })
+      .finally(() => { if (alive) setGroupChecked(true) })
+    return () => { alive = false }
   }, [groupId])
 
   const load = useCallback(() => {
     if (!groupId) return
+    const current = ++requestId.current
     setLoading(true)
     setError('')
+    setRows([])
     get(`/security_group/${groupId}/rule`, { page, limit, direction })
-      .then((res) => { setRows(res.data?.list || []); setTotal(res.data?.count || 0) })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
+      .then((res) => {
+        if (current !== requestId.current) return
+        const count = Number(res.data?.count) || 0
+        const lastPage = Math.max(1, Math.ceil(count / limit))
+        setTotal(count)
+        if (page > lastPage) { ++requestId.current; setPage(lastPage); return }
+        setRows(res.data?.list || [])
+      })
+      .catch(() => { if (current === requestId.current) setError('页面错误，请刷新重试') })
+      .finally(() => { if (current === requestId.current) setLoading(false) })
   }, [groupId, page, limit, direction])
 
-  useEffect(load, [load])
-  useEffect(() => { setPage(1) }, [direction])
+  useEffect(() => {
+    load()
+    return () => { ++requestId.current }
+  }, [load])
+
+  function changeDirection(value) {
+    if (value === direction) return
+    ++requestId.current
+    setRows([])
+    setLoading(true)
+    setError('')
+    setPage(1)
+    setDirection(value)
+  }
+
+  function changePage(value) {
+    ++requestId.current
+    setRows([])
+    setLoading(true)
+    setPage(value)
+  }
 
   async function save(e) {
     e.preventDefault()
@@ -346,7 +382,16 @@ export function GroupRulesPage() {
     )
   }
 
-  // 详情确认后仍没有该组：说明 ID 无效或不属于当前账户。
+  if (!groupChecked || groupError) {
+    return <>
+      <PageHeader title="安全组规则" description="配置入站与出站访问策略" />
+      <Card><CardContent className="p-5">
+        {groupError ? <Alert tone="error">{groupError}</Alert> : <Skeleton className="h-48" />}
+      </CardContent></Card>
+    </>
+  }
+
+  // 详情成功读取后仍没有该组：说明 ID 无效或不属于当前账户。
   // 这时不应继续渲染规则表格（会显示成「该组没有规则」，误导用户）。
   if (groupChecked && !group) {
     return (
@@ -411,7 +456,7 @@ export function GroupRulesPage() {
             <Button variant="outline" size="sm" onClick={() => { window.location.href = '/security_group.htm' }}>
               <ArrowLeft className="size-3.5" />返回安全组
             </Button>
-            <Button size="sm" onClick={() => setEditing(emptyRule())}>
+            <Button size="sm" disabled={loading || !!error} onClick={() => setEditing(emptyRule())}>
               <Plus className="size-3.5" />添加规则
             </Button>
           </div>
@@ -423,7 +468,7 @@ export function GroupRulesPage() {
           <button
             key={t.v}
             type="button"
-            onClick={() => setDirection(t.v)}
+            onClick={() => changeDirection(t.v)}
             aria-pressed={direction === t.v}
             className={
               'rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 ' +
@@ -439,15 +484,14 @@ export function GroupRulesPage() {
 
       <Card>
         <CardContent className="p-5">
-          <DataTable
+          {error ? <Alert tone="error">{error}</Alert> : <DataTable
             columns={columns}
             rows={rows}
             loading={loading}
-            error={error}
             page={page}
             total={total}
             limit={limit}
-            onPageChange={setPage}
+            onPageChange={changePage}
             empty={
               <EmptyState
                 icon={SearchX}
@@ -458,7 +502,7 @@ export function GroupRulesPage() {
                 </Button>}
               />
             }
-          />
+          />}
         </CardContent>
       </Card>
 

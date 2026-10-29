@@ -686,8 +686,7 @@ const payDialog = {
               </div>
           </div>
           <div v-if="gatewayError" role="alert" style="padding:16px;text-align:center">
-              <p>{{gatewayError}}</p>
-              <el-button type="text" @click="zfSelectChange" :disabled="payLoading || priceLoading">{{retryText}}</el-button>
+              <p>页面错误，请刷新重试</p>
           </div>
       </div>
       <div class="pay-footer">
@@ -781,7 +780,6 @@ const payDialog = {
       balance: 0,
       payHtml: "",
       gatewayError: "",
-      retryText: window.CRA1Shared?.I18n?.t("重新加载") || "重新加载",
       balanceTimer: null,
       commonData: {
         currency_prefix: "￥",

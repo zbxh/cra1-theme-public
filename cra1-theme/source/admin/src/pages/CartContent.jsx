@@ -296,8 +296,7 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
   if (error || !config) {
     return (
       <div className="space-y-4 p-6">
-        <div className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger">{error || '配置加载失败'}</div>
-        <Button variant="outline" onClick={load}>重试</Button>
+        <div className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger">页面错误，请刷新重试</div>
       </div>
     )
   }
@@ -446,7 +445,7 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
         }
       />
 
-      {productError && <Alert tone="warning">{productError}<Button className="ml-3" variant="outline" onClick={() => setProductAttempt((n) => n+1)}>重试商品清单</Button></Alert>}
+      {productError && <Alert tone="warning">页面错误，请刷新重试</Alert>}
       {block && !['card_sections','recommendations'].includes(block)?<Card><CardHeader><CardTitle>{RECORDS.find(r=>r.group===scope&&r.sub===block)?.label}</CardTitle></CardHeader><CardContent className="space-y-5">{GroupFormBody({group:scope,sub:block})}</CardContent></Card>:!block&&(<>
       {/* 页面文案记录（一条记录 + 编辑弹窗） */}
       <Card>

@@ -53,7 +53,7 @@ export function ModuleView({ url, params, title, description, empty, onLoaded, d
         setHtml(content)
       })
       .catch((e) => {
-        if (alive) setError(e.message || '模块服务暂时不可用')
+        if (alive) setError(e.message || '页面错误，请刷新重试')
       })
       .finally(() => {
         if (alive) setLoading(false)
@@ -125,14 +125,10 @@ export function ModuleView({ url, params, title, description, empty, onLoaded, d
         <CardContent className="space-y-4 p-5">
           <Alert tone="warning">
             <span className="inline-flex items-center gap-1.5 font-medium">
-              <AlertTriangle className="size-3.5" aria-hidden="true" />模块服务暂时不可用
+              <AlertTriangle className="size-3.5" aria-hidden="true" />页面错误，请刷新重试
             </span>
-            <span className="mt-1 block">{error}</span>
           </Alert>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
-              <RefreshCw className="size-3.5" />重新加载
-            </Button>
             <Button variant="outline" size="sm" onClick={() => { window.location.href = '/productList.htm' }}>
               <ArrowLeft className="size-3.5" />返回产品列表
             </Button>

@@ -28,7 +28,7 @@
               </el-input>
             </div>
             <div class="goods-box" v-loading="listLoding">
-              <div v-if="listError" class="cui-alert cui-alert--error cra1-cart-read-error" role="alert"><p>{{listError}}</p><el-button @click="getCartList">重新加载</el-button></div>
+              <div v-if="listError" class="cui-alert cui-alert--error cra1-cart-read-error" role="alert"><p>页面错误，请刷新重试</p></div>
               <template v-else-if="showList.length !== 0 || listLoding">
               <div class="goods-item cl-pc-cart">
                 <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
@@ -149,9 +149,8 @@
                           <tr v-else>
                             <td></td>
                             <td class="no-goods-td">
-                              <span class="no-goods-tips" :class="{'cra1-cart-read-error-text': !!item.priceError}">{{item.priceError || lang.shoppingCar_no_goods_tip}}</span>
-                              <el-button v-if="item.priceError" class="buy-again-btn" @click="getConfigOption(item)">重新加载</el-button>
-                              <el-button v-else class="buy-again-btn"
+                              <span class="no-goods-tips" :class="{'cra1-cart-read-error-text': !!item.priceError}">{{item.priceError ? '页面错误，请刷新重试' : lang.shoppingCar_no_goods_tip}}</span>
+                              <el-button v-if="!item.priceError" class="buy-again-btn"
                                 @click="goGoods(item)">{{lang.shoppingCar_buy_again}}</el-button>
                             </td>
                             <td></td>
@@ -257,9 +256,8 @@
 
                     <template v-else>
                       <div class="cl-m-cart-invalid">
-                        <span class="no-goods-tips" :class="{'cra1-cart-read-error-text': !!item.priceError}">{{item.priceError || lang.shoppingCar_no_goods_tip}}</span>
-                        <el-button v-if="item.priceError" class="buy-again-btn" @click="getConfigOption(item)">重新加载</el-button>
-                        <el-button v-else class="buy-again-btn" @click="goGoods(item)">{{lang.shoppingCar_buy_again}}</el-button>
+                        <span class="no-goods-tips" :class="{'cra1-cart-read-error-text': !!item.priceError}">{{item.priceError ? '页面错误，请刷新重试' : lang.shoppingCar_no_goods_tip}}</span>
+                        <el-button v-if="!item.priceError" class="buy-again-btn" @click="goGoods(item)">{{lang.shoppingCar_buy_again}}</el-button>
                         <i class="el-icon-delete cl-m-cart-del" @click="handelDeleteGoods(item)"></i>
                       </div>
                     </template>

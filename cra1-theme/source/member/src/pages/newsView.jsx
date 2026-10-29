@@ -74,7 +74,7 @@ export default function NewsViewPage() {
   }
 
   if (error && !doc) {
-    return <Wrapper><Alert tone="error">暂时无法读取内容，请稍后重试<Button variant="outline" size="sm" className="ml-3" onClick={() => setAttempt(n => n + 1)}>重新加载</Button></Alert></Wrapper>
+    return <Wrapper><Alert tone="error">页面错误，请刷新重试</Alert></Wrapper>
   }
 
   if (!doc) {

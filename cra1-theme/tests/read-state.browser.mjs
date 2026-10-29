@@ -62,15 +62,15 @@ try {
   fixture={noticeFail:true}
   let {page,context}=await fresh('/notifications.html')
   const search=page.getByRole('searchbox',{name:'搜索通知'})
-  await page.getByRole('button',{name:'重新加载',exact:true}).waitFor()
+  await page.getByText('页面错误，请刷新重试',{exact:true}).waitFor();check(await page.getByRole('button',{name:/重试|重新加载/}).count()===0,'notification failure has no retry control')
   await search.fill('服务')
-  check((await page.locator('.cra1-notification-center__message').first().textContent()).includes('无法加载'),'typing after notification failure preserves unavailable state')
+  check((await page.locator('.cra1-notification-center__message').first().textContent()).includes('页面错误，请刷新重试'),'typing after notification failure preserves unavailable state')
   check(!(await page.content()).includes('fixture-secret'),'notification failure hides private diagnostics')
   fixture.noticeFail=false;fixture.noticeDelay=350
-  await page.getByRole('button',{name:'重新加载',exact:true}).click();await search.fill('维护')
-  check((await page.locator('.cra1-notification-center__message').first().textContent()).includes('正在加载'),'typing during notification retry preserves loading state')
+  await page.reload();await search.fill('维护')
+  check((await page.locator('.cra1-notification-center__message').first().textContent()).includes('正在加载'),'typing during notification refresh preserves loading state')
   await search.fill('');await page.locator('.cra1-notification-center__entry').first().waitFor()
-  check(await page.locator('.cra1-notification-center__entry').count()===1,'notification retry recovers content')
+  check(await page.locator('.cra1-notification-center__entry').count()===1,'notification refresh recovers content')
   for(const width of [1920,1440,768,390]){await page.setViewportSize({width,height:900});await shot(page,'notification-recovered')}
   await search.fill('没有匹配内容');check((await page.locator('.cra1-notification-center__message').first().textContent()).includes('没有找到'),'successful search with no match stays distinct from failure')
   fixture.noticeEmpty=true;await search.fill('');await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})))
@@ -134,13 +134,13 @@ try {
   await page.waitForTimeout(600)
   check(await page.locator('.cra1-articles__list').isVisible(),'failed categories do not hide a successful article list')
   const retry=page.getByRole('button',{name:'重试分类',exact:true})
-  check(await retry.count()===1,'category read failure offers its own retry')
+  check(await retry.count()===0,'category failure asks for browser refresh without retry');await page.getByText('页面错误，请刷新重试',{exact:true}).waitFor()
   check(!(await page.content()).includes('fixture-secret'),'category failure hides private diagnostics')
-  if(await retry.count()){
+  {
     for(const width of [1920,1440,768,390]){await page.setViewportSize({width,height:900});await shot(page,'article-category-failure')}
-    fixture.categoryFail=false;await retry.click();await page.getByRole('button',{name:'服务维护',exact:true}).waitFor()
-    check(fixture.categoryReads===2,'category retry actually requests the category endpoint')
-    check(await retry.count()===0,'category retry clears only the category error')
+    fixture.categoryFail=false;await page.reload();await page.getByRole('button',{name:'服务维护',exact:true}).waitFor()
+    check(fixture.categoryReads===2,'browser refresh requests the category endpoint')
+    check(await retry.count()===0,'browser refresh clears only the category error')
   }
   const keywords=page.getByRole('searchbox',{name:'搜索公告'})
   await keywords.fill('旧查询');await page.getByRole('button',{name:'搜索',exact:true}).click()

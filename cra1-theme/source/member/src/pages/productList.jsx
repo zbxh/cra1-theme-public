@@ -265,8 +265,8 @@ export default function ProductListPage() {
         <p aria-live="polite"><strong>{categoryName}</strong><span> / {tabName}{loading ? ' · 加载中…' : error ? ' · 读取失败' : ` · ${total} 个产品`}</span></p>
         <span className="cra1-products__order">按产品编号从新到旧排列</span>
       </div>
-      {hasSummaryFailure && !loading && !error && <p className="cra1-products__sync-note" role="status">部分产品信息暂时无法读取。<button type="button" onClick={() => setRefresh(n => n + 1)}>重试</button></p>}
-      {error ? <Alert tone="error"><span>{error}</span><Button size="sm" variant="outline" onClick={() => setRefresh(n => n + 1)}><RefreshCw aria-hidden="true" />重试</Button></Alert>
+      {hasSummaryFailure && !loading && !error && <p className="cra1-products__sync-note" role="status">页面错误，请刷新重试</p>}
+      {error ? <Alert tone="error"><span>页面错误，请刷新重试</span></Alert>
         : loading ? <div className="cra1-products__grid" aria-label="产品加载中" aria-busy="true">{Array.from({ length: limit }).map((_, i) => <Skeleton key={i} className="h-[220px] rounded-2xl" />)}</div>
           : rows.length === 0 ? <div className="cra1-products__empty"><EmptyState icon={Package} title={keywords ? '没有符合条件的产品' : tab === 'deleted' ? '没有已删除的产品' : '暂无产品'} description={keywords ? '尝试其他名称、产品标识或 IP。' : tab === 'deleted' ? '此分类下没有已删除的产品。' : '当前分类及状态下没有产品。'} action={<div className="cra1-products__empty-actions"><Button size="sm" variant="outline" onClick={reset}>清除筛选</Button>{!keywords && tab !== 'deleted' && <Button size="sm" onClick={() => { window.location.href = '/cart/goodsList.htm' }}>浏览产品</Button>}</div>} /></div>
             : <div className="cra1-products__grid" role="list" aria-label="产品卡片">{rows.map(h => <HostCard key={h.id} host={h} fields={fields} tab={tab} onOperation={onHostOperation} />)}</div>}

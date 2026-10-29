@@ -747,7 +747,7 @@ function HomeNewsCard({ content, setContentSection }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {catalogError && <Alert tone="warning">{catalogError}<Button className="ml-3" variant="outline" onClick={() => setAttempt((n) => n+1)}>重试分类</Button></Alert>}
+        {catalogError && <Alert tone="warning">页面错误，请刷新重试</Alert>}
         {!catalogError && catalog && !catalog[source]?.enabled && <Alert>{sources[source]}插件当前不可用，设置将保留，插件恢复后生效。</Alert>}
         <Toggle
           label="启用文章时间轴"
@@ -909,7 +909,7 @@ function TicketAssistCard({ content, setContentSection }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {catalogError && <Alert tone="warning">{catalogError}<Button className="ml-3" variant="outline" onClick={() => setAttempt((n) => n+1)}>重试分类</Button></Alert>}
+        {catalogError && <Alert tone="warning">页面错误，请刷新重试</Alert>}
         <Toggle
           label="启用工单提交助手"
           desc="总开关：关闭时提交工单页保持插件原样"

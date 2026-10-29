@@ -133,7 +133,7 @@ export default function HomePage() {
     <div className="space-y-4">
       <HomeQuickbar />
 
-      {error && <Alert tone="error">账户信息暂时无法读取。<Button size="sm" variant="outline" className="ml-3" onClick={() => setAccountAttempt(n => n + 1)}>重新加载</Button></Alert>}
+      {error && <Alert tone="error">页面错误，请刷新重试</Alert>}
 
       {/* 推荐位（阿里云营销位式图文卡）：后台 home_banner 配置 */}
       <BannerRow cfg={homeBanner} />
@@ -541,8 +541,7 @@ function TodoEmpty({ text, tip, onSwitch }) {
 
 function ReadFailure({ onRetry, className }) {
   return <div role="status" className={cn('flex flex-wrap items-center justify-between gap-3 py-5 text-[13px] text-muted-foreground', className)}>
-    <span>暂时无法读取内容，请稍后重试</span>
-    <Button variant="outline" size="sm" onClick={onRetry}>重新加载</Button>
+    <span>页面错误，请刷新重试</span>
   </div>
 }
 
@@ -718,8 +717,7 @@ function HostSection() {
       <CardContent>
         {!loading && renewalError && (
           <Alert tone="warning" className="mb-4">
-            部分到期产品的续费资格暂时无法确认，当前仅显示已确认可用的产品。
-            <Button variant="outline" size="sm" className="ml-3" onClick={() => setAttempt(n => n + 1)}>重新检查</Button>
+            页面错误，请刷新重试
           </Alert>
         )}
         {loading ? (
@@ -727,10 +725,7 @@ function HostSection() {
             {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-lg" />)}
           </div>
         ) : error ? (
-          <Alert tone="error">
-            {error}
-            <Button variant="outline" size="sm" className="ml-3" onClick={() => setAttempt(n => n + 1)}>重试</Button>
-          </Alert>
+          <Alert tone="error">页面错误，请刷新重试</Alert>
         ) : shown.length === 0 ? (
           <EmptyState
             icon={Server}
@@ -1093,9 +1088,7 @@ function SecurityOverview({ cfg, account }) {
               <span className={cn('min-w-0 flex-1 truncate', c.done ? 'text-body' : 'font-medium text-ink')}>
                 {c.label}
               </span>
-              {c.unknown && !c.loading && (c.label === '实名认证'
-                ? <button type="button" className="text-xs text-brand" onClick={() => setAttempt(n => n + 1)}>重试</button>
-                : <span className="text-xs text-muted-foreground">暂未确认</span>)}
+              {c.unknown && !c.loading && <span className="text-xs text-muted-foreground">页面错误，请刷新重试</span>}
               {!c.loading && !c.unknown && !c.done && (
                 <a href={c.href} className="shrink-0 text-xs font-medium text-brand hover:underline">去完善</a>
               )}

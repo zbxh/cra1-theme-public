@@ -5,7 +5,7 @@
                     <div class="skeleton-line h-8 w-2/3"></div><div class="skeleton-line mt-5 h-4 w-1/4"></div><div class="skeleton-line mt-8 h-4 w-full"></div><div class="skeleton-line mt-3 h-4 w-full"></div><div class="skeleton-line mt-3 h-4 w-3/4"></div>
                 </div>
                 <div x-cloak x-show="!loading && notFound" class="empty-state mt-8 py-20 text-center">{if ( cra1_content_explicit($data.cra1, 'core_article_copy.txt8') || (( isset($data.cra1.core_article_copy['txt8']) && $data.cra1.core_article_copy['txt8'] )) ) }{$data.cra1.core_article_copy['txt8']}{else /}新闻不存在或已删除{/if}</div>
-                <div x-cloak x-show="!loading && loadFailed" class="empty-state mt-8 py-20 text-center" role="status"><p>暂时无法读取内容，请稍后重试</p><button type="button" class="btn btn-sm btn-outline cui-button cui-button--outline cui-button--sm mt-4" @click="retry()">重新加载</button></div>
+                <div x-cloak x-show="!loading && loadFailed" class="empty-state mt-8 py-20 text-center" role="status"><p>页面错误，请刷新重试</p></div>
                 <article data-reading-article x-cloak x-show="!loading && item" class="article-card mt-8 glass-card p-6 md:p-10 cui-card">
                     <h2 class="text-2xl font-bold leading-snug text-ink md:text-3xl" x-text="item?.title"></h2>
                     <p class="mt-4 text-sm text-muted" x-text="timeText(item?.create_time)"></p>

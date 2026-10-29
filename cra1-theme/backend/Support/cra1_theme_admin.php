@@ -58,13 +58,14 @@ function theme_auth_api(string $action,array $p): void {
     throw new CRA1ThemeSecurityError('未知登录操作',404,'NOT_FOUND');
 }
 function theme_target(string $action,array $p): string {
+    if($action==='transfer.history.settings.save')return 'configuration:history';
     if(strpos($action,'media.')===0)return 'attachment:'.(string)($p['id']??'new');
     if(strpos($action,'security.accounts.')===0)return 'account:'.(string)($p['id']??'new');
     if($action==='security.audit.export')return 'audit';if($action==='path'||$action==='security.settings.save')return 'security';if($action==='security.session.revoke')return 'account:'.(string)($p['account_id']??theme_actor()['id']);
     if(strpos($action,'security.mfa.')===0||strpos($action,'security.recovery.')===0||$action==='security.password')return 'account:'.(theme_actor()['id']??0);
     return (string)($p['domain']??(strpos($action,'member.')===0?'member':(strpos($action,'cart.')===0?'cart':'website'))).':'.(string)($p['editorId']??$p['scopeId']??'all');
 }
-function theme_read_action(string $a): bool { return in_array($a,['announcements.preview','announcements.legacy-draft','release.check','release.history','release.license.get','release.candidate.get','release.local.list','media.list','media.attachments','get','products','site-pages','link-options','icons','icons.catalog','icons.page','icons.resolve','icons.preview','icon-search','navigation-catalog','product-options','logs','security.my','security.accounts.list','security.audit.list','security.audit.detail','security.settings.get','security.alerts'],true)||preg_match('/\.(get|catalog)$/D',$a)===1; }
+function theme_read_action(string $a): bool { return in_array($a,['menu.export','menu.inspect','menu.preview','transfer.export','transfer.media.download','transfer.history.prepare','announcements.preview','announcements.legacy-draft','release.check','release.history','release.diagnostics','release.license.get','release.candidate.get','release.local.list','media.list','media.attachments','get','products','site-pages','link-options','icons','icons.catalog','icons.page','icons.resolve','icons.preview','icon-search','navigation-catalog','product-options','logs','security.my','security.accounts.list','security.audit.list','security.audit.detail','security.settings.get','security.alerts'],true)||preg_match('/\.(get|catalog)$/D',$a)===1; }
 function theme_protected_code_changes(array $p,array $current): bool {
     $keys=['custom_code','custom_css','custom_js','custom_css_enabled','custom_js_enabled'];
     foreach($p as$k=>$v){if(in_array($k,$keys,true)){if($v===null||!array_key_exists($k,$current)||json_encode($current[$k])!==json_encode($v))return true;}elseif(is_array($v)){if(theme_protected_code_changes($v,$current))return true;}elseif(is_string($v)&&preg_match('/(?:overrides|config|patch).*json$/i',(string)$k)){$d=json_decode($v,true);if(is_array($d)&&theme_protected_code_changes($d,$current))return true;}}
@@ -79,13 +80,16 @@ function theme_api_guard(string $action,array $p): void {
     if(is_file($GLOBALS['ROOT'].'/runtime/cra1_theme/distribution/pending.json')&&!theme_read_action($action)&&!in_array($action,['release.recover','auth.reauth','logout','security.password'],true))throw new CRA1ThemeSecurityError('主题更新尚未完成，请先从主题管理恢复。',503,'THEME_UPDATE_PENDING');
     $domain=(string)($p['domain']??(strpos($action,'member.')===0?'member':(strpos($action,'cart.')===0?'cart':'website')));$domains=null;$code=false;
     if(!theme_read_action($action)||$action==='workspace.preview'){$domains=theme_read_domains();$current=$domains[$domain]??[];if($domain==='website')$current+=\template\cra1\controller\Cra1::defaults();elseif($domain==='member')$current+=MemberCenterStore::defaults();elseif($domain==='cart')$current+=CartThemeStore::defaults();$code=theme_protected_code_changes($p,$current);}
-    if(strpos($action,'release.')===0)theme_require_role(in_array($action,['release.check','release.history','release.license.get'],true)?['admin','super_admin']:['super_admin']);
+    if(strpos($action,'transfer.')===0)theme_require_role(['super_admin']);
+    if(strpos($action,'menu.')===0&&$action!=='menu.preview')theme_require_role(['admin','super_admin']);
+    if(is_file($GLOBALS['ROOT'].'/runtime/cra1_theme/transfer-pending.json')&&!theme_read_action($action)&&!in_array($action,['transfer.recover','auth.reauth','logout','security.password'],true))throw new CRA1ThemeSecurityError('上次配置导入尚未完成，请在主题管理恢复原配置。',503,'CONFIG_IMPORT_PENDING');
+    if(strpos($action,'release.')===0)theme_require_role(in_array($action,['release.check','release.history','release.diagnostics','release.license.get'],true)?['admin','super_admin']:['super_admin']);
     if($action==='path'||$action==='security.settings.get'||$action==='security.settings.save'||$code)theme_require_role(['super_admin']);
     if(in_array($action,['media.delete','media.restore','reset','member.reset','cart.reset','workspace.snapshot.rebuild','security.accounts.list','security.accounts.create','security.accounts.update','security.audit.export'],true)||(strpos($action,'import')!==false&&in_array($p['mode']??'',['replace','first'],true)))theme_require_role(['admin','super_admin']);
     if(preg_match('/save|import|preview$/',$action)&&strpos($action,'security.')!==0){$normal=$p;unset($normal['_reauth']);theme_safe_content($normal);}
     if($a['must_change']&&!theme_read_action($action)&&!in_array($action,['auth.reauth','security.password','logout','security.session.revoke','workspace.preview'],true))throw new CRA1ThemeSecurityError('请先在“我的安全”修改初始密码。',403,'PASSWORD_CHANGE_REQUIRED');
     if($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id']){theme_require_role(['admin','super_admin']);theme_security()->manageAllowed($a,theme_security()->account((int)$p['account_id']));}
-    $step=($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id'])||in_array($action,['release.license.save','reset','member.reset','cart.reset','path','security.settings.save','security.accounts.create','security.accounts.update','security.audit.export','security.password','security.mfa.begin','security.mfa.disable','security.mfa.recovery','security.recovery.begin','security.recovery.remove'],true)||$code;
+    $step=in_array($action,['transfer.apply','transfer.recover'],true)||($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id'])||in_array($action,['release.license.save','reset','member.reset','cart.reset','path','security.settings.save','security.accounts.create','security.accounts.update','security.audit.export','security.password','security.mfa.begin','security.mfa.disable','security.mfa.recovery','security.recovery.begin','security.recovery.remove'],true)||$code;
     if($step)theme_security()->useReauth((string)($p['_reauth']??''),(string)($_SESSION['security_token']??''),$action,theme_target($action,$p));
     if(!theme_read_action($action)){
         // Config writers hold a shared lock; reference checking/deletion holds an exclusive lock.
@@ -100,6 +104,7 @@ function theme_api_guard(string $action,array $p): void {
         if($action==='path')$GLOBALS['THEME_WRITE']['entry_before']=$GLOBALS['SLUG'];
         try{theme_event($action,'attempt',['category'=>$GLOBALS['THEME_WRITE']['category'],'target'=>$GLOBALS['THEME_WRITE']['target'],'risk'=>$GLOBALS['THEME_WRITE']['risk'],'reason'=>$code?'准备修改受保护的自定义代码':'准备执行写操作']);}catch(Throwable $e){unset($GLOBALS['THEME_WRITE']);throw new CRA1ThemeSecurityError('审计服务不可用，本次操作未执行。',503,'AUDIT_UNAVAILABLE');}
     }
+    if(\CRA1\Theme\Storage\ConfigurationTransfer::tracks($action))(new \CRA1\Theme\Storage\ConfigurationTransfer($GLOBALS['ROOT']))->checkpoint($action,(string)$a['username']);
 }
 function theme_api_complete(array $data): array {
     $w=$GLOBALS['THEME_WRITE']??null;if(!$w)return $data;unset($GLOBALS['THEME_WRITE']);$status=(int)($data['status']??500);$diff=theme_diff($w['before'],theme_read_domains());$partial=($data['data']['snapshot_ok']??true)===false;
@@ -107,6 +112,7 @@ function theme_api_complete(array $data): array {
     if($status===200&&strpos($w['action'],'security.accounts.')===0&&isset($data['data']['id'])){$account=$data['data'];$w['target']='account:'.$account['id'];$old=$w['account_before']??[];foreach(['username','role','enabled','mfa_enabled','must_change']as$k)if(($old[$k]??null)!==($account[$k]??null))$diff[]=['field'=>$k,'before'=>$old[$k]??null,'after'=>$account[$k]??null];if(!empty($w['password_reset']))$diff[]=['field'=>'password_reset','changed'=>true];if(!empty($w['mfa_reset']))$diff[]=['field'=>'mfa_reset','changed'=>true];}
     if($status===200&&isset($w['settings_before'])){foreach(theme_security()->settings()as$k=>$v)if(json_encode($w['settings_before'][$k]??null)!==json_encode($v))$diff[]=['field'=>$k,'before'=>$w['settings_before'][$k]??null,'after'=>$v];}
     if($status===200&&isset($w['entry_before'])){$r=json_decode((string)@file_get_contents($GLOBALS['ROOT'].'/runtime/cra1_theme/entry.json'),true);$diff[]=['field'=>'entry','before'=>$w['entry_before'],'after'=>$r['entry']??''];}
+    if($status===200&&$w['action']==='transfer.history.settings.save')$diff[]=['field'=>'history_limit','before'=>$data['data']['previous_limit'],'after'=>$data['data']['history']['limit'],'deleted'=>$data['data']['deleted']];
     try{theme_event($w['action'],$status===200?($partial?'partial':'ok'):'fail',['category'=>$w['category'],'target'=>$w['target'],'risk'=>$w['risk'],'reason'=>$status===200?($partial?'配置已保存，公开快照同步失败':($w['code']?'自定义代码已更新，仅记录摘要':'操作已完成')):(string)($data['msg']??'操作失败')],$diff);}catch(Throwable $e){$data['code']='AUDIT_COMPLETION_FAILED';$data['msg']=$status===200?'已保存，审计记录异常，请联系超级管理员。':'操作未完成，审计记录异常，请联系超级管理员。';$data['data']['audit_ok']=false;}
     return $data;
 }

@@ -131,7 +131,7 @@ function OverviewPanel({ onNavigateTab }) {
   /* 概览改为「横向指标条」（与财务中心同款）：一张卡并排评分+三项状态 */
   return (
     <>
-      {readError&&<Alert tone="error">{readError}<Button variant="link" onClick={()=>location.reload()}>重新读取</Button></Alert>}
+      {readError&&<Alert tone="error">页面错误，请刷新重试</Alert>}
       <Card>
         <CardContent className="grid grid-cols-2 gap-4 p-5 xl:grid-cols-4">
           <div>

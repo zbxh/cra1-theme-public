@@ -55,7 +55,7 @@ export default function AccountPage() {
   }, [])
 
   if (loading) return <AccountSkeleton />
-  if (error) return <Alert tone="error">{error}<Button variant="link" onClick={load}>重新加载</Button></Alert>
+  if (error) return <Alert tone="error">页面错误，请刷新重试</Alert>
 
   /* 头像：统一走共享实现（/web/cra1/assets/js/avatar.js，与官网、会员中心顶栏同一套算法）。
      文件由 footer.php 全局加载；若尚未就绪则回退为首字母 + 品牌蓝底。 */

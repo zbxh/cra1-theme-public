@@ -63,8 +63,7 @@ export function NetworkErrorPage() {
       icon={WifiOff}
       code="ERR"
       title="网络连接异常"
-      description="无法连接到服务器，请检查网络后重试。"
-      primary={<Button onClick={() => window.location.reload()}>重新加载</Button>}
+      description="页面错误，请刷新重试"
       secondary={<Button variant="outline" onClick={() => { window.location.href = '/home.htm' }}>返回控制台</Button>}
     />
   )

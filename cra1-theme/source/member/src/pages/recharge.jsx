@@ -120,7 +120,7 @@ export default function RechargePage() {
     <div className="space-y-4">
       {orderId&&<Alert>充值订单已创建。若未打开收银台，可点击下方按钮继续支付。</Alert>}
       {creationUnknown&&<Alert tone="warning">暂时无法确认充值订单是否已创建。请先查看订单列表，避免重复充值。<Button variant="link" onClick={()=>location.assign('/finance.htm')}>查看订单</Button></Alert>}
-      {(loadError||certError)&&<Alert tone="error">{loadError||certError}<Button variant="link" onClick={()=>location.reload()}>重新读取</Button></Alert>}
+      {(loadError||certError)&&<Alert tone="error">页面错误，请刷新重试</Alert>}
       <PageHeader
         title="余额充值"
         description="为账户余额充值，可用于支付订单与续费"

@@ -181,6 +181,7 @@ final class CRA1ThemeMediaStore
         if ($this->referenceTexts === null) {
             $files=glob($this->root.'/runtime/cra1_theme/*.json')?:[];
             foreach (['previews','backups'] as $folder) $files=array_merge($files,glob($this->root.'/runtime/cra1_theme/'.$folder.'/*.json')?:[]);
+            foreach(['transfers/backups','transfers/incoming'] as$folder)$files=array_merge($files,glob($this->root.'/runtime/cra1_theme/'.$folder.'/*.json')?:[]);
             $files[]=$this->root.'/public/web/cra1/controller/storage.json';
             $this->referenceTexts=[];
             foreach ($files as $file) {
@@ -189,6 +190,11 @@ final class CRA1ThemeMediaStore
                 if (strpos($file,'/previews/')!==false) { $doc=json_decode($text,true); if (($doc['expires_at']??$doc['expires']??PHP_INT_MAX)<time()) continue; }
                 $key=basename($file); $labels=['config.json'=>'官网主题','member_center.json'=>'会员中心主题','cart_theme.json'=>'购物车主题','member_center_public.json'=>'会员中心快照','cart_theme_public.json'=>'购物车快照','storage.json'=>'兼容主题配置'];
                 $label=$labels[$key]??(strpos($file,'/previews/')!==false?'未过期的预览草稿':'主题备份或设置');
+                if(strpos($file,'/transfers/')!==false){
+                    $doc=json_decode($text,true);if(isset($doc['expires'])&&$doc['expires']<time())continue;
+                    if(isset($doc['files'])&&is_array($doc['files']))foreach($doc['files']as$name=>$encoded){if(!in_array($name,['config.json','member_center.json','cart_theme.json','announcements.json'],true)||!is_string($encoded))continue;$decoded=base64_decode($encoded,true);if($decoded!==false)$text.='\n'.str_replace('\\/','/',$decoded);}
+                    $label='配置历史或待导入配置';
+                }
                 $this->referenceTexts[]=[$label,$text,rawurldecode($text)];
             }
         }

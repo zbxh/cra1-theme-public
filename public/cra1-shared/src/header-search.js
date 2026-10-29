@@ -197,9 +197,8 @@
       });
       if (state.errors.length) {
         var error = doc.createElement('div'); error.className = 'cra1-header-search__error'; error.setAttribute('role', 'status');
-        var message = doc.createElement('span'); message.textContent = state.errors.join('、') + '暂时无法搜索';
-        var retry = doc.createElement('button'); retry.type = 'button'; retry.textContent = '重试'; retry.addEventListener('mousedown', function (event) { event.preventDefault(); });
-        retry.addEventListener('click', function () { UI.focus(input); perform(); }); error.append(message, retry); resultsNode.appendChild(error);
+        var message = doc.createElement('span'); message.textContent = '页面错误，请刷新重试';
+        error.append(message); resultsNode.appendChild(error);
       }
       setActive();
     }

@@ -169,3 +169,15 @@ export const securityApi={call:(action,p={})=>api('api.security.'+action,p),expo
   if(!r.ok){const j=await r.json();throw new Error(j.msg)}
   const blob=await r.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='主题后台审计.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return {nextCursor:r.headers.get('X-Next-Cursor')}
 }}
+
+/** Authenticated POST downloads share the ordinary API's CSRF and session boundary. */
+export async function downloadFile(route, body, filename, options={}) {
+  const response=await fetch(base+'?r='+route,{method:'POST',credentials:'same-origin',signal:options.signal,headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(body||{})})
+  if(!response.ok||!response.headers.get('content-type')?.includes('application/zip')) {
+    const result=await response.json().catch(()=>null)
+    if(result?.status===401)window.location.replace(base+'?r=login')
+    throw new ApiError(result?.msg||'下载未完成，请重试',result?.status||response.status,result)
+  }
+  const url=URL.createObjectURL(await response.blob()),link=document.createElement('a')
+  link.href=url;link.download=filename;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)
+}

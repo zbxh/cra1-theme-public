@@ -57,7 +57,7 @@ trait ThemeEditorStore
                         if(trim($line)==='')continue;$target=$this->rowPage($line);
                         if($key==='page_hero_rows_text'&&$target==='')continue;
                         if(!cra1_row_targets_page($target,$pk))continue;
-                        $normalized=preg_replace('/^([!>]*)[^|]*\|/','$1'.$pk.'|',$line,1);
+                        $normalized=preg_replace_callback('/^([!>]*)[^|]*\|/',static function($match)use($pk){return $match[1].$pk.'|';},$line,1);
                         $lines[]=$normalized;if($target===$pk)$exact[]=$normalized;else$shared[]=$normalized;
                     }
                     // Single-value readers take the first visible row. Keep the

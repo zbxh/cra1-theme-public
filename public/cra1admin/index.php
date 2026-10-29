@@ -161,7 +161,9 @@ function read_body(): array
     }
     $body = [];
     $raw = file_get_contents('php://input');
-    if (is_string($raw) && $raw !== '' && strlen($raw) < 262144) {
+    $transferRequest=strpos((string)($_GET['r']??''),'api.menu.')===0;
+    if(is_string($raw)&&strlen($raw)>=($transferRequest?4194304:262144))throw new InvalidArgumentException('请求内容过大，请缩小导入内容后重试');
+    if (is_string($raw) && $raw !== '') {
         $decoded = json_decode($raw, true);
         if (is_array($decoded)) {
             $body = $decoded;
@@ -1263,6 +1265,46 @@ if (strpos($r,'api.')===0) {
     if(strpos($action,'security.')===0||in_array($action,['auth.reauth','logs'],true))theme_security_api($action,$body);
 
     if (strpos($action,'release.')===0) json_out(\CRA1\Theme\Release\Management::run(substr($action,8),$body));
+
+    if (strpos($action,'menu.')===0) {
+        $transfer=new \CRA1\Theme\Storage\MenuTransfer($ROOT);
+        if($action==='menu.export'){
+            if(!is_array($body['sidebar']??null)||!is_array($body['selected']??null))throw new InvalidArgumentException('请选择需要导出的菜单');
+            json_out(['status'=>200,'data'=>$transfer->export($body['sidebar'],$body['selected'],!empty($body['recent']))]);
+        }
+        if($action==='menu.preview'){
+            if(!is_array($body['sidebar']??null))throw new InvalidArgumentException('菜单草稿格式不正确');
+            json_out(['status'=>200,'data'=>$transfer->preview($body['sidebar'])]);
+        }
+        if(!is_array($body['document']??null))throw new InvalidArgumentException('菜单文件格式不正确');
+        $transfer->validate($body['document']);
+        if($action==='menu.inspect')json_out(['status'=>200,'data'=>['sidebar'=>$body['document']['sidebar']]]);
+        if($action==='menu.import'){
+            if(!is_array($body['selected']??null)||!is_array($body['sidebar']??null))throw new InvalidArgumentException('请选择需要导入的菜单');
+            json_out(['status'=>200,'msg'=>'已应用到菜单草稿，保存后生效','data'=>$transfer->proposal($body['document'],$body['selected'],!empty($body['recent']),$body['sidebar'],(string)($body['mode']??'append'))]);
+        }
+        throw new InvalidArgumentException('未知菜单传输操作');
+    }
+    if (strpos($action,'transfer.')===0) {
+        $transfer=new \CRA1\Theme\Storage\ConfigurationTransfer($ROOT);
+        if($action==='transfer.get')json_out(['status'=>200,'data'=>['interrupted'=>is_file($STORE.'/transfer-pending.json'),'history'=>$transfer->history()]]);
+        if($action==='transfer.history.settings.save')json_out($transfer->saveHistoryLimit($body['limit']??null,$body['expected_limit']??null));
+        if($action==='transfer.export')json_out(['status'=>200,'data'=>!empty($body['images'])?$transfer->exportWithMedia((string)$THEME_SETTINGS['canonical_url'],(int)theme_actor()['id'],$THEME_SESSION_HASH):$transfer->export((string)$THEME_SETTINGS['canonical_url'])]);
+        if($action==='transfer.history.prepare')json_out(['status'=>200,'data'=>$transfer->prepareHistory((string)($body['id']??''),(int)theme_actor()['id'],$THEME_SESSION_HASH,(string)theme_actor()['username'])]);
+        if($action==='transfer.media.download'){
+            $path=(new \CRA1\Theme\Storage\ConfigurationMedia($ROOT))->download((string)($body['id']??''),(int)theme_actor()['id'],$THEME_SESSION_HASH);
+            header('Content-Type: application/zip');header('Content-Disposition: attachment; filename="CRA1-configuration-images.zip"');header('Content-Length: '.filesize($path));header('Cache-Control: private, no-store');header('X-Content-Type-Options: nosniff');readfile($path);exit;
+        }
+        if($action==='transfer.prepare'){
+            $file=$_FILES['file']??[];
+            if(($file['error']??UPLOAD_ERR_NO_FILE)!==UPLOAD_ERR_OK||!is_uploaded_file($file['tmp_name']??'')||($file['size']??0)>\CRA1\Theme\Storage\ConfigurationTransfer::MAX_BYTES)throw new InvalidArgumentException('请选择不超过 8MB 的配置 JSON 文件');
+            $doc=\CRA1\Theme\Storage\ConfigurationTransfer::decode((string)file_get_contents($file['tmp_name']));
+            json_out(['status'=>200,'data'=>$transfer->prepare($doc,(int)theme_actor()['id'],$THEME_SESSION_HASH,(string)theme_actor()['username'])]);
+        }
+        if($action==='transfer.apply')json_out($transfer->apply((string)($body['candidate']??''),(int)theme_actor()['id'],$THEME_SESSION_HASH,(string)theme_actor()['username']));
+        if($action==='transfer.recover')json_out($transfer->recover());
+        throw new InvalidArgumentException('未知配置传输操作');
+    }
 
     if ($action==='announcements.legacy-draft') {
         $store=new \CRA1\Theme\Storage\AnnouncementStore($ROOT);

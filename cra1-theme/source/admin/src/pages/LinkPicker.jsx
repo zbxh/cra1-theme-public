@@ -31,32 +31,35 @@ export default function LinkPicker({ value, onChange, placeholder, label='跳转
   const [tab, setTab] = useState('page')
   const [pages, setPages] = useState([])
   const [products, setProducts] = useState({ groups: [], products: [] })
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState({ page: true, product: true })
+  const [loaded, setLoaded] = useState({ page: false, product: false })
   const [q, setQ] = useState('')
   const [groupId, setGroupId] = useState('')
-  const [error, setError] = useState('')
-  const [attempt, setAttempt] = useState(0)
+  const [error, setError] = useState({ page: false, product: false })
   const [contactType, setContactType] = useState(/^mailto:/.test(value||'')?'mailto':'tel')
 
   useEffect(() => {
     if (!open) return
     let alive = true
-    setLoading(true)
-    setError('')
-    Promise.all([
-      pages.length ? Promise.resolve(null) : websiteApi.linkOptions(),
-      products.products.length ? Promise.resolve(null) : websiteApi.productOptions(),
-    ]).then(([lo, po]) => {
-      if (!alive) return
-      if (lo && lo.status === 200) setPages(lo.data?.pages || [])
-      if (po && po.status === 200) setProducts(po.data || { groups: [], products: [] })
-      const failed = [lo,po].find((r) => r && r.status !== 200)
-      if (failed) setError(failed.msg || '链接来源读取失败')
-    }).catch((e) => { if (alive) setError(e.message || '链接来源读取失败') })
-      .finally(() => { if (alive) setLoading(false) })
+    function read(key, request, apply) {
+      if (loaded[key]) return
+      request().then((res) => {
+        if (!alive) return
+        if (res.status !== 200) throw new Error('读取失败')
+        apply(res.data)
+      }).catch(() => {
+        if (alive) setError((prev) => ({ ...prev, [key]: true }))
+      }).finally(() => {
+        if (!alive) return
+        setLoaded((prev) => ({ ...prev, [key]: true }))
+        setLoading((prev) => ({ ...prev, [key]: false }))
+      })
+    }
+    read('page', websiteApi.linkOptions, (data) => setPages(data?.pages || []))
+    read('product', websiteApi.productOptions, (data) => setProducts(data || { groups: [], products: [] }))
     return () => { alive = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, attempt])
+  }, [open])
 
   const filteredPages = useMemo(() => {
     const s = q.trim().toLowerCase()
@@ -88,7 +91,7 @@ export default function LinkPicker({ value, onChange, placeholder, label='跳转
 
       {open && (
         <div className="mt-2 overflow-hidden rounded-lg border border-line bg-surface">
-          {error && <div role="alert" className="flex flex-wrap items-center gap-2 p-3 text-xs text-danger">{error}<Button size="sm" variant="outline" onClick={() => setAttempt((n) => n+1)}>重试读取</Button></div>}
+          {error[tab] && <div role="alert" className="p-3 text-xs text-danger">页面错误，请刷新重试</div>}
           <div className="flex flex-wrap items-center gap-1 border-b border-line bg-surface-alt/60 p-2">
             {TABS.map((t) => {
               const Icon = t.icon
@@ -110,9 +113,9 @@ export default function LinkPicker({ value, onChange, placeholder, label='跳转
           </div>
 
           <div className="max-h-64 overflow-y-auto p-2">
-            {loading && <p className="px-2 py-3 text-[12px] text-muted-foreground">加载中…</p>}
+            {loading[tab] && <p className="px-2 py-3 text-[12px] text-muted-foreground">加载中…</p>}
 
-            {!loading && tab === 'page' && (
+            {!loading.page && !error.page && tab === 'page' && (
               filteredPages.length === 0
                 ? <p className="px-2 py-3 text-[12px] text-muted-foreground">没有匹配的页面</p>
                 : filteredPages.map((p) => (
@@ -124,7 +127,7 @@ export default function LinkPicker({ value, onChange, placeholder, label='跳转
                 ))
             )}
 
-            {!loading && tab === 'product' && (
+            {!loading.product && !error.product && tab === 'product' && (
               <>
                 <div className="mb-2 flex flex-wrap items-center gap-2 px-1">
                   <Label className="text-[11px] text-muted-foreground">分组</Label>
@@ -148,7 +151,7 @@ export default function LinkPicker({ value, onChange, placeholder, label='跳转
             )}
 
             {tab === 'contact' && <div className="space-y-3 p-2"><Choice aria-label="联系方式类型" value={contactType} onChange={e=>setContactType(e.target.value)}><option value="tel">拨打电话</option><option value="mailto">发送邮件</option></Choice><Input aria-label={contactType==='tel'?'电话号码':'邮箱地址'} value={String(value||'').startsWith(contactType+':')?String(value).slice(contactType.length+1):''} placeholder={contactType==='tel'?'填写电话号码':'填写邮箱地址'} onChange={e=>onChange(e.target.value?contactType+':'+e.target.value:'')}/><Button variant="outline" size="sm" onClick={()=>setOpen(false)}>完成</Button></div>}
-            {!loading && tab === 'custom' && (
+            {tab === 'custom' && (
               <div className="space-y-2 p-1">
                 <p className="text-[12px] leading-5 text-muted-foreground">
                   直接在上方输入框填写链接。支持站内路径（<code className="font-mono">/about.html</code>）、

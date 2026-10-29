@@ -47,7 +47,7 @@ export function createAutoRenewController(api, onChange) {
         const response = await api.renewAutoStatus()
         if (!disposed) confirm(response, target)
       } catch (error) {
-        update({ phase: 'error', error: `无法读取自动续费状态：${error.message || '请稍后重试'}。点击开关重新读取。` })
+        update({ phase: 'error', error: '页面错误，请刷新重试' })
       } finally {
         locked = false
       }
@@ -70,8 +70,8 @@ export function createAutoRenewController(api, onChange) {
         update({
           phase: 'error',
           error: submitted
-            ? `设置已提交，但状态确认失败：${error.message || '请稍后重试'}。点击开关重新确认。`
-            : `自动续费设置未完成：${error.message || '请稍后重试'}。点击开关重新读取状态后再操作。`,
+            ? '设置已提交，但状态尚未确认。页面错误，请刷新重试'
+            : `自动续费设置未完成：${error.message || '页面错误，请刷新重试'}。请刷新页面后确认状态。`,
         })
       } finally {
         locked = false

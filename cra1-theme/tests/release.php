@@ -53,18 +53,23 @@ try{
  $info=Package::inspect($path);check(count($info['manifest']['files'])===2,'manifest inventory');
  $up=new Updater($site,'cra1admin',static function(){return ['database'=>true,'system_version'=>'10.7.4','modules'=>[]];});
  $unknown=new Updater($site,'cra1admin',static function(){return ['database'=>true,'system_version'=>'10.7.5','modules'=>[]];});
- check(!$unknown->preflight($path)['can_apply'],'unknown version must block update');
+ check($unknown->preflight($path)['can_apply']&&count($unknown->preflight($path)['warnings'])===1,'unknown combination warns without blocking theme-only update');
+ check(!CRA1\Theme\Release\Inspector::runtimeMatch($info['manifest'],['system_version'=>'10.7.5','modules'=>[]]),'allowing file update never marks unknown runtime as verified');
+ $extra=new Updater($site,'cra1admin',static function(){return ['database'=>true,'system_version'=>'10.7.4','modules'=>[['name'=>'FixtureThirdParty','version'=>'1.0.0','status'=>1]]];});
+ check($extra->preflight($path)['can_apply']&&count($extra->preflight($path)['warnings'])===1,'extra third-party modules do not prevent theme-only update');
+ $offline=new Updater($site,'cra1admin',static function(){return ['database'=>false,'system_version'=>'','modules'=>[]];});
+ check(!$offline->preflight($path)['can_apply'],'unreadable system context remains a retryable blocker');
  $contract=$base.'/native-contract.zip';
  zipFixture($contract,['public/web/cra1/example.js'=>'after'],[],['native_dependencies'=>[['path'=>'app/protected.php','verified_sha256'=>[$protected]]]]);
  check($up->preflight($contract)['can_apply'],'candidate matches original native file contract');
  Files::atomic($site.'/app/protected.php','same-version modified system file');
- check(!$up->preflight($contract)['can_apply'],'same system version with different native bytes cannot pass update');
+ check($up->preflight($contract)['can_apply']&&$up->preflight($contract)['native_dependencies'][0]['status']==='unverified','native byte differences remain unverified but do not prevent theme-only update');
  Files::atomic($site.'/app/protected.php','system');
  $groupBy=new Updater($site,'cra1admin',static function(){return ['database'=>true,'system_version'=>'10.7.4','modules'=>[],'database_sql_mode'=>'STRICT_TRANS_TABLES,ONLY_FULL_GROUP_BY'];});
  check($groupBy->preflight($contract)['can_apply']&&count($groupBy->preflight($contract)['warnings'])===1,'native query settings remain visible without blocking a theme-file update');
  $unverified=$base.'/unverified-contract.zip';
  zipFixture($unverified,['public/web/cra1/example.js'=>'after'],[],['native_dependencies'=>[['path'=>'app/protected.php','verified_sha256'=>[]]]]);
- check(!$up->preflight($unverified)['can_apply'],'unverified original file is not accepted by update');
+ check($up->preflight($unverified)['can_apply']&&count($up->preflight($unverified)['warnings'])===1,'unverified originals are reported without preventing theme-only update');
  $integration=['id'=>'fixture-reviewed-integration','provenance'=>'reviewed-integration','system'=>'10.7.4','modules'=>[],
   'review_sha256'=>hash('sha256','isolated integration review'),'files'=>['app/protected.php'=>hash('sha256','reviewed'),'app/dependency.php'=>hash('sha256','nested')]];
  Files::atomic($site.'/app/protected.php','reviewed');Files::atomic($site.'/app/dependency.php','nested');
@@ -72,9 +77,9 @@ try{
  zipFixture($integrationZip,['public/web/cra1/example.js'=>'after'],[],['verified_combinations'=>[],'integration_profiles'=>[$integration],
   'native_dependencies'=>[['path'=>'app/protected.php','verified_sha256'=>[$protected]]]]);
  check($up->preflight($integrationZip)['can_apply'],'complete reviewed integration passes native update checks');
- check(!$unknown->preflight($integrationZip)['can_apply'],'integration cannot be reused for another system version');
+ check(!CRA1\Theme\Release\Inspector::runtimeMatch(Package::inspect($integrationZip)['manifest'],['system_version'=>'10.7.5','modules'=>[]]),'integration is never reported as verified for another system version');
  Files::atomic($site.'/app/dependency.php','changed nested dependency');
- check(!$up->preflight($integrationZip)['can_apply'],'changed transitive integration dependency blocks update');
+ check($up->preflight($integrationZip)['can_apply']&&$up->preflight($integrationZip)['native_dependencies'][0]['status']==='unverified','changed transitive dependency stays unverified without blocking theme-only update');
  Files::atomic($site.'/app/dependency.php','nested');
  $badIntegration=$integration;unset($badIntegration['review_sha256']);$badIntegrationZip=$base.'/missing-integration-review.zip';
  zipFixture($badIntegrationZip,['public/web/cra1/example.js'=>'after'],[],['integration_profiles'=>[$badIntegration]]);
@@ -97,7 +102,7 @@ try{
  symlink($site.'/app/protected.php',$site.'/app/native-link.php');
  $linked=$base.'/linked-contract.zip';
  zipFixture($linked,['public/web/cra1/example.js'=>'after'],[],['native_dependencies'=>[['path'=>'app/native-link.php','verified_sha256'=>[$protected]]]]);
- check(!$up->preflight($linked)['can_apply'],'matching native bytes through symlink cannot pass update');
+ check($up->preflight($linked)['can_apply']&&$up->preflight($linked)['native_dependencies'][0]['status']==='blocked','native symlink is never a verified business contract or written by the update');
  $invalidNative=$base.'/invalid-native-contract.zip';
  zipFixture($invalidNative,['public/web/cra1/example.js'=>'after'],[],['native_dependencies'=>[['path'=>'config.php','verified_sha256'=>[$protected]]]]);
  rejects(static function()use($invalidNative){Package::inspect($invalidNative);},'native declaration outside native paths accepted');
@@ -118,6 +123,11 @@ try{
  $bad=$base.'/traversal.zip';zipFixture($bad,['public/web/cra1/x.js'=>'x'],['payload/../../escape.php'=>'evil']);rejects(static function()use($bad){Package::inspect($bad);},'zip traversal accepted');
  $bad=$base.'/symlink.zip';zipFixture($bad,['public/web/cra1/x.js'=>'x']);$zip=new ZipArchive();$zip->open($bad);$zip->setExternalAttributesName('payload/public/web/cra1/x.js',ZipArchive::OPSYS_UNIX,0120777<<16);$zip->close();rejects(static function()use($bad){Package::inspect($bad);},'archive symlink accepted');
  $bad=$base.'/hash.zip';zipFixture($bad,['public/web/cra1/x.js'=>'x']);$zip=new ZipArchive();$zip->open($bad);$zip->addFromString('payload/public/web/cra1/x.js','y');$zip->close();rejects(static function()use($bad){Package::inspect($bad);},'tampered payload accepted');
+ $mixed=$base.'/mixed-size.zip';$large=str_repeat('L',8388609);
+ zipFixture($mixed,['public/web/cra1/empty.js'=>'','public/web/cra1/small.js'=>'small','public/web/cra1/large.js'=>$large]);
+ check(count(Package::inspect($mixed)['manifest']['files'])===3,'indexed small and empty entries coexist with streamed large entries');
+ $zip=new ZipArchive();$zip->open($mixed);$zip->addFromString('payload/public/web/cra1/large.js','X'.substr($large,1));$zip->close();unset($large);
+ rejects(static function()use($mixed){Package::inspect($mixed);},'tampered streamed large payload accepted');
  $bad=$base.'/blocked.zip';zipFixture($bad,['public/web/cra1/x.js'=>'x'],[],['release_blockers'=>['clean baseline missing']]);check(!$up->preflight($bad)['can_apply'],'candidate blockers not enforced');
  $internal=$base.'/commercial-pending.zip';
  $runtimeCombination=['system'=>'10.7.4','modules'=>[],'evidence'=>['scope'=>'native-runtime-baseline','official_upgrade'=>true,'record_sha256'=>hash('sha256','isolated baseline evidence')]];
@@ -128,13 +138,13 @@ try{
  zipFixture($testPackage,['public/web/cra1/example.js'=>'test UI'],[],['release_channel'=>'test','verified_combinations'=>[],'installation_combinations'=>[$runtimeCombination],'commercial_blockers'=>['full support unverified'],'native_dependencies'=>[['path'=>'app/protected.php','verified_sha256'=>[$protected]]]]);
  $testCheck=$up->preflight($testPackage);
  check($testCheck['release_channel']==='test'&&$testCheck['can_apply']&&!isset($testCheck['commercial_release_accepted']),'test update remains installable without inventing commercial acceptance');
- check(!$unknown->preflight($testPackage)['can_apply'],'test channel never permits an unverified system upgrade');
+ check($unknown->preflight($testPackage)['can_apply']&&!CRA1\Theme\Release\Inspector::runtimeMatch(Package::inspect($testPackage)['manifest'],['system_version'=>'10.7.5','modules'=>[]]),'test update allows theme files without claiming system-upgrade verification');
  $invalidChannel=$base.'/invalid-channel.zip';zipFixture($invalidChannel,['public/web/cra1/x.js'=>'x'],[],['release_channel'=>'unchecked']);
  rejects(static function()use($invalidChannel){Package::inspect($invalidChannel);},'unknown release channel accepted');
- check(!$unknown->preflight($internal)['can_apply'],'commercial separation does not permit an unknown native runtime');
+ check(count($unknown->preflight($internal)['warnings'])>0,'unverified native runtime remains visible during file update');
  Files::atomic($site.'/app/protected.php','unverified native bytes');
- check(!$up->preflight($internal)['can_apply'],'commercial separation never skips native byte verification');
- check(!$up->preflight($testPackage)['can_apply'],'test channel never skips native byte verification after a system update');
+ check($up->preflight($internal)['native_dependencies'][0]['status']==='unverified','native byte verification is still performed');
+ check($up->preflight($testPackage)['native_dependencies'][0]['status']==='unverified','test channel preserves native compatibility results after system changes');
  Files::atomic($site.'/app/protected.php','system');
  $invalid=$base.'/invalid-runtime-evidence.zip';zipFixture($invalid,['public/web/cra1/x.js'=>'x'],[],['installation_combinations'=>[['system'=>'10.7.4','modules'=>[],'evidence'=>['scope'=>'complete-support']]]]);
  rejects(static function()use($invalid){Package::inspect($invalid);},'runtime baseline without official evidence accepted');

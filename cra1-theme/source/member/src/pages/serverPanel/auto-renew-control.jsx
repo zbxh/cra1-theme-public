@@ -40,13 +40,13 @@ export const AutoRenewButton = forwardRef(function AutoRenewButton({ state, disa
   const known = typeof state.enabled === 'boolean' && state.phase !== 'error' && !disabledReason
   const label = disabledReason ? '不支持自动续费'
     : state.phase === 'loading' ? '正在读取自动续费…'
-      : state.phase === 'error' ? '重试读取自动续费'
+      : state.phase === 'error' ? '自动续费状态未确认'
         : state.phase === 'saving' || state.phase === 'confirming'
           ? `正在${state.target ? '开启' : '关闭'}自动续费…`
           : `已${state.enabled ? '开启' : '关闭'}自动续费`
   const displayLabel = !compact ? label : disabledReason ? '不可用'
     : state.phase === 'loading' ? '读取中…'
-      : state.phase === 'error' ? '重试读取'
+      : state.phase === 'error' ? '状态未确认'
         : state.phase === 'saving' || state.phase === 'confirming' ? `${state.target ? '开启' : '关闭'}中…`
           : `已${state.enabled ? '开启' : '关闭'}`
 
@@ -60,7 +60,7 @@ export const AutoRenewButton = forwardRef(function AutoRenewButton({ state, disa
         aria-busy={busy}
         aria-describedby={state.error && !disabledReason ? errorId : undefined}
         data-on={known && state.enabled}
-        disabled={busy || !!disabledReason || props.disabled}
+        disabled={busy || state.phase === 'error' || !!disabledReason || props.disabled}
         title={disabledReason || (compact ? label : undefined)}
         onClick={event => {
           restoreFocus.current = document.activeElement === button.current

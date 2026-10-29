@@ -50,7 +50,7 @@
                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
                 </button>
             </div>
-            <div x-cloak x-show="!loadingProducts && productsFailed" class="empty-state text-center py-8" role="status"><p>暂时无法读取商品，请稍后重试</p><button type="button" class="empty-link" @click="loadProducts()">重新加载</button></div>
+            <div x-cloak x-show="!loadingProducts && productsFailed" class="empty-state text-center py-8" role="status"><p>页面错误，请刷新重试</p></div>
             <div x-cloak x-show="!loadingProducts && !productsFailed && products.length === 0" class="empty-state mt-8">{if ( cra1_content_explicit($data.cra1, 'pricing_copy.empty_intro') || (( isset($data.cra1.pricing_copy['empty_intro']) && $data.cra1.pricing_copy['empty_intro'] )) ) }{$data.cra1.pricing_copy['empty_intro']}{else /}暂无可展示商品，请前往{/if}<a href="/cart/goodsList.htm" class="text-brand">商品目录</a>{if ( cra1_content_explicit($data.cra1, 'pricing_copy.txt2') || (( isset($data.cra1.pricing_copy['txt2']) && $data.cra1.pricing_copy['txt2'] )) ) }{$data.cra1.pricing_copy['txt2']}{else /}查看可用服务。{/if}</div>
         </div>
     </section>

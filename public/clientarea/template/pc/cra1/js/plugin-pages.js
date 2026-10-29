@@ -63,12 +63,9 @@
       status = root.document.createElement('p'); status.className = 'cra1-plugin-read-status';
       status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite'); host.appendChild(status);
     }
-    var state = vm.cra1CertificationState, text = state === 'loading' ? '正在加载认证方式…' : state === 'empty' ? '暂未提供可用认证方式，请联系在线客服。' : state === 'error' ? '认证方式暂时无法加载，请稍后重试。' : vm.cra1CertificationConfig === 'error' ? '所选认证方式暂时无法加载，请重试。' : '';
+    var state = vm.cra1CertificationState, text = state === 'loading' ? '正在加载认证方式…' : state === 'empty' ? '暂未提供可用认证方式，请联系在线客服。' : state === 'error' ? '页面错误，请刷新重试' : vm.cra1CertificationConfig === 'error' ? '页面错误，请刷新重试' : '';
     status.textContent = text; status.hidden = !text;
-    if (state === 'error' || vm.cra1CertificationConfig === 'error') {
-      var retry = root.document.createElement('button'); retry.type = 'button'; retry.className = 'cui-button cui-button--outline'; retry.textContent = '重新加载';
-      retry.onclick = function () { if (state === 'error') vm.getCertificationInfo(); else vm.getConfig(); }; status.appendChild(retry);
-    }
+
     var blocked = state !== 'ready' || vm.cra1CertificationConfig !== 'ready' || !vm.checkedVlue || vm.configLoading;
     Array.from(vm.$el.querySelectorAll('.next-box button')).forEach(function (button) { button.disabled = blocked; button.setAttribute('aria-disabled', String(blocked)); });
     Array.from(host.querySelectorAll('.el-select input')).forEach(function (input) { input.disabled = state !== 'ready' || vm.configLoading; });
@@ -80,10 +77,7 @@
     var status = host.querySelector('.cra1-plugin-read-status');
     if (!status) { status = root.document.createElement('p'); status.className = 'cra1-plugin-read-status'; status.setAttribute('role', 'status'); host.appendChild(status); }
     status.hidden = vm.cra1TicketState !== 'error';
-    status.textContent = '工单详情暂时无法加载，请稍后重试。';
-    if (!status.hidden) {
-      var retry = root.document.createElement('button'); retry.type = 'button'; retry.className = 'cui-button cui-button--outline'; retry.textContent = '重新加载'; retry.onclick = function () { vm.getDetails(); }; status.appendChild(retry);
-    }
+    status.textContent = '页面错误，请刷新重试';
   }
 
   // Patch only the identified native root instances, before Vue initializes
@@ -356,9 +350,9 @@
     template: `<section class="cra1-articles" aria-label="公告中心" :aria-busy="String(loading)">
       <header class="cra1-articles__heading"><div><h1>{{detail ? '公告详情' : '公告中心'}}</h1><p v-if="!detail">了解最新动态与服务公告</p></div><a v-if="detail" :href="base+'source.htm'" class="cui-button cui-button--outline">返回公告列表</a></header>
       <template v-if="!detail"><form class="cra1-articles__search" @submit.prevent="search"><input class="cui-input" v-model="keywords" type="search" maxlength="100" placeholder="搜索公告" aria-label="搜索公告"><button class="cui-button cui-button--primary" type="submit">搜索</button></form>
-        <nav class="cra1-articles__categories" aria-label="公告分类" :aria-busy="String(categoriesLoading)"><button type="button" :aria-current="category===''?'true':null" @click="select('')">全部公告</button><button type="button" v-for="item in categories" :key="item.id" :aria-current="category===String(item.id)?'true':null" @click="select(item.id)">{{item.name}}</button><span v-if="categoriesFailure" class="cra1-articles__category-status" role="status">{{categoriesFailure}}<button type="button" @click="loadCategories">重试分类</button></span></nav>
+        <nav class="cra1-articles__categories" aria-label="公告分类" :aria-busy="String(categoriesLoading)"><button type="button" :aria-current="category===''?'true':null" @click="select('')">全部公告</button><button type="button" v-for="item in categories" :key="item.id" :aria-current="category===String(item.id)?'true':null" @click="select(item.id)">{{item.name}}</button><span v-if="categoriesFailure" class="cra1-articles__category-status" role="status">页面错误，请刷新重试</span></nav>
       </template>
-      <div v-if="failure" class="cra1-articles__empty" role="alert"><p>{{failure}}</p><button type="button" class="cui-button cui-button--outline" @click="load">重试</button></div>
+      <div v-if="failure" class="cra1-articles__empty" role="alert"><p>页面错误，请刷新重试</p></div>
       <p v-else-if="loading" class="cra1-articles__empty" role="status">正在加载公告…</p>
       <template v-else-if="detail"><article v-if="article" class="cui-card cra1-articles__detail"><h2>{{article.title}}</h2><div class="cra1-articles__meta"><span>{{article.type}}</span><time>{{date(article.create_time)}}</time></div><div class="cra1-articles__body" v-html="content"></div><div v-if="attachments.length" class="cra1-articles__attachments"><h3>附件</h3><a v-for="(file,index) in attachments" :key="file" :href="file" target="_blank" rel="noopener noreferrer">下载附件 {{index+1}}</a></div><nav class="cra1-articles__adjacent" aria-label="相邻公告"><a v-if="article.prev && article.prev.id" :href="href(article.prev.id)">上一篇：{{article.prev.title}}</a><a v-if="article.next && article.next.id" :href="href(article.next.id)">下一篇：{{article.next.title}}</a></nav></article><p v-else class="cra1-articles__empty">该公告不存在或已下架。</p></template>
       <template v-else><ul v-if="items.length" class="cra1-articles__list cui-card"><li v-for="item in items" :key="item.id"><a :href="href(item.id)"><span>{{item.title}}</span><time>{{date(item.create_time)}}</time><span aria-hidden="true">→</span></a></li></ul><p v-else class="cra1-articles__empty">暂无符合条件的公告。</p><nav v-if="total>limit" class="cra1-articles__pagination" aria-label="公告分页"><button type="button" class="cui-button cui-button--outline" :disabled="page<=1" @click="paginate(-1)">上一页</button><span aria-live="polite">{{page}} / {{pages}}</span><button type="button" class="cui-button cui-button--outline" :disabled="page>=pages" @click="paginate(1)">下一页</button></nav></template>

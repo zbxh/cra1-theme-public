@@ -16,8 +16,8 @@ export default function OrderDetailPage() {
   useEffect(()=>{
     let alive=true
     if(!/^[1-9]\d*$/.test(id)){setError('订单信息不完整，请从财务中心重新打开。');setLoading(false);return}
-    get(`/order/${id}`).then(res=>{if(!alive)return;const data=res.data?.order;setOrder(data?.id?data:null);if(data?.id)window.dispatchEvent(new CustomEvent('cra1:page-title',{detail:{name:data.order_sn || `订单 #${id}`}}))}).catch(e=>{if(alive)setError(e.message)}).finally(()=>{if(alive)setLoading(false)})
-    get(`/order/${id}/transaction_record`).then(res=>{if(alive)setRecords(res.data?.list||[])}).catch(()=>{if(alive)setRecordError('交易记录暂时无法读取，可稍后刷新。')})
+    get(`/order/${id}`).then(res=>{if(!alive)return;const data=res.data?.order;setOrder(data?.id?data:null);if(data?.id)window.dispatchEvent(new CustomEvent('cra1:page-title',{detail:{name:data.order_sn || `订单 #${id}`}}))}).catch(()=>{if(alive)setError('页面错误，请刷新重试')}).finally(()=>{if(alive)setLoading(false)})
+    get(`/order/${id}/transaction_record`).then(res=>{if(alive)setRecords(res.data?.list||[])}).catch(()=>{if(alive)setRecordError('页面错误，请刷新重试')})
     return()=>{alive=false}
   },[id])
   async function openCashier(){try{(await sharedReady()).Payments.navigate({orderId:id,operation:'order'})}catch(e){setError(e.message || '收银台暂时无法打开，请重试')}}
@@ -26,7 +26,7 @@ export default function OrderDetailPage() {
   return <div className="cra1-order-detail space-y-5">
     <PageHeader title="订单详情" description={order?`订单 #${order.order_sn || id}`:undefined} actions={<Button variant="outline" size="sm" onClick={()=>location.assign('/finance.htm')}><ArrowLeft className="size-3.5"/>财务中心</Button>}/>
     {error&&<Alert tone="error">{error}</Alert>}
-    {!order?<EmptyState icon={Receipt} title={error?'订单暂时无法读取':'订单不存在'} description="请确认订单属于当前账号，或稍后重试。" action={<Button variant="outline" onClick={()=>location.reload()}>重新读取</Button>}/>:<>
+    {!order?(error?null:<EmptyState icon={Receipt} title="订单不存在" description="请确认订单属于当前账号。"/>):<>
       <Card><CardContent className="flex flex-wrap items-center gap-x-9 gap-y-4 p-6">
         <div><p className="text-xs text-muted-foreground">订单金额</p><p className="mt-1 text-2xl font-semibold tabular-nums break-all">{formatMoney(order.amount)}</p></div>
         <div><p className="text-xs text-muted-foreground">状态</p><p className="mt-2"><Badge tone={st[1]}>{st[0]}</Badge></p></div>

@@ -89,7 +89,10 @@ final class Installer
                 foreach(['attachments','member_avatars','media_rates','member_events']as$table)$media->db->query('SELECT * FROM '.$table.' LIMIT 0');
                 unset($media);
                 foreach(['member_store.php','cart_store.php']as$file)require_once CRA1_THEME_BACKEND.'/Storage/'.$file;
-                $defaults=['config'=>[],'member_center'=>\CRA1\Theme\Storage\MemberCenterStore::defaults(),'cart_theme'=>\CRA1\Theme\Storage\CartThemeStore::defaults()];
+                $memberDefaults=\CRA1\Theme\Storage\MemberCenterStore::defaults();
+                // Seed only absent installations; an existing empty or customized menu is intentional.
+                if(!is_file($this->root.'/runtime/cra1_theme/member_center.json'))$memberDefaults['sidebar']=array_replace($memberDefaults['sidebar'],(new \CRA1\Theme\Storage\MenuTransfer($this->root))->defaults());
+                $defaults=['config'=>[],'member_center'=>$memberDefaults,'cart_theme'=>\CRA1\Theme\Storage\CartThemeStore::defaults()];
                 foreach($defaults as$name=>$value){$path=$this->root.'/runtime/cra1_theme/'.$name.'.json';if(!is_file($path)){Files::putJson($path,$value);$created[]=$path;}else Files::json($path);}
                 $announcementFile=$this->root.'/runtime/cra1_theme/announcements.json';
                 if (!is_file($announcementFile)) $created[]=$announcementFile;

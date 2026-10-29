@@ -22,7 +22,7 @@ const TOGGLES = [
   { key: 'show_cart', label: '显示购物车', desc: '顶栏右侧购物车图标与数量角标' },
   { key: 'show_language', label: '显示语言切换', desc: '多语言站点切换入口' },
   { key: 'show_message', label: '显示消息中心', desc: '需安装 ClientCare 插件才生效' },
-  { key: 'sidebar_default_open', label: '侧边栏默认展开', desc: '关闭时进入会员中心不显示主导航，由顶栏图标唤出' },
+  { key: 'sidebar_default_open', label: '侧边栏默认展开', desc: '控制主导航打开后的默认宽度；会员手动折叠的选择优先' },
 ]
 
 /* v20 手机端二级菜单折叠档位（仅手机端；PC 侧栏恒展开） */

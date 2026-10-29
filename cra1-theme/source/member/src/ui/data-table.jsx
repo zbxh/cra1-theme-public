@@ -81,8 +81,7 @@ export function DataTable({
 
       {error && (
         <div role="alert" className="rounded-lg border border-destructive/20 bg-destructive/5 px-3.5 py-2.5 text-[13px] text-destructive">
-          {window.CRA1Shared?.Errors?.message(error) || '暂时无法读取记录，请稍后重试'}
-          <Button variant="outline" size="sm" className="ml-3" disabled={loading} onClick={onRetry || (() => window.location.reload())}>{onRetry ? '重新加载' : '刷新页面'}</Button>
+          页面错误，请刷新重试
         </div>
       )}
 

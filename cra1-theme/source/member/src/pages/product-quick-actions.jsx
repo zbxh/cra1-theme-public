@@ -26,7 +26,6 @@ function CheckDialog({ action, error, retry, close, url }) {
         : url ? <p>控制台已准备就绪，请点击下方按钮打开。</p>
           : <p className="cra1-product-action-dialog__loading" role="status"><Loader2 className="animate-spin" aria-hidden="true" />正在检查是否可以{action.title}…</p>}
       <DialogFooter><Button variant="outline" onClick={close}>取消</Button>
-        {error && <Button onClick={retry}>重新检查</Button>}
         {url && <a className="cui-button cui-button--primary" href={url} target="_blank" rel="noopener noreferrer" onClick={close}>打开控制台<ExternalLink aria-hidden="true" /></a>}
       </DialogFooter>
     </DialogContent>

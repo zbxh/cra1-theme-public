@@ -95,10 +95,10 @@ try {
   await page.getByRole('button', { name: '选择通知图标', exact: true }).click(); await page.getByLabel('搜索图标', { exact: true }).waitFor(); await page.keyboard.press('Escape')
   check(await page.locator('dialog.ip-dialog[open]').count() === 0, 'aligned icon picker still opens and cancels normally')
   await page.goto(base + '?r=dashboard#/member/edit/home?module=news'); await page.getByLabel('文章时间轴前台标题', { exact: true }).waitFor()
-  catalogFail = true; await page.reload(); await page.getByRole('button', { name: '重试分类', exact: true }).waitFor()
+  catalogFail = true; await page.reload(); await page.getByText('页面错误，请刷新重试', { exact: true }).waitFor(); check(await page.getByRole('button', { name: '重试分类', exact: true }).count() === 0, 'catalogue failure has no retry button')
   check(await page.getByLabel('显示的分类', { exact: true }).isDisabled(), 'catalogue failure prevents accidental category changes')
   check(await page.getByLabel('文章时间轴前台标题', { exact: true }).inputValue() === '帮助指南', 'catalogue failure retains saved copy')
-  catalogFail = false; await page.getByRole('button', { name: '重试分类', exact: true }).click(); await page.getByRole('option', { name: '入门指南', exact: true }).waitFor({ state: 'attached' })
+  catalogFail = false; await page.reload(); await page.getByRole('option', { name: '入门指南', exact: true }).waitFor({ state: 'attached' })
   await context.close()
   const front = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' }), member = await front.newPage(), requests = []
   member.on('pageerror', error => errors.push(error.message))
