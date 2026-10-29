@@ -93,6 +93,18 @@ function cra1IntegrationChecks(array $fixture): array
         $reply=$guard($requestFor($child,"/console/v1/mf_cloud/$host/reboot"));$check($reply['status']===403,'billing permission cannot grant power controls');
         $db::name('addon_idcsmart_sub_account')->where('id',$sub)->update(['host_id'=>'[]']);
         $reply=$guard($requestFor($child,"/console/v1/host/$host/renew"));$check($reply['status']===404,'unassigned product stays hidden from subaccount');
+        // Page grants for future plugins use the installed native registry too.
+        require_once IDCSMART_ROOT.'public/cra1-shared/compatibility.php';
+        $pageId=(int)$db::name('clientarea_auth')->insertGetId(['title'=>'fixture_plugin_page','url'=>'plugin/999991/source.htm','order'=>0,'parent_id'=>0,'module'=>'','plugin'=>'']);
+        $projection=\CRA1ThemeCompatibility::access($child);
+        $pageMap=array_column($projection['pages'],'allowed','url');
+        $check($projection['all']===false && $pageMap['/plugin/999991/source.htm']===false,'native subaccount without a new page grant cannot see its menu');
+        $db::name('addon_idcsmart_sub_account')->where('id',$sub)->update(['auth'=>json_encode([$pageId])]);
+        $projection=\CRA1ThemeCompatibility::access($child);
+        $pageMap=array_column($projection['pages'],'allowed','url');
+        $check($pageMap['/plugin/999991/source.htm']===true,'granting a native page exposes its menu without hardcoded plugin adapters');
+        $projection=\CRA1ThemeCompatibility::access($owner);
+        $check($projection['all']===true && $projection['pages']===[],'main account does not receive unnecessary page grant data');
         // Native SMS validation consumes the code once; the theme observes only the request-local proof.
         $template=$db::name('host')->where('id',(int)$fixture['host_id'])->find();
         if(!$template)throw new RuntimeException('A native MfCloud fixture host is required');

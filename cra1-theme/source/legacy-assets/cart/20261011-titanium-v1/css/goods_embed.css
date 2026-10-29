@@ -146,10 +146,9 @@ body {
 }
 
 /* ---- 模块底条 → 右侧摘要栏（mf_cloud / mf_dcim；CSS-only 不改模块模板） ----
-   v6.2：原生侧栏**默认隐藏**（模块 HTML 注入即生效，加载等待期不再闪现旧 f-order）；
-   仅壳侧桥接超时降级（body.rail-fallback）时以 v5 卡片形态显示。 */
-.cart-embed .f-order,
-.cart-embed .order-right {
+   只有确认桥接成功才隐藏原生购买控件；未知模块始终保留自身购买流程。 */
+body.rail-bridged .f-order,
+body.rail-bridged .order-right {
   display: none !important;
 }
 

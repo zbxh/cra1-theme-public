@@ -1,155 +1,68 @@
-<div align="center">
-
 # 酷锐A1主题 · CRA1
 
-**适用于智简魔方 V10 系统的官网、会员中心与购物车主题**
+酷锐A1主题（CRA1）是为 **智简魔方 V10 系统**设计的一套主题，覆盖官网、会员中心与购物车，采用钛灰银与香槟金配色，让品牌展示、客户服务与商品购买流程保持统一的视觉体验。
 
-钛灰银与香槟金配色 · 可视化页面设置 · 三个主题独立管理
+三个主题共用基础组件，并各自保留独立的内容设置和自定义 CSS / JavaScript。可在主题后台按页面编辑文案、图片与模块，通过拖拽调整菜单和条目顺序。
 
-<p>
-  <a href="https://github.com/zbxh/cra1-theme-public/releases/tag/v17.2"><img src="https://img.shields.io/badge/版本-v17.2_测试版-b59a64?style=flat-square" alt="v17.2 测试版"></a>
-  <a href="#compatibility"><img src="https://img.shields.io/badge/V10-10.7.4-35383c?style=flat-square" alt="V10 10.7.4"></a>
-  <a href="#compatibility"><img src="https://img.shields.io/badge/PHP-7.4-61656b?style=flat-square" alt="PHP 7.4"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/许可-源码可见-b59a64?style=flat-square" alt="源码可见商业许可证"></a>
-  <a href="https://qm.qq.com/q/O3d7bVtcoS"><img src="https://img.shields.io/badge/QQ交流群-603107399-35383c?style=flat-square" alt="QQ 交流群 603107399"></a>
-</p>
+产品、订单、支付与账户等业务由智简魔方 V10 系统及已安装的模块、插件提供，具体可用功能以系统设置、模块兼容情况及账号权限为准。
 
-<p>
-  <a href="#screenshots">界面预览</a> ·
-  <a href="#features">功能特性</a> ·
-  <a href="#quick-start">快速安装</a> ·
-  <a href="https://github.com/zbxh/cra1-theme-public/releases/download/v17.2/CRA1-theme-v17.2-install.zip">主题下载</a> ·
-  <a href="#documentation">使用文档</a> ·
-  <a href="#community">交流反馈</a>
-</p>
+## 下载与安装
 
-</div>
+当前版本：[**v17.3 测试版**](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.3)。
 
----
+[下载主题安装包](https://github.com/zbxh/cra1-theme-public/releases/download/v17.3/CRA1-theme-v17.3-install.zip)
 
-## 📖 项目介绍
+主题需安装在已有的智简魔方 V10 系统上，当前测试基准为 V10 10.7.4、PHP 7.4 与 Nginx，网站需启用 HTTPS。其他系统或模块版本尚需验证，安装前请按教程确认环境。
 
-酷锐A1主题（CRA1）是为 **智简魔方 V10 系统**设计的一套主题，覆盖官网、会员中心与购物车，让品牌展示、客户服务与商品购买流程保持统一的视觉体验。
+安装包已包含运行所需资源，无需安装 Node.js 或自行编译。
 
-主题采用钛灰银与香槟金配色，统一按钮、表单、卡片、导航和弹窗的样式。官网、会员中心与购物车共用基础组件，同时各自保留独立的内容设置和自定义 CSS / JavaScript。
+- [安装与更新图文教程](docs/installation.md)：文件放置位置、安装向导、主题后台设置与覆盖更新。
+- [主题使用教程](docs/usage.md)：页面编辑、公共设置、图片、菜单、草稿、预览和主题管理。
+- [更新日志](https://github.com/zbxh/cra1-theme-public/releases)：在 Release 中查看每次发布的修复与优化。
 
-日常维护可在主题后台完成：按页面编辑文案、图片与模块，通过列表和拖拽调整菜单与条目顺序，并在保存前预览效果。安装包已包含运行所需资源，无需安装 Node.js 或自行编译。
-
-<a id="screenshots"></a>
-
-## 🖼️ 界面预览
-
-以下展示主题的主要界面。官网、登录与注册页展示未登录状态；会员中心、侧栏、控制面板、通知与后台截图使用主题实际组件和示例数据，不含真实客户资料。点击图片可查看大图。
-
-| 官网首页 | 会员中心 |
-| :---: | :---: |
-| [![官网首页：浅色雾状背景与产品展示](docs/images/readme/website.png)](docs/images/preview-website.png) | [![会员中心：待办事项、产品与常用功能](docs/images/readme/member.png)](docs/images/preview-member.png) |
-| **服务器控制面板** | **侧边栏导航** |
-| [![服务器控制面板：实例配置、资源与操作入口](docs/images/readme/server-panel.png)](docs/images/preview-server-panel.png) | [![侧边栏导航：多级菜单与产品入口](docs/images/readme/sidebar.png)](docs/images/preview-sidebar.png) |
-
-| 登录页面 | 注册页面 |
-| :---: | :---: |
-| [![登录页面：账密登录与验证码登录](docs/images/readme/login.png)](docs/images/preview-login.png) | [![注册页面：账户注册与服务条款](docs/images/readme/register.png)](docs/images/preview-register.png) |
-| **所有通知** | **主题后台** |
-| [![所有通知：通知列表、搜索与正文阅读](docs/images/readme/notifications.png)](docs/images/preview-notifications.png) | [![主题后台：三个主题与公共设置独立管理](docs/images/readme/admin.png)](docs/images/preview-admin.png) |
-
-<a id="features"></a>
-
-## ✨ 功能特性
-
-| 模块 | 主要能力 |
-| --- | --- |
-| 官网主题 | 首页、产品、解决方案、资讯与文档页面；支持页面内容独立设置、公共区块、搜索与客服入口 |
-| 会员中心 | 产品列表、服务器控制面板、财务与工单入口；提供最近访问、快捷操作及资源状态展示 |
-| 购物车 | 商品分类、参数选配、镜像与存储配置、购物车及结算；沿用 V10 的商品定价与业务规则 |
-| 登录与注册 | 自动识别手机号或邮箱，支持账密登录与手机验证码登录；按系统设置提供注册、验证码及接入 V10 官方登录接口的第三方登录方式 |
-| 可视化后台 | 按页面组织设置，提供中文表单、图片选择、条目拖拽与显示开关；支持草稿、保存冲突保护和页面预览 |
-| 主题通知 | 按官网、会员中心与购物车批量或单独勾选展示页面；支持开始时间、到期时间、轮播、详情弹窗及所有通知页面 |
-| 共用组件 | 银灰边缘光、淡金点缀与统一控件；适配桌面、平板与手机，并响应减少动效设置 |
-| 安装与维护 | 安装向导、独立主题后台、兼容检查、手动上传安装包更新、备用本地导入及备份回退；更新时保留已有配置与内容 |
-
-产品、订单、支付与账户等业务由智简魔方 V10 系统及已安装的模块、插件提供。主题负责页面展示与交互，具体可用功能以系统设置、模块兼容情况及账号权限为准。
-
-<a id="quick-start"></a>
-
-## 🚀 快速安装
-
-当前版本为 **v17.2 测试版**，需安装在已有的智简魔方 V10 系统上。首次安装与后续手动更新使用同一份安装包：
-
-| 场景 | 下载与说明 |
-| --- | --- |
-| 主题下载 | [主题安装包 ZIP](https://github.com/zbxh/cra1-theme-public/releases/download/v17.2/CRA1-theme-v17.2-install.zip)，首次安装与覆盖更新使用同一个 ZIP；图文教程在线阅读 |
-| 安装与使用 | [安装图文教程](docs/installation.md) · [主题使用教程](docs/usage.md)，可直接在 GitHub 阅读 |
-| 更新说明 | [版本发布与更新说明](https://github.com/zbxh/cra1-theme-public/releases) |
-
-1. 备份现有网站文件、数据库与配置，下载主题安装包 ZIP。
-2. 将主题安装包 ZIP 上传至 **V10 网站根目录**解压，同名文件夹选择合并。
-3. 以智简魔方 V10 超级管理员身份登录系统，打开 `https://你的域名/cra1-install/`，点击“验证并检查”。
-4. 完成环境检查，设置主题后台入口与独立账号密码，点击“完成安装”。
-5. 使用设置的账号密码登录主题后台，先修改页面内容；准备好后再到 V10 系统后台手动启用需要的主题。安装保留当前主题选择，不会自动切换网站。
-
-完整步骤见 [安装与更新图文教程](docs/installation.md)。GitHub 自动生成的 **Source code** 压缩包用于源码开发，安装请使用上表中的主题安装包。
+**首次安装：**将下载的主题安装包 ZIP 上传到 **智简魔方 V10 网站根目录**解压，同名文件夹合并。以 V10 超级管理员身份登录系统，打开 `https://你的域名/cra1-install/`，按向导完成检查与安装。安装保留当前主题选择；先用设置的账号密码登录主题后台配置内容，再到 V10 系统后台手动启用需要的主题。
 
 **已有安装的更新方式：**进入主题后台“主题管理 → 安装与更新”，直接上传同一个主题安装包 ZIP，检查通过后确认覆盖更新，无需解压或再次输入密码。配置、后台账号、密钥、媒体、草稿和页面独立内容会保留，无需卸载。浏览器上传受限时可使用折叠入口中的服务器本地导入。请通过主题后台更新，避免在服务器直接解压覆盖已有安装。当前不提供单独更新包或在线更新。
 
-<a id="compatibility"></a>
+GitHub 自动生成的 **Source code** 压缩包用于源码开发，安装请使用上方的主题安装包，图文教程可直接在线阅读。
 
-## 🧩 环境与更新
+## 界面预览
 
-| 项目 | 当前测试基准 |
-| --- | --- |
-| 智简魔方 V10 系统 | 10.7.4 |
-| 运行环境 | Nginx、PHP 7.4、HTTPS |
-| 服务器模块 | MfCloud 4.3.0、MfDcim 4.2.1 |
-| 通用商品模块 | IdcsmartCommon 4.3.1 |
+以下展示主题的主要界面。会员中心、侧栏、控制面板与通知截图使用主题实际组件和示例数据，不含真实客户资料。
 
-安装向导会检查实际环境与文件。上表以外的系统或模块版本尚需验证；使用智简魔方 V10 10.7.2 的站点，请先通过官方流程升级至 10.7.4。
+### 官网首页
 
-主题安装与更新仅处理主题自有文件。V10 系统及官方模块仍按官方流程升级；升级后可在主题后台重新检查兼容性，主题更新方式见 [已有主题如何更新](docs/installation.md#05-已有主题如何更新)。
+![官网首页](docs/images/preview-website.png)
 
-<a id="documentation"></a>
+### 会员中心首页
 
-## 📚 使用文档
+![会员中心首页](docs/images/preview-member.png)
 
-| 文档 | 内容 |
-| --- | --- |
-| [安装与更新图文教程](docs/installation.md) | 文件放置位置、安装向导、主题后台设置与覆盖更新 |
-| [主题使用教程](docs/usage.md) | 官网、会员中心与购物车设置，以及菜单、通知、草稿与自定义代码 |
-| [开发与构建](cra1-theme/docs/开发与构建.md) | 源码目录、依赖安装、构建入口与打包方式 |
-| [版本更新说明](https://github.com/zbxh/cra1-theme-public/releases) | 各版本实际交付的修复与优化 |
+### 侧边栏导航
 
-<a id="development"></a>
+![展开的侧边栏导航](docs/images/preview-sidebar.png)
 
-## 🛠️ 源码与开发
+### 服务器控制面板
 
-```text
-cra1-theme/
-├── backend/              主题后端与兼容适配
-├── source/member/        会员中心源码
-├── source/admin/         主题后台源码
-└── scripts/              统一构建与打包脚本
-public/
-├── web/cra1/             官网模板与样式
-├── clientarea/           会员中心模板
-├── cart/                 购物车模板
-├── cra1-shared/          共用组件与基础样式
-└── cra1-install/         安装向导
-docs/                    安装及使用教程
-```
+![服务器控制面板](docs/images/preview-server-panel.png)
 
-开发构建使用 Node.js 22、Python 3 与 PHP 7.4，通过 `cra1-theme/scripts/build.mjs` 将构建结果统一输出到网站目录外的暂存目录。具体命令见 [开发与构建](cra1-theme/docs/开发与构建.md)。
+### 登录页面
 
-<a id="community"></a>
+![登录页面](docs/images/preview-login.png)
 
-## 💬 交流与反馈
+### 注册页面
 
-- **QQ 交流群：603107399** · [点击加入](https://qm.qq.com/q/O3d7bVtcoS)
-- **问题反馈：**[提交 Issue](https://github.com/zbxh/cra1-theme-public/issues/new)，请说明页面、复现步骤、浏览器及主题／系统版本，并附打码截图。
-- **功能建议：**[提交建议](https://github.com/zbxh/cra1-theme-public/issues/new)，欢迎分享使用体验与改进想法。
+![注册页面](docs/images/preview-register.png)
 
-请勿在反馈中附带账号密码、验证码、令牌、密钥或未脱敏的客户资料。
+### 所有通知
 
-## 📄 许可
+![所有通知](docs/images/preview-notifications.png)
+
+## 开发
+
+源码修改与构建方法见[开发与构建](cra1-theme/docs/开发与构建.md)。
+
+## 许可
 
 本项目采用 **酷锐A1主题源码可见商业许可证**，具体使用与商业授权条件见 [LICENSE](LICENSE)。源码可见不等于无限制免费商用。
 

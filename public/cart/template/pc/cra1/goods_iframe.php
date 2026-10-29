@@ -2,6 +2,7 @@
 <script src="/{$template_catalog}/template/{$themes}/js/common/jquery.mini.js"></script>
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261011-titanium-v1/css/goods_iframe.css', '/cart/template/pc/cra1/releases/20261011-titanium-v1/css/goods_iframe.css')}">
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261012-icon-suite-v1/css/cart-theme.css', '/cart/template/pc/cra1/releases/20261012-icon-suite-v1/css/cart-theme.css')}">
+<script src="{:cra1_theme_asset_url('native', 'js/module-deps.js', '/clientarea/template/pc/cra1/js/module-deps.js')}"></script>
 </head>
 
 <body>

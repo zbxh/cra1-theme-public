@@ -2,6 +2,7 @@
 <!-- 页面独有样式 -->
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261011-titanium-v1/css/goodsList.css', '/cart/template/pc/cra1/releases/20261011-titanium-v1/css/goodsList.css')}">
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261012-icon-suite-v1/css/cart-theme.css', '/cart/template/pc/cra1/releases/20261012-icon-suite-v1/css/cart-theme.css')}">
+<script src="{:cra1_theme_asset_url('native', 'js/module-deps.js', '/clientarea/template/pc/cra1/js/module-deps.js')}"></script>
 </head>
 
 <body>
@@ -255,9 +256,9 @@
                           <el-button @click="openStandalone">在独立页打开</el-button>
                         </el-empty>
                       </div>
-                      <div v-if="isMobileCart" v-show="configState === 'ready'" class="cl-config-direct"
+                      <div v-if="isMobileCart && !mobileNativeFrame" v-show="configState === 'ready'" class="cl-config-direct"
                         ref="mobileConfigBody"></div>
-                      <iframe v-if="!isMobileCart" :key="embedSrc" :src="embedSrc" class="cl-config-frame"
+                      <iframe v-if="!isMobileCart || mobileNativeFrame" :key="embedSrc" :src="embedSrc" class="cl-config-frame"
                         :class="{'is-loading': configState === 'loading'}"
                         :style="configState === 'ready' && frameHeight ? { height: frameHeight + 'px' } : {}"
                         :title="selectedProduct.name + ' 配置'"

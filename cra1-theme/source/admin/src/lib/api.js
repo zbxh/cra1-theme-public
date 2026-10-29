@@ -77,7 +77,7 @@ export async function api(route, body, options = {}) {
   }
   if(json.code==='REAUTH_REQUIRED'&&options.reauth!==false){
     const action=route.replace(/^api\./,''),domain=body?.domain||(action.startsWith('member.')?'member':action.startsWith('cart.')?'cart':'website')
-    const target=action.startsWith('security.accounts.')?'account:'+(body?.id||'new'):action==='security.audit.export'?'audit':action==='path'||action==='security.settings.save'?'security':action==='security.session.revoke'?'account:'+(body?.account_id||boot.user_id):action.startsWith('security.mfa.')||action==='security.password'?'account:'+boot.user_id:domain+':'+(body?.editorId||body?.scopeId||'all')
+    const target=action.startsWith('security.accounts.')?'account:'+(body?.id||'new'):action==='security.audit.export'?'audit':action==='path'||action==='security.settings.save'?'security':action==='security.session.revoke'?'account:'+(body?.account_id||boot.user_id):action.startsWith('security.mfa.')||action.startsWith('security.recovery.')||action==='security.password'?'account:'+boot.user_id:domain+':'+(body?.editorId||body?.scopeId||'all')
     const credential=await new Promise(resolve=>window.dispatchEvent(new CustomEvent('theme-reauth',{detail:{action,target,resolve}})))
     if(credential){if(multipart){body.set('_reauth',credential);return api(route,body,{...options,reauth:false})}return api(route,{...body,_reauth:credential},{...options,reauth:false})}
   }

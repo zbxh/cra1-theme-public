@@ -111,7 +111,7 @@ export default function HomePage() {
       const items = ql && Number(ql.enabled) === 1
         ? (ql.items || []).filter((x) => Number(x.enabled) === 1 && x.url)
         : []
-      setQuickLinks(filterFinanceLinks(items, feat))
+      setQuickLinks(filterFinanceLinks(items, feat).filter(item=>window.CRA1Shared.Access.canUrl(window.CRA1Shared.Navigation.href(item))))
       setHomeTodo(c?.home_todo || null)
       setHomeBanner(c?.home_banner || null)
       setHomeNews(c?.home_news || null)
@@ -624,11 +624,11 @@ function QuickLinks({ items }) {
         >
           {items.map((it) => {
             const Icon = QUICK_ICONS[it.icon] || Package
-            const url = String(it.url || '').replace(/^\//, '')
+            const url = window.CRA1Shared.Navigation.href(it)
             return (
               <li key={it.id}>
                 <a
-                  href={`/${url}`}
+                  href={url}
                   className="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2.5 transition-colors duration-150 hover:border-line hover:bg-surface-alt focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                 >
                   <span className="flex size-8 shrink-0 items-center justify-center rounded-md cui-business-icon cui-business-icon--tile" data-cra1-icon-label={it.label} data-cui-icon-style={it.icon_style ? '1' : undefined} style={iconStyleVars(it.icon_style)}>

@@ -372,15 +372,30 @@
     }
   });
 
+  function railContract(vm) {
+    if (document.querySelector('.f-order') && Array.isArray(vm.cycleList) && vm.params
+        && vm.calcTotalPrice !== undefined && typeof vm.handlerCart==='function' && typeof vm.submitOrder==='function') return 'f-order';
+    if (document.querySelector('.order-right') && Array.isArray(vm.custom_cycles)
+        && vm.totalPrice !== undefined && typeof vm.addCart==='function' && typeof vm.buyNow==='function') return 'order-right';
+    return '';
+  }
+  function nativeControls() {
+    document.body.classList.remove('rail-bridged');
+    document.body.classList.add('rail-native');
+    postHeight();
+    post('rail-fallback', { message: '请在下方查看价格并完成订购。' });
+  }
   function railBoot(force) {
+    if (new URLSearchParams(location.search).get('native_controls')==='1') { nativeControls(); return; }
     if (railVM && !force) { railStartBridge(); return; }
     var waited = 0;
     var t = setInterval(function () {
       var vm = railFindVM();
       if (vm) {
         clearInterval(t);
+        railKind = railContract(vm);
+        if (!railKind) { nativeControls(); return; }
         railVM = vm;
-        railKind = document.querySelector('.order-right') ? 'order-right' : 'f-order';
         railStartBridge();
       } else if ((waited += 400) >= 12000) {
         clearInterval(t);

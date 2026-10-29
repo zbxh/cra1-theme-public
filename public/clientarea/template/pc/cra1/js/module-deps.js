@@ -36,6 +36,7 @@
  */
 
 ;(function (window) {
+  if (window.CRA1ModuleDeps && window.CRA1ModuleDeps.mountScripts) return
   // CRA1 主题已提供的组件，不要用 default 的覆盖（否则会换掉新外壳）
   var THEME_PROVIDED = { asideMenu: 1, topMenu: 1 }
 
@@ -93,6 +94,8 @@
     config: ['payDialog', 'discountCode', 'eventCode', 'customGoods'],
   }
 
+  var NATIVE_BINDINGS = Object.assign({}, COMPONENT_PATHS)
+  var declaredLoads = {}
   var loaded = {}      // name -> true
   var inflight = {}    // name -> Promise
   var scriptPromises = window.__CRA1_SCRIPT_LOADS__ = window.__CRA1_SCRIPT_LOADS__ || {}  // rel 路径 -> Promise（同一文件只请求一次）
@@ -102,16 +105,18 @@
   }
 
   function loadScript(rel) {
-    var src = rel === 'components/payDialog/payDialog.js' && window.__CRA1_PAYMENT_BASE__ ? window.__CRA1_PAYMENT_BASE__ + '/' + rel : baseUrl() + rel
+    var src = /^(?:https?:|\/)/.test(rel) ? rel : rel === 'components/payDialog/payDialog.js' && window.__CRA1_PAYMENT_BASE__ ? window.__CRA1_PAYMENT_BASE__ + '/' + rel : baseUrl() + rel
     if (scriptPromises[src]) return scriptPromises[src]
     scriptPromises[src] = new Promise(function (resolve) {
       var s = document.createElement('script')
       s.src = src
       // 串行插入时 async=false 保证按插入顺序执行，避免依赖竞态
       s.async = false
-      s.onload = function () { resolve(true) }
+      var timer=setTimeout(function(){s.onerror()},15000)
+      s.onload = function () { clearTimeout(timer);resolve(true) }
       s.onerror = function () {
-        console.warn('[cloud] 模块依赖组件加载失败：' + rel)
+        clearTimeout(timer)
+        console.warn('[CRA1] 模块依赖组件加载失败：' + rel)
         delete scriptPromises[src]
         s.remove()
         resolve(false)
@@ -163,7 +168,7 @@
       var rel = COMPONENT_PATHS[name]
       if (!rel) throw new Error('尚未登记模块组件：'+name)
       return loadScript(rel).then(function (ok) {
-        if(ok&&binding(name))loaded[name]=true
+        if(ok&&(binding(name)||!NATIVE_BINDINGS[name]))loaded[name]=true
         else if(ok){delete inflight[name];throw new Error('模块组件未正确初始化，请刷新页面重试：'+name)}
         else { delete inflight[name]; throw new Error('模块组件加载失败：'+name) }
         return ok
@@ -183,8 +188,132 @@
     return Promise.all(['asideMenu','topMenu'].concat(names).map(loadOne)).then(function () {})
   }
 
+
+  function register(name, spec) {
+    if (!/^[A-Za-z_$][\w$]*$/.test(name) || THEME_PROVIDED[name]) throw new Error('模块组件登记无效')
+    if (COMPONENT_PATHS[name]) return
+    var path = typeof spec === 'string' ? spec : spec.path
+    var url = new URL(path, window.location.origin + '/')
+    if (!['http:', 'https:'].includes(url.protocol)) throw new Error('模块组件地址无效')
+    COMPONENT_PATHS[name] = url.href
+    DEPS[name] = typeof spec === 'string' ? [] : (spec.dependencies || []).slice()
+    function visit(key, trail) {
+      if (trail.indexOf(key) !== -1) throw new Error('模块组件存在循环依赖')
+      ;(DEPS[key] || []).forEach(function (dep) { visit(dep, trail.concat(key)) })
+    }
+    try { visit(name, []) } catch (error) { delete COMPONENT_PATHS[name]; delete DEPS[name]; throw error }
+  }
+
+  function component(src) {
+    if (!src) return ''
+    var url = new URL(src, document.baseURI)
+    if (url.origin !== window.location.origin) return ''
+    var match = /\/clientarea\/template\/(?:pc|mobile)\/[^/]+\/(?:releases\/[^/]+\/)?components\/([^/]+)\/\1\.js$/.exec(url.pathname)
+    return match ? match[1] : ''
+  }
+
+  function aborted() { return new DOMException('模块加载已取消', 'AbortError') }
+  function observe(promise, signal) {
+    if (!signal) return promise
+    if (signal.aborted) return Promise.reject(aborted())
+    return new Promise(function(resolve,reject){
+      function abort(){reject(aborted())}
+      signal.addEventListener('abort',abort,{once:true})
+      promise.then(resolve,reject).finally(function(){signal.removeEventListener('abort',abort)})
+    })
+  }
+
+  /** Execute native declarations once; page boot scripts still execute per mount. */
+  async function mountScripts(host, options) {
+    options = options || {}
+    var signal=options.signal, enabled=options.enabled || function(){return true}
+    var scripts=Array.from(host.querySelectorAll('script'))
+    // Vue must not compile inert script nodes. Keep their order outside its root.
+    scripts.forEach(function(node){node.remove()})
+    var declared=scripts.filter(function(node){return component(node.getAttribute('src'))})
+    for(var dependency of declared){
+      if(signal && signal.aborted)throw aborted()
+      var src=dependency.getAttribute('src'),name=component(src)
+      if(!enabled(src))continue
+      if(COMPONENT_PATHS[name])await observe(loadOne(name),signal)
+      else if(!loaded[name]) {
+        var target=new URL(src,document.baseURI);
+        var present=Array.from(document.scripts).some(function(script){return script.src && new URL(script.src,document.baseURI).pathname===target.pathname});
+        if(!present){
+          try { await execute(dependency,true) }
+          catch(error){
+            if(error.code!=='MODULE_RESOURCE_LOAD' || !/\/template\/(?:pc|mobile)\/cra1\//.test(target.pathname))throw error;
+            var fallback=dependency.cloneNode(true);
+            fallback.src=new URL(baseUrl()+'components/'+name+'/'+name+'.js',location.origin).href;
+            await execute(fallback,true);
+          }
+        }
+        loaded[name]=true;
+      }
+    }
+    for(var node of scripts){
+      if(signal && signal.aborted)throw aborted()
+      if(!host.isConnected)return
+      var source=node.getAttribute('src')||''
+      if(!enabled(source)||component(source))continue
+      var deps=(node.getAttribute('data-cra1-deps')||'').split(/[\s,]+/).filter(Boolean)
+      if(deps.length)await observe(ensure(deps),signal)
+      await execute(node,!!source && !!options.once && options.once(source))
+    }
+    async function execute(old, once) {
+      var src=old.getAttribute('src')||'',type=(old.type||'').toLowerCase()
+      if(type&&!['text/javascript','application/javascript','module'].includes(type)){
+        host.appendChild(old);return
+      }
+      var url=src?new URL(src,document.baseURI):null
+      if(url&&!['http:','https:'].includes(url.protocol))throw new Error('模块资源地址无效')
+      var key=url && (component(src)?url.origin+url.pathname:url.href)
+      if(once && declaredLoads[key])return observe(declaredLoads[key],signal)
+      var promise=(async function(){
+        var text=old.text
+        // Verified, repeatable phone boot scripts are fetched first, so an old
+        // request can never execute against a newly selected product's DOM.
+        if(url&&options.fetchScripts){
+          if(url.origin!==window.location.origin)throw new Error('模块资源地址无效')
+          var response=await fetch(url.href,{signal:signal,credentials:'same-origin'})
+          if(!response.ok)throw new Error('模块资源加载失败')
+          text=await response.text()
+        }
+        if(signal && signal.aborted)throw aborted()
+        await new Promise(function(resolve,reject){
+          var next=document.createElement('script'),timer,executionError
+          Array.from(old.attributes).forEach(function(a){if(a.name!=='src')next.setAttribute(a.name,a.value)})
+          next.async=false
+          if(url&&!options.fetchScripts)next.src=url.href
+          else next.text=text
+          function finish(error){
+            clearTimeout(timer);window.removeEventListener('error',failed);if(signal)signal.removeEventListener('abort',cancel)
+            next.onload=next.onerror=null;next.remove()
+            ;(error||executionError)?reject(error||executionError):resolve()
+          }
+          function failed(event){
+            if((url&&!options.fetchScripts&&event.filename===url.href)||((!url||options.fetchScripts)&&event.filename===location.href))
+              executionError=new Error('模块组件初始化失败，请重试')
+          }
+          function cancel(){finish(aborted())}
+          next.onload=function(){finish()}
+          next.onerror=function(){var error=new Error('模块所需资源未能加载，请重试');error.code='MODULE_RESOURCE_LOAD';finish(error)}
+          if(signal)signal.addEventListener('abort',cancel,{once:true})
+          timer=setTimeout(function(){finish(new Error('模块资源加载超时，请重试'))},15000)
+          window.addEventListener('error',failed)
+          document.head.appendChild(next)
+          if((!url||options.fetchScripts)&&type!=='module')finish()
+        })
+      })()
+      if(once&&!options.fetchScripts)declaredLoads[key]=promise
+      try{await promise;if(once)declaredLoads[key]=Promise.resolve()}catch(error){if(once)delete declaredLoads[key];throw error}
+    }
+  }
+
   window.CRA1ModuleDeps = {
     ensure: ensure,
+    register: register,
+    mountScripts: mountScripts,
     deps: MODULE_DEPS,
     graph: DEPS,
   }

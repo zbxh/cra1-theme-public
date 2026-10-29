@@ -1254,7 +1254,7 @@ if ($r==='preview') {
 /* JSON API */
 if (strpos($r,'api.')===0) {
     $action=substr($r,4);$body=read_body();
-    if(in_array($action,['auth.login','auth.mfa','auth.captcha'],true))theme_auth_api($action,$body);
+    if(in_array($action,['auth.login','auth.mfa','auth.captcha','auth.recovery.begin','auth.recovery.finish'],true))theme_auth_api($action,$body);
     // The old password route uses the same service and cannot bypass step-up.
     if($action==='password')$action='security.password';
     theme_api_guard($action,$body);

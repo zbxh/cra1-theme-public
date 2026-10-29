@@ -17,6 +17,19 @@ function theme_new_login(array $a): array {
 function theme_captcha_valid(array $p): bool { $c=$_SESSION['security_captcha']??[];unset($_SESSION['security_captcha']);return !empty($c['hash'])&&($c['expires']??0)>=time()&&hash_equals($c['hash'],hash('sha256',strtoupper(trim((string)($p['captcha']??''))))); }
 function theme_auth_api(string $action,array $p): void {
     $s=theme_security();theme_request_check();
+    if($action==='auth.recovery.begin'){
+        if(!$s->boundedRate('recovery:request:'.hash('sha256',client_ip()),30,900))throw new CRA1ThemeSecurityError('请求过于频繁，请稍后重试',429,'RATE_LIMITED');
+        if(!theme_captcha_valid($p))json_out(['status'=>400,'msg'=>'图形验证码错误或已失效，请重新输入','code'=>'CAPTCHA_REQUIRED','data'=>['captcha_required'=>true]],400);
+        $data=(new \CRA1\Theme\Security\AdminRecovery($s))->beginReset((string)($p['username']??''),(string)($p['email']??''),session_id(),client_ip());
+        theme_event('auth.recovery.begin','ok',['category'=>'security','reason'=>'找回密码请求已处理，不记录账号匹配结果或验证码']);
+        json_out(['status'=>200,'msg'=>'如果账号与已绑定邮箱匹配，验证码将发送至该邮箱。未收到时请稍后重试或联系管理员。','data'=>$data]);
+    }
+    if($action==='auth.recovery.finish'){
+        (new \CRA1\Theme\Security\AdminRecovery($s))->finishReset((string)($p['challenge']??''),session_id(),(string)($p['code']??''),(string)($p['new_password']??''),client_ip());
+        theme_event('auth.recovery.finish','ok',['category'=>'security','risk'=>'high','reason'=>'邮件验证后重置后台密码，旧会话已撤销，保留双重验证']);
+        session_regenerate_id(true);$_SESSION=['cra1_csrf'=>bin2hex(random_bytes(24))];
+        json_out(['status'=>200,'msg'=>'密码已重置，请使用新密码登录。已启用的双重验证仍需验证。']);
+    }
     if($action==='auth.captcha'){
         if(!$s->boundedRate('captcha:'.hash('sha256',client_ip()),30,60)){header('Retry-After: 60');throw new CRA1ThemeSecurityError('验证码请求过于频繁，请稍后重试。',429,'RATE_LIMITED');}
         $alphabet='23456789ABCDEFGHJKLMNPQRSTUVWXYZ';$code='';for($i=0;$i<5;$i++)$code.=$alphabet[random_int(0,strlen($alphabet)-1)];$_SESSION['security_captcha']=['hash'=>hash('sha256',$code),'expires'=>time()+300];
@@ -48,7 +61,7 @@ function theme_target(string $action,array $p): string {
     if(strpos($action,'media.')===0)return 'attachment:'.(string)($p['id']??'new');
     if(strpos($action,'security.accounts.')===0)return 'account:'.(string)($p['id']??'new');
     if($action==='security.audit.export')return 'audit';if($action==='path'||$action==='security.settings.save')return 'security';if($action==='security.session.revoke')return 'account:'.(string)($p['account_id']??theme_actor()['id']);
-    if(strpos($action,'security.mfa.')===0||$action==='security.password')return 'account:'.(theme_actor()['id']??0);
+    if(strpos($action,'security.mfa.')===0||strpos($action,'security.recovery.')===0||$action==='security.password')return 'account:'.(theme_actor()['id']??0);
     return (string)($p['domain']??(strpos($action,'member.')===0?'member':(strpos($action,'cart.')===0?'cart':'website'))).':'.(string)($p['editorId']??$p['scopeId']??'all');
 }
 function theme_read_action(string $a): bool { return in_array($a,['announcements.preview','announcements.legacy-draft','release.check','release.history','release.license.get','release.candidate.get','release.local.list','media.list','media.attachments','get','products','site-pages','link-options','icons','icons.catalog','icons.page','icons.resolve','icons.preview','icon-search','navigation-catalog','product-options','logs','security.my','security.accounts.list','security.audit.list','security.audit.detail','security.settings.get','security.alerts'],true)||preg_match('/\.(get|catalog)$/D',$a)===1; }
@@ -72,7 +85,7 @@ function theme_api_guard(string $action,array $p): void {
     if(preg_match('/save|import|preview$/',$action)&&strpos($action,'security.')!==0){$normal=$p;unset($normal['_reauth']);theme_safe_content($normal);}
     if($a['must_change']&&!theme_read_action($action)&&!in_array($action,['auth.reauth','security.password','logout','security.session.revoke','workspace.preview'],true))throw new CRA1ThemeSecurityError('请先在“我的安全”修改初始密码。',403,'PASSWORD_CHANGE_REQUIRED');
     if($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id']){theme_require_role(['admin','super_admin']);theme_security()->manageAllowed($a,theme_security()->account((int)$p['account_id']));}
-    $step=($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id'])||in_array($action,['release.license.save','reset','member.reset','cart.reset','path','security.settings.save','security.accounts.create','security.accounts.update','security.audit.export','security.password','security.mfa.begin','security.mfa.disable','security.mfa.recovery'],true)||$code;
+    $step=($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id'])||in_array($action,['release.license.save','reset','member.reset','cart.reset','path','security.settings.save','security.accounts.create','security.accounts.update','security.audit.export','security.password','security.mfa.begin','security.mfa.disable','security.mfa.recovery','security.recovery.begin','security.recovery.remove'],true)||$code;
     if($step)theme_security()->useReauth((string)($p['_reauth']??''),(string)($_SESSION['security_token']??''),$action,theme_target($action,$p));
     if(!theme_read_action($action)){
         // Config writers hold a shared lock; reference checking/deletion holds an exclusive lock.
@@ -104,7 +117,10 @@ function theme_security_api(string $action,array $p): void {
         try{$cap=$s->reauthenticate($a,(string)($p['password']??''),(string)($p['code']??''),$token,(string)($p['action']??''),(string)($p['target']??''));}catch(CRA1ThemeSecurityError $e){$s->fail($a['username'].'#reauth',client_ip());theme_event('auth.reauth','fail',['category'=>'security','risk'=>'medium','reason'=>'密码或第二因素验证失败']);throw $e;}
         if(session_status()!==PHP_SESSION_ACTIVE)session_start();session_regenerate_id(true);session_write_close();$s->clearRate($a['username'].'#reauth',client_ip());json_out(['status'=>200,'msg'=>'身份已验证','data'=>['credential'=>$cap,'expires_at'=>time()+300]]);
     }
-    if($action==='security.my')json_out(['status'=>200,'msg'=>'已读取','data'=>['account'=>CRA1ThemeSecurity::publicAccount($a),'sessions'=>$s->sessionList($id,$token),'recovery_remaining'=>count(json_decode($a['recovery_hashes'],true)?:[])]]);
+    if($action==='security.my')json_out(['status'=>200,'msg'=>'已读取','data'=>['account'=>CRA1ThemeSecurity::publicAccount($a),'sessions'=>$s->sessionList($id,$token),'recovery_remaining'=>count(json_decode($a['recovery_hashes'],true)?:[]),'recovery_email'=>(new \CRA1\Theme\Security\AdminRecovery($s))->status($id)]]);
+    if($action==='security.recovery.begin')json_out(['status'=>200,'msg'=>'验证码已发送，请在 5 分钟内完成验证','data'=>(new \CRA1\Theme\Security\AdminRecovery($s))->beginBinding($a,$token,(string)($p['email']??''),client_ip())]);
+    if($action==='security.recovery.confirm'){(new \CRA1\Theme\Security\AdminRecovery($s))->finishBinding($a,(string)($p['challenge']??''),$token,(string)($p['code']??''));json_out(['status'=>200,'msg'=>'找回邮箱已绑定，请重新登录','data'=>['relogin'=>true]]);}
+    if($action==='security.recovery.remove'){(new \CRA1\Theme\Security\AdminRecovery($s))->removeBinding($a);json_out(['status'=>200,'msg'=>'找回邮箱已解除，请重新登录','data'=>['relogin'=>true]]);}
     if($action==='security.password'){$s->changeOwnPassword($a,(string)($p['new_password']??''));json_out(['status'=>200,'msg'=>'密码已更新，请重新登录。','data'=>['relogin'=>true]]);}
     if($action==='security.session.revoke'){$target=(int)($p['account_id']??$id);if($target!==$id){$s->manageAllowed($a,$s->account($target));theme_require_role(['admin','super_admin']);}$h=!empty($p['session_id'])?(string)$p['session_id']:null;$s->revoke($target,$h);json_out(['status'=>200,'msg'=>'会话已撤销','data'=>['relogin'=>$target===$id&&($h===null||hash_equals($h,CRA1ThemeSecurity::hashToken($token)))]]);}
     if($action==='security.mfa.begin')json_out(['status'=>200,'msg'=>'绑定准备完成','data'=>$s->enrollment($a,$token)]);

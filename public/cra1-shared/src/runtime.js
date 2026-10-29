@@ -10,6 +10,24 @@
     if (Number(clean.cart_instruction)!==1) delete clean.cart_instruction_content;
     return clean;
   }
+  shared.Navigation = {
+    href: function (item) {
+      var raw=String(typeof item==='string'?item:(item && item.url)||'').trim();
+      if(!raw)return '';
+      var type=item && (item.type||item.source_type);
+      if(type!=='embedded' && /^(?:mailto:|tel:|#)/i.test(raw))return raw;
+      var u;try{u=new URL(raw,root.location.origin+'/')}catch(e){return ''}
+      if(!['http:','https:'].includes(u.protocol)||u.username||u.password)return '';
+      if(u.origin===root.location.origin && u.pathname==='/custom_iframe.htm'){
+        var tail=raw.split(/[?&]iframe_url=/)[1]||'';
+        var target=/^https?:\/\//i.test(tail)?tail:u.searchParams.get('iframe_url');
+        if(target)return '/custom_iframe.htm?iframe_url='+encodeURIComponent(target);
+      }
+      if(type==='embedded' && !(u.origin===root.location.origin && u.pathname==='/custom_iframe.htm'))
+        return '/custom_iframe.htm?iframe_url='+encodeURIComponent(u.href);
+      return u.origin===root.location.origin?u.pathname+u.search+u.hash:u.href;
+    }
+  };
   shared.Runtime = {
     context: function () { return root.__CRA1_RUNTIME__ || context; },
     common: function () { return filterCommon(this.context().common || {}); },
@@ -54,6 +72,23 @@
  function forUrl(url){
   var u;try{u=new URL(url,root.location.origin)}catch(e){return false}
   if(u.origin!==root.location.origin)return true;
+  if(!access)return false;
+  if(u.pathname==='/custom_iframe.htm'){
+    var embedded=u.searchParams.get('iframe_url'),target;
+    try{target=new URL(embedded,root.location.origin)}catch(e){return false}
+    if(!embedded||target.pathname==='/custom_iframe.htm'||!['http:','https:'].includes(target.protocol)||!forUrl(target.href))return false;
+  }
+  // Apply the native page registry first, preferring a more specific query route.
+  // Additional parameters (record IDs, pagination) do not bypass a page grant.
+  var matches=(access.pages||[]).filter(function(page){
+    var target;try{target=new URL(page.url,root.location.origin)}catch(e){return false}
+    if(target.origin!==u.origin||target.pathname!==u.pathname)return false;
+    return Array.from(target.searchParams).every(function(pair){return u.searchParams.getAll(pair[0]).includes(pair[1])});
+  });
+  if(access.all!==true && matches.length){
+    var specificity=Math.max.apply(null,matches.map(function(p){return Array.from(new URL(p.url,root.location.origin).searchParams).length}));
+    if(!matches.some(function(p){return Array.from(new URL(p.url,root.location.origin).searchParams).length===specificity&&p.allowed===true}))return false;
+  }
   var file=u.pathname.split('/').pop(),tab=u.searchParams.get('tab'),rule='';
   if(file==='account.htm'&&!tab)return ['Account::update','Account::updatePassword','Account::creditList'].some(function(r){return can(access,r)});
   if(file==='account.htm')rule=({profile:'Account::update',security:'Account::updatePassword',credit:'Account::creditList'})[tab]||'';

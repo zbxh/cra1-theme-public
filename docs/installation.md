@@ -1,12 +1,12 @@
 # 酷锐A1主题安装图文教程
 
-适用：**v17.2 测试版 · 智简魔方 V10 10.7.4**。
+适用：**v17.3 测试版 · 智简魔方 V10 10.7.4**。
 
 **QQ 交流群：603107399** · [点击加入](https://qm.qq.com/q/O3d7bVtcoS)
 
 ## 01 下载主题包
 
-[下载主题安装包](https://github.com/zbxh/cra1-theme-public/releases/download/v17.2/CRA1-theme-v17.2-install.zip)。下载得到的 **`CRA1-theme-v17.2-install.zip`** 就是可直接上传的主题安装包，无需再从教程合集中提取。图文步骤直接阅读本页。
+[下载主题安装包](https://github.com/zbxh/cra1-theme-public/releases/download/v17.3/CRA1-theme-v17.3-install.zip)。下载得到的 **`CRA1-theme-v17.3-install.zip`** 就是可直接上传的主题安装包，无需再从教程合集中提取。图文步骤直接阅读本页。
 
 首次安装按下面步骤操作；已经安装过主题，直接看[已有主题如何更新](#05-已有主题如何更新)。操作前先备份网站。
 

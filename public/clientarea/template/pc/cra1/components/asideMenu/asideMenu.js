@@ -647,7 +647,10 @@
         return pages
       },
       isExternal(u) {
-        return /^(((ht|f)tps?):\/\/)([^!@#$%^&*?.\s-]([^!@#$%^&*?.\s]{0,63}[^!@#$%^&*?.\s])?\.)+[a-z]{2,6}\/?/.test(u || '')
+        try {
+          var url=new URL(u,global.location.origin+'/')
+          return /^(mailto|tel):$/.test(url.protocol) || (['http:','https:'].includes(url.protocol) && url.origin!==global.location.origin)
+        } catch (error) { return false }
       },
       /**
        * 把后端菜单树摊平成一级列表（父级在前、子级紧随）。
@@ -780,22 +783,25 @@
       },
       goPage(pg) {
         if (!pg || !pg.url) return
+        var href = global.CRA1Shared.Navigation.href(pg)
+        if (!href || !global.CRA1Shared.Access.canUrl(href)) return
+        if (/^(mailto|tel):/i.test(href)) { location.href=href; return }
 
         // 外链：与官方 default 主题保持一致的安全语义 ——
         // second_reminder=1 的菜单先跳转 /transfer.htm 让用户确认目标地址，
         // 否则直接新窗口打开。丢失这一步会把官方的二次确认环节去掉。
-        if (this.isExternal(pg.url)) {
+        if (this.isExternal(href)) {
           if (pg.second_reminder === 1) {
-            location.href = '/transfer.htm?target=' + encodeURIComponent(pg.url)
+            location.href = '/transfer.htm?target=' + encodeURIComponent(href)
           } else {
-            global.open(pg.url)
+            global.open(href, '_blank', 'noopener')
           }
           return
         }
 
         // 最近访问条目可由后台设置为统一新标签页打开
         if (pg.newTab) {
-          global.open('/' + pg.url)
+          global.open(href, '_blank', 'noopener')
           return
         }
 
@@ -812,7 +818,7 @@
 
         // 跳转前收起导航：新页面默认不显示导航，避免刷新后仍挡着内容
         this.closeMobile()
-        location.href = '/' + pg.url
+        location.href = href
       },
       goHome() {
         localStorage.frontMenusActiveId = ''
@@ -1101,7 +1107,7 @@
             language: n.language || {},
             select_field: n.select_field || [],
             select_field_set: n.select_field_set || false,
-            url: n.url || '',
+            url: global.CRA1Shared.Navigation.href(n).replace(/^\//,''),
             icon: n.icon || '',
             icon_style:n.icon_style,icon_resolved:n.icon_resolved,
             second_reminder: n.second_reminder || 0,

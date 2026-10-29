@@ -52,7 +52,7 @@ final class CRA1ThemeCompatibility
     }
     public static function access(int $clientId, array $account=[]): array
     {
-        $all = true; $rules = []; $actions = [];
+        $all = true; $rules = []; $actions = []; $pages = [];
         $plugin = \think\facade\Db::name('plugin')->where('name','IdcsmartSubAccount')->where('status',1)->find();
         if ($plugin) {
             $child = \think\facade\Db::name('addon_idcsmart_sub_account')->where('client_id',$clientId)->find();
@@ -62,6 +62,13 @@ final class CRA1ThemeCompatibility
                 $groups = \think\facade\Db::name('clientarea_auth')->whereIn('id',$ids ?: [-1])->column('title');
                 $map = ['power'=>'clientarea_auth_on_off_restart','control'=>'clientarea_auth_control_reinstall_rescue_reset_set_mount','billing'=>'clientarea_auth_refund_renew_upgrade','delete'=>'clientarea_auth_delete'];
                 foreach ($map as $key=>$group) $actions[$key] = in_array($group,$groups,true);
+                $enabled = [];
+                foreach (\think\facade\Db::name('plugin')->where('status',1)->field('module,name')->select()->toArray() as $p) $enabled[$p['module'].':'.$p['name']] = true;
+                $pages = \CRA1\Theme\Compatibility\MenuAccess::project(
+                    \think\facade\Db::name('clientarea_auth')->field('id,url,module,plugin')->select()->toArray(),
+                    array_map('intval', $ids), $enabled
+                );
+
             }
         }
         $known = \think\facade\Db::name('clientarea_auth_rule')->column('name');
@@ -85,6 +92,6 @@ final class CRA1ThemeCompatibility
                 if (!empty($cert) && is_array($cert) && empty($cert['person']) && empty($cert['company'])) $missing[]=['label'=>'完成实名认证','url'=>'/plugin/'.(int)$certPlugin['id'].'/authentication_select.htm'];
             }
         }
-        return ['required_profile'=>$requiredProfile,'security'=>$missing,'all'=>$all,'rules'=>array_values($rules),'known'=>array_values($known),'actions'=>$actions];
+        return ['required_profile'=>$requiredProfile,'security'=>$missing,'all'=>$all,'rules'=>array_values($rules),'known'=>array_values($known),'actions'=>$actions,'pages'=>$pages];
     }
 }

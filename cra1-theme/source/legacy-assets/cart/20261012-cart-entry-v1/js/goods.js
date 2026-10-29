@@ -164,18 +164,14 @@ localStorage.setItem = function (key, newValue) {
               this.configError("商品配置暂不可用，请重试或选择其他商品。");
               return false;
             }
-            this.$nextTick(() => {
-              // 解决Jquery加载JS会在文件末尾添加时间戳的问题
-              $.ajaxSetup({
-                cache: true,
-              });
-              const content = window.CRA1CartControls ? window.CRA1CartControls.transform(res.data.data.content) : res.data.data.content;
-              $(".config-box .content").html(content);
-              // 嵌入壳：内容注入后通知父页（模块脚本由 jQuery 异步执行，高度由桥接层兜底轮询）
-              if (window.__CART_EMBED__ && this.isEmbed) {
-                window.__CART_EMBED__.markReady();
-              }
-            });
+            await this.$nextTick();
+            const host=document.querySelector('.config-box .content');
+            if (!host || !window.CRA1ModuleDeps) throw new Error('配置组件尚未加载');
+            await window.CRA1ModuleDeps.ensure('config');
+            const content = window.CRA1CartControls ? window.CRA1CartControls.transform(res.data.data.content) : res.data.data.content;
+            host.innerHTML=content;
+            await window.CRA1ModuleDeps.mountScripts(host);
+            if (window.__CART_EMBED__ && this.isEmbed) window.__CART_EMBED__.markReady();
             this.content = res.data.data.content;
             return true;
           } catch (error) {

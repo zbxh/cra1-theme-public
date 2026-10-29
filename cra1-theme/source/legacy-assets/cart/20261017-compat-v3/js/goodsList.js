@@ -138,6 +138,7 @@
         isMobileCart: /android|iphone|ipod|mobile/i.test(navigator.userAgent) && !/ipad/i.test(navigator.userAgent),
         mobileRailTimer: null,
         mobileLoadSeq: 0,
+        mobileNativeFrame: false,
         dockDetailOpen: false,
         couponOpen: false,   // idle | bridged | fallback
           railLoading: false,
@@ -318,11 +319,12 @@
           return Math.min(rows * this.currentColumns, 24);
         },
         embedSrc() {
-          if (this.isMobileCart) return "";
+          if (this.isMobileCart && !this.mobileNativeFrame) return "";
           if (!this.selectedProductId || this.configState === "error") return "";
           if(window.__THEME_PREVIEW__){const u=new URL(window.location.href);u.searchParams.set('part','goods');u.searchParams.set('id','1');u.searchParams.set('embed','1');u.searchParams.set('embed_nonce',this.embedNonce);return u.pathname+u.search;}
           const url = this.productConfigUrl("/cart/goods_embed.htm", this.selectedProductId);
           url.searchParams.set("embed", "1");
+          if (this.isMobileCart && this.mobileNativeFrame) url.searchParams.set("native_controls", "1");
           url.searchParams.set("embed_nonce", this.embedNonce);
           // V10 module parsers decode percent escapes, but do not decode '+' spaces.
           return url.pathname + url.search.replace(/\+/g, "%20");
@@ -1588,6 +1590,8 @@
         },
         reloadConfig() {
           if (this.isMobileCart && this.selectedProductId) {
+            this.embedSeq++;
+            this.embedNonce = `n${Date.now().toString(36)}${this.embedSeq}`;
             this.loadMobileConfig();
             return;
           }
@@ -1792,7 +1796,7 @@
           } catch (e) { }
         },
         railSetDuration(id) {
-          if (this.isMobileCart) {
+          if (this.isMobileCart && !this.mobileNativeFrame) {
             if (this.railVM && this.railVM.params) {
               this.railVM.params.duration_id = id;
               if (typeof this.railVM.changeDuration === "function") this.railVM.changeDuration();
@@ -1804,7 +1808,7 @@
           this.railPost("rail-set", { field: "duration", value: id });
         },
         railSetQty(val) {
-          if (this.isMobileCart) {
+          if (this.isMobileCart && !this.mobileNativeFrame) {
             if (this.railVM) {
               this.railVM.qty = val;
               if (typeof this.railVM.changQty === "function") this.railVM.changQty();
@@ -1818,14 +1822,14 @@
         railApplyCoupon() {
           const code = String(this.railCoupon || "").trim();
           if (!code) return;
-          if (this.isMobileCart) {
+          if (this.isMobileCart && !this.mobileNativeFrame) {
             // 手机档：直填组件内优惠码输入框并触发（与桥接同路径）
             const inp = document.querySelector(".m-cloud-m .discount-code input, .m-dcim-m .discount-code input, .discount-box input");
             if (inp) {
               const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
               setter.call(inp, code);
               inp.dispatchEvent(new Event("input", { bubbles: true }));
-              const btn = inp.closest(".discount-code, .discount-box");
+              let btn = inp.closest(".discount-code, .discount-box");
               btn = btn && btn.querySelector('button, .btn, [class*="confirm"], [class*="exchange"]');
               if (btn) btn.click();
             }
@@ -1835,7 +1839,7 @@
           this.railPost("rail-set", { field: "coupon", value: code });
         },
         railAddCart() {
-          if (this.isMobileCart) {
+          if (this.isMobileCart && !this.mobileNativeFrame) {
             this.railLoading = true;
             try { this.railVM.handlerCart(); } catch (e) { }
             // 轮询模块购物车弹窗：出现即关闭并走父页确认（与桥接同语义）
@@ -1862,7 +1866,7 @@
           this.railAddTimer = setTimeout(() => { this.railLoading = false; }, 6000);
         },
         railBuyNow() {
-          if (this.isMobileCart) {
+          if (this.isMobileCart && !this.mobileNativeFrame) {
             this.railLoading = true;
             try {
               this.railVM.submitOrder({ data: { type: "iframeBuy" } });
@@ -1879,7 +1883,7 @@
         railPrimaryAction() {
           if (!this.isEditingCartItem) { this.railBuyNow(); return; }
           this.railLoading = true;
-          if (this.isMobileCart) {
+          if (this.isMobileCart && !this.mobileNativeFrame) {
             try { this.railVM.changeCart(); } catch (_) { this.railLoading = false; }
           } else {
             this.railPost("rail-save");
@@ -1888,65 +1892,63 @@
           this.railBuyTimer = setTimeout(() => { this.railLoading = false; }, 6000);
         },
 
-        /* ==== v12 手机档：配置直渲染（无 iframe）==== */
+        disposeMobileConfig() {
+          clearInterval(this.mobileRailTimer);
+          if (this.__mobileController) this.__mobileController.abort();
+          const body = this.$refs.mobileConfigBody;
+          if (body) {
+            const vms=new Set([body,...body.querySelectorAll('*')].map(el=>el.__vue__).filter(Boolean));
+            vms.forEach(vm=>{if(!vm._isDestroyed)vm.$destroy();if(window.__cloudMobileVm===vm)window.__cloudMobileVm=null;});
+            body.replaceChildren();
+          }
+          this.railVM=null;
+          document.documentElement.style.removeProperty('--dock-h');
+        },
         async loadMobileConfig() {
           const pid = this.selectedProductId;
           if (!pid) return;
+          this.disposeMobileConfig();
           const seq = ++this.mobileLoadSeq;
+          const controller = this.__mobileController = new AbortController();
+          this.mobileNativeFrame=false;
           this.configState = "loading";
           this.configErrorText = "";
           this.railState = "idle";
-          clearInterval(this.mobileRailTimer);
           try {
             const res = await getOrederConfig({ id: pid, flag: false });
-            if (seq !== this.mobileLoadSeq) return; // 过期响应丢弃
-            const content =
-              res.data && res.data.data && typeof res.data.data.content === "string"
-                ? res.data.data.content
-                : null;
-            if (!content) {
-              throw new Error((res.data && res.data.msg) || "商品配置暂时无法加载，请稍后重试");
-            }
-            this.$nextTick(() => {
-              const body = this.$refs.mobileConfigBody;
-              if (!body) return;
-              /* 原生注入（goodsList 页无 jQuery）：innerHTML 不执行 script，
-                 需按序手动加载——外链 api/lang 首次加载复用全局（去重），
-                 mobile/cloud/js 的 fork 每次执行（IIFE 闭包隔离，可重复挂载） */
-              this.__mobileScriptsLoaded = this.__mobileScriptsLoaded || new Set();
-              body.innerHTML = window.CRA1CartControls ? window.CRA1CartControls.transform(content) : content;
-              const scripts = [...body.querySelectorAll("script")];
-              let chain = Promise.resolve();
-              scripts.forEach((old) => {
-                const src = old.getAttribute("src") || "";
-                const inline = old.textContent;
-                old.remove();
-                const isFork = /mobile\/cloud\/js\//.test(src);
-                if (src && !isFork && this.__mobileScriptsLoaded.has(src)) return;
-                if (src) this.__mobileScriptsLoaded.add(src);
-                chain = chain.then(() => new Promise((res2) => {
-                  const el = document.createElement("script");
-                  if (src) {
-                    el.src = src;
-                    el.onload = () => res2();
-                    el.onerror = () => res2();
-                    document.head.appendChild(el);
-                  } else {
-                    el.textContent = inline;
-                    document.head.appendChild(el);
-                    res2();
-                  }
-                }));
-              });
-              chain.then(() => {
-                this.configState = "ready";
-                this.$nextTick(() => this.initMobileRail(seq));
-              });
+            if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
+            const content = res.data?.status===200 && res.data?.data?.content;
+            if (typeof content !== 'string' || !content) throw new Error('商品配置暂时无法加载，请稍后重试');
+            const probe=document.createElement('template');probe.innerHTML=content;
+            const verifiedFork=probe.content.querySelector('.m-cloud-m') && Array.from(probe.content.querySelectorAll('script[src]')).some(node=>{
+              const u=new URL(node.getAttribute('src'),location.href);
+              return u.origin===location.origin && u.pathname==='/plugins/server/mf_cloud/template/clientarea/mobile/cloud/js/mf_cloud.js';
             });
-          } catch (e) {
-            if (seq !== this.mobileLoadSeq) return;
+            if (!verifiedFork) {
+              // Unknown module globals, CSS and boot scripts get a fresh document
+              // on each selection. Its own price and purchase controls remain live.
+              this.mobileNativeFrame=true;
+              return;
+            }
+            await this.$nextTick();
+            if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
+            const body = this.$refs.mobileConfigBody;
+            if (!body || !window.CRA1ModuleDeps) throw new Error('配置组件未能加载，请刷新重试');
+            await window.CRA1ModuleDeps.ensure('config');
+            if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
+            body.innerHTML = window.CRA1CartControls ? window.CRA1CartControls.transform(content) : content;
+            await window.CRA1ModuleDeps.mountScripts(body,{
+              signal:controller.signal,fetchScripts:true,
+              once:src=>!/\/mobile\/cloud\/js\//.test(src),
+            });
+            if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
+            this.configState = "ready";
+            this.$nextTick(() => this.initMobileRail(seq));
+          } catch (error) {
+            if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
+            this.disposeMobileConfig();
             this.configState = "error";
-            this.configErrorText = (e && e.message) || "配置加载失败";
+            this.configErrorText = '商品配置暂时无法加载，请重试；如仍失败，请联系管理员。';
           }
         },
         initMobileRail(seq) {
@@ -1955,7 +1957,7 @@
           this.mobileRailTimer = setInterval(() => {
             if (seq !== this.mobileLoadSeq) { clearInterval(this.mobileRailTimer); return; }
             tries++;
-            const root = document.querySelector(".m-cloud-m, .m-dcim-m, .m-common-m");
+            const root = this.$refs.mobileConfigBody?.querySelector(".m-cloud-m");
             const vm = root && root.__vue__;
             if (vm && vm.calcTotalPrice !== undefined) {
               clearInterval(this.mobileRailTimer);
@@ -2088,10 +2090,14 @@
           }
         },
       },
+      beforeDestroy() { ++this.mobileLoadSeq; this.disposeMobileConfig(); },
       watch: {
         selectedProductId(pid) {
           /* v12 手机档：选中商品即直渲染进父页（含深链默认选中与卡片切换） */
-          if (this.isMobileCart && pid) this.loadMobileConfig();
+          if (this.isMobileCart) {
+            if (pid) this.loadMobileConfig();
+            else { ++this.mobileLoadSeq; this.disposeMobileConfig(); this.mobileNativeFrame=false; }
+          }
         },
         "select_first_obj.id": function (val) {
           // 切分组：作废上一组的商品选择，URL 移除 product_id（分组规范化用 replace）
