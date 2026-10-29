@@ -19,11 +19,13 @@ final class Updater
     }
     public function preflight(string $archive): array
     {
-        $info=Package::inspect($archive);$doc=$info['manifest'];$files=[];$blockers=$doc['release_blockers']??[];
+        $info=Package::inspect($archive);$doc=$info['manifest'];$files=[];$permissions=[];$warnings=[];$blockers=$doc['release_blockers']??[];
         if(!is_array($blockers))throw new \InvalidArgumentException('更新包检查规则无效');
         $context=($this->contextReader)();
         if(!Inspector::runtimeMatch($doc,$context)||empty($context['database']))$blockers[]='当前系统与模块组合没有已核验的原生运行基线';
-        if(in_array('ONLY_FULL_GROUP_BY',explode(',',strtoupper((string)($context['database_sql_mode']??''))),true))$blockers[]='当前 MySQL 分组规则不符合已验证的原生产品查询环境';
+        // SQL query compatibility belongs to the native business diagnostics;
+        // replacing theme files never changes this database setting.
+        if(in_array('ONLY_FULL_GROUP_BY',explode(',',strtoupper((string)($context['database_sql_mode']??''))),true))$warnings[]='当前数据库分组规则可能影响部分 V10 原生产品查询；本次主题更新不修改数据库设置，可在版本与兼容中查看。';
         $dependencies=[];
         foreach($doc['native_dependencies']??[] as $dependency){
             $row=Inspector::nativeDependency($this->root,$dependency,$doc['integration_profiles']??[]);$dependencies[]=$row;
@@ -43,14 +45,23 @@ final class Updater
                 $old=is_file($target)?hash_file('sha256',$target):null;
                 $status=$old===null?'新增':(hash_equals($old,$row['sha256'])?'一致':'更新');
                 if($old!==null&&strpos($path,'/releases/')!==false&&$status!=='一致')throw new \RuntimeException('不可变资源目录已存在，禁止重写');
-                $parent=dirname($target);while(!is_dir($parent))$parent=dirname($parent);
-                if(!is_writable($parent))throw new \RuntimeException('目标目录不可写');
+                // Reading an unchanged file does not require replacing it. In a
+                // normal V10 installation bin/ and lib/ can be read-only to PHP.
+                if($status!=='一致'){
+                    $parent=dirname($target);while(!is_dir($parent))$parent=dirname($parent);
+                    if(!is_writable($parent)||!is_executable($parent)){
+                        $relative=substr($parent,strlen($this->root)+1);$relative=$relative!==''?$relative.'/':'网站根目录';
+                        $permissions[$relative]=true;
+                        throw new \RuntimeException('此文件需要写入，但所在目录未允许 PHP 运行用户写入：'.$relative);
+                    }
+                }
                 $files[]=['path'=>$path,'owner'=>'酷锐A1主题','purpose'=>$row['purpose']??self::purpose($path),'status'=>$status,'before'=>$old,'after'=>$row['sha256'],'impact'=>$status==='一致'?'无变化':'旧版将备份；不涉及系统核心'];
-            }catch(\Throwable $e){$blockers[]=$path.'：'.$e->getMessage();$files[]=['path'=>$path,'status'=>'阻断','owner'=>'酷锐A1主题','purpose'=>self::purpose($path),'impact'=>$e->getMessage()];}
+            }catch(\Throwable $e){if(strpos($e->getMessage(),'此文件需要写入，但所在目录')!==0)$blockers[]=$path.'：'.$e->getMessage();$files[]=['path'=>$path,'status'=>'阻断','owner'=>'酷锐A1主题','purpose'=>self::purpose($path),'impact'=>$e->getMessage()];}
         }
+        if($permissions)$blockers[]='以下目录内有需要更新的主题文件，但 PHP 运行用户无写入权限：'.implode('、',array_keys($permissions)).'。请在网站面板调整这些目录的属主或写入权限后重新上传，无需将整站设为 777。';
         try{References::inspect($this->root,$doc['references']??[],$this->entry);References::checkCopies($this->root);}catch(\Throwable $e){$blockers[]=$e->getMessage();}
         if(is_file($this->dir.'/pending.json'))$blockers[]='有未完成的更新，请先恢复';
-        return $info+['release_channel'=>$doc['release_channel']??'candidate','files'=>$files,'native_dependencies'=>$dependencies,'blockers'=>$blockers,'can_apply'=>!$blockers,'signature'=>'请核对更新包来源及 SHA-256 校验值'];
+        return $info+['release_channel'=>$doc['release_channel']??'candidate','files'=>$files,'native_dependencies'=>$dependencies,'blockers'=>$blockers,'warnings'=>$warnings,'can_apply'=>!$blockers,'signature'=>'请核对更新包来源及 SHA-256 校验值'];
     }
     public static function purpose(string $path): string
     {
@@ -74,7 +85,7 @@ final class Updater
         return Files::locked($this->dir.'/update.lock',function()use($archive,$expectedDigest){
             $check=$this->preflight($archive);
             if(!hash_equals($check['sha256'],$expectedDigest))throw new \RuntimeException('候选包与已确认预检不一致');
-            if(!$check['can_apply'])throw new \RuntimeException('候选包存在发行阻断项，禁止应用');
+            if(!$check['can_apply'])throw new \RuntimeException('更新检查未通过，请按页面提示处理后重新上传');
             $id=$check['manifest']['release'];$backup=$this->dir.'/history/'.$id.'-'.bin2hex(random_bytes(5));
             $stage=$this->dir.'/staging/'.bin2hex(random_bytes(16));$prepared=false;
             try{
@@ -85,8 +96,10 @@ final class Updater
                 $journal['release_channel']=$check['manifest']['release_channel']??'candidate';
                 foreach($check['files'] as $row){
                     $target=Manifest::destination($this->root,$row['path'],$this->entry);
+                    $actual=is_file($target)?hash_file('sha256',$target):null;
+                    if($actual!==$row['before'])throw new \RuntimeException('预检后目标已变更，请重新检查');
+                    if($row['before']===$row['after'])continue;
                     if($row['before']!==null){
-                        if(!is_file($target)||!hash_equals($row['before'],hash_file('sha256',$target)))throw new \RuntimeException('预检后目标已变更，请重新检查');
                         Files::atomic($backup.'/files/'.$row['path'],(string)file_get_contents($target),0600);
                     }
                     $journal['files'][$row['path']]=['before'=>$row['before'],'after'=>$row['after'],'mode'=>is_file($target)?(fileperms($target)&0777):0644];
@@ -97,21 +110,29 @@ final class Updater
                     $registry=Files::json(References::copyRegistry($this->root),true);
                     foreach($copyPlan as$path=>$row){
                         $target=Manifest::destination($this->root,$path,$this->entry);
-                        if($row['before']!==null)Files::atomic($backup.'/files/'.$path,(string)file_get_contents($target),0600);
-                        $journal['files'][$path]=['before'=>$row['before'],'after'=>$row['after'],'mode'=>is_file($target)?fileperms($target)&0777:0644];
+                        if($row['before']!==$row['after']){
+                            if($row['before']!==null)Files::atomic($backup.'/files/'.$path,(string)file_get_contents($target),0600);
+                            $journal['files'][$path]=['before'=>$row['before'],'after'=>$row['after'],'mode'=>is_file($target)?fileperms($target)&0777:0644];
+                        }
                         $registry['files'][$path]=$row['after'];
                     }
                     if(isset($registry['files']))ksort($registry['files']);
                     $registryPath='runtime/cra1_theme/native-reference-copies.json';$target=$this->root.'/'.$registryPath;
                     $before=is_file($target)?hash_file('sha256',$target):null;
-                    if($before!==null)Files::atomic($backup.'/files/'.$registryPath,(string)file_get_contents($target),0600);
-                    $journal['files'][$registryPath]=['before'=>$before,'after'=>hash('sha256',json_encode($registry,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR)."\n"),'mode'=>0600];
+                    $after=hash('sha256',json_encode($registry,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR)."\n");
+                    if($before!==$after){
+                        if($before!==null)Files::atomic($backup.'/files/'.$registryPath,(string)file_get_contents($target),0600);
+                        $journal['files'][$registryPath]=['before'=>$before,'after'=>$after,'mode'=>0600];
+                    }
                 }else foreach($references as $path=>$target)if(!file_exists($this->root.'/'.$path)&&!is_link($this->root.'/'.$path))$journal['references'][$path]=$target;
                 Files::putJson($backup.'/journal.json',$journal,0600);
                 Files::putJson($this->dir.'/pending.json',$journal,0600);$prepared=true;
                 foreach($check['manifest']['files'] as $path=>$row){
                     $target=Manifest::destination($this->root,$path,$this->entry);
-                    if(is_file($target)&&hash_equals($row['sha256'],hash_file('sha256',$target)))continue;
+                    if(!isset($journal['files'][$path])){
+                        if(!is_file($target)||!hash_equals($row['sha256'],hash_file('sha256',$target)))throw new \RuntimeException('预检后目标已变更，请重新检查');
+                        continue;
+                    }
                     if(strpos($path,'public/')===0&&!is_dir(dirname($target))&&!mkdir(dirname($target),0755,true))throw new \RuntimeException('主题资源目录无法创建');
                     ($this->fileWriter)($target,(string)file_get_contents($stage.'/'.$path),strpos($path,'public/')===0?0644:0640);
                     if(!is_file($target)||!hash_equals($row['sha256'],hash_file('sha256',$target)))throw new \RuntimeException('落盘校验失败：'.$path);
@@ -158,6 +179,9 @@ final class Updater
         foreach($j['files'] as $path=>$row){
             $target=$this->journalTarget($path);
             if(!is_array($row)||!array_key_exists('before',$row)||($row['before']!==null&&!preg_match('/^[a-f0-9]{64}$/D',(string)$row['before']))||!preg_match('/^[a-f0-9]{64}$/D',(string)($row['after']??''))||!is_int($row['mode']??null)||$row['mode']<0||$row['mode']>0777)throw new \RuntimeException('恢复文件记录异常');
+            // Older journals also backed up unchanged files. They were never
+            // replaced and must not make a rollback depend on directory writes.
+            if($row['before']===$row['after'])continue;
             if($retainSecurity&&(self::retainedOnRollback($path)||$path==='runtime/cra1_theme/native-reference-copies.json'))continue;
             if($row['before']!==null){$file=$j['backup'].'/files/'.$path;Files::noLinks($file);if(!is_file($file)||!hash_equals($row['before'],hash_file('sha256',$file)))throw new \RuntimeException('恢复文件损坏：'.$path);}
             if($protectChanges&&is_file($target)&&!hash_equals($row['after'],hash_file('sha256',$target))&&($row['before']===null||!hash_equals($row['before'],hash_file('sha256',$target))))throw new \RuntimeException('更新后文件已被修改，请先备份：'.$path);
@@ -168,10 +192,11 @@ final class Updater
     {
         $this->validateJournal($journal,$protectChanges,$retainSecurity);
         foreach(array_reverse($journal['files'],true) as $path=>$row){
+            if($row['before']===$row['after'])continue;
             if($retainSecurity&&(self::retainedOnRollback($path)||$path==='runtime/cra1_theme/native-reference-copies.json'))continue;
             $target=$this->journalTarget($path);
             if($row['before']===null){if(is_file($target)&&strpos($path,'/releases/')===false&&!unlink($target))throw new \RuntimeException('无法恢复新增文件');}
-            else Files::atomic($target,(string)file_get_contents($journal['backup'].'/files/'.$path),$row['mode']);
+            elseif(!is_file($target)||!hash_equals($row['before'],hash_file('sha256',$target)))Files::atomic($target,(string)file_get_contents($journal['backup'].'/files/'.$path),$row['mode']);
             self::invalidate($target);
         }
         $removeReferences=$journal['references']??[];

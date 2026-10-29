@@ -35,8 +35,6 @@ with tempfile.TemporaryDirectory(prefix='cra1-install-permissions-') as temporar
     shutil.copytree(source / 'cra1-theme/backend', backend, ignore=shutil.ignore_patterns('releases'))
     for relative in ['lib', 'config', 'runtime/cra1_theme', 'public/cra1admin', 'public/cra1-install', 'public/upload']:
         (site / relative).mkdir(parents=True, exist_ok=True)
-    for name in ['cra1_theme_security.php', 'cra1_theme_media.php']:
-        shutil.copyfile(source / 'lib' / name, site / 'lib' / name)
     shared = site / 'public/cra1-shared'
     shared.mkdir(parents=True)
     for path in (source / 'public/cra1-shared').glob('*.php'):

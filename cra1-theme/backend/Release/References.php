@@ -83,7 +83,8 @@ final class References
             foreach($plan as$path=>$row)$doc['files'][$path]=$row['after'];
             if(isset($doc['files']))ksort($doc['files']);
             if(!is_file($registry))$created[]=$registry;
-            \CRA1\Theme\Files::putJson($registry,$doc,0600);
+            $bytes=json_encode($doc,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR)."\n";
+            if(!is_file($registry)||!hash_equals(hash_file('sha256',$registry),hash('sha256',$bytes)))\CRA1\Theme\Files::atomic($registry,$bytes,0600);
             return $created;
         }catch(\Throwable $e){
             foreach(array_reverse($previous,true)as$target=>$bytes){if($bytes===null){if(is_file($target))unlink($target);}else \CRA1\Theme\Files::atomic($target,$bytes,0644);}

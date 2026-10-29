@@ -61,7 +61,7 @@ try{
  check(!$up->preflight($contract)['can_apply'],'same system version with different native bytes cannot pass update');
  Files::atomic($site.'/app/protected.php','system');
  $groupBy=new Updater($site,'cra1admin',static function(){return ['database'=>true,'system_version'=>'10.7.4','modules'=>[],'database_sql_mode'=>'STRICT_TRANS_TABLES,ONLY_FULL_GROUP_BY'];});
- check(!$groupBy->preflight($contract)['can_apply'],'update preflight checks original query environment');
+ check($groupBy->preflight($contract)['can_apply']&&count($groupBy->preflight($contract)['warnings'])===1,'native query settings remain visible without blocking a theme-file update');
  $unverified=$base.'/unverified-contract.zip';
  zipFixture($unverified,['public/web/cra1/example.js'=>'after'],[],['native_dependencies'=>[['path'=>'app/protected.php','verified_sha256'=>[]]]]);
  check(!$up->preflight($unverified)['can_apply'],'unverified original file is not accepted by update');

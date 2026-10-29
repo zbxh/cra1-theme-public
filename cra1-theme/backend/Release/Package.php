@@ -15,6 +15,7 @@ final class Package
             if($zip->numFiles>Manifest::MAX_FILES+1)throw new \InvalidArgumentException('ZIP 文件数量过多');
             $install=$zip->locateName('manifest.json')===false;
             $manifestName=$install?'cra1-theme/release.json':'manifest.json';
+            if($install&&$zip->locateName($manifestName)===false)throw new \InvalidArgumentException('请选择主题安装包 ZIP，不要上传包含图文教程的安装合集或源码包');
             $manifestStat=$zip->statName($manifestName);
             if(!$manifestStat||$manifestStat['size']>8388608)throw new \InvalidArgumentException('发行清单缺失或过大');
             $raw=$zip->getFromName($manifestName);

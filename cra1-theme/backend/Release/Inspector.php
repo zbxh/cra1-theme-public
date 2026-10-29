@@ -66,7 +66,9 @@ final class Inspector
             $check=self::nativeDependency($root,$dependency,$release['integration_profiles']??[]);
             $add('dependency:'.$check['path'],$check['status'],$check['purpose'],$check['detail'],$check['path'],$check['impact']);
         }
-        foreach(['runtime/cra1_theme','config','public/upload','public']as$dir){
+        // Renaming a backend entry checks its parent when requested. Ordinary
+        // use and uploads into theme-owned directories do not write public/ itself.
+        foreach(['runtime/cra1_theme','config','public/upload']as$dir){
             $path=$root.'/'.$dir;while(!file_exists($path)&&dirname($path)!==$path)$path=dirname($path);
             $add('writable:'.$dir,is_writable($path)?'pass':'blocked','目录权限',is_writable($path)?'目标可写':'目标不可写',$dir);
         }

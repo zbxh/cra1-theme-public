@@ -1,6 +1,7 @@
 <?php
 if (PHP_SAPI !== 'cli' && realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) { http_response_code(404); exit; }
-require_once dirname(__DIR__,2).'/lib/cra1_theme_media.php';
+require_once dirname(__DIR__,2).'/cra1-theme/backend/bootstrap.php';
+require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_media.php';
 function theme_admin_media(string $root,string $action): array
 {
     try {

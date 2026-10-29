@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Build deterministic source/install/update *candidates*. Never touches runtime or live releases."""
-import argparse, hashlib, json, os, pathlib, re, stat, zipfile
+import argparse, hashlib, json, os, pathlib, re, stat, zipfile, shutil
 from bundle_install import bundle_install, guide_sources, read_source
 ROOT=pathlib.Path(__file__).resolve().parents[2]
 RUNTIME_ROOTS=['cra1-theme/backend','cra1-theme/docs','cra1-theme/licenses','public/web/cra1','public/clientarea/template/pc/cra1','public/clientarea/template/mobile/cra1','public/cart/template/pc/cra1','public/cart/template/mobile/cra1','public/home/template/pc/cra1','public/home/template/mobile/cra1','public/cra1-shared','public/cra1admin','public/cra1-install']
-HELPERS=['lib/cra1_theme_admin.php','lib/cra1_theme_security.php','lib/cra1_theme_media.php','lib/cra1_theme_seo.php','lib/cra1_theme_client_actions.php','bin/cra1-theme-security.php','bin/cra1-theme-media.php','cra1-theme/THIRD_PARTY_NOTICES.md','cra1-theme/scripts/private-path-check.php']
+LEGACY_HELPERS=['lib/cra1_theme_admin.php','lib/cra1_theme_security.php','lib/cra1_theme_media.php','lib/cra1_theme_seo.php','lib/cra1_theme_client_actions.php','bin/cra1-theme-security.php','bin/cra1-theme-media.php']
+# Runtime consumers load the selected private backend directly. Existing legacy
+# wrappers remain on disk; updating them would needlessly require system-directory writes.
+HELPERS=['cra1-theme/scripts/security.php','cra1-theme/scripts/media.php','cra1-theme/THIRD_PARTY_NOTICES.md','cra1-theme/scripts/private-path-check.php']
 NATIVE_CONTRACTS={
  'app/event/AppInit.php':'主题钩子装载时机',
  'app/http/middleware/CheckHome.php':'原生会员身份及会话校验',
@@ -86,7 +89,7 @@ def maintenance_archive(stage,out,meta,build):
  print(json.dumps(report,ensure_ascii=False,indent=2))
 
 def main():
- ap=argparse.ArgumentParser();ap.add_argument('--stage',required=True,type=pathlib.Path);ap.add_argument('--out',required=True,type=pathlib.Path);args=ap.parse_args()
+ ap=argparse.ArgumentParser();ap.add_argument('--stage',required=True,type=pathlib.Path);ap.add_argument('--out',required=True,type=pathlib.Path);ap.add_argument('--with-guide-bundle',action='store_true',help='Also generate an optional offline tutorial bundle');args=ap.parse_args()
  stage=args.stage.resolve();out=args.out.resolve()
  if ROOT==out or ROOT in out.parents or ROOT==stage or ROOT in stage.parents:raise RuntimeError('Staging and package outputs must be outside the site')
  meta=json.loads((stage/'release.json').read_text());release=meta['release']
@@ -151,6 +154,8 @@ def main():
    # Tests belong to source only. Runtime packages above never include them.
    if p.is_file() and not p.is_symlink() and p.name!='AGENTS.md' and not any(x in p.parts for x in ['node_modules','.git','__pycache__']) and not any(x.startswith('.') for x in p.relative_to(ROOT).parts) and p.suffix not in ['.map','.log','.key','.pem','.sqlite','.pyc']:
     source[rel]=p.read_bytes()
+ for rel in LEGACY_HELPERS:
+  if (ROOT/rel).is_file():source[rel]=(ROOT/rel).read_bytes()
  source['cra1-theme/LICENSE.txt']=(ROOT/'cra1-theme/LICENSE.txt').read_bytes()
  source['LICENSE']=(ROOT/'LICENSE').read_bytes()
  source.update(guides)
@@ -162,9 +167,12 @@ def main():
  for rel in ['public/cra1-shared/README.md','public/clientarea/template/pc/cra1/README.md','public/cra1-shared/package.json','public/cra1-shared/package-lock.json','public/cra1-shared/build.mjs','public/cra1-shared/build-icons.py']:
   if (ROOT/rel).is_file():source[rel]=(ROOT/rel).read_bytes()
  results.append(archive(out/f'cra1-theme-{version}-source-candidate.zip',source))
- delivery=bundle_install(out/results[0]['path'],out/'delivery',ROOT)
- delivery['path']='delivery/'+delivery['path']
+ delivery_dir=out/'delivery';delivery_dir.mkdir()
+ delivery_file=delivery_dir/f'CRA1-theme-{version}-install.zip'
+ shutil.copyfile(out/results[0]['path'],delivery_file)
+ delivery={'path':'delivery/'+delivery_file.name,'kind':'install','version':version,'bytes':delivery_file.stat().st_size,'sha256':digest(delivery_file.read_bytes())}
  report={'release':release,'version':version,'release_channel':meta.get('release_channel','candidate'),'commercial_release_accepted':False,'release_blockers':outer['release_blockers'],'files':len(data),'native_references':len(refs),'native_dependencies':len(native),'asset_provenance_pending':len(pending_assets),'packages':results,'delivery':delivery}
+ if args.with_guide_bundle:report['guide_bundle']=bundle_install(out/results[0]['path'],out/'optional-guide-bundle',ROOT)
  (out/'candidate-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
  print(json.dumps(report,ensure_ascii=False,indent=2))
 if __name__=='__main__':main()

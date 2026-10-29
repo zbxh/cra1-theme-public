@@ -31,11 +31,14 @@ def main():
   packages[kind]=path
  check(set(packages)=={'install','update','source'},'安装、更新及源码包齐全')
  delivery=report.get('delivery',{})
- delivery_name=f"delivery/CRA1-theme-{report.get('version',report['release'])}.zip"
- check(delivery.get('path')==delivery_name,'安装交付为包含版本号的单一合集')
+ direct=delivery.get('kind')=='install'
+ delivery_name=f"delivery/CRA1-theme-{report.get('version',report['release'])}{'-install' if direct else ''}.zip"
+ check(delivery.get('path')==delivery_name,'安装交付使用包含版本号的文件名')
  delivery_path=folder/delivery_name
- check(delivery_path.is_file() and delivery_path.stat().st_size==delivery.get('bytes') and sha(delivery_path.read_bytes())==delivery.get('sha256'),'安装合集存在且内容完整')
- if delivery_path.is_file():
+ check(delivery_path.is_file() and delivery_path.stat().st_size==delivery.get('bytes') and sha(delivery_path.read_bytes())==delivery.get('sha256'),'安装交付存在且内容完整')
+ if direct and delivery_path.is_file():
+  check(delivery_path.read_bytes()==packages['install'].read_bytes(),'交付包就是可直接上传的主题安装包，无嵌套合集')
+ elif delivery_path.is_file():
   with zipfile.ZipFile(delivery_path) as bundle:
    check(bundle.read('cra1-theme-install.zip')==packages['install'].read_bytes(),'安装合集内的安装包与已检查候选包完全一致')
    guide_files={'安装教程/安装教程.md','安装教程/安装教程.html','安装教程/安装教程.pdf','开始安装.txt'}
@@ -48,8 +51,9 @@ def main():
  check(native_install.returncode==0,'同一安装 ZIP 通过覆盖更新的完整解析与负载校验')
  with zipfile.ZipFile(packages['install']) as install,zipfile.ZipFile(packages['update']) as update,zipfile.ZipFile(packages['source']) as source:
   doc=json.loads(update.read('manifest.json'));files=doc['files']
-  check(doc.get('version',doc['release'])==report.get('version',report['release'])==delivery.get('version',delivery.get('release')),'安装合集、更新包及报告使用同一版本号')
+  check(doc.get('version',doc['release'])==report.get('version',report['release'])==delivery.get('version',delivery.get('release')),'安装交付、更新包及报告使用同一版本号')
   check(set(install.namelist())==set(files),'安装与更新负载完全对应')
+  check(not any(name.startswith(('lib/','bin/')) for name in files),'主题辅助程序自包含，无需写入 V10 的 lib 和 bin 目录')
   check(set(source.namelist()).issuperset(files),'源码包保留运行文件')
   identity=json.loads(install.read('cra1-theme/docs/product-identity.json'))
   license_bytes=source.read('cra1-theme/LICENSE.txt');license_meta=json.loads(source.read('cra1-theme/docs/repository-license.json'))

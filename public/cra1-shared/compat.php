@@ -3,7 +3,8 @@
 declare(strict_types=1);
 ini_set('display_errors', '0');
 $root = dirname(__DIR__, 2);
-require_once $root . '/lib/cra1_theme_client_actions.php';
+require_once $root.'/cra1-theme/backend/bootstrap.php';
+require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_client_actions.php';
 require_once __DIR__.'/compatibility.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');

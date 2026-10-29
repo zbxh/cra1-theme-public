@@ -25,9 +25,36 @@ export class ApiError extends Error {
   }
 }
 
+function multipartRequest(url, body, options) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    const signal = options.signal
+    const abort = () => xhr.abort()
+    const cleanup = () => signal?.removeEventListener('abort', abort)
+    xhr.open('POST', url)
+    xhr.withCredentials = true
+    xhr.setRequestHeader('X-CSRF-Token', csrf)
+    xhr.upload.onprogress = event => {
+      if (event.lengthComputable) options.onUploadProgress(Math.min(100, Math.round(event.loaded * 100 / event.total)))
+    }
+    xhr.onload = () => {
+      cleanup()
+      if (xhr.status === 413) return reject(new ApiError('安装包超过服务器上传限制，可改用服务器本地导入', 413, null))
+      resolve({status:xhr.status, json:async()=>JSON.parse(xhr.responseText)})
+    }
+    xhr.onerror = () => { cleanup(); reject(new ApiError('上传连接中断，请检查网络后重试；也可使用服务器本地导入', 0, null)) }
+    xhr.onabort = () => { cleanup(); reject(new DOMException('请求已取消', 'AbortError')) }
+    if (signal?.aborted) return reject(new DOMException('请求已取消', 'AbortError'))
+    signal?.addEventListener('abort', abort, {once:true})
+    xhr.send(body)
+  })
+}
+
 export async function api(route, body, options = {}) {
   const multipart = typeof FormData !== 'undefined' && body instanceof FormData
-  const res = await fetch(base + '?r=' + route, {
+  const res = multipart && typeof options.onUploadProgress === 'function'
+    ? await multipartRequest(base + '?r=' + route, body, options)
+    : await fetch(base + '?r=' + route, {
     method: 'POST',
     signal: options.signal,
     credentials: 'same-origin',

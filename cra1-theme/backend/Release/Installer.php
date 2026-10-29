@@ -63,7 +63,7 @@ final class Installer
             if(file_exists($pointer))throw new \RuntimeException('检测到已有发行指针，禁止覆盖安装记录');
             $release=Files::json($this->root.'/cra1-theme/release.json');
             References::inspect($this->root,$release['references']??[]);
-            require_once $this->root.'/lib/cra1_theme_security.php';
+            require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_security.php';
             \CRA1ThemeSecurity::username((string)($input['username']??''));$hash=\CRA1ThemeSecurity::password((string)($input['password']??''));
             $canonical=rtrim((string)($input['canonical']??''),'/');$url=parse_url($canonical);
             if(!filter_var($canonical,FILTER_VALIDATE_URL)||($url['scheme']??'')!=='https'||!empty($url['path'])||isset($url['user'])||isset($url['pass'])||isset($url['query'])||isset($url['fragment']))throw new \InvalidArgumentException('请输入本站有效 HTTPS 源地址');
@@ -81,7 +81,7 @@ final class Installer
                 foreach(References::apply($this->root,$release['references']??[])as$createdLink)$created[]=$createdLink;
                 $security=new \CRA1ThemeSecurity($this->root);
                 if($security->scalar('PRAGMA quick_check')!=='ok'||$security->scalar('SELECT COUNT(*) FROM accounts WHERE enabled=1 AND role=\'super_admin\'')!=1)throw new \RuntimeException('主题后台安装后自检失败');
-                require_once $this->root.'/lib/cra1_theme_media.php';
+                require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_media.php';
                 $mediaFile=$this->root.'/runtime/cra1_theme/attachments.sqlite';$newMedia=!is_file($mediaFile);
                 if($newMedia)foreach(['attachments.sqlite','attachments.sqlite-wal','attachments.sqlite-shm']as$file)$created[]=$this->root.'/runtime/cra1_theme/'.$file;
                 $media=new \CRA1ThemeMediaStore($this->root,$newMedia);

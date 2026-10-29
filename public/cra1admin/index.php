@@ -48,7 +48,8 @@ if (in_array((string)($_GET['r']??''),['member.sidebar.snapshot','cart.snapshot'
     require $ROOT.'/public/cra1-shared/snapshot.php';exit;
 }
 $THEME_SECURITY_STARTED=hrtime(true);
-require_once $ROOT.'/lib/cra1_theme_admin.php';
+require_once $ROOT.'/cra1-theme/backend/bootstrap.php';
+require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_admin.php';
 $THEME_REQUEST_ID=bin2hex(random_bytes(12));
 try {$THEME_SECURITY=new CRA1ThemeSecurity($ROOT);$THEME_SETTINGS=$THEME_SECURITY->settings();}
 catch(Throwable $e){http_response_code(503);header('Cache-Control: no-store');header('X-Robots-Tag: noindex, nofollow');header('X-Content-Type-Options: nosniff');if(strpos((string)($_GET['r']??''),'api.')===0){header('Content-Type: application/json; charset=utf-8');echo json_encode(['status'=>503,'msg'=>'后台安全服务不可用，请通过本地维护命令检查。','code'=>'SECURITY_UNAVAILABLE','request_id'=>$THEME_REQUEST_ID],JSON_UNESCAPED_UNICODE);}else{header('Content-Type: text/plain; charset=utf-8');echo '后台安全服务不可用，请通过本地维护命令检查。';}exit;}
@@ -91,7 +92,7 @@ header('Content-Security-Policy: default-src \'self\'; script-src \'self\' \'non
 
 /* ---------- 通用工具 ---------- */
 function json_out(array $data,int $code=200): void {
-    if(($data['status']??0)===200&&in_array($GLOBALS['THEME_WRITE']['action']??'',['seo.save','workspace.editor.save','workspace.save','save','reset'],true)){try{require_once $GLOBALS['ROOT'].'/lib/cra1_theme_seo.php';theme_generate_seo($GLOBALS['ROOT'],$GLOBALS['THEME_SETTINGS']['canonical_url']);}catch(Throwable $e){$data['data']['seo_ok']=false;$data['msg']='配置已保存，搜索引擎文件同步失败，请通过维护命令重建。';}}
+    if(($data['status']??0)===200&&in_array($GLOBALS['THEME_WRITE']['action']??'',['seo.save','workspace.editor.save','workspace.save','save','reset'],true)){try{require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_seo.php';theme_generate_seo($GLOBALS['ROOT'],$GLOBALS['THEME_SETTINGS']['canonical_url']);}catch(Throwable $e){$data['data']['seo_ok']=false;$data['msg']='配置已保存，搜索引擎文件同步失败，请通过维护命令重建。';}}
     $data=theme_api_complete($data);$status=(int)($data['status']??$code);
     $data['code']=$data['code']??([200=>'OK',400=>'INVALID_REQUEST',401=>'SESSION_INVALID',403=>'PERMISSION_DENIED',404=>'NOT_FOUND',409=>'CONFIG_CONFLICT',429=>'RATE_LIMITED',500=>'SERVER_ERROR',503=>'SERVICE_UNAVAILABLE'][$status]??'REQUEST_FAILED');
     $data['request_id']=$GLOBALS['THEME_REQUEST_ID'];if(($data['msg']??'')==='success')$data['msg']='已读取';

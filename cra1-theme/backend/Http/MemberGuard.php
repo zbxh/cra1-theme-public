@@ -44,7 +44,7 @@ class MemberGuard extends \app\http\middleware\CheckHome
             if ((int)$gate['status'] !== 200) return json($gate);
             $response = $next($authenticated);
             if ($path === '/console/v1/account' && strtoupper($authenticated->method()) === 'GET') {
-                require_once CRA1_THEME_ROOT.'/lib/cra1_theme_media.php';
+                require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_media.php';
                 $data = $response->getData();
                 if (is_array($data) && (int)($data['status']??0)===200 && isset($data['data']['account'])) {
                     $data['data']['account']['theme_avatar'] = \CRA1ThemeMediaStore::avatarFor(CRA1_THEME_ROOT,(int)get_client_id(false));

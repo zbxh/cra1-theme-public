@@ -16,7 +16,7 @@ final class CustomerData
 
     public static function candidate(array $data): array
     {
-        $out=array_intersect_key($data,array_flip(['sha256','bytes','release_channel','files','native_dependencies','blockers','can_apply','signature','candidate']));
+        $out=array_intersect_key($data,array_flip(['sha256','bytes','release_channel','files','native_dependencies','blockers','warnings','can_apply','signature','candidate']));
         $out['release']=$data['manifest']['release']??$data['release']??null;
         if(isset($data['manifest']['version']))$out['version']=$data['manifest']['version'];
         $out['files']=array_values(array_filter($out['files']??[],static function($row){return !self::repositoryFile((string)($row['path']??''));}));

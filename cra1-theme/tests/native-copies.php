@@ -19,7 +19,8 @@ try{
  check(file_get_contents($base.'/public/clientarea/template/mobile/cra1/api/common.js')==='native API','mobile virtual source includes declared child dependencies');
  check(file_get_contents($base.'/public/clientarea/template/mobile/cra1/components/sample/component.js')==='native component','directory dependencies are copied without disabled symlink function');
  check(!is_link($base.'/public/clientarea/template/mobile/cra1')&&!is_link($base.'/public/clientarea/template/pc/cra1/api/common.js'),'fallback creates ordinary files and directories');
- check(References::apply($base,$refs)===[],'copy dependency preparation is idempotent');
+ $registryInode=fileinode(References::copyRegistry($base));
+ check(References::apply($base,$refs)===[]&&fileinode(References::copyRegistry($base))===$registryInode,'unchanged dependency copies and registry are not rewritten');
  References::checkCopies($base);check(true,'copy integrity registry matches prepared bytes');
  $path='public/clientarea/template/pc/cra1/header.php';$release='fixture-copy-update-v1';
  $meta=['format'=>1,'product'=>'cra1-theme','release'=>$release,'files'=>[$path=>['sha256'=>hash('sha256','second UI'),'bytes'=>strlen('second UI')]],'references'=>$refs,'verified_combinations'=>[['system'=>'10.7.4','modules'=>[],'evidence'=>'isolated copy fixture']],'release_blockers'=>[]];

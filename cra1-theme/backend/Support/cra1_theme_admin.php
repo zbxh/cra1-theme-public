@@ -51,7 +51,7 @@ function theme_target(string $action,array $p): string {
     if(strpos($action,'security.mfa.')===0||$action==='security.password')return 'account:'.(theme_actor()['id']??0);
     return (string)($p['domain']??(strpos($action,'member.')===0?'member':(strpos($action,'cart.')===0?'cart':'website'))).':'.(string)($p['editorId']??$p['scopeId']??'all');
 }
-function theme_read_action(string $a): bool { return in_array($a,['announcements.preview','announcements.legacy-draft','release.check','release.history','release.license.get','release.candidate.get','media.list','media.attachments','get','products','site-pages','link-options','icons','icons.catalog','icons.page','icons.resolve','icons.preview','icon-search','navigation-catalog','product-options','logs','security.my','security.accounts.list','security.audit.list','security.audit.detail','security.settings.get','security.alerts'],true)||preg_match('/\.(get|catalog)$/D',$a)===1; }
+function theme_read_action(string $a): bool { return in_array($a,['announcements.preview','announcements.legacy-draft','release.check','release.history','release.license.get','release.candidate.get','release.local.list','media.list','media.attachments','get','products','site-pages','link-options','icons','icons.catalog','icons.page','icons.resolve','icons.preview','icon-search','navigation-catalog','product-options','logs','security.my','security.accounts.list','security.audit.list','security.audit.detail','security.settings.get','security.alerts'],true)||preg_match('/\.(get|catalog)$/D',$a)===1; }
 function theme_protected_code_changes(array $p,array $current): bool {
     $keys=['custom_code','custom_css','custom_js','custom_css_enabled','custom_js_enabled'];
     foreach($p as$k=>$v){if(in_array($k,$keys,true)){if($v===null||!array_key_exists($k,$current)||json_encode($current[$k])!==json_encode($v))return true;}elseif(is_array($v)){if(theme_protected_code_changes($v,$current))return true;}elseif(is_string($v)&&preg_match('/(?:overrides|config|patch).*json$/i',(string)$k)){$d=json_decode($v,true);if(is_array($d)&&theme_protected_code_changes($d,$current))return true;}}
@@ -72,7 +72,7 @@ function theme_api_guard(string $action,array $p): void {
     if(preg_match('/save|import|preview$/',$action)&&strpos($action,'security.')!==0){$normal=$p;unset($normal['_reauth']);theme_safe_content($normal);}
     if($a['must_change']&&!theme_read_action($action)&&!in_array($action,['auth.reauth','security.password','logout','security.session.revoke','workspace.preview'],true))throw new CRA1ThemeSecurityError('请先在“我的安全”修改初始密码。',403,'PASSWORD_CHANGE_REQUIRED');
     if($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id']){theme_require_role(['admin','super_admin']);theme_security()->manageAllowed($a,theme_security()->account((int)$p['account_id']));}
-    $step=($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id'])||in_array($action,['release.upload','release.apply','release.rollback','release.recover','release.license.save','reset','member.reset','cart.reset','path','security.settings.save','security.accounts.create','security.accounts.update','security.audit.export','security.password','security.mfa.begin','security.mfa.disable','security.mfa.recovery'],true)||$code;
+    $step=($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id'])||in_array($action,['release.license.save','reset','member.reset','cart.reset','path','security.settings.save','security.accounts.create','security.accounts.update','security.audit.export','security.password','security.mfa.begin','security.mfa.disable','security.mfa.recovery'],true)||$code;
     if($step)theme_security()->useReauth((string)($p['_reauth']??''),(string)($_SESSION['security_token']??''),$action,theme_target($action,$p));
     if(!theme_read_action($action)){
         // Config writers hold a shared lock; reference checking/deletion holds an exclusive lock.
@@ -80,7 +80,8 @@ function theme_api_guard(string $action,array $p): void {
             require_once __DIR__.'/cra1_theme_media.php';
             $GLOBALS['THEME_MEDIA_WRITE_LOCK']=(new CRA1ThemeMediaStore($GLOBALS['ROOT']))->lock();
         }
-        $GLOBALS['THEME_WRITE']=['action'=>$action,'target'=>theme_target($action,$p),'risk'=>$step?'high':'low','category'=>strpos($action,'security.')===0||$action==='logout'||$action==='path'?'security':'operation','before'=>$domains??theme_read_domains(),'code'=>$code];
+        $releaseWrite=in_array($action,['release.upload','release.local.import','release.apply','release.rollback','release.recover'],true);
+        $GLOBALS['THEME_WRITE']=['action'=>$action,'target'=>theme_target($action,$p),'risk'=>$step||$releaseWrite?'high':'low','category'=>strpos($action,'security.')===0||$action==='logout'||$action==='path'?'security':'operation','before'=>$domains??theme_read_domains(),'code'=>$code];
         if($action==='security.accounts.update'){$GLOBALS['THEME_WRITE']['account_before']=CRA1ThemeSecurity::publicAccount(theme_security()->account((int)($p['id']??0)));$GLOBALS['THEME_WRITE']['password_reset']=array_key_exists('password',$p);$GLOBALS['THEME_WRITE']['mfa_reset']=!empty($p['reset_mfa']);}
         if($action==='security.settings.save')$GLOBALS['THEME_WRITE']['settings_before']=theme_security()->settings();
         if($action==='path')$GLOBALS['THEME_WRITE']['entry_before']=$GLOBALS['SLUG'];

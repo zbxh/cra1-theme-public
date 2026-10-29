@@ -27,7 +27,7 @@ final class MemberController
                     $result = ['status'=>200,'data'=>['enabled'=>Verification::enabled(),'expires_at'=>Verification::expiresAt((int)get_client_id())]];
                     break;
                 case 'avatar': case 'saveAvatar': case 'uploadAvatar':
-                    require_once CRA1_THEME_ROOT.'/lib/cra1_theme_media.php';
+                    require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_media.php';
                     if ($action === 'avatar') $data = ['theme_avatar'=>\CRA1ThemeMediaStore::avatarFor(CRA1_THEME_ROOT,$self)];
                     else {
                         $store = new \CRA1ThemeMediaStore(CRA1_THEME_ROOT);
