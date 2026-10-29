@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 安装与更新教程
+    url: https://github.com/zbxh/cra1-theme-public/blob/main/docs/installation.md
+    about: 查看主题放置位置、安装和后台覆盖更新方法。

@@ -1,0 +1,66 @@
+name: 第三方模块兼容
+description: 反馈第三方模块的商品配置、显示或交互问题
+title: "[模块] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请先搜索是否已有相同反馈。此处公开可见，请勿上传账号、密码、验证码、令牌、数据库配置、完整日志或未打码的客户资料。
+        可以进入「主题管理 → 版本与兼容 → 复制排查信息」，核对后粘贴。后台无法进入时，填写已知信息和脱敏截图即可。
+  - type: input
+    id: theme_version
+    attributes:
+      label: 主题版本
+      placeholder: 例如 v17.3 测试版
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 系统及浏览器
+      placeholder: V10 版本、PHP 版本、浏览器及是否手机端
+    validations:
+      required: true
+  - type: input
+    id: module
+    attributes:
+      label: 模块名称及版本
+      description: 请填写模块公开名称和版本，勿提供模块密钥或 API 认证信息。
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: 出问题的场景
+      options:
+        - 桌面端商品选配
+        - 手机端商品选配
+        - 切换商品后
+        - 产品列表或控制面板
+        - 其他
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 写明操作入口与步骤；页面只写相对地址，不必提供站点域名。
+      placeholder: |
+        1. 打开……
+        2. 点击或修改……
+        3. 出现……
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期与实际表现
+      description: 可附打码截图；请说明是否每次都发生，以及刷新后是否恢复。
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: 排查信息（可选）
+      description: 粘贴主题后台生成的排查信息；请勿粘贴完整配置或日志。报错可以仅提供错误编号。
+      render: text
