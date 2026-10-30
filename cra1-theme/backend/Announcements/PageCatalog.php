@@ -35,7 +35,8 @@ final class PageCatalog
             'security-group'=>['安全组','账户与安全',['/security_group.htm','/group_rules.htm']], 'security-log'=>['操作日志','账户与安全',['/security_log.htm']],
             'finance'=>['财务中心','财务与订单',['/finance.htm']], 'recharge'=>['充值','财务与订单',['/recharge.htm']],
             'withdrawal'=>['提现','财务与订单',['/withdrawal.htm']], 'transfer'=>['余额转账','财务与订单',['/transfer.htm']],
-            'order'=>['订单详情','财务与订单',['/orderDetail.htm']], 'news'=>['资讯详情','资讯与其他',['/newsView.htm']],
+            'order'=>['订单详情','财务与订单',['/orderDetail.htm']], 'cashier'=>['收银台','财务与订单',['/cashier.htm']],
+            'embedded'=>['内嵌页面','资讯与其他',['/custom_iframe.htm']], 'news'=>['资讯详情','资讯与其他',['/newsView.htm']],
             'login'=>['登录','登录与注册',['/login.htm']], 'regist'=>['注册','登录与注册',['/regist.htm']],
             'forget'=>['找回密码','登录与注册',['/forget.htm']], 'oauth'=>['第三方登录','登录与注册',['/oauth.htm']],
             'agreement'=>['协议页面','资讯与其他',['/agreement.htm']], 'cross-module'=>['跨模块产品','常用页面',['/crossModule.htm']],
@@ -52,8 +53,11 @@ final class PageCatalog
             $base=$this->root.'/public/plugins/'.$module.'/'.$folder;
             if (!is_dir($base)) continue;
             $known=['authentication_status'=>'认证状态','authentication_thrid'=>'第三方认证','file_download'=>'文件下载','product_detail'=>'产品详情','product_list'=>'产品列表','self_change_ip'=>'自助更换 IP','unified_expiry'=>'统一到期日期','msgDetail'=>'消息详情','index'=>'功能首页','applyContract'=>'申请合同','contractDetail'=>'合同详情','signContract'=>'签署合同','invoice'=>'发票','issuedInvoice'=>'已开发票','buyDomain'=>'域名购买','creatTemplate'=>'域名资料模板','domain_list'=>'域名列表','whois'=>'域名信息','recommend'=>'推荐计划','ticket'=>'工单中心','ticketDetails'=>'工单详情','addTicket'=>'提交工单','source'=>'内容列表','news_detail'=>'内容详情','helpTotal'=>'文档中心','help_detail'=>'文档详情','authentication_select'=>'实名认证','authentication_person'=>'个人认证','authentication_company'=>'企业认证','childAccount'=>'子账户','addChildAccount'=>'新增子账户'];
-            foreach (glob($base.'/template/clientarea/pc/default/*.{html,php}',GLOB_BRACE)?:[] as $file) {
-                $view=pathinfo($file,PATHINFO_FILENAME);
+            $views=array_map(static function(string $file): string { return pathinfo($file,PATHINFO_FILENAME); },glob($base.'/template/clientarea/pc/default/*.{html,php}',GLOB_BRACE)?:[]);
+            // These pages are rendered by our ViewClientController adapter even
+            // when an older announcement package has no pc/default directory.
+            if ($plugin['name']==='IdcsmartAnnouncement' && $module==='addon') $views=array_merge($views,['source','news_detail']);
+            foreach (array_unique($views) as $view) {
                 if (!preg_match('/^[A-Za-z][A-Za-z0-9_-]*$/D',$view) || in_array($view,['header','footer'],true)) continue;
                 $id='plugin:'.$plugin['name'].':'.$view;
                 $url='/plugin/'.(int)$plugin['id'].'/'.$view.'.htm';

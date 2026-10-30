@@ -4,8 +4,22 @@
   var shared = root.CRA1Shared;
   if (shared.Session || !shared.Request.requiresLogin()) return;
   var pending = null, pendingToken = '', lastCheck = 0;
+  var pageToken = null, replacing = false;
+  function changed() {
+    var token = shared.Request.getToken();
+    if (pageToken === null) { pageToken = token; return false; }
+    if (pageToken === token || replacing) return replacing;
+    replacing = true;
+    // Every page owns account-specific data and action handlers. Replace the
+    // document together so an old view cannot submit with the new identity.
+    root.document.documentElement.style.visibility = 'hidden';
+    if (!token) shared.Request.unauthorized({ policy: 'redirect', token: token });
+    else root.location.reload();
+    return true;
+  }
   function check(force) {
     if (!shared.Request.requiresLogin()) return Promise.resolve();
+    if (changed()) return Promise.resolve();
     var token = shared.Request.getToken();
     if (!token) {
       shared.Request.unauthorized({ policy: 'redirect', token: token });
@@ -31,6 +45,6 @@
   });
   root.addEventListener('pageshow', function (event) { if (event.persisted) check(true); });
   root.document.addEventListener('visibilitychange', function () {
-    if (!root.document.hidden && (!shared.Request.getToken() || Date.now() - lastCheck > 60000)) check(true);
+    if (!root.document.hidden && (pageToken !== shared.Request.getToken() || !shared.Request.getToken() || Date.now() - lastCheck > 60000)) check(true);
   });
 })(window);

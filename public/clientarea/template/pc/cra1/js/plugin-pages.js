@@ -83,8 +83,26 @@
   // Patch only the identified native root instances, before Vue initializes
   // methods/data. Child components and other themes retain their own lifecycle.
   root.Vue.mixin({beforeCreate: function () {
-    if (!plugin || this.$options.parent) return;
     var methods = this.$options.methods || {};
+    // Native auto-renew opens before its host read finishes. Keep confirmation
+    // unavailable until that read identifies the host; also serialize clicks.
+    if (methods.autoRenewChange && methods.handleAutoRenew && String(this.$options.template || '').includes('com-auto-renew')) {
+      this.$options.template = this.$options.template.replace('@click="handleAutoRenew"', ':disabled="loading || submitLoading || !host.id" @click="handleAutoRenew"');
+      this.$options.methods = Object.assign({}, methods, {
+        autoRenewChange: function () {
+          var vm=this;vm.host={};
+          return Promise.resolve(methods.autoRenewChange.apply(vm,arguments)).then(function(){
+            if(Number(vm.host.id)!==Number(vm.id))vm.showRenewDialog=false;
+          });
+        },
+        handleAutoRenew: function () {
+          if(this.loading || this.submitLoading || !this.showRenewDialog || Number(this.host.id)!==Number(this.id))return;
+          return methods.handleAutoRenew.apply(this,arguments);
+        },
+      });
+      return;
+    }
+    if (!plugin || this.$options.parent) return;
     if (name === 'IdcsmartTicket' && view === 'ticketDetails' && methods.getDetails) {
       var ticketData = this.$options.data;
       this.$options.data = function () { return Object.assign({}, typeof ticketData === 'function' ? ticketData.call(this) : ticketData, {cra1TicketState: 'loading'}); };

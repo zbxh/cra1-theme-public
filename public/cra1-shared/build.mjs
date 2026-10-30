@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
+import {createRequire} from 'node:module'
 import postcss from 'postcss'
 
 if(process.env.CRA1_RELEASE_BUILD!=='1')throw new Error('Use cra1-theme/scripts/build.mjs; direct live builds are disabled.')
@@ -25,8 +26,10 @@ function components(css) {
   })
   return tree.toString()
 }
-const modules = ['errors.js', 'request.js', 'runtime.js', 'i18n.js', 'payments.js', 'security.js', 'ui.js', 'notification-session.js', 'announcements.js', 'notification-center.js', 'avatar.js', 'header-search.js', 'header-actions.js', 'ambient.js', 'business-icons.js', 'icon-style.js', 'motion.js']
-fs.writeFileSync(path.join(output, 'cra1-shared.js'), banner + modules.map(file=>file==='i18n.js'?read(file).replace('__CRA1_TRANSLATIONS__',read('translations.json')):read(file)).join('\n') + '\n' + read('context.js') + '\n' + read('session.js') + '\n' + read('styles.js').replace('__CRA1_LEGACY_CLASSES__',JSON.stringify(JSON.parse(read('aliases.json')))))
+const member=new URL('../../cra1-theme/source/member/',import.meta.url)
+const hash=createRequire(new URL('package.json',member))('esbuild').buildSync({entryPoints:[new URL('src/lib/checkout-hash.js',member).pathname],bundle:true,format:'iife',write:false,minify:true,legalComments:'inline'}).outputFiles[0].text
+const modules = ['errors.js', 'request.js', 'runtime.js', 'i18n.js', 'payments.js', 'checkout.js', 'security.js', 'ui.js', 'notification-session.js', 'announcements.js', 'notification-center.js', 'avatar.js', 'header-search.js', 'header-actions.js', 'ambient.js', 'business-icons.js', 'icon-style.js', 'motion.js']
+fs.writeFileSync(path.join(output, 'cra1-shared.js'), banner + modules.map(file=>file==='i18n.js'?read(file).replace('__CRA1_TRANSLATIONS__',read('translations.json')):file==='checkout.js'?hash+'\n'+read(file):read(file)).join('\n') + '\n' + read('context.js') + '\n' + read('session.js') + '\n' + read('styles.js').replace('__CRA1_LEGACY_CLASSES__',JSON.stringify(JSON.parse(read('aliases.json')))))
 fs.writeFileSync(path.join(output, 'announcements-preview.js'), banner + read('ui.js') + '\n' + read('announcements.js'))
 // Native fallback templates keep their business UI and need only this small guard.
 fs.writeFileSync(path.join(output, 'member-session.js'), banner + read('errors.js') + '\n' + read('request.js') + '\n' + read('context.js') + '\n' + read('session.js'))

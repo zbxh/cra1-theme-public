@@ -2,14 +2,18 @@ import fs from 'node:fs'
 import vm from 'node:vm'
 import assert from 'node:assert/strict'
 import {test} from 'node:test'
+import {createHash} from 'node:crypto'
 const code=fs.readFileSync(new URL('../source/legacy-assets/cart/20261017-compat-v3/js/settlement.js',import.meta.url),'utf8')
+const checkout=fs.readFileSync(new URL('../../public/cra1-shared/src/checkout.js',import.meta.url),'utf8')
 const drain=async()=>{for(let i=0;i<30;i++)await Promise.resolve()}
 function fixture(){
  let instance,settle=()=>Promise.resolve({data:{status:200,data:{order_id:7}}}),navigate=()=>{}
  const calls=[],messages=[]
  function Vue(options){instance=this;Object.assign(this,options.data(),{$message:{error:v=>messages.push(v),warning:v=>messages.push(v)}});for(const[k,f]of Object.entries(options.methods))this[k]=f.bind(this);for(const[k,f]of Object.entries(options.computed))Object.defineProperty(this,k,{get:()=>f.call(this)});this.$mount=()=>this}
  Vue.prototype={}
- const window={CRA1Shared:{Request:{request:async()=>({status:200,data:{}})},Payments:{navigate:options=>{calls.push(['navigate',options.orderId]);navigate(options)}}}}
+ const records=new Map(),token='header.'+Buffer.from(JSON.stringify({info:{id:2}})).toString('base64')+'.sig'
+ const window={setTimeout,atob,localStorage:{getItem:k=>records.get(k)||null,setItem:(k,v)=>records.set(k,v),removeItem:k=>records.delete(k)},navigator:{locks:{request:(_key,run)=>run()}},CRA1Shared:{CheckoutHash:value=>createHash('sha256').update(value).digest('hex'),Request:{getToken:()=>token,request:async()=>({status:200,data:{}})},Payments:{navigate:options=>{calls.push(['navigate',options.orderId]);navigate(options)}}}}
+ vm.runInNewContext(checkout,{window});
  const send=params=>{calls.push(['settle',params]);return settle(params)}
  vm.runInNewContext(code,{window,Vue,document:{getElementsByClassName:()=>[{}]},location:{pathname:'/cart/settlement.htm',search:'?cart=1'},localStorage:{},sessionStorage:{setItem(){}},asideMenu:{},topMenu:{},payDialog:{},eventCode:{},lang:{},cart_settle:send,product_settle:send})
  window.onload();Object.assign(instance,{checked:true,showGoodsList:[{quoteReady:true,qty:1}],selectGoodsList:[0]})

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+define('CRA1_THEME_BACKEND',dirname(__DIR__).'/backend');
 require dirname(__DIR__).'/backend/bootstrap.php';
 use CRA1\Theme\Release\Package;
 use CRA1\Theme\Release\Updater;

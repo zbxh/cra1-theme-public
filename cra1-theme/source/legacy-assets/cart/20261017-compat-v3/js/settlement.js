@@ -39,6 +39,12 @@
           });
         }
         const temp = this.getQuery(location.search);
+        const freshCheckout = !temp.cart && Boolean(sessionStorage.product_information);
+        const intentKey = 'cra1:checkout:intent:' + (temp.cart ? 'cart' : 'product');
+        try {
+          if (freshCheckout || !sessionStorage.getItem(intentKey)) sessionStorage.setItem(intentKey, String(Date.now()) + '-' + Math.random().toString(36).slice(2));
+          this.checkoutIntent = sessionStorage.getItem(intentKey);
+        } catch (_) { this.contextError = '无法保存结算记录，请检查浏览器存储设置后刷新页面。'; }
         if (temp.cart) {
           // 购物车过来
           const selected = readJSON(sessionStorage.shoppingCartList, null);
@@ -123,6 +129,7 @@
           subBtnLoading: false, // 提交按钮loading
           createdOrderId: null,
           submissionUncertain: false,
+          checkoutIntent: '',
         };
       },
 
@@ -343,7 +350,8 @@
                 self_defined_field: this.productObj.self_defined_field,
                 qty: this.productObj.qty,
               };
-          settleApi(params)
+          const identity=this.isFormShoppingCart ? this.showGoodsList.map(item=>({product_id:item.product_id,config_options:item.config_options,customfield:item.customfield,self_defined_field:item.self_defined_field,qty:item.qty})) : params;
+          window.CRA1Shared.Checkout.submit(this.isFormShoppingCart ? 'cart' : 'product', params, () => settleApi(params), {intent:this.checkoutIntent,identity})
             .then((res) => {
               checkedData(res);
               const id=res.data.data.order_id;

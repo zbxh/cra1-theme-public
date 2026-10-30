@@ -3,6 +3,15 @@ import vm from 'node:vm'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 const source=fs.readFileSync(new URL('../../public/clientarea/template/pc/cra1/js/plugin-pages.js',import.meta.url),'utf8')
+test('native auto-renew ignores confirmation before host load and serializes double clicks',async()=>{
+ const mixins=[];const root={Vue:{mixin:m=>mixins.push(m)},document:{documentElement:{getAttribute:()=> '[]'}},location:{pathname:'/productdetail.htm',origin:'https://fixture.invalid'},CRA1Shared:{}};
+ vm.runInNewContext(source,{window:root,URL,URLSearchParams,Promise});
+ let sends=0;const instance={id:20,host:{},loading:true,submitLoading:false,showRenewDialog:true,$options:{parent:{},template:'<div class="com-auto-renew"><button @click="handleAutoRenew"></button></div>',methods:{autoRenewChange:async function(){this.host={id:20};this.loading=false},handleAutoRenew:function(){sends++;this.submitLoading=true}}}};
+ mixins[0].beforeCreate.call(instance);Object.assign(instance,instance.$options.methods);
+ instance.handleAutoRenew();assert.equal(sends,0)
+ await instance.autoRenewChange();instance.handleAutoRenew();instance.handleAutoRenew();assert.equal(sends,1)
+ instance.submitLoading=false;instance.host={id:19};instance.handleAutoRenew();assert.equal(sends,1)
+})
 function fixture(name,view,respond,{project=false,status=1,registry}={}){
   const mixins=[],calls=[],errors=[],attributes={addons_js:registry===undefined?JSON.stringify([{id:71,name,status},...(project?[{id:72,name:'IdcsmartProject',status:1}]:[])]):registry}
   const root={location:{pathname:'/plugin/71/'+view+'.htm',origin:'https://fixture.invalid',search:''},document:{documentElement:{getAttribute:key=>attributes[key]||null,setAttribute:(key,value)=>attributes[key]=value}},Vue:{mixin:value=>mixins.push(value),component(){}},CRA1Shared:{Errors:{message:()=> '暂时无法读取，请稍后重试'}},Axios:{get:(path,options)=>{calls.push(path);return Promise.resolve().then(()=>respond(path,options)).then(data=>({data:{data}}))}},setInterval:fn=>{root.timer=fn;return 17},clearInterval:id=>{root.cleared=id;delete root.timer},apiCertificationOrder:body=>{calls.push('POST /certification/plugin/order');return Promise.resolve({data:{data:{order_id:22}}})}}

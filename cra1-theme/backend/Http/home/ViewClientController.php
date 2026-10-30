@@ -5,6 +5,18 @@ namespace CRA1\Theme\Http\home;
 /** Keep the native dispatch, initialization, permissions and unknown-page fallback. */
 class ViewClientController extends \app\home\controller\ViewClientController
 {
+    public function module()
+    {
+        $params=$this->request->param();
+        $theme=(string)($params['theme']??(cookie('clientarea_theme')?:configuration('clientarea_theme')));
+        if (use_mobile()) $theme=(string)($params['theme_mobile']??(cookie('clientarea_theme_mobile')?:configuration('clientarea_theme_mobile')));
+        // Native detail scripts require a concrete host. Keep an incomplete
+        // bookmark actionable rather than rendering an empty, unusable panel.
+        if (\CRA1\Theme\Context::isCRA1($theme) && ($params['view_html']??'')==='product_detail'
+            && (!is_scalar($params['id']??null) || !preg_match('~^[1-9][0-9]*$~D',(string)$params['id']))) return redirect('/productList.htm');
+        return parent::module();
+    }
+
     public function plugin()
     {
         $params=$this->request->param();

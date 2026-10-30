@@ -83,9 +83,14 @@ final class Updater
         return strpos($path,'cra1-theme/backend/')===0||strpos($path,'lib/')===0||strpos($path,'public/cra1-install/')===0||
             in_array($path,['public/cra1admin/index.php','public/web/cra1/controller/hooks.php','public/cra1-shared/runtime.php','public/cra1-shared/snapshot.php','public/cra1-shared/compat.php','public/cra1-shared/compatibility.php','public/cra1-shared/assets.php'],true);
     }
-    public function apply(string $archive,string $expectedDigest): array
+    public function apply(string $archive,string $expectedDigest,?string $expectedPointerDigest=null): array
     {
-        return Files::locked($this->dir.'/update.lock',function()use($archive,$expectedDigest){
+        return Files::locked($this->dir.'/update.lock',function()use($archive,$expectedDigest,$expectedPointerDigest){
+            if($expectedPointerDigest!==null){
+                Files::noLinks($this->dir.'/current.json');
+                $actual=is_file($this->dir.'/current.json')?hash_file('sha256',$this->dir.'/current.json'):'missing';
+                if(!hash_equals($expectedPointerDigest,$actual))throw new \RuntimeException('主题版本已变化，请重新点击“验证并检查”');
+            }
             $check=$this->preflight($archive);
             if(!hash_equals($check['sha256'],$expectedDigest))throw new \RuntimeException('候选包与已确认预检不一致');
             if(!$check['can_apply'])throw new \RuntimeException('更新检查未通过，请按页面提示处理后重新上传');
@@ -94,7 +99,7 @@ final class Updater
             try{
                 Package::stage($archive,$stage,$check);
                 $previous=Files::json($this->dir.'/current.json',true);
-                $journal=['release'=>$id,'entry'=>$this->entry,'previous'=>$previous,'created_at'=>time(),'backup'=>$backup,'files'=>[],'references'=>[],'state'=>'prepared'];
+                $journal=['release'=>$id,'entry'=>$this->entry,'previous'=>$previous,'created_at'=>time(),'backup'=>$backup,'stage'=>$stage,'files'=>[],'references'=>[],'state'=>'prepared'];
                 if(isset($check['manifest']['version']))$journal['version']=$check['manifest']['version'];
                 $journal['release_channel']=$check['manifest']['release_channel']??'candidate';
                 foreach($check['files'] as $row){
@@ -145,6 +150,7 @@ final class Updater
                 // Candidate migration runs only in the write transaction, after its files
                 // passed verification. Read-only preflight never initializes user data.
                 self::migrateAnnouncements($this->root,$check['manifest']);
+                ThemeCache::refresh($this->root,$check['manifest'],$this->entry);
                 $current=['release'=>$id,'manifest'=>$check['manifest'],'security_epoch'=>$check['manifest']['security_epoch']??1,'archive_sha256'=>$expectedDigest,'installed_at'=>time(),'history'=>basename($backup),'previous_release'=>$previous['release']??null];
                 if(isset($check['manifest']['backend_root']))$current['backend_root']=$check['manifest']['backend_root'];
                 // New resource selection becomes visible only after all files are verified.
@@ -179,6 +185,10 @@ final class Updater
     {
         if(($j['entry']??'')!==$this->entry||!preg_match('/^[a-z0-9-]+$/D',basename((string)($j['backup']??'')))||dirname((string)($j['backup']??''))!==$this->dir.'/history'||!is_array($j['files']??null)||!is_array($j['previous']??null))throw new \RuntimeException('恢复记录归属异常');
         Files::noLinks($j['backup']);
+        if(isset($j['stage'])){
+            if(!is_string($j['stage'])||dirname($j['stage'])!==$this->dir.'/staging'||!preg_match('/^[a-f0-9]{32}$/D',basename($j['stage'])))throw new \RuntimeException('恢复暂存目录归属异常');
+            Files::noLinks($j['stage']);
+        }
         foreach($j['files'] as $path=>$row){
             $target=$this->journalTarget($path);
             if(!is_array($row)||!array_key_exists('before',$row)||($row['before']!==null&&!preg_match('/^[a-f0-9]{64}$/D',(string)$row['before']))||!preg_match('/^[a-f0-9]{64}$/D',(string)($row['after']??''))||!is_int($row['mode']??null)||$row['mode']<0||$row['mode']>0777)throw new \RuntimeException('恢复文件记录异常');
@@ -243,11 +253,17 @@ final class Updater
             return ['release'=>$journal['previous']['release']??'安装前版本','restored'=>true,'security_retained'=>true];
         });
     }
-    public function recover(): array
+    public function recover(?string $expectedPendingDigest=null): array
     {
-        return Files::locked($this->dir.'/update.lock',function(){
+        return Files::locked($this->dir.'/update.lock',function()use($expectedPendingDigest){
+            if($expectedPendingDigest!==null){
+                Files::noLinks($this->dir.'/pending.json');
+                if(!is_file($this->dir.'/pending.json')||!hash_equals($expectedPendingDigest,hash_file('sha256',$this->dir.'/pending.json')))throw new \RuntimeException('更新状态已变化，请重新检查');
+            }
             $journal=Files::json($this->dir.'/pending.json');
-            $this->restore($journal,false,!empty($journal['retain_security']));return ['restored'=>true];
+            $this->restore($journal,false,!empty($journal['retain_security']));
+            if(isset($journal['stage']))$this->removeStage($journal['stage']);
+            return ['restored'=>true];
         });
     }
     public function history(): array

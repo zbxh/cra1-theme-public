@@ -47,12 +47,21 @@ async function fixture({width=1440,fastTimeout=false}={}){
   if(fastTimeout)await page.addInitScript(()=>{const original=window.setTimeout;window.setTimeout=(fn,ms,...args)=>original(fn,ms===60000?100:ms,...args);});
   page.on('pageerror',error=>errors.push(error.message));
   page.on('console',message=>{if(message.type()==='error')consoles.push(message.text());});
-  const state={mode:'success',checkResponse:structuredClone(ready),calls:0,installs:0,release:null};
+  const state={mode:'success',checkResponse:structuredClone(ready),calls:0,installs:0,updates:0,recoveries:0,release:null};
   await page.route('**/cra1-install/api.php',async route=>{
     const input=route.request().postDataJSON();state.calls++;
     check(route.request().headers().authorization==='Bearer isolated-native-admin','native administrator authentication retained');
     check(!!route.request().headers()['x-csrf-token'],'installer CSRF retained');
     if(input.action==='check'){await route.fulfill({json:{status:200,data:state.checkResponse}});return;}
+    if(['update','recover_update'].includes(input.action)){
+      check(input.confirmation==='a'.repeat(64),'completion carries only the server-issued confirmation');
+      check(!Object.hasOwn(input,'username')&&!Object.hasOwn(input,'password')&&!Object.hasOwn(input,'entry'),'maintenance never submits replacement credentials or an entry');
+      if(input.action==='recover_update'){state.recoveries++;await route.fulfill({json:{status:200,data:{restored:true,mode:'maintenance'}}});return;}
+      check(input.backup_confirmed===true,'completion requires explicit website backup confirmation');state.updates++;
+      if(state.mode==='hold')await new Promise(resolve=>state.release=resolve);
+      if(state.mode==='network'){await route.abort();return;}
+      await route.fulfill({json:{status:200,data:{updated:true,admin_url:'/customadmin/index.php',update_state:'complete'}}});return;
+    }
     check(input.action==='install','only registered installation actions are sent');
     check(!Object.hasOwn(input,'confirm'),'confirmation password is not sent to the server');
     state.installs++;totalWrites++;
@@ -142,6 +151,31 @@ try{
   check((await guard.page.locator('#status').innerText()).includes('请先'),'anonymous visitor gets a login instruction');
   await guard.page.evaluate(()=>localStorage.setItem('backJwt','isolated-native-admin'));guard.state.checkResponse={...ready,installation_ready:false};await guard.inspect();
   check(await guard.page.locator('#setup').isHidden(),'failed preflight never exposes an enabled form');await guard.close();
+  const maintenance={mode:'maintenance',version:'v17.3',release_channel:'test',checks:[],update_state:'ready',can_update:true,confirmation:'a'.repeat(64),admin_url:'/customadmin/index.php'};
+  const update=await fixture();update.state.checkResponse=maintenance;await update.inspect();
+  check(await update.page.locator('#setup').isHidden(),'existing installation never exposes new account fields');
+  check(await update.page.locator('#update').isDisabled(),'completion waits for backup confirmation');
+  await update.page.locator('#backup-confirmed').check();check(await update.page.locator('#update').isEnabled(),'backup enables explicit completion');
+  for(const width of [1920,1440,768,390]){
+    await update.page.setViewportSize({width,height:1000});check(await update.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'maintenance fits '+width+'px');
+    await update.page.screenshot({path:path.join(output,'overlay-'+width+'.png'),fullPage:true});
+  }
+  update.state.mode='hold';await update.page.locator('#update').click();await update.page.getByRole('button',{name:'正在更新…',exact:true}).waitFor();
+  check(await update.page.locator('#check').isDisabled()&&await update.page.locator('#backup-confirmed').isDisabled(),'completion locks check and backup controls');
+  await update.page.keyboard.press('Enter');check(update.state.updates===1,'completion cannot double-submit by Enter');
+  update.state.release();await update.page.locator('#update-success').waitFor();
+  check(await update.page.locator('#updated-admin-link').getAttribute('href')==='/customadmin/index.php','success points to original administrator entry');
+  check(await update.page.locator('#credentials').innerText()==='','update success never returns or displays passwords');
+  update.state.checkResponse={...maintenance,update_state:'current',can_update:false,confirmation:undefined};await update.inspect();
+  check(await update.page.locator('#update').isHidden()&&await update.page.locator('#check').isEnabled(),'already-current package remains checkable without a second apply');await update.close();
+  const lost=await fixture();lost.state.checkResponse=maintenance;await lost.inspect();await lost.page.locator('#backup-confirmed').check();lost.state.mode='network';await lost.page.locator('#update').click();
+  await lost.page.waitForFunction(()=>document.getElementById('maintenance').getAttribute('aria-busy')==='false');
+  check(await lost.page.locator('#update-status').isVisible()&&await lost.page.locator('#update').isDisabled(),'lost completion response shows feedback and requires rechecking');
+  lost.state.checkResponse={...maintenance,update_state:'current',can_update:false,confirmation:undefined};await lost.inspect();check(lost.state.updates===1,'status check after lost response never retries completion');await lost.close();
+  const recovery=await fixture();recovery.state.checkResponse={...maintenance,update_state:'interrupted',can_update:false,can_recover:true};await recovery.inspect();
+  check(await recovery.page.locator('#update-options').isHidden(),'interrupted update offers recovery instead of another completion');
+  await recovery.page.getByRole('button',{name:'恢复未完成的更新',exact:true}).click();
+  await recovery.page.getByText('已恢复，请点击“验证并检查”后继续更新。',{exact:true}).first().waitFor();check(recovery.state.recoveries===1&&recovery.state.updates===0,'recovery is explicit and never applies automatically');await recovery.close();
   const context=await browser.newContext({ignoreHTTPSErrors:true}),page=await context.newPage();page.on('console',m=>{if(m.type()==='error')consoles.push(m.text());});page.on('pageerror',e=>errors.push(e.message));
   let accountWrites=0;await page.route('**/admin.php?*',async route=>{
     const action=new URL(route.request().url()).searchParams.get('r');

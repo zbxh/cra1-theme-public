@@ -31,6 +31,15 @@ $ATTEMPT_FILE = $STORE . '/login_attempts.json';
 $AUDIT_FILE   = $STORE . '/audit.log';
 $ENTRY_FILE   = $STORE . '/entry.json';   // 非公开的当前入口记录
 
+// Extracting an install ZIP recreates the default directory. Only the saved
+// administrator entry may serve it; extraction never changes the chosen address.
+if (is_file($ENTRY_FILE)) {
+    $entryRecord=json_decode((string)file_get_contents($ENTRY_FILE),true);
+    if (!is_array($entryRecord)||!is_string($entryRecord['entry']??null)||$entryRecord['entry']!==$SLUG) {
+        http_response_code(404);header('Cache-Control: no-store');exit;
+    }
+}
+
 if (!is_dir($STORE)) {
     @mkdir($STORE, 0750, true);
 }

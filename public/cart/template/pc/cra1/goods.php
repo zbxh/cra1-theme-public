@@ -1,4 +1,4 @@
-{php}require_once IDCSMART_ROOT.'public/cra1-shared/assets.php';{/php}
+{php}require_once IDCSMART_ROOT.'public/cra1-shared/cart-runtime.php';cra1_cart_runtime((string)($themes??''));{/php}
 {php}
 require_once IDCSMART_ROOT . 'public/cra1-shared/cart-links.php';
 cra1_cart_redirect_legacy_goods();

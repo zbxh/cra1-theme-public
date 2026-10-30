@@ -571,6 +571,8 @@
             return;
           }
           this.settleLoading = true;
+          try { sessionStorage.setItem('cra1:checkout:intent:cart', String(Date.now()) + '-' + Math.random().toString(36).slice(2)); }
+          catch (_) { this.settleLoading = false; this.$message.error('无法保存结算记录，请检查浏览器存储设置后刷新页面。'); return; }
           sessionStorage.shoppingCartList = JSON.stringify(this.checkedCities);
           setTimeout(() => {
             location.href = `/cart/settlement.htm?cart=1`;

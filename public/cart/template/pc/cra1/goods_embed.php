@@ -1,4 +1,4 @@
-{php}require_once IDCSMART_ROOT.'public/cra1-shared/assets.php';{/php}
+{php}require_once IDCSMART_ROOT.'public/cra1-shared/cart-runtime.php';cra1_cart_runtime((string)($themes??''));{/php}
 <!-- goods_embed：融合页的配置承载薄壳（CRA1 主题）。
      与 goods_iframe 的区别：
        1. 不加载 goods_iframe.css（那里 .ifram-hiden 会隐藏模块原生加购/立即购买控件，

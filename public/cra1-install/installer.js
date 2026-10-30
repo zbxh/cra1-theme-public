@@ -2,7 +2,8 @@
   'use strict';
   const root=document.getElementById('installer'),status=document.getElementById('status'),form=document.getElementById('setup');
   const checkButton=document.getElementById('check'),installButton=document.getElementById('install'),feedback=document.getElementById('setup-status');
-  let busy=false,ready=false,installed=false;
+  const maintenance=document.getElementById('maintenance'),updateButton=document.getElementById('update'),backup=document.getElementById('backup-confirmed'),updateFeedback=document.getElementById('update-status');
+  let busy=false,ready=false,installed=false,confirmation=null,updateState=null;
   function failure(message,needsCheck=false){return Object.assign(new Error(message),{needsCheck});}
   async function request(body){
     let token;
@@ -23,7 +24,7 @@
       if(!data.data||typeof data.data!=='object')throw failure('安装服务返回不完整，请点击“验证并检查”确认当前安装状态。',true);
       return data.data;
     }catch(error){
-      if(error.name==='AbortError')throw failure('等待安装服务超时，请点击“验证并检查”确认当前安装状态，勿重复安装。',true);
+      if(error.name==='AbortError')throw failure('等待服务超时，请点击“验证并检查”确认当前安装或更新状态，勿重复提交。',true);
       if(error.needsCheck!==undefined)throw error;
       throw failure('无法连接安装服务，请检查网络后点击“验证并检查”确认当前安装状态。',true);
     }finally{clearTimeout(timer);}
@@ -37,6 +38,9 @@
     checkButton.disabled=value||installed;installButton.disabled=value||!ready||installed;
     checkButton.textContent=value&&action==='check'?'正在检查…':'验证并检查';
     installButton.textContent=value&&action==='install'?'正在安装…':'完成安装';
+    updateButton.disabled=value||!confirmation||(updateState!=='interrupted'&&!backup.checked);
+    updateButton.textContent=value&&action==='update'?'正在更新…':value&&action==='recover_update'?'正在恢复…':updateState==='interrupted'?'恢复未完成的更新':'完成更新';
+    maintenance.setAttribute('aria-busy',value&&['update','recover_update'].includes(action)?'true':'false');
     form.setAttribute('aria-busy',value&&action==='install'?'true':'false');
   }
   function clearField(input){
@@ -67,8 +71,14 @@
     message('');return true;
   }
   form.addEventListener('input',event=>{if(event.target instanceof HTMLInputElement)clearField(event.target);});
+  function adminLink(node,value){
+    const url=new URL(value,location.origin);
+    if(url.origin!==location.origin||!/^\/[a-z0-9]{6,32}\/index\.php$/.test(url.pathname)||url.search||url.hash)throw failure('后台地址返回异常，请重新检查。',true);
+    node.href=url.pathname;
+  }
+  backup.addEventListener('change',()=>lock(false));
   checkButton.addEventListener('click',async()=>{
-    if(busy||installed)return;ready=false;lock(true,'check');message('');status.textContent='正在验证身份并自动检查安装环境…';form.hidden=true;
+    if(busy||installed)return;ready=false;confirmation=null;updateState=null;backup.checked=false;lock(true,'check');message('');status.textContent='正在验证身份并检查主题文件，请稍候…';form.hidden=true;maintenance.hidden=true;document.getElementById('update-success').hidden=true;updateFeedback.hidden=true;
     document.getElementById('checks').replaceChildren();
     try{
       const data=await request({action:'check'}),out=document.getElementById('checks');
@@ -79,11 +89,40 @@
         const system=data.environment?.system_version;
         out.prepend(text('p',`${data.identity.display_name} · ${data.version||data.release}${data.release_channel==='test'?'（测试版）':''}${system?' · V10 '+system:''}`));
       }
-      if(data.mode==='maintenance'){installed=true;form.reset();status.textContent='此站已安装酷锐A1主题，请从现有主题后台进入“主题管理”。';return;}
+      if(data.mode==='maintenance'){
+        form.reset();
+        if(!data.update_state){status.textContent='此站已安装酷锐A1主题，请从现有主题后台进入“主题管理”。';return;}
+        if(!['current','ready','interrupted'].includes(data.update_state)||typeof data.admin_url!=='string')throw failure('更新检查结果不完整，请重新检查。',true);
+        adminLink(document.getElementById('existing-admin-link'),data.admin_url);
+        updateState=data.update_state;
+        if((data.can_update===true||data.can_recover===true)&&/^[a-f0-9]{64}$/.test(data.confirmation||''))confirmation=data.confirmation;
+        maintenance.hidden=false;document.getElementById('update-options').hidden=updateState!=='ready'||!confirmation;updateButton.hidden=!confirmation;
+        document.getElementById('maintenance-title').textContent=updateState==='current'?'主题已是当前版本':updateState==='interrupted'?'恢复未完成的更新':'完成主题更新';
+        document.getElementById('maintenance-summary').textContent=updateState==='current'?'当前安装包已生效，无需重复更新。':updateState==='interrupted'?'恢复本次未完成事务的文件和生效版本后，可重新检查并更新。解压前已覆盖的文件需从网站备份恢复。':`检测到已解压的 ${data.version||'新版'}${data.release_channel==='test'?' 测试版':''}，检查通过后点击“完成更新”。`;
+        status.textContent=updateState==='current'?'已确认当前主题文件和生效版本一致。':confirmation?'检查通过，请在下方继续。':'更新暂不能继续，请处理检查提示后重试。';return;
+      }
       ready=data.installation_ready===true;
       status.textContent=ready?'运行环境检查通过，请设置主题后台。':'运行环境暂不满足，请处理下面提示后重新检查。';form.hidden=!ready;
       if(!form.elements.canonical.value)form.elements.canonical.value=location.origin;
     }catch(error){status.textContent=error.message;}finally{lock(false);}
+  });
+  updateButton.addEventListener('click',async()=>{
+    if(busy||!confirmation||(updateState!=='interrupted'&&!backup.checked))return;
+    const action=updateState==='interrupted'?'recover_update':'update';
+    lock(true,action);updateFeedback.hidden=false;updateFeedback.dataset.state='pending';updateFeedback.textContent=action==='update'?'正在完成主题更新，请勿关闭页面…':'正在恢复，请稍候…';
+    try{
+      const result=await request({action,confirmation,backup_confirmed:backup.checked});
+      if(action==='recover_update'){
+        if(result.restored!==true)throw failure('恢复结果不完整，请重新检查。',true);
+        confirmation=null;updateButton.hidden=true;updateFeedback.textContent='已恢复，请点击“验证并检查”后继续更新。';status.textContent=updateFeedback.textContent;return;
+      }
+      if(result.updated!==true||typeof result.admin_url!=='string')throw failure('更新结果不完整，请重新检查当前状态。',true);
+      adminLink(document.getElementById('updated-admin-link'),result.admin_url);
+      confirmation=null;maintenance.hidden=true;document.getElementById('update-success').hidden=false;status.textContent='主题更新完成，请刷新页面。';
+      document.getElementById('update-success').scrollIntoView({block:'nearest'});
+    }catch(error){
+      confirmation=null;status.textContent=error.message;updateFeedback.dataset.state='error';updateFeedback.textContent=error.message+' 请先点击“验证并检查”确认状态。';updateFeedback.focus();
+    }finally{lock(false);}
   });
   form.addEventListener('submit',async event=>{
     event.preventDefault();if(busy||installed)return;

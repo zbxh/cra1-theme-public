@@ -171,3 +171,15 @@ test('detail outages do not claim deletion; retry recovers and404 remains missin
  action=()=>Promise.resolve({news:{id:9,title:'fixture'}});page.retry();await settle();assert.equal(page.loadFailed,false);assert.equal(page.item.id,9)
  action=()=>Promise.reject({status:404});page.retry();await settle();assert.equal(page.notFound,true);assert.equal(page.loadFailed,false)
 })
+
+test('native read failures ask for refresh while writes retain useful business reasons',async()=>{
+ const f=axiosFixture()
+ for(const error of [{code:'ERR_NETWORK',message:'Network Error'},{code:'ECONNABORTED',message:'timeout'}, {response:{status:503,data:{msg:'SQLSTATE[HY000]'}}}]){
+  await assert.rejects(f.fail({...error,config:{method:'get',url:'/host/20/specific_info'}}),e=>e.data.msg==='页面错误，请刷新重试')
+ }
+ await assert.rejects(f.ok({status:200,config:{method:'get',url:'/host/20'},data:{status:400,msg:'读取失败'}}),e=>e.data.msg==='页面错误，请刷新重试')
+ await assert.rejects(f.ok({status:200,config:{method:'post',url:'/product/settle'},data:{status:400,msg:'商品库存不足'}}),e=>e.data.msg==='商品库存不足')
+ for(const [status,message] of [[401,'登录已失效，请重新登录'],[403,'当前账号无权执行此操作'],[429,'操作过于频繁，请稍后重试']]){
+  await assert.rejects(f.ok({status:200,config:{method:'get',url:'/account'},data:{status,msg:message}}),e=>e.data.msg===message)
+ }
+})

@@ -25,6 +25,9 @@ if (is_file(IDCSMART_ROOT . 'public/clientarea/template/' . $themes . '/componen
      见 js/module-deps.js 顶部说明。 -->
 <!-- 工单提交助手（主题层增强，仅 addTicket 页生效；依赖快照由 asideMenu 加载） -->
 <script src="{:cra1_theme_asset_url('member', 'js/ticket-assist.js', '/clientarea/template/pc/cra1/releases/20261017-member-auth-v2/js/ticket-assist.js')}"></script>
+{php}if (\CRA1\Theme\Compatibility\NativeComponents::forPath((string)($_SERVER['REQUEST_URI']??''))) {{/php}
+<script src="{:cra1_theme_asset_url('native', 'js/native-page.js', '/clientarea/template/pc/cra1/js/native-page.js')}"></script>
+{php}}{/php}
 </body>
 
 </html>

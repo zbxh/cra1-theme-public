@@ -53,6 +53,7 @@ def main():
   doc=json.loads(update.read('manifest.json'));files=doc['files']
   check(doc.get('version',doc['release'])==report.get('version',report['release'])==delivery.get('version',delivery.get('release')),'安装交付、更新包及报告使用同一版本号')
   check(set(install.namelist())==set(files),'安装与更新负载完全对应')
+  check(all(name in files for name in ['public/home/template/pc/cra1/home.php','public/home/template/pc/cra1/theme.jpg']) and doc.get('references',{}).get('public/home/template/mobile/cra1')=='public/home/template/pc/cra1','独立会员首页模板及移动端引用完整')
   check(not any(name.startswith(('lib/','bin/')) for name in files),'主题辅助程序自包含，无需写入 V10 的 lib 和 bin 目录')
   check(set(source.namelist()).issuperset(files),'源码包保留运行文件')
   identity=json.loads(install.read('cra1-theme/docs/product-identity.json'))

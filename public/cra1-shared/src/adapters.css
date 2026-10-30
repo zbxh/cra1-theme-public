@@ -264,3 +264,8 @@ html[data-cra1-theme="cart"] .cart-page .domain-box .domain-content .domain-left
  html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .content-right {padding:20px 16px;}
  html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .page {margin-left:0;}
 }
+/* Native cards contain Element dialogs, but their backdrop lives under body.
+   Keep the dialog's own stacking order instead of trapping it in card effects. */
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.main-card.cui-card,.el-card.cui-card) {isolation:auto;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.main-card.cui-card,.el-card.cui-card)::before,
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.main-card.cui-card,.el-card.cui-card)::after {content:none;}

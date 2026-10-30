@@ -1,4 +1,4 @@
-{php}require_once IDCSMART_ROOT.'public/cra1-shared/assets.php';{/php}
+{php}require_once IDCSMART_ROOT.'public/cra1-shared/cart-runtime.php';cra1_cart_runtime((string)($themes??''));{/php}
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261011-titanium-v1/css/settlement.css', '/cart/template/pc/cra1/releases/20261011-titanium-v1/css/settlement.css')}">
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261017-compat-v3/css/purchase-theme.css', '/cart/template/pc/cra1/releases/20261011-titanium-v1/css/cart-theme.css')}">
 </head>

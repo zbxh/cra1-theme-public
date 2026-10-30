@@ -1,4 +1,4 @@
-{php}require_once IDCSMART_ROOT.'public/cra1-shared/assets.php';{/php}
+{php}require_once IDCSMART_ROOT.'public/cra1-shared/cart-runtime.php';cra1_cart_runtime((string)($themes??''));{/php}
 <!-- 页面引入样式位置 -->
 <script src="/{$template_catalog}/template/{$themes}/js/common/jquery.mini.js"></script>
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261011-titanium-v1/css/goods.css', '/cart/template/pc/cra1/releases/20261011-titanium-v1/css/goods.css')}">

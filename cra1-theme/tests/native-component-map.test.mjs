@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const source=fs.readFileSync(new URL('../../public/clientarea/template/pc/cra1/js/module-deps.js',import.meta.url),'utf8');
+const registry=JSON.parse(fs.readFileSync(new URL('../backend/Compatibility/native-components.json',import.meta.url)));
+const context={window:{},console,URL,Set,Promise};
+vm.runInNewContext(source.replace('window.CRA1ModuleDeps = {','window.CRA1ModuleDeps = { paths: COMPONENT_PATHS,'),context);
+const loader=context.window.CRA1ModuleDeps;
+for(const [key,value]of Object.entries({paths:loader.paths,dependencies:loader.graph,groups:loader.deps}))assert.deepEqual(JSON.parse(JSON.stringify(value)),registry[key],key+' stays consistent for native pages and injected modules');
+console.log(JSON.stringify({status:'passed',checks:3}));

@@ -87,7 +87,7 @@
     ],
     // 通用产品内页：idcsmart_common/common_product_detail.js（无 ipDefase）
     detailCommon: [
-      'payDialog', 'pagination', 'discountCode', 'cashBack', 'safeConfirm',
+      'payDialog', 'pagination', 'flowPacket', 'discountCode', 'cashBack', 'safeConfirm',
       'hostStatus', 'autoRenew', 'renewDialog', 'unsubscribe',
     ],
     // 商品配置页：idcsmart_common/common_product.js

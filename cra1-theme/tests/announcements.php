@@ -19,6 +19,8 @@ try {
     foreach($schema['pageAliases']as$alias)check($catalog->resolve('website',$alias['route'])['id']===$alias['aliasOf'],'website aliases use canonical IDs');
     check($catalog->resolve('member','/productList.htm?id=1')['id']==='products','product queries match page type');
     check($catalog->resolve('cart','/cart/goods.htm?id=24')['id']==='goods','cart page type');
+    check($catalog->resolve('member','/cashier.htm?id=7')['id']==='cashier','cashier supports page-specific notifications');
+    check($catalog->resolve('member','/custom_iframe.htm?iframe_url=%2Fabout.html')['id']==='embedded','embedded shell supports page-specific notifications');
     foreach(['//evil.invalid','/../home.htm','/home%2ehtm','https://evil.invalid/home.htm','/unknown.htm']as$path)check($catalog->resolve('member',$path)===null,'reject unknown or forged path');
     check($catalog->resolve('website','/home.htm')===null,'theme ownership');
     $a=$store->payload();$b=$store->payload();check($a['revision']===$b['revision'],'missing store produces stable revision');check(!is_dir($base.'/runtime'),'read does not initialize data');
@@ -97,6 +99,12 @@ try {
     $pluginDir=$base.'/public/plugins/addon/example/template/clientarea/pc/default';mkdir($pluginDir,0700,true);file_put_contents($pluginDir.'/ticket.html','fixture');
     $extensions=new PageCatalog($base,[['id'=>9,'name'=>'Example','module'=>'addon','title'=>'工单','status'=>1],['id'=>10,'name'=>'Disabled','module'=>'addon','status'=>0]]);
     check($extensions->resolve('member','/plugin/9/ticket.htm')['id']==='plugin:Example:ticket','enabled plugin page uses stable identity');check($extensions->resolve('member','/plugin/10/ticket.htm')===null,'disabled plugins omitted');
+    $legacyDir=$base.'/public/plugins/addon/idcsmart_announcement/template/clientarea';mkdir($legacyDir,0700,true);file_put_contents($legacyDir.'/source.html','legacy fixture');
+    $announcementPages=new PageCatalog($base,[['id'=>30,'name'=>'IdcsmartAnnouncement','module'=>'addon','title'=>'公告中心','status'=>1]]);
+    check($announcementPages->resolve('member','/plugin/30/source.htm')['id']==='plugin:IdcsmartAnnouncement:source','legacy announcement adapter list remains selectable');
+    check($announcementPages->resolve('member','/plugin/30/news_detail.htm?id=25')['id']==='plugin:IdcsmartAnnouncement:news_detail','legacy announcement adapter detail remains selectable');
+    $disabledAnnouncement=new PageCatalog($base,[['id'=>30,'name'=>'IdcsmartAnnouncement','module'=>'addon','status'=>0]]);
+    check($disabledAnnouncement->resolve('member','/plugin/30/source.htm')===null,'disabled announcement adapter is not advertised');
     $preset=$base.'/legacy-preset';Files::putJson($preset.'/runtime/cra1_theme/distribution/current.json',['manifest'=>['product'=>'cra1-theme','files'=>['public/web/cra1/controller/Cra1.php'=>['sha256'=>'617e59a6f8ce48025aa0b826dc4c4ba88e54463b306a58aa51971b14b243e3e2']]]]);
     $presetStore=new AnnouncementStore($preset,new PageCatalog($preset,[]));
     check(count($presetStore->publicPayload('website','/index.html')['items'])===3,'known installed legacy template presets migrate even if never explicitly saved');

@@ -24,9 +24,13 @@ if (!defined('CRA1_THEME_BACKEND')) {
         if (!is_array($doc) || json_last_error()!==JSON_ERROR_NONE) throw new \RuntimeException('主题发行清单损坏，原文件保留');
         return $doc;
     };
-    $current = $read($pointer);
+    // The fixed maintenance entry must be able to finish an extracted update
+    // while normal requests continue to use the last committed release.
+    $installer = defined('CRA1_THEME_INSTALLER_CANDIDATE') && CRA1_THEME_INSTALLER_CANDIDATE === true;
+    $current = $installer ? [] : $read($pointer);
     $manifest = isset($current['manifest']) && is_array($current['manifest']) ? $current['manifest'] : $read($releaseFile);
     $backend = $current['backend_root'] ?? $manifest['backend_root'] ?? '';
+    if ($installer && $backend !== '' && $backend !== 'cra1-theme/backend/releases/'.($manifest['release']??'')) throw new \RuntimeException('主题安装文件版本不一致，请完整解压同一份安装包');
     if ($backend !== '') {
         if (!is_string($backend) || !preg_match('~^cra1-theme/backend/releases/[a-z0-9][a-z0-9-]{3,80}$~D',$backend)) throw new \RuntimeException('主题后端版本路径无效');
         $selected = CRA1_THEME_ROOT.'/'.$backend;
@@ -34,7 +38,7 @@ if (!defined('CRA1_THEME_BACKEND')) {
         if (!is_file($selected.'/Release/Updater.php') || !is_file($selected.'/Security/OperationVerification.php')) throw new \RuntimeException('主题后端版本不完整，请恢复上次安装');
     }
     define('CRA1_THEME_BACKEND', $selected);
-    unset($selected,$pointer,$releaseFile,$read,$current,$manifest,$backend,$rootBoundary,$noLinks);
+    unset($selected,$pointer,$releaseFile,$read,$current,$manifest,$backend,$rootBoundary,$noLinks,$installer);
 }
 spl_autoload_register(static function (string $class): void {
     $prefix = 'CRA1\\Theme\\';

@@ -65,7 +65,9 @@
     const value = error.response ? error.response.data : error.data;
     const data = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
     const status = httpStatus >= 400 ? httpStatus : Number(data.status) || 503;
-    const message = shared.Errors.message({ message: data.msg || data.message || error.message, status, code:error.code }, { method:config?.method });
+    const message = /^(get|head)$/i.test(String(config?.method || '')) && ![401, 403, 429].includes(status)
+      ? '页面错误，请刷新重试'
+      : shared.Errors.message({ message: data.msg || data.message || error.message, status, code:error.code }, { method:config?.method });
     data.status = status;
     data.msg = message;
     if (Object.prototype.hasOwnProperty.call(data, 'message')) data.message = message;

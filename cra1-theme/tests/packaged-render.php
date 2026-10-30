@@ -34,7 +34,8 @@ function packagedAssets(string $html,string $page):void {
     foreach(array_unique($matches[1]) as $url){
         $path=parse_url(html_entity_decode($url),PHP_URL_PATH);
         if(!preg_match('~\.(?:js|css)$~',$path)||strpos($path,'/upload/')===0)continue;
-        packagedCheck(is_file(IDCSMART_ROOT.'public'.$path),'missing resource '.$path.' in '.$page);
+        $nativeModule=strpos($path,'/plugins/server/')===0 && strpos($path,'..')===false;
+        packagedCheck(is_file(IDCSMART_ROOT.'public'.$path)||($nativeModule&&is_file($GLOBALS['native'].'/public'.$path)),'missing resource '.$path.' in '.$page);
         $GLOBALS['assets'][$path]=true;
     }
 }
@@ -81,6 +82,19 @@ foreach(['pc','mobile'] as $device){
     packagedCheck(strpos($html,'/js/shell.js')!==false,'home loads shell lifecycle '.$themes);
     packagedCheck(substr_count($html,'/cra1-shared.js')===1&&substr_count($html,'/cra1-shared.css')===1,'home loads shared assets once '.$themes);
     packagedAssets($html,'home:'.$themes);$pages[]='home:'.$themes;
+    foreach (['mf_cloud','mf_dcim'] as $module) foreach (['product_list','product_detail'] as $nativeView) {
+        $_SERVER['REQUEST_URI']='/module/'.$module.'/'.$nativeView.'.htm?id=1';
+        $file=$native.'/public/plugins/server/'.$module.'/template/clientarea/pc/default/'.$nativeView.'.html';
+        $html=packagedRender($member.'/header.php',$vars,$member,'php')
+            .packagedRender($file,$vars,dirname($file),'html')
+            .packagedRender($member.'/footer.php',$vars,$member,'php');
+        $guardPos=strpos($html,'/js/native-capabilities.js');
+        $businessPos=strpos($html,'/plugins/server/'.$module.'/template/clientarea/pc/default/js/');
+        packagedCheck($guardPos!==false && $businessPos!==false && $guardPos<$businessPos,'capability adapter precedes native business scripts '.$themes.'/'.$module.'/'.$nativeView);
+        packagedCheck(strpos($html,'/js/native-page.js')!==false,'native module navigation adapter '.$module.'/'.$nativeView);
+        packagedCheck(strpos($html,'/components/pagination/pagination.js')<strpos($html,'/plugins/server/'.$module.'/template/clientarea/pc/default/js/'),'native module components precede business initialization '.$module.'/'.$nativeView);
+        packagedAssets($html,'native:'.$themes.'/'.$module.'/'.$nativeView);$pages[]='native:'.$themes.'/'.$module.'/'.$nativeView;
+    }
     $pluginVars=array_replace($vars,['cra1_plugin_id'=>71]);
     $html=packagedRender($member.'/header.php',$pluginVars,$member,'php')
         .packagedRender(CRA1_THEME_BACKEND.'/Views/announcement.html',$pluginVars,CRA1_THEME_BACKEND.'/Views','html')

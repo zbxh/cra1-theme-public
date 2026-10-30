@@ -1,4 +1,5 @@
 import HostCustomFields from './serverPanel/custom-fields'
+import HostAccessGate from './host-access-gate'
 import {hostPayload} from '../compat'
 import { useState, useEffect } from 'react'
 import { Package, LayoutGrid, Server, RefreshCw, Plus } from 'lucide-react'
@@ -343,7 +344,7 @@ export default function ProductPage({ mode = 'mylist' }) {
   }
   if (mode === 'detail') {
     const hostId = new URLSearchParams(location.search).get('id') || ''
-    return <HostDetailPage hostId={hostId} />
+    return hostId ? <HostAccessGate hostId={hostId}><HostDetailPage hostId={hostId} /></HostAccessGate> : <HostDetailPage hostId={hostId} />
   }
   return <MyProductsPage />
 }

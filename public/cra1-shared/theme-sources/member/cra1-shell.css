@@ -84,6 +84,64 @@
   background: transparent;
 }
 
+/* Native module navigation owns separate Vue roots from the live module view. */
+.cra1-native-page__navigation { display: contents; }
+.cra1-native-page__content > div { min-width: 0; max-width: 100%; }
+.cra1-native-page__content > .template { display: block; }
+@media (max-width: 1023px) {
+  .cra1-native-page__content .template .main-card .card-top .top-msg { display: flex; flex-wrap: wrap; gap: 16px; }
+  .cra1-native-page__content .template .main-card .card-top .top-msg > .msg-l,
+  .cra1-native-page__content .template .main-card .card-top .top-msg > .msg-r {
+    flex: 1 1 100%;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  .cra1-native-page__content .manage-content > .el-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0;
+  }
+  .cra1-native-page__content .manage-content > .el-row::before,
+  .cra1-native-page__content .manage-content > .el-row::after { display: none; }
+  .cra1-native-page__content .manage-content > .el-row + .el-row { margin-top: 14px; }
+  .cra1-native-page__content .manage-content > .el-row > .el-col { float: none; width: 100%; min-width: 0; padding: 0; }
+  .cra1-native-page__content .main-card .manage-content .el-row .el-col .manage-item {
+    float: none !important;
+    margin: 0 !important;
+    width: 100%;
+    min-width: 0;
+    padding: 14px;
+    box-sizing: border-box;
+  }
+  .cra1-native-page__content .manage-item .item-top { flex-wrap: wrap; gap: 10px; }
+  .cra1-native-page__content .manage-item .item-top > .el-select { flex: 1 1 120px; width: auto; min-width: 0; max-width: 100%; }
+  .cra1-native-page__content .manage-item .item-top-btn { max-width: 100%; min-height: 36px; font-size: 13px; }
+  .cra1-native-page__content .manage-item .item-top .item-top-btn { flex: 0 0 100px; min-width: 0; margin: 0 !important; }
+  .cra1-native-page__content .manage-item .item-bottom { font-size: 12px; line-height: 1.65; }
+}
+@media (max-width: 767px) {
+  .cra1-native-page__content .template .main-card .card-top .tabs { width: 100%; min-width: 0; max-width: 100%; }
+  .cra1-native-page__content .template .main-card .card-top .top-operation { width: 100%; max-width: 100%; }
+  .cra1-native-page__content .top-operation .operation-row2 { flex-wrap: wrap; gap: 10px; }
+  .cra1-native-page__content .top-operation .row2-action-group { flex: 1 1 100% !important; width: 100%; flex-wrap: wrap; gap: 8px; }
+  .cra1-native-page__content .top-operation .row2-right { flex-wrap: wrap; max-width: 100%; }
+  .cra1-native-page__content .main-card-search,
+  .cra1-native-page__content .main-card-search .right-search {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 100%;
+  }
+  .cra1-native-page__content .main-card-search .right-search { flex: 1 0 100%; width: 100%; }
+  .cra1-native-page__content .main-card-search .el-input,
+  .cra1-native-page__content .main-card-search .el-select { flex: 1 1 140px; min-width: 0; width: auto; max-width: 100%; margin: 0; }
+  .cra1-native-page__content .manage-content > .el-row { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* 插件/购物车页：Element 内层容器自带灰白底（rgb(246,246,250)）横跨全宽，
    会把 1440 内容之外的渐变背景挡住 —— 统一透明，让全局渐变透出。
    宽度机制按【结构】匹配而非根类名：系统官方插件的页面脚手架恒为

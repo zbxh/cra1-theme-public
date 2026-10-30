@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
-require dirname(__DIR__,2).'/lib/cra1_theme_seo.php';
+define('CRA1_THEME_BACKEND',dirname(__DIR__).'/backend');
+require CRA1_THEME_BACKEND.'/bootstrap.php';
+require CRA1_THEME_BACKEND.'/Support/cra1_theme_seo.php';
 $base=sys_get_temp_dir().'/cra1-seo-'.bin2hex(random_bytes(6));mkdir($base.'/public/web/cra1/controller',0700,true);mkdir($base.'/runtime/cra1_theme',0700,true);
 foreach(['SeoRegistry.php','PageModuleRegistry.php']as$file)symlink(CRA1_THEME_ROOT.'/public/web/cra1/controller/'.$file,$base.'/public/web/cra1/controller/'.$file);
 $checks=0;function check($ok,$label){if(!$ok)throw new RuntimeException($label);$GLOBALS['checks']++;}

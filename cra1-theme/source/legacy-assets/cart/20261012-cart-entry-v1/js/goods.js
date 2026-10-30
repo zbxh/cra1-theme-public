@@ -1,3 +1,15 @@
+// Both link forms must reach the native module with its expected id parameter.
+// Normalize before injecting its scripts, preserving the original history state.
+(function (window) {
+  var params = new URLSearchParams(window.location.search);
+  var productId = params.get('product_id') || '';
+  if (!params.has('id') && /^[1-9]\d*$/.test(productId)) {
+    params.set('id', productId);
+    window.history.replaceState(window.history.state, '',
+      window.location.pathname + '?' + params.toString() + (window.location.hash || ''));
+  }
+})(window);
+
 var orignalSetItem = localStorage.setItem;
 localStorage.setItem = function (key, newValue) {
   var setItemEvent = new Event("setItemEvent");
