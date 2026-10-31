@@ -6,6 +6,13 @@
 
 产品、订单、支付与账户等业务由智简魔方 V10 系统及已安装的模块、插件提供，具体可用功能以系统设置、模块兼容情况及账号权限为准。
 
+## 在线演示
+
+| 入口 | 地址 | 账号 | 密码 |
+| --- | --- | --- | --- |
+| 前台 | [cra1.coorw.com](https://cra1.coorw.com/) | `18888888888` | `testkr123456` |
+| 主题后台 | [cra1.coorw.com/testadmin](https://cra1.coorw.com/testadmin/) | `testkr` | `testkr123456` |
+
 ## 下载与安装
 
 当前版本：[**v17.4 测试版**](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.4)。
