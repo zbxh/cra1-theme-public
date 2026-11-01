@@ -122,46 +122,36 @@ function HostDetailPage({ hostId }) {
   const [host, setHost] = useState(null)
   const [loading, setLoading] = useState(!!hostId)
   const [readError, setReadError] = useState('')
-  /* 云模块探测：mf_cloud / mf_dcim 产品 → 渲染全新 React 控制面板；
-     其他模块（idcsmart_common 等）→ false，走下方旧版三段式 + ModuleView。null=探测中 */
+  /* 已登记的 mf_cloud / mf_dcim 产品使用 React 控制面板；其他模块保留原生视图。 */
   const [serverReady, setServerReady] = useState(null)
-  /* 探测结果缓存：外层已请求过 /mf_cloud/:id（或 /mf_dcim/:id），
-     传给 ServerPanel 复用，避免其内部再次探测造成同一请求发两次 */
+  /* 复用宿主信息及对应模块详情，避免面板再次请求相同数据。 */
   const [serverDetected, setServerDetected] = useState(null)
 
   useEffect(() => {
     if (!hostId) return
     setLoading(true)
     let alive = true
-    /* 先探测云模块：mf_cloud / mf_dcim 产品由 ServerPanel 接管（自取数据），
-       通用产品只读取其实际产品资料，避免重复请求 */
-    detectServerModule(hostId)
-      .catch(() => null)
-      .then((detected) => {
+    setReadError(''); setHost(null); setServerDetected(null); setServerReady(null)
+    get(`/theme/host/${hostId}`)
+      .then(async (res) => {
+        const h = res.data?.host
+        if (!h?.id) return null
+        return { host: hostPayload(res.data), detected: await detectServerModule(hostId, h) }
+      })
+      .then((result) => {
         if (!alive) return
+        const h = result?.host, detected = result?.detected
+        setHost(h || null)
         setServerReady(!!detected)
         if (detected) {
           setServerDetected(detected)
-          setLoading(false)
-          return
         }
-        return get(`/theme/host/${hostId}`)
-          // 后端对不存在的产品返回 status:200 + host:{}（不是 404），
-          // 必须用 host.id 判断是否真的取到了数据，否则会渲染一屏「—」。
-          .then((res) => {
-            const h = res.data?.host
-            setHost(h && h.id ? hostPayload(res.data) : null)
-            // 侧栏「最近访问」回填：同一地址（productdetail.htm?id=N）内容随产品
-            // 不同，这里广播具体名称，让记录显示产品标识而非笼统的「产品详情」
-            if (h && h.id) {
-              window.dispatchEvent(new CustomEvent('cra1:page-title', {
-                detail: { name: h.product_name || h.name || `产品 #${h.id}` },
-              }))
-            }
-          })
-          .catch(() => {setReadError('页面错误，请刷新重试');setHost(null)})
-          .finally(() => setLoading(false))
+        if (h) window.dispatchEvent(new CustomEvent('cra1:page-title', {
+          detail: { name: h.product_name || h.name || `产品 #${h.id}` },
+        }))
       })
+      .catch(() => { if (alive) { setReadError('页面错误，请刷新重试'); setHost(null); setServerReady(false) } })
+      .finally(() => { if (alive) setLoading(false) })
     return () => { alive = false }
   }, [hostId])
 
@@ -185,7 +175,7 @@ function HostDetailPage({ hostId }) {
 
   /* 云产品：全新控制面板（云模块探测命中即接管整个详情页） */
   if (serverReady) {
-    return <ServerPanel hostId={hostId} initialDetected={serverDetected} />
+    return <ServerPanel hostId={hostId} initialDetected={serverDetected} initialHost={host} />
   }
 
   if (loading || (serverReady === null && !host)) {

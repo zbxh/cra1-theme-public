@@ -43,23 +43,42 @@ checks.push('invalid product aliases do not become native module ids')
 // Exercise the actual iframe bridge when the native product has no billing
 // periods, then receives them later. No server or merchant data is changed.
 {
- let now=0,nextId=0;const timers=new Map(),messages=[],classes=new Set();
- const productVM={cycleList:[],params:{},qty:1,calcTotalPrice:0,totalPrice:0,preview:[],handlerCart(){},submitOrder(){}};
+ let now=0,nextId=0;const timers=new Map(),messages=[],classes=new Set(),handlers=new Map();
+ let purchases=0;
+ const productVM={cycleList:[],params:{},qty:1,calcTotalPrice:0,totalPrice:0,preview:[],handlerCart(){purchases++},submitOrder(){purchases++},changeCart(){purchases++}};
  const body={scrollHeight:640,classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)}};
  const document={body,documentElement:{scrollHeight:640},getElementById:()=>({style:{}}),querySelectorAll:()=>[{__vue__:productVM}],querySelector:s=>['.cart-embed','.f-order'].includes(s)?{style:{}}:null};
- const window={location:new URL('https://fixture.invalid/cart/goods_embed.htm?id=4&embed=1&embed_nonce=fixture'),addEventListener(){},parent:{postMessage:m=>messages.push(m)},CRA1Shared:{Runtime:{common:()=>({currency_prefix:'¥',currency_suffix:''})}}};
+ const window={location:new URL('https://fixture.invalid/cart/goods_embed.htm?id=4&embed=1&embed_nonce=fixture'),addEventListener:(type,fn)=>handlers.set(type,fn),parent:{postMessage:m=>messages.push(m)},CRA1Shared:{Runtime:{common:()=>({currency_prefix:'¥',currency_suffix:''})}}};
  vm.runInNewContext(bridge,{window,document,location:window.location,URLSearchParams,Date:{now:()=>now},setInterval:(fn,ms)=>{timers.set(++nextId,{fn,ms});return nextId},clearInterval:id=>timers.delete(id)});
  window.__CART_EMBED__.markReady();
- [...timers.values()].find(t=>t.ms===400).fn();
- assert.equal(classes.has('rail-bridged'),false);checks.push('a native VM without periods keeps its native controls visible');
+ assert.equal(classes.has('rail-bridged'),true);assert.equal(messages.at(-1).payload.availability,'loading');
+ assert.equal(messages.at(-1).payload.price.calcText,'');checks.push('a supported VM keeps the parent calculator while its periods are pending');
+ for(const type of ['rail-add','rail-buy','rail-save'])handlers.get('message')({origin:window.location.origin,data:{v:1,source:'cart-parent',type,productId:4,nonce:'fixture'}});
+ assert.equal(purchases,0);checks.push('pending periods cannot submit purchase or edit operations');
  const poll=[...timers.values()].find(t=>t.ms===800).fn;
  now=12001;poll();poll();
- assert.equal(messages.filter(m=>m.type==='rail-fallback').length,1);
- assert.equal(classes.has('rail-fallback'),true);checks.push('missing periods become one actionable fallback instead of endless loading');
+ assert.equal(messages.filter(m=>m.type==='rail-fallback').length,0);
+ assert.equal(messages.at(-1).payload.availability,'unavailable');
+ assert.equal(classes.has('rail-bridged'),true);checks.push('missing periods leave one unavailable calculator in the parent instead of a native bottom bar');
  productVM.cycleList=[{id:1,name:'月付'}];productVM.params.duration_id=1;productVM.calcTotalPrice=76;
  poll();
- assert.equal(messages.at(-1).type,'rail-data');assert.equal(messages.at(-1).payload.price.calcText,'76.00');
+ assert.equal(messages.at(-1).type,'rail-updated');assert.equal(messages.at(-1).payload.price.calcText,'76.00');
+ assert.equal(messages.at(-1).payload.availability,'ready');
  assert.equal(classes.has('rail-bridged'),true);assert.equal(classes.has('rail-fallback'),false);checks.push('late billing data recovers the real calculator without a page reload');
  const count=messages.length;poll();assert.equal(messages.length,count);checks.push('unchanged calculator data does not send duplicate updates');
+ productVM.cycleList[0].name='每月';poll();assert.equal(messages.at(-1).payload.durations[0].name,'每月');checks.push('period names refresh even when the total and selected id stay the same');
+ productVM.loadingPrice=true;poll();assert.equal(messages.at(-1).payload.price.calcText,'');assert.equal(messages.at(-1).payload.availability,'loading');checks.push('an outstanding quote hides the previous amount and locks submission');
+ productVM.loadingPrice=false;productVM.calcTotalPrice=0;poll();assert.equal(messages.at(-1).payload.availability,'ready');assert.equal(messages.at(-1).payload.price.calcText,'0.00');checks.push('a confirmed zero price remains a valid quote');
+ productVM.cycleList=[];poll();assert.equal(messages.at(-1).payload.durations.length,0);assert.equal(messages.at(-1).payload.current,null);assert.equal(messages.at(-1).payload.price.calcText,'');checks.push('disappearing periods clear stale selection and price');
+ productVM.cycleList=[{id:1,name:'每月'}];productVM.params.duration_id=999;poll();assert.equal(messages.at(-1).payload.availability,'loading');checks.push('an unavailable selected period cannot use a previous price');
+}
+for(const pay_type of ['free','onetime']){
+ const messages=[],classes=new Set(),timers=new Map();let id=0;
+ const productVM={custom_cycles:[],pay_type,curCycle:0,totalPrice:pay_type==='free'?0:99,original_price:99,orderData:{qty:1},basicInfo:{allow_qty:1},addCart(){},buyNow(){}};
+ const document={body:{scrollHeight:640,classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)}},documentElement:{scrollHeight:640},getElementById:()=>({style:{}}),querySelectorAll:s=>s==='.template'?[{__vue__:productVM}]:[],querySelector:s=>['.cart-embed','.order-right'].includes(s)?{style:{}}:null};
+ const window={location:new URL('https://fixture.invalid/cart/goods_embed.htm?id=4&embed=1&embed_nonce=fixture'),addEventListener(){},parent:{postMessage:m=>messages.push(m)},CRA1Shared:{Runtime:{common:()=>({currency_prefix:'¥',currency_suffix:''})}}};
+ vm.runInNewContext(bridge,{window,document,location:window.location,URLSearchParams,Date,setInterval:(fn,ms)=>{timers.set(++id,{fn,ms});return id},clearInterval:i=>timers.delete(i)});
+ window.__CART_EMBED__.markReady();const data=messages.at(-1).payload;
+ assert.equal(data.availability,'ready');assert.equal(data.durationRequired,false);assert.equal(data.price.calcText,pay_type==='free'?'0.00':'99.00');checks.push(pay_type+' native common billing does not require a recurring period');
 }
 console.log(JSON.stringify({status:'passed',checks:checks.length,results:checks,production_requests:0}))

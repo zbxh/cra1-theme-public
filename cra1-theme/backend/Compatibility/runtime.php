@@ -35,7 +35,8 @@ final class CRA1ThemePublicProjection
         try {
             foreach(\CRA1\Theme\Compatibility\Database::query($db,"SELECT id,name FROM idcsmart_plugin WHERE module='addon' AND status=1")->fetchAll(PDO::FETCH_ASSOC) as $p)$plugins[$p['name']]=(int)$p['id'];
         } catch(Throwable $e) { error_log('CRA1 plugin capabilities unavailable'); }
-        $features=['recharge_open'=>(int)($settings['recharge_open']??0)===1?1:0,'withdraw_open'=>0];
+        $features=['recharge_open'=>(int)($settings['recharge_open']??0)===1?1:0,'withdraw_open'=>0,
+            'ssh'=>isset($plugins['IdcsmartSshKey']),'security_group'=>isset($plugins['IdcsmartCloud'])];
         if($features['recharge_open']) {
             foreach(['recharge_min','recharge_max'] as $key)$features[$key]=(string)($settings[$key]??'');
             if((int)($settings['recharge_notice']??0)===1){$features['recharge_money_notice']=(string)($settings['recharge_money_notice_content']??'');$features['recharge_pay_notice']=(string)($settings['recharge_pay_notice_content']??'');}
@@ -72,6 +73,15 @@ final class CRA1ThemePublicProjection
                     }
                 }
                 $url=(string)($node['url']??'');
+                // Only local theme routes denote these plugin capabilities.
+                // External links with a similar filename remain merchant links.
+                if (strpos($url,'//')!==0 && !preg_match('~^[a-z][a-z0-9+.-]*:~i',$url)) {
+                    $path=ltrim((string)parse_url($url,PHP_URL_PATH),'/');
+                    parse_str((string)parse_url($url,PHP_URL_QUERY),$query);
+                    $tab=is_string($query['tab']??null)?$query['tab']:'';
+                    if (($path==='security_ssh.htm'||($path==='security.htm'&&$tab==='ssh')) && empty($features['ssh'])) continue;
+                    if (($path==='security_group.htm'||($path==='security.htm'&&$tab==='group')) && empty($features['security_group'])) continue;
+                }
                 if(preg_match('~^/?plugin/([0-9]+)/~',$url,$m)&&!in_array((int)$m[1],array_values($plugins),true))continue;
                 if(preg_match('~(?:^|/)withdrawal\.htm~',$url)&&empty($features['withdraw_open']))continue;
                 if(preg_match('~(?:^|/)recharge\.htm~',$url)&&empty($features['recharge_open']))continue;

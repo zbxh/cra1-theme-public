@@ -6,6 +6,7 @@ import { Card, CardContent } from './card'
 import { Button } from './button'
 import { Alert, Skeleton } from './feedback'
 import { mountModuleScripts } from './module-scripts'
+import { watchModuleFailure } from './module-boundary'
 
 /**
  * 模块内页容器
@@ -100,23 +101,24 @@ export function ModuleView({ url, params, title, description, empty, onLoaded, d
     host.addEventListener('click', readCredentials)
 
     const scriptController=new AbortController()
-    let reapTimer, disposed=false
+    let reapTimer, disposed=false, boundary
     function dispose() {
       if(disposed)return
       disposed=true;clearTimeout(reapTimer);scriptController.abort();credentialController.abort();host.removeEventListener('click',readCredentials)
-      const instances=new Set([host,...host.querySelectorAll('*')].map(el=>el.__vue__).filter(Boolean))
+      const instances=new Set([...(boundary?.instances || []),...[host,...host.querySelectorAll('*')].map(el=>el.__vue__).filter(Boolean)])
       instances.forEach(vm=>{if(!vm._isDestroyed)vm.$destroy()})
     }
+    boundary = watchModuleFailure(host, () => { if (!disposed) { dispose(); setError('页面错误，请刷新重试') } })
     mountModuleScripts(host,{signal:scriptController.signal,enabled:src=>!(src.split('?')[0]==='/plugins/addon/flow_packet/template/clientarea/flowPacketUsage.js' && window.__CRA1_RUNTIME__?.features?.flow_packet!==true)})
       .then(()=>{if(!scriptController.signal.aborted)onLoaded?.(host)})
       .catch(()=>{if(!scriptController.signal.aborted){dispose();setError('模块所需资源未能加载。请重试，或联系管理员检查模块及网络。')}})
 
-    // 原生模块接口失败时可能一直保留 loading；明确显示故障与重试入口。
+    // 原生模块接口失败时可能一直保留 loading；结束初始化并提示刷新。
     reapTimer = setTimeout(() => {
-      if([...host.querySelectorAll('.pro-des-loading')].some(el=>el.getBoundingClientRect().height>0)){dispose();setError('模块仍未完成加载。请重试，或联系管理员检查产品连接。')}
+      if(!disposed && [...host.querySelectorAll('.pro-des-loading,.el-loading-mask')].some(el=>el.getBoundingClientRect().height>0)){dispose();setError('页面错误，请刷新重试')}
     }, 12000)
 
-    return dispose
+    return () => { dispose(); boundary.dispose() }
 
     // onLoaded 由调用方每次渲染新建，纳入依赖会导致重复注入
     // eslint-disable-next-line react-hooks/exhaustive-deps

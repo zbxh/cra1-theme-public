@@ -88,6 +88,67 @@
 .cra1-native-page__navigation { display: contents; }
 .cra1-native-page__content > div { min-width: 0; max-width: 100%; }
 .cra1-native-page__content > .template { display: block; }
+/* Keep the plugin action secondary and independent of the module's rem scale. */
+.cra1-native-page__content .sch-ip-change-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  border: 1px solid #dfe2e6;
+  border-radius: 8px;
+  background: #f9fafb;
+  color: #4b525a;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+.cra1-native-page__content > .sch-ip-change-btn {
+  display: flex;
+  width: max-content;
+  margin-top: 16px;
+}
+.cra1-native-page__content .cra1-native-action-card .sch-ip-change-btn { align-self: flex-start; }
+.cra1-native-page__content .cra1-native-action-card .item-bottom { padding-right: 14px; font-size: 12px; line-height: 1.65; }
+.cra1-native-page__content .sch-ip-change-btn > i { flex-shrink: 0; font-size: 14px; }
+/* The native fallback does not always load the plugin's icon font. */
+.cra1-native-page__content .sch-ip-change-btn > i.fa-exchange-alt {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m8 3-4 4 4 4M4 7h16m-4 6 4 4-4 4M20 17H4'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m8 3-4 4 4 4M4 7h16m-4 6 4 4-4 4M20 17H4'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.cra1-native-page__content .sch-ip-change-btn > i.fa-exchange-alt::before { content: none; }
+.cra1-native-page__content .sch-ip-change-btn:visited { color: #4b525a; }
+@media (hover: hover) {
+  .cra1-native-page__content .sch-ip-change-btn:hover {
+    border-color: #d8c296;
+    background: #ffffff;
+    color: #35383c;
+    box-shadow: 0 2px 8px rgba(175, 143, 82, 0.1);
+    text-decoration: none;
+  }
+}
+.cra1-native-page__content .sch-ip-change-btn:focus-visible {
+  outline: 2px solid #a28b5b;
+  outline-offset: 3px;
+}
+@media (max-width: 767px) {
+  .cra1-native-page__content .sch-ip-change-btn { min-height: 44px; padding: 10px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cra1-native-page__content .sch-ip-change-btn { transition: none; }
+}
 @media (max-width: 1023px) {
   .cra1-native-page__content .template .main-card .card-top .top-msg { display: flex; flex-wrap: wrap; gap: 16px; }
   .cra1-native-page__content .template .main-card .card-top .top-msg > .msg-l,

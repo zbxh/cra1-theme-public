@@ -18,12 +18,19 @@ async function injectHtml(container, html, current) {
   container.innerHTML = html
   for (const old of Array.from(container.querySelectorAll('script'))) {
     if (!current()) return
+    // JSON/bootstrap scripts are data consumed by the provider. Leave their
+    // type, data attributes and position intact rather than executing them.
+    const type = (old.getAttribute('type') || '').trim().toLowerCase()
+    if (type && !/^(?:(?:text|application)\/(?:java|ecma)script|module)$/.test(type)) continue
+    // Cloning an inert, parsed script also copies its "already started" flag.
+    // Create a fresh element so the provider actually executes when inserted.
     const script = document.createElement('script')
+    for (const attribute of Array.from(old.attributes)) script.setAttribute(attribute.name, attribute.value)
     if (old.src) {
       // Reuse local jQuery, while retaining any actual native CAPTCHA dependencies.
       if (/\/jquery(?:[./-]|$)/i.test(old.src) && window.jQuery) { old.remove(); continue }
       await new Promise((resolve, reject) => {
-        script.async = false; script.src = old.src
+        script.async = false
         script.onload = resolve; script.onerror = () => reject(new Error('图形验证加载失败'))
         old.replaceWith(script)
       })

@@ -43,10 +43,10 @@ export default function CashierPage() {
         onState: state => { if (active) { setSnapshot(state); setStatus(state.order?.status || ''); setReady(true) } },
         onPaid: () => { if (active) { setStatus('Paid'); setReady(true); window.dispatchEvent(new Event('cra1:finance-updated')) } },
         onUpdated: () => { if (active) setAttempt(n => n + 1) },
-        onCancel: () => { if (active) setError('付款尚未完成。可以继续支付，也可以稍后从订单详情打开。') },
+        onCancel: () => { if (active) setError('付款尚未完成，请刷新页面后继续付款。') },
       })
       return handle.ready
-    }).catch(e => { if (active) setError(window.CRA1Shared?.Errors?.message(e) || '支付暂时无法加载，请重试') })
+    }).catch(() => { if (active) setError('页面错误，请刷新重试') })
     return () => { active = false; if (generation.current === ticket) generation.current++; handle?.destroy() }
   }, [id, valid, permitted, attempt])
 
@@ -66,7 +66,7 @@ export default function CashierPage() {
           {status === 'Paid' ? <CheckCircle2 aria-hidden="true" /> : <Clock3 aria-hidden="true" />}
           <div><h2>{state[0]}</h2><p>{state[1]}</p>{order?.review_fail_reason && <p>{order.review_fail_reason}</p>}</div>
         </div>}
-        {error && <Alert tone="error">{error}<div className="mt-3"><Button size="sm" onClick={() => setAttempt(n => n + 1)}>继续支付当前订单</Button></div></Alert>}
+        {error && <Alert tone="error">{error}</Alert>}
         {!ready && !error && <p className="cra1-cashier-loading" role="status">正在读取订单及付款方式…</p>}
         <div ref={host} className="cra1-cashier-mount" hidden={terminal || !!error} />
         {terminal && <div className="cra1-cashier-result-actions">

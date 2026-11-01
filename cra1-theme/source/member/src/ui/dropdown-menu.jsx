@@ -1,9 +1,36 @@
 import {useAccess} from './access'
+import { useEffect, useState } from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, Circle } from 'lucide-react'
 import { cn } from './utils'
 
-export const DropdownMenu = DropdownMenuPrimitive.Root
+export function DropdownMenu({ open, defaultOpen = false, onOpenChange, ...props }) {
+  const [localOpen, setLocalOpen] = useState(defaultOpen)
+  const isOpen = open === undefined ? localOpen : open
+  useEffect(() => {
+    if (!isOpen || typeof window === 'undefined') return
+    const viewport = window.visualViewport
+    const size = () => [window.innerWidth, window.innerHeight, viewport?.width, viewport?.height]
+    const openingSize = size()
+    // A menu opened before rotation or a keyboard/viewport resize can retain
+    // its old collision height. Reopening lets Radix position it afresh.
+    const closeOnResize = () => {
+      if (!size().some((value, index) => Math.abs((value ?? 0) - (openingSize[index] ?? 0)) > 1)) return
+      if (open === undefined) setLocalOpen(false)
+      onOpenChange?.(false)
+    }
+    window.addEventListener('resize', closeOnResize)
+    viewport?.addEventListener('resize', closeOnResize)
+    return () => {
+      window.removeEventListener('resize', closeOnResize)
+      viewport?.removeEventListener('resize', closeOnResize)
+    }
+  }, [isOpen, open, onOpenChange])
+  return <DropdownMenuPrimitive.Root {...props} open={isOpen} onOpenChange={next => {
+    if (open === undefined) setLocalOpen(next)
+    onOpenChange?.(next)
+  }} />
+}
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 export const DropdownMenuGroup = DropdownMenuPrimitive.Group
 export const DropdownMenuPortal = DropdownMenuPrimitive.Portal

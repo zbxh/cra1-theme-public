@@ -71,7 +71,7 @@ const POWER_STATE = {
   pending: { label: '等待中', tone: 'default' },
 }
 
-export default function ServerPanel({ hostId, onFallback, initialDetected = null }) {
+export default function ServerPanel({ hostId, onFallback, initialDetected = null, initialHost = null }) {
   const toast = useToast()
   const [phase, setPhase] = useState('detect') // detect | ok | fallback | missing
   const [module, setModule] = useState('mf_cloud')
@@ -113,11 +113,9 @@ export default function ServerPanel({ hostId, onFallback, initialDetected = null
   useEffect(() => {
     let alive = true
     setPhase('detect')
-    Promise.all([
-      get(`/theme/host/${hostId}`).then((r) => (r.data?.host?.id ? hostPayload(r.data) : null)).catch(() => null),
-      /* 外层 HostDetailPage 已探测过则直接复用（避免同一实例详情重复请求） */
-      initialDetected ? Promise.resolve(initialDetected) : detectServerModule(hostId),
-    ]).then(([h, detected]) => {
+    Promise.resolve(initialHost || get(`/theme/host/${hostId}`).then(r => r.data?.host?.id ? hostPayload(r.data) : null))
+      .then(async h => [h, h ? (initialDetected || await detectServerModule(hostId, h)) : null])
+      .then(([h, detected]) => {
       if (!alive) return
       if (!h) {
         setPhase('missing')
@@ -158,7 +156,7 @@ export default function ServerPanel({ hostId, onFallback, initialDetected = null
         if (ticket?.url) setSupportUrl(ticket.url.startsWith('/') ? ticket.url : `/${ticket.url}`)
       }).catch(() => {})
       setPhase('ok')
-    })
+    }).catch(() => { if (alive) setPhase('missing') })
     return () => { alive = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hostId])
@@ -823,7 +821,7 @@ function UsageCard({ real, module, host, cloud, setDlg, caps, error, onRetry }) 
           {attrRows.map(([k, v]) => (
             <div key={k} className="flex items-baseline justify-between gap-3 border-b border-line/50 py-1">
               <dt className="shrink-0 text-xs text-muted-foreground">{k}</dt>
-              {k === 'SSH 密钥' ? (
+              {k === 'SSH 密钥' && window.__CRA1_RUNTIME__?.features?.ssh ? (
                 <button
                   type="button"
                   onClick={() => { window.location.href = '/security_ssh.htm' }}

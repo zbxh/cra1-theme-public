@@ -245,7 +245,8 @@ html[data-cra1-theme="website"] main .reading-image-button { display:block; widt
   .duo-item h3 { font-size:18px; }
   .duo-item .duo-copy>p { margin-top:8px; }
   html[data-cra1-theme="website"] main .proof-grid { grid-template-columns:1fr; }
-  .home-news-grid { grid-template-columns:1fr; }
+  .home-news-grid { grid-template-columns:minmax(0,1fr); }
+  .home-news-grid>* { min-width:0; }
   .home-news-grid .home-notices { grid-row:auto; }
   html[data-cra1-theme="website"] main [data-cra1-module="step_ribbon"] ol { display:block; }
   html[data-cra1-theme="website"] main [data-cra1-module="step_ribbon"] ol>li { padding:0 0 22px 48px; min-height:70px; }

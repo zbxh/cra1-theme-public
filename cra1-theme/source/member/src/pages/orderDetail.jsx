@@ -47,14 +47,14 @@ export default function OrderDetailPage() {
       </CardContent></Card>
       <Card><CardHeader><CardTitle>商品明细</CardTitle></CardHeader><CardContent className="p-0">
         {(order.items||[]).length?<ul className="divide-y divide-line">{order.items.map((item,i)=><li key={item.id||i} className="flex flex-wrap items-center gap-4 px-5 py-4">
-          <div className="min-w-0 flex-1"><p className="text-sm font-medium break-words">{item.product_name||item.description||'订单项目'}</p><p className="mt-1 text-xs text-muted-foreground break-words">{[item.host_name,item.billing_cycle].filter(Boolean).join(' · ')}</p></div>
+          <div className="min-w-0 basis-full sm:flex-1 sm:basis-0"><p className="text-sm font-medium break-words">{item.product_name||item.description||'订单项目'}</p><p className="mt-1 text-xs text-muted-foreground break-words">{[item.host_name,item.billing_cycle].filter(Boolean).join(' · ')}</p></div>
           {item.host_status&&<Badge>{HOST_STATUS[item.host_status]||'状态待同步'}</Badge>}<span className="text-sm tabular-nums break-all">{formatMoney(item.amount)}</span>
           {item.host_id>0&&<Button variant="ghost" size="sm" onClick={()=>location.assign(`/productdetail.htm?id=${item.host_id}`)}>管理</Button>}
         </li>)}</ul>:<div className="p-5"><EmptyState title="暂无商品明细"/></div>}
       </CardContent></Card>
       {(order.voucher||[]).length>0&&<Card><CardHeader><CardTitle>已上传凭证</CardTitle></CardHeader><CardContent><ul className="flex flex-wrap gap-3">{order.voucher.map((v,i)=><li key={v.save_name||i}><a href={v.url || '#'} target="_blank" rel="noopener noreferrer" className="inline-flex max-w-full items-center gap-2 break-all text-sm underline"><FileText className="size-4 shrink-0"/>{v.name||v.save_name||`凭证 ${i+1}`}</a></li>)}</ul></CardContent></Card>}
       <Card><CardHeader><CardTitle>交易记录</CardTitle></CardHeader><CardContent className="p-0">
-        {recordError?<p className="p-5 text-sm text-muted-foreground">{recordError}</p>:records.length?<ul className="divide-y divide-line">{records.map((r,i)=><li key={r.id||i} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 text-sm"><time className="text-muted-foreground">{formatDateTime(r.create_time)}</time><span className="min-w-0 flex-1 break-words">{r.description||r.notes||'付款记录'}</span>{r.amount!==undefined&&<span className="tabular-nums">{formatMoney(r.amount)}</span>}</li>)}</ul>:<p className="p-5 text-sm text-muted-foreground">暂无交易记录</p>}
+        {recordError?<p className="p-5 text-sm text-muted-foreground">{recordError}</p>:records.length?<ul className="divide-y divide-line">{records.map((r,i)=><li key={r.id||i} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 text-sm"><time className="text-muted-foreground">{formatDateTime(r.create_time)}</time><span className="order-first min-w-0 basis-full break-words sm:order-none sm:flex-1 sm:basis-0">{r.description||r.notes||'付款记录'}</span>{r.amount!==undefined&&<span className="tabular-nums">{formatMoney(r.amount)}</span>}</li>)}</ul>:<p className="p-5 text-sm text-muted-foreground">暂无交易记录</p>}
       </CardContent></Card>
     </>}
   </div>

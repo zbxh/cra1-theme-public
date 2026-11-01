@@ -24,16 +24,16 @@
             <span class="n">{{ it.value ? it.name + '：' + it.value : it.name }}</span>
             <span class="p" v-if="it.price">{{ it.price }}</span>
           </div>
-          <div class="cl-dock-m-detail-item" v-if="railPrice.originText && railPrice.originText !== railPrice.calcText">
+          <div class="cl-dock-m-detail-item" v-if="railAvailability === 'ready' && railPrice.originText && railPrice.originText !== railPrice.calcText">
             <span class="n">{{lang.shoppingCar_tip_text4 || '优惠'}}</span>
             <span class="p">-{{railPrice.currency}}{{railPrice.originText}}{{railPrice.suffix}}</span>
           </div>
           <div class="cl-dock-m-detail-empty" v-if="!railPreview.length">{{lang.goods_loading || '加载中…'}}</div>
         </div>
         <div class="cl-dock-m-row">
-          <div class="cl-dock-m-field">
+          <div class="cl-dock-m-field" v-if="railDurationRequired">
             <span class="cl-dock-m-lbl">{{lang.cycle || '订购时长'}}</span>
-            <el-select v-model="railDurationId" size="small" @change="railSetDuration" :loading="railLoading">
+            <el-select v-model="railDurationId" size="small" @change="railSetDuration" :loading="railAvailability === 'loading'" :disabled="!railDurations.length">
               <el-option v-for="d in railDurations" :key="d.id" :value="d.id" :label="d.name"></el-option>
             </el-select>
           </div>
@@ -62,20 +62,22 @@
           <i v-if="isMobileCart" :class="dockDetailOpen ? 'el-icon-arrow-down' : 'el-icon-arrow-up'"></i>
         </span>
         <span class="cl-rail-dock-now">
-          <span class="cl-rail-cur">{{railPrice.currency}}</span><span class="cl-rail-dock-num">{{railPrice.calcText}}{{railPrice.suffix}}</span>
+          <template v-if="railAvailability === 'ready'"><span class="cl-rail-cur">{{railPrice.currency}}</span><span class="cl-rail-dock-num">{{railPrice.calcText}}{{railPrice.suffix}}</span></template>
+          <span class="cl-rail-dock-num cl-rail-price-pending" v-else>待计算</span>
         </span>
-        <span class="cl-rail-price-origin" v-if="railPrice.originText && railPrice.originText !== railPrice.calcText">
+        <span class="cl-rail-price-origin" v-if="railAvailability === 'ready' && railPrice.originText && railPrice.originText !== railPrice.calcText">
           <span>{{railPrice.currency}}</span>{{railPrice.originText}}{{railPrice.suffix}}
         </span>
       </div>
       <div class="cl-rail-dock-actions">
         <button type="button" class="cl-rail-addcart" v-if="!isEditingCartItem" :title="lang.add_cart || '加入购物车'"
-          :disabled="railLoading" @click="railAddCart">
+          :disabled="railLoading || railAvailability !== 'ready'" @click="railAddCart">
           <i class="el-icon-shopping-cart-2"></i>
         </button>
-        <el-button type="primary" class="cl-rail-buy" :disabled="railLoading"
+        <el-button type="primary" class="cl-rail-buy" :disabled="railLoading || railAvailability !== 'ready'"
           @click="railPrimaryAction">{{isEditingCartItem ? '保存修改' : (lang.product_buy_now || '立即购买')}}</el-button>
       </div>
+      <p v-if="railAvailability !== 'ready'" class="cl-rail-status" role="status">{{railStatusText}}</p>
     </div>
     <el-container>
       <aside-menu @getruleslist="getRule"></aside-menu>
@@ -154,7 +156,7 @@
                   <div class="no-goods" v-else-if="goodsList.length === 0 && !goodSLoading && !catalogError">
                     <el-empty :description="lang.no_goods"></el-empty>
                   </div>
-                  <div v-else class="cl-goods-grid" :style="gridStyle">
+                  <div v-else ref="goodsGrid" class="cl-goods-grid" :style="gridStyle">
                     <template v-for="(item,index) in goodsList">
                       <div class="cl-goods-card"
                         :class="{'is-sold-out': item.stock_control === 1 && item.qty <= 0, 'is-selected': selectedProductId === item.id}"
@@ -237,6 +239,7 @@
                       </div></div>
                     </template>
                   </div>
+                  <p class="cl-goods-scroll-hint" v-if="goodsList.length > 1 && !goodSLoading">左右滑动查看更多型号</p>
                   <!-- 底部加载提示 -->
                   <p v-if="isNormal && !catalogError && !scrollDisabled && goodsList.length !== 0" class="cl-loadtip">{{lang.goods_loading}}</p>
                   </section>
@@ -286,9 +289,9 @@
                     </div>
                     <!-- 订购时长 + 订购数量（同行，v6.7；模块无数量能力时时长独占整行） -->
                     <div class="cl-rail-row">
-                      <div class="cl-rail-field">
+                      <div class="cl-rail-field" v-if="railDurationRequired">
                         <div class="cl-rail-label">{{lang.cycle || '订购时长'}}</div>
-                        <el-select v-model="railDurationId" size="small" @change="railSetDuration" :loading="railLoading">
+                        <el-select v-model="railDurationId" size="small" @change="railSetDuration" :loading="railAvailability === 'loading'" :disabled="!railDurations.length">
                           <el-option v-for="d in railDurations" :key="d.id" :value="d.id" :label="d.name"></el-option>
                         </el-select>
                       </div>
@@ -302,12 +305,14 @@
                     <div class="cl-rail-price">
                       <div class="cl-rail-label">{{lang.config_free || '配置费用'}}</div>
                       <div class="cl-rail-price-now">
-                        <span class="cl-rail-cur">{{railPrice.currency}}</span><span class="cl-rail-num">{{railPrice.calcText}}{{railPrice.suffix}}</span>
-                        <span class="cl-rail-price-origin" v-if="railPrice.originText && railPrice.originText !== railPrice.calcText">
+                        <template v-if="railAvailability === 'ready'"><span class="cl-rail-cur">{{railPrice.currency}}</span><span class="cl-rail-num">{{railPrice.calcText}}{{railPrice.suffix}}</span></template>
+                        <span class="cl-rail-num cl-rail-price-pending" v-else>待计算</span>
+                        <span class="cl-rail-price-origin" v-if="railAvailability === 'ready' && railPrice.originText && railPrice.originText !== railPrice.calcText">
                           <span>{{railPrice.currency}}</span>{{railPrice.originText}}{{railPrice.suffix}}
                         </span>
                       </div>
                     </div>
+                    <p v-if="railAvailability !== 'ready'" class="cl-rail-status" role="status">{{railStatusText}}</p>
                     <!-- 优惠码（模块提供时显示） -->
                     <div class="cl-rail-field" v-if="railPrice.hasDiscount">
                       <div class="cl-rail-label">{{lang.coupon_code || '优惠码'}}</div>
@@ -320,10 +325,10 @@
                     <!-- 操作按钮 -->
                     <div class="cl-rail-actions">
                       <button type="button" class="cl-rail-addcart" v-if="!isEditingCartItem" :title="lang.add_cart || '加入购物车'"
-                        :disabled="railLoading" @click="railAddCart">
+                        :disabled="railLoading || railAvailability !== 'ready'" @click="railAddCart">
                         <i class="el-icon-shopping-cart-2"></i>
                       </button>
-                      <el-button type="primary" class="cl-rail-buy" :disabled="railLoading"
+                      <el-button type="primary" class="cl-rail-buy" :disabled="railLoading || railAvailability !== 'ready'"
                         @click="railPrimaryAction">{{isEditingCartItem ? '保存修改' : (lang.product_buy_now || '立即购买')}}</el-button>
                     </div>
                   </template>

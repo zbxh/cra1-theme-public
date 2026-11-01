@@ -237,6 +237,8 @@ export function featureFlags() {
       flag.recharge_min = f.recharge_min || ''
       flag.recharge_max = f.recharge_max || ''
       flag.certification = f.certification || null
+      flag.ssh = !!f.ssh
+      flag.security_group = !!f.security_group
       flag.ready = true
       try {
         window.dispatchEvent(new CustomEvent('cra1:feature-flags'))

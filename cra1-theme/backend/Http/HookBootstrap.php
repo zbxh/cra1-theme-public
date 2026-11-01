@@ -16,6 +16,9 @@ final class HookBootstrap
         self::$registered = true;
         // AppInit runs before the native HTTP middleware pipeline is resolved.
         \think\facade\Event::listen('HttpRun', static function () {
+            if (\CRA1\Theme\Context::active()) {
+                app()->bind('app\\admin\\controller\\ViewController', admin\ViewController::class);
+            }
             if (\CRA1\Theme\Context::active() && class_exists('think\\template\\driver\\File')) {
                 $view = (array)app()->config->get('view', []);
                 $storage = strtolower(ltrim((string)($view['compile_type'] ?? 'file'), '\\'));

@@ -232,14 +232,14 @@ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccoun
 html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .addAccount-footer button {width:auto;min-width:84px;min-height:40px;padding:8px 18px;font-size:14px;line-height:22px;border-radius:var(--cui-radius-control);box-sizing:border-box;}
 /* The native pagination has important rem declarations. Counter only those
    declarations here; keep its component, page events and disabled behavior. */
-html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination {flex-wrap:wrap;gap:8px 0;overflow:visible;white-space:normal;font-size:13px;}
-html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination :is(.el-pager li,.el-pagination__jump,.page-total) {font-size:13px!important;}
-html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination :is(.el-pager li,.btn-prev,.btn-next) {width:auto;min-width:36px;min-height:36px;height:auto;line-height:34px;box-sizing:border-box;}
-html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination :is(.el-pagination__jump,.el-pagination__sizes) {display:inline-flex;align-items:center;height:auto;line-height:40px;}
-html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-pagination__jump {order:1;}
-html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-input__inner {height:40px!important;font-size:13px;}
-html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-pagination__editor {width:48px;height:auto;}
-html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-input__icon {line-height:40px;}
+html[data-cra1-theme="member"] .myPage .el-pagination {flex-wrap:wrap;gap:8px 0;overflow:visible;white-space:normal;font-size:13px;}
+html[data-cra1-theme="member"] .myPage .el-pagination :is(.el-pager li,.el-pagination__jump,.page-total) {font-size:13px!important;}
+html[data-cra1-theme="member"] .myPage .el-pagination :is(.el-pager li,.btn-prev,.btn-next) {width:auto;min-width:36px;min-height:36px;height:auto;line-height:34px;box-sizing:border-box;}
+html[data-cra1-theme="member"] .myPage .el-pagination :is(.el-pagination__jump,.el-pagination__sizes) {display:inline-flex;align-items:center;height:auto;line-height:40px;}
+html[data-cra1-theme="member"] .myPage .el-pagination .el-pagination__jump {order:1;}
+html[data-cra1-theme="member"] .myPage .el-pagination .el-input__inner {height:40px!important;font-size:13px;}
+html[data-cra1-theme="member"] .myPage .el-pagination .el-pagination__editor {width:48px;height:auto;}
+html[data-cra1-theme="member"] .myPage .el-pagination .el-input__icon {line-height:40px;}
 html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartDomain"] .tem-form .sub-box .el-button {font-size:14px;line-height:20px;background:var(--cui-button-gradient);color:var(--cui-button-ink);border-color:var(--cui-titanium);border-radius:var(--cui-radius-control);}
 html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartDomain"] .tem-form .sub-box .el-button:disabled {opacity:.5;cursor:not-allowed;}
 html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartDomain"] #domain .content-box .el-tabs__item {font-size:14px;}
@@ -253,10 +253,10 @@ html[data-cra1-theme="cart"] .cart-page .domain-box .domain-content .domain-left
  html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .tree-box .el-tree-node__content {min-height:44px;padding-top:0;padding-bottom:0;align-items:center;}
  html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .tree-box .el-checkbox {min-height:44px;height:44px;margin-top:0;}
  html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .addAccount-content .addAccount-footer button {min-height:44px;}
- html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination :is(.el-pager li,.btn-prev,.btn-next) {min-width:44px;min-height:44px;line-height:42px;}
- html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-input__inner {height:44px!important;}
- html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-pagination__sizes {display:none;}
- html[data-cra1-theme="member"][data-cra1-plugin] .myPage .el-pagination .el-pagination__jump {margin-left:8px;}
+ html[data-cra1-theme="member"] .myPage .el-pagination :is(.el-pager li,.btn-prev,.btn-next) {min-width:44px;min-height:44px;line-height:42px;}
+ html[data-cra1-theme="member"] .myPage .el-pagination .el-input__inner {height:44px!important;}
+ html[data-cra1-theme="member"] .myPage .el-pagination .el-pagination__sizes {display:none;}
+ html[data-cra1-theme="member"] .myPage .el-pagination .el-pagination__jump {margin-left:8px;}
  html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help .main-card .more-btn {min-height:44px;}
  html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card .main-card-content {flex-direction:column;overflow:visible;gap:16px;}
  html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartHelp"] .help-total .main-card :is(.content-left,.contnet-right-out,.content-right) {width:100%;min-width:0;max-width:100%;margin-left:0;box-sizing:border-box;}
@@ -269,3 +269,66 @@ html[data-cra1-theme="cart"] .cart-page .domain-box .domain-content .domain-left
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.main-card.cui-card,.el-card.cui-card) {isolation:auto;}
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.main-card.cui-card,.el-card.cui-card)::before,
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.main-card.cui-card,.el-card.cui-card)::after {content:none;}
+
+/* Native modules retain their rem geometry. Give their text a pixel floor
+   without changing the document rem, icon fonts or modern React pages. */
+/* Plugin list entries can be inserted before the native tree. Reserve their
+   own row so they never consume the tree/table's horizontal space. */
+html[data-cra1-theme="member"] .chinac-cloud-phone-list {flex-wrap:wrap;}
+html[data-cra1-theme="member"] .chinac-cloud-phone-list > .ue-list-entry {flex:0 0 100%;min-width:0;max-width:100%;box-sizing:border-box;}
+html[data-cra1-theme="member"] .chinac-cloud-phone-list > .l-nav {flex:0 0 300px;min-width:0;}
+html[data-cra1-theme="member"] .chinac-cloud-phone-list > .l-nav.isFlod {flex-basis:0;}
+html[data-cra1-theme="member"] .chinac-cloud-phone-list > .r-content {min-width:0;}
+@media (max-width:767px) {
+ html[data-cra1-theme="member"] #product_detail_cloud .top-operation :is(.host-status,.top-area,.city,.country,.name,.ip,.vpc-ip,.base-color,.notes-text,.no-notes) {font-size:13px;line-height:1.6;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-operation :is(.top-renew-btn,.top-renew-btn-disable,.refund-btn,.refund-stop-btn) {display:inline-flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;font-size:14px;line-height:20px;}
+ html[data-cra1-theme="member"] #product_detail_cloud .operation-row1 {flex-wrap:wrap;gap:8px;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-product-name {font-size:18px;line-height:1.5;overflow-wrap:anywhere;}
+ html[data-cra1-theme="member"] #product_detail_cloud .row2-left {min-width:0;max-width:100%;flex-wrap:wrap;gap:6px;}
+ html[data-cra1-theme="member"] #product_detail_cloud .info-box :is(.cpu-box,.memory-box) {font-size:12px;line-height:20px;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg :is(.l-t,.r-t) {flex-wrap:wrap;gap:8px;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg :is(.l-t-l-text,.r-t-l-text) {font-size:18px;line-height:1.5;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg :is(.copy-btn,.r-t-r,.r-t-r>span,.help,.common-cashback) {font-size:12px;line-height:20px;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg .copy-btn {display:inline-flex;align-items:center;min-height:36px;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg .l-b {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg .info-item {display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:auto;min-width:0;margin:0;font-size:14px;line-height:22px;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg :is(.label,.value,.value>span) {font-size:14px;line-height:22px;white-space:normal;overflow-wrap:anywhere;min-width:0;max-width:100%;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg .info-item .label {width:auto;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg .r-b .row {display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-bottom:14px;}
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg .r-b :is(.row-l,.row-r) {width:auto;min-width:0;margin:0;gap:6px;flex-wrap:wrap;}
+ html[data-cra1-theme="member"] :is(#cloudList,.cra1-native-page__content) .main-card-search :is(span,.search-btn):not([class*="icon"]) {font-size:14px;line-height:22px;}
+ html[data-cra1-theme="member"] :is(#cloudList,.cra1-native-page__content) .main-card-search .search-btn {display:inline-flex;align-items:center;justify-content:center;min-height:44px;height:auto;box-sizing:border-box;}
+ html[data-cra1-theme="member"] :is(#cloudList,.cra1-native-page__content) .el-table .cell {font-size:14px;line-height:22px;}
+ html[data-cra1-theme="member"] .file_download :is(.total,.total>span,.file_folder .item,.tag),
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartNews"] .news .tag {font-size:13px;line-height:22px;}
+ html[data-cra1-theme="member"] .file_download .tit {font-size:16px;line-height:24px;}
+ html[data-cra1-theme="member"] .file_download .main-card .main-card-title {font-size:20px;line-height:28px;height:auto;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartSubAccount"] .question-icon {font-size:14px;line-height:22px;min-width:22px;}
+ html[data-cra1-theme="member"][data-cra1-plugin="EContract"] :is(.apply-des,.fingerprint-info,.info-label,.info-value) {font-size:14px;line-height:24px;overflow-wrap:anywhere;}
+ html[data-cra1-theme="member"][data-cra1-plugin="EContract"] .sign-title {font-size:18px;line-height:26px;}
+ html[data-cra1-theme="member"][data-cra1-plugin="IdcsmartInvoice"] .invoice-after :is(.tips,.tips div,.cell) {font-size:14px;line-height:22px;}
+ html[data-cra1-theme="member"] .template.ticket .cra1-ticket-mobile-empty,
+ html[data-cra1-theme="member"] .template.ticket-details :is(.send-btn,.talk-main>.top) {font-size:14px;line-height:22px;}
+ html[data-cra1-theme="cart"] .cart-page .el-checkbox__label,
+ html[data-cra1-theme="cart"] .cl-result-description {font-size:14px;line-height:22px;}
+
+ /* Keep the cloud-phone tree and its existing fold/group actions in normal
+    flow, above the table, instead of reserving a fixed 300px beside it. */
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list {flex-direction:column;gap:16px;min-width:0;max-width:100%;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list > .ue-list-entry {flex:none;width:100%;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list .l-nav {position:static;width:100%;height:auto;max-width:100%;flex:none;border-right:0;border-bottom:1px solid var(--cui-line);box-sizing:border-box;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list .l-nav.isFlod {display:none;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list .l-nav .opt {flex-wrap:wrap;gap:8px;padding:8px 0;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list .l-nav .opt .icon {display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;margin:0;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list .l-nav .group-search {flex:1 1 100%;width:100%;min-width:0;margin:0;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list .l-group {max-height:280px;overflow-y:auto;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list .r-content {width:100%;min-width:0;max-width:100%;padding-left:0;flex:auto;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list .r-content .flod {position:static;left:auto;top:auto;width:44px;height:44px;margin:0 0 8px;border-radius:8px;box-shadow:none;border:1px solid var(--cui-line);box-sizing:border-box;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list :is(.com-top-tit,.com-top-opt) {flex-wrap:wrap;gap:8px;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list .com-top-opt .btns {gap:8px;margin:0;}
+ html[data-cra1-theme="member"] .chinac-cloud-phone-list .com-top-opt .el-button {min-height:44px;height:auto;line-height:22px;padding-top:10px;padding-bottom:10px;}
+ html[data-cra1-theme="member"] .chinac-phone-sync .com-top-opt span {font-size:14px;line-height:22px;}
+}
+@media (max-width:359px) {
+ html[data-cra1-theme="member"] #product_detail_cloud .top-msg .l-b {grid-template-columns:minmax(0,1fr);}
+}

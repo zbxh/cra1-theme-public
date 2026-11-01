@@ -591,19 +591,19 @@ function RowsField({ field, value, onChange, config }) {
               className={dragRowClass({ isDragging: drag.isDragging(i), isOver: drag.isOver(i) })}
             >
               <DragHandle {...drag.handleProps(i, '拖拽排序：' + titleOf(it))} />
-              <div className="flex min-w-0 flex-1 items-center gap-1.5">{(it.row.image||it.row.img)&&<img src={it.row.image||it.row.img} alt="" className="h-10 w-14 shrink-0 rounded object-cover"/>}
+              <div className="cra1-row-content flex min-w-0 flex-1 items-center gap-1.5">{(it.row.image||it.row.img)&&<img src={it.row.image||it.row.img} alt="" className="h-10 w-14 shrink-0 rounded object-cover"/>}
                 <span className={cn('truncate text-[13px]', it.hidden ? 'text-muted-foreground line-through opacity-60' : 'text-ink')}>
                   {it.child ? '└ ' : ''}{titleOf(it)}
                 </span>
                 {subtitleOf(it) && (
-                  <span className="hidden shrink-0 truncate text-[11px] text-muted-foreground sm:block">
+                  <span className="cra1-row-secondary hidden shrink-0 truncate text-[11px] text-muted-foreground sm:block">
                     {subtitleOf(it)}
                   </span>
                 )}
               </div>
               {drag.isOver(i) && <DropBadge pos={drag.dropPos} />}
               {it.hidden && <Badge tone="muted">隐藏</Badge>}
-              <div className="flex shrink-0 items-center gap-0.5">
+              <div className="cra1-row-actions flex shrink-0 items-center gap-0.5">
                 {!field.visual?.dragOnly && <><RowIconBtn label="条目上移" disabled={i===0} onClick={()=>move(i,i-1)}><ArrowUp className="size-3.5"/></RowIconBtn><RowIconBtn label="条目下移" disabled={i===list.length-1} onClick={()=>move(i,i+1)}><ArrowDown className="size-3.5"/></RowIconBtn></>}<RowIconBtn label="编辑" onClick={() => setEditing({ index: i, ...it })}>
                   <Pencil className="size-3.5" />
                 </RowIconBtn>

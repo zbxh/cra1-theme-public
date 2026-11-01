@@ -22,8 +22,18 @@ final class CRA1ThemeCompatibility
         if (preg_match('~^/host/([1-9][0-9]*)/app-preset-task/([1-9][0-9]*)/log$~D',$path,$m)) return '/mf_cloud/'.$m[1].'/app_preset_task/'.$m[2].'/log';
         return '';
     }
-    public static function host(array $data): array
+    public static function host(array $data, ?callable $module = null): array
     {
+        // Native /host/:id has already applied member and ownership checks.
+        // Resolve the registered module locally instead of probing unrelated APIs.
+        if (!empty($data['host']['id'])) {
+            $resolve = $module ?? static function (int $id): string {
+                $host = \app\common\model\HostModel::where('id', $id)
+                    ->where('client_id', get_client_id(false))->where('is_delete', 0)->find();
+                return $host ? (string)$host->getModule() : '';
+            };
+            $data['host']['module'] = $resolve((int)$data['host']['id']);
+        }
         $fields = [];
         foreach (($data['self_defined_field'] ?? []) as $f) {
             if (!is_array($f)) continue;

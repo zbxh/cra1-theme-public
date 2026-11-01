@@ -20,6 +20,13 @@
   .bg-brand-8 { background:rgb(37 99 235 / .08); }
   .bg-danger-8 { background:rgb(220 38 38 / .08); }
 }
+/* These names are also used by Radix Presence when unmounting portals. Keep
+   them in the admin bundle rather than relying on the member stylesheet. */
+@keyframes cra1-fade-in { from { opacity:0; } to { opacity:1; } }
+@keyframes cra1-fade-out { from { opacity:1; } to { opacity:0; } }
+@keyframes cra1-dialog-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@keyframes cra1-pop-in { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+@keyframes cra1-toast-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 html,body,#cra1-admin-root { min-height:100%; }
 body { margin:0; color:var(--foreground); background:#fff; font:14px/1.5 Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
 button,a,input,select,textarea { -webkit-tap-highlight-color:transparent; }
@@ -106,3 +113,19 @@ button:disabled { cursor:not-allowed; }
 /* Shared tree lists adapt to narrow editor columns as well as phone screens. */
 .tree-editor{container-type:inline-size}
 @container(max-width:600px){.tree-editor-row{height:auto;min-height:44px;flex-wrap:wrap;row-gap:4px;padding-top:4px;padding-bottom:4px;padding-left:8px!important}.tree-editor-row~ul{margin-left:12px!important}.tree-editor-controls{flex-basis:100%;justify-content:flex-end}.tree-editor-heading,.tree-editor-meta,.tree-editor-leaf-space{display:none}}
+/* Keep titles readable without shrinking touch targets in narrow editor columns. */
+.cra1-sort-list,.cra1-product-entries{container-type:inline-size}
+@container(max-width:600px){
+  .cra1-flat-row:has(>.cra1-row-actions){height:auto;min-height:44px;flex-wrap:wrap;row-gap:4px;padding-block:6px}
+  .cra1-flat-row>.cra1-row-content{flex:1 1 calc(100% - 60px);min-width:0}
+  .cra1-flat-row>.cra1-row-actions{flex:1 0 100%;flex-wrap:wrap;justify-content:flex-end}
+  .cra1-flat-row .cra1-row-secondary{display:none}
+  .cra1-product-entry{display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 8px;padding:6px 8px}
+  .cra1-product-entry-label{grid-column:2;overflow-wrap:anywhere}
+  .cra1-product-entry-actions{grid-column:2;flex-wrap:wrap;justify-content:flex-end}
+  .cra1-product-branch-icon,.cra1-product-leaf-space{display:none}
+  .cra1-product-leaf-icon{justify-self:center}
+  .cra1-product-children{margin-left:12px}
+  .cra1-product-default{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:12px}
+  .cra1-product-default>:first-child{grid-column:1/-1;justify-self:start}
+}

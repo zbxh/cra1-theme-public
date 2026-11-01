@@ -67,7 +67,7 @@ const topMenu = {
     <div ref="supportRoot" class="cra1-header-support" @click.stop></div>
     <a href="/document.html" class="cra1-header-docs" @click.prevent="go('/document.html')">文档</a>
     <!-- 购物车 -->
-    <button v-if="isShowCart && appearance.show_cart !== 0" type="button" class="cra1-header__icon-btn" aria-label="购物车"
+    <button v-if="isShowCart && appearance.show_cart !== 0" type="button" class="cra1-header__icon-btn cra1-header__cart" aria-label="购物车"
             @click="goShoppingCar">
       <span class="cra1-header-glyph" v-html="headerIcon('cart')"></span>
       <span v-if="shoppingCarNum > 0" class="cra1-header__badge">{{ shoppingCarNum > 999 ? '999+' : shoppingCarNum }}</span>
@@ -120,7 +120,7 @@ const topMenu = {
     <button v-if="unLogin && isGetData" type="button" class="cra1-header__login" @click="goLogin">登录 / 注册</button>
 
     <!-- Structure, avatar and popover are rendered by the shared framework-neutral component. -->
-    <div v-else-if="isGetData" ref="accountRoot" class="cra1-account cra1-account--header" @click.stop></div>
+    <div v-if="isGetData" ref="accountRoot" class="cra1-account cra1-account--header cra1-account--mobile-actions" :class="{'cra1-account--guest': unLogin}" @click.stop></div>
 
     <!-- 可选子组件：仅当页面已注册时才渲染，避免插件页缺注册时报未知组件 -->
     <component v-if="childComponents.coinActive" :is="'coin-active'" ref="coinActive" v-plugin="['Coin', 'PresaleConsult']"></component>
@@ -236,6 +236,7 @@ const topMenu = {
   watch: {
     unLogin() {
       if (this._headerSearch) this._headerSearch.refresh()
+      this.ensureMessageCount()
     },
     accountOpen(value) { if (this._accountPopover) this._accountPopover.setOpen(value) },
   },
@@ -256,6 +257,7 @@ const topMenu = {
     window.addEventListener('cra1:member-content', this.onMemberContent)
     window.addEventListener('cra1:avatar-updated', this.onAvatarUpdated)
     window.addEventListener('cra1:avatar-refresh', this.onAvatarRefresh)
+    window.addEventListener('cra1:feature-flags', this.onHeaderFeatures)
   },
   mounted() {
     this._notices = CRA1Shared.Notices.mount(this.$refs.noticeHost, {theme: location.pathname.startsWith('/cart/') ? 'cart' : 'member'})
@@ -284,6 +286,8 @@ const topMenu = {
     window.removeEventListener('cra1:member-content', this.onMemberContent)
     window.removeEventListener('cra1:avatar-updated', this.onAvatarUpdated)
     window.removeEventListener('cra1:avatar-refresh', this.onAvatarRefresh)
+    window.removeEventListener('cra1:feature-flags', this.onHeaderFeatures)
+    this._messageGeneration = (this._messageGeneration || 0) + 1
     window.removeEventListener('cra1:aside-state', this.onNavState)
     if (this._notices) this._notices.destroy()
   },
@@ -315,13 +319,39 @@ const topMenu = {
         if (this._accountPopover) { this._accountPopover.destroy(); this._accountPopover = null }
         this._accountRoot = host
         if (host) this._accountPopover = CRA1Shared.HeaderActions.mountAccount(host, {
-          getUser: () => this.accountData,
-          onNavigate: (url) => this.go(url), onLogout: () => this.logOut(),
+          getUser: () => this.unLogin ? null : this.accountData,
+          getMobileActions: () => this.mobileAccountActions(),
+          onNavigate: (url) => url === '/login.htm' ? this.goLogin() : this.go(url), onLogout: () => this.logOut(),
+          onLanguage: (lang) => this.changeLang(lang),
           beforeOpen: () => { this.closeSearch(false); this.msgPanelOpen = false; this.langOpen = false },
           onOpenChange: (value) => { this.accountOpen = value },
         })
       }
       if (this._accountPopover) this._accountPopover.update()
+    },
+    mobileAccountActions() {
+      const messages = !this.unLogin && this.appearance.show_message !== 0 && window.__CRA1_RUNTIME__?.features?.client_care
+      return {
+        message: messages ? {href: CRA1Shared.Runtime.link('client_care'), count: this.msgCount} : null,
+        cart: this.isShowCart && this.appearance.show_cart !== 0 ? {href: '/cart/shoppingCar.htm', count: this.shoppingCarNum} : null,
+        support: this.commonData.theme_header_support,
+        languages: this.appearance.show_language !== 0 ? this.commonData.lang_list : [],
+        language: this.seletcLang,
+      }
+    },
+    ensureMessageCount() {
+      if (this.unLogin || this.appearance.show_message === 0 || !window.__CRA1_RUNTIME__?.features?.client_care) {
+        this._messageGeneration = (this._messageGeneration || 0) + 1
+        this._messageLoaded = false
+        this._messageFlight = null
+        this.msgList = []; this.msgCount = 0; this.msgPanelOpen = false
+        return
+      }
+      if (!this._messageLoaded) this.getMessageList()
+    },
+    onHeaderFeatures() {
+      this.ensureMessageCount()
+      this.$nextTick(() => { if (this._accountPopover) this._accountPopover.update() })
     },
     onAvatarUpdated(e) {
       if (this.accountData && String(this.accountData.id) === String(e.detail.id)) {
@@ -337,7 +367,7 @@ const topMenu = {
     toggleAccount() { this.mountAccountPopover(); if (this._accountPopover) this._accountPopover.toggle() },
     onMemberContent(e) {
       this.appearance=e.detail?.appearance || {show_cart:0,show_language:0,show_message:0}
-      if(this.appearance.show_message===0){this.msgList=[];this.msgCount=0;this.msgPanelOpen=false}
+      this.ensureMessageCount()
     },
     closePopovers() {
       this.closeSearch(false)
@@ -442,7 +472,7 @@ const topMenu = {
       getMenu().then(() => {
         accountDetail()
           .then((res) => {
-            if (res.data.status !== 200) return
+            if (res.data.status !== 200) { this.unLogin = true; this.isGetData = true; return }
             const acc = res.data.data.account || {}
             this.accountData = acc
             CRA1Shared.Avatar.register(acc)
@@ -464,13 +494,18 @@ const topMenu = {
     },
     // account.js 通过 $refs.topMenuRef.getMessageList() 调用，必须保留
     getMessageList() {
-      if (this.appearance.show_message===0 || !window.__CRA1_RUNTIME__?.features?.client_care) return
-      messageInfo().then((res) => {
-        if (res.data.status === 200) {
+      if (this.unLogin || this.appearance.show_message === 0 || !window.__CRA1_RUNTIME__?.features?.client_care) return Promise.resolve()
+      if (this._messageFlight) return this._messageFlight
+      const generation = this._messageGeneration || 0
+      const flight = messageInfo().then((res) => {
+        if (generation === (this._messageGeneration || 0) && res.data.status === 200) {
           this.msgList = res.data.data.list || []
-          this.msgCount = res.data.data.count || 0
+          this.msgCount = Math.max(0, Number(res.data.data.count) || 0)
+          this._messageLoaded = true
         }
-      }).catch(() => {})
+      }).catch(() => {}).finally(() => { if (this._messageFlight === flight) this._messageFlight = null })
+      this._messageFlight = flight
+      return flight
     },
     changeLang(lang) {
       this.seletcLang = lang

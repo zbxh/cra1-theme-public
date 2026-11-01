@@ -27,11 +27,11 @@ function Highlights({ items, onChange }) {
     <p className="text-xs text-muted-foreground">最多 6 条。拖动手柄排序，也可聚焦手柄后按空格和方向键调整。</p>
     {items.length ? <ul className={DRAG_LIST_BASE}>{items.map((item, i) => <li key={item.id} draggable {...drag.itemProps(i)} className={dragRowClass({isDragging: drag.isDragging(i), isOver: drag.isOver(i)})}>
       <DragHandle {...drag.handleProps(i, '拖拽排序：' + (item.title || '未命名条目'))}/>
-      <span className="min-w-0 flex-1 truncate text-sm">{item.title || item.description || '未命名条目'}</span>
+      <span className="cra1-row-content min-w-0 flex-1 truncate text-sm">{item.title || item.description || '未命名条目'}</span>
       {!Number(item.enabled) && <Badge tone="muted">隐藏</Badge>}{drag.isOver(i) && <DropBadge pos={drag.dropPos}/>}
-      <RowIconBtn label={'编辑：' + (item.title || '条目')} onClick={() => setEditing({...item})}><Pencil className="size-3.5"/></RowIconBtn>
+      <div className="cra1-row-actions flex shrink-0 items-center gap-0.5"><RowIconBtn label={'编辑：' + (item.title || '条目')} onClick={() => setEditing({...item})}><Pencil className="size-3.5"/></RowIconBtn>
       <RowIconBtn label={(Number(item.enabled) ? '隐藏：' : '显示：') + (item.title || '条目')} onClick={() => onChange(items.map(x => x.id === item.id ? {...x, enabled: Number(x.enabled) ? 0 : 1} : x))}><Power className="size-3.5"/></RowIconBtn>
-      <RowIconBtn label={'删除：' + (item.title || '条目')} danger onClick={() => onChange(items.filter(x => x.id !== item.id))}><Trash2 className="size-3.5"/></RowIconBtn>
+      <RowIconBtn label={'删除：' + (item.title || '条目')} danger onClick={() => onChange(items.filter(x => x.id !== item.id))}><Trash2 className="size-3.5"/></RowIconBtn></div>
     </li>)}</ul> : <p className="rounded-lg border border-dashed border-line p-4 text-sm text-muted-foreground">尚未添加介绍条目。</p>}
     <DragAnnouncer message={announcement}/>
     <Dialog open={!!editing} onOpenChange={open => !open && setEditing(null)}><DialogContent><DialogHeader><DialogTitle>编辑介绍条目</DialogTitle><DialogDescription>应用到当前页草稿，保存页面后生效。</DialogDescription></DialogHeader>{editing && <form className="space-y-4" onSubmit={e => {e.preventDefault(); onChange(items.some(x => x.id === editing.id) ? items.map(x => x.id === editing.id ? editing : x) : [...items, editing]); setEditing(null)}}>

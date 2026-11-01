@@ -184,17 +184,13 @@ export const createServerApi = (module, hostId, signal, transport) => {
   }
 }
 
-/** 探测产品属于哪个云模块：先 mf_cloud 后 mf_dcim；都不中返回 null（走 ModuleView 回退） */
-export async function detectServerModule(hostId) {
-  const candidates = ['mf_cloud', 'mf_dcim']
-  for (const m of candidates) {
-    try {
-      const res = await baseGet(`/${m}/${hostId}`)
-      const d = res.data
-      if (d && (d.id || d.ip !== undefined || d.data_center)) return { module: m, detail: d }
-    } catch (e) {
-      // 404/非本模块产品：继续探测
-    }
-  }
-  return null
+/** Read only the registered module; unrelated products must never probe cloud APIs. */
+export async function detectServerModule(hostId, host, read = baseGet) {
+  const value = host || (await read(`/theme/host/${hostId}`)).data?.host
+  const module = value?.module
+  if (!['mf_cloud', 'mf_dcim'].includes(module)) return null
+  const response = await read(`/${module}/${hostId}`)
+  const detail = response.data
+  if (!detail || !(detail.id || detail.ip !== undefined || detail.data_center)) throw new Error('页面错误，请刷新重试')
+  return { module, detail }
 }

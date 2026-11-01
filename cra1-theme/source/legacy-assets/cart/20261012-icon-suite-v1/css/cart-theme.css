@@ -417,6 +417,25 @@
   font-size: 15px;
 }
 
+.cart-page .cl-rail-status {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 22px;
+  color: var(--muted-foreground);
+}
+
+.cart-page .cl-rail-price-pending {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.cart-page .cl-rail-dock > .cl-rail-status {
+  flex: 0 0 100%;
+  margin: 0;
+  font-size: 12px;
+}
+
 .cart-page .cl-rail-empty {
   padding: 18px 4px 6px;
   font-size: 13px;
@@ -495,6 +514,7 @@
 @media (max-width: 1024px) {
   .cart-page .cl-rail-dock {
     position: fixed;
+    flex-wrap: wrap;
     bottom: 0;
     left: 0;
     right: 0;
@@ -2283,8 +2303,9 @@
 }
 
 /* ==========================================================================
-   v12 手机端：产品型号卡片横向滑动（无滚动条）
+   手机端：产品型号卡片横向滑动
    ========================================================================== */
+.cart-page .cl-goods-scroll-hint { display: none; }
 @media (max-width: 768px) {
   .cart-page .cl-goods-grid,
   .cart-page .cl-goods-grid[style*="--cart-cols"] {
@@ -2304,7 +2325,15 @@
 
   .cart-page .cl-goods-grid .cl-goods-card {
     flex: 0 0 auto;
-    width: 250px;
+    width: min(250px, 100%);
+  }
+
+  .cart-page .cl-goods-scroll-hint {
+    display: block;
+    margin: 6px 0 0;
+    color: var(--text-muted, #6b7280);
+    font-size: 12px;
+    line-height: 20px;
   }
 
   /* 骨架屏同形态 */
@@ -2322,7 +2351,7 @@
 
   .cart-page .cl-skeleton .cl-skel-card {
     flex: 0 0 auto;
-    width: 250px;
+    width: min(250px, 100%);
   }
 }
 
@@ -2437,6 +2466,9 @@
 
 @media (max-width: 768px) {
   /* dock 纵向堆叠：明细(绝对定位) + 时长/数量行 + 优惠码行 + 价格/按钮行 */
+  .cart-page .cl-rail-dock > .cl-rail-status {
+    flex-basis: auto;
+  }
   .cart-page .cl-rail-dock {
     flex-direction: column;
     align-items: stretch;

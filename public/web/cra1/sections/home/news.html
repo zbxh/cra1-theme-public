@@ -19,7 +19,7 @@
                         <template x-for="(n, i) in notices" :key="n.id">
                             <li class="border-t border-line first:border-t-0" :class="i === 0 ? 'py-4' : ''">
                                 <a :href="'/announce-details.html?id=' + n.id" class="flex items-center justify-between gap-4" :class="i === 0 ? '' : 'py-3'">
-                                    <span class="min-w-0">
+                                    <span class="min-w-0 flex-1">
                                         <span class="block truncate" :class="i === 0 ? 'text-base font-semibold text-ink' : 'text-sm text-body'" x-text="n.title"></span>
                                         <span class="mt-1 block text-xs leading-5 text-body line-clamp-1" x-show="i === 0 && n.description" x-text="n.description || ''"></span>
                                     </span>
@@ -38,7 +38,7 @@
                         <template x-for="(n, i) in news" :key="n.id">
                             <li class="border-t border-line first:border-t-0">
                                 <a :href="'/news-details.html?id=' + n.id" class="flex items-center justify-between gap-4 py-3">
-                                    <span class="truncate text-sm" :class="i === 0 ? 'font-medium text-ink' : 'text-body'" x-text="n.title"></span>
+                                    <span class="min-w-0 flex-1 truncate text-sm" :class="i === 0 ? 'font-medium text-ink' : 'text-body'" x-text="n.title"></span>
                                     <time class="shrink-0 text-xs text-muted" x-text="timeText(n.create_time)"></time>
                                 </a>
                             </li>

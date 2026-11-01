@@ -24,7 +24,7 @@ export const DRAG_ROW_BASE =
   'group flex h-10 items-center gap-2 border-b border-line/60 px-3 transition-colors duration-150 last:border-b-0'
 
 /** 拖拽列表容器（与侧边栏所在卡片同构：一个描边圆角容器包住全部行） */
-export const DRAG_LIST_BASE = 'overflow-hidden rounded-lg border border-line bg-surface'
+export const DRAG_LIST_BASE = 'cra1-sort-list overflow-hidden rounded-lg border border-line bg-surface'
 
 /** 行内操作图标按钮（与侧边栏操作列同一套视觉）
  *
@@ -49,7 +49,7 @@ export function RowIconBtn({ children, label, onClick, danger, disabled }) {
 
 /** 行状态 class：落点浅底 + 拖动中半透明 */
 export function dragRowClass({ isDragging, isOver, className } = {}) {
-  return cn(DRAG_ROW_BASE, isOver && 'bg-brand/5', isDragging && 'opacity-50', className)
+  return cn(DRAG_ROW_BASE, 'cra1-flat-row', isOver && 'bg-brand/5', isDragging && 'opacity-50', className)
 }
 
 /** 落点位置徽章（插到前面 / 插到后面 / 作为子级） */

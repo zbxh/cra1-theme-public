@@ -73,6 +73,48 @@ try{
   }
  }
  await contact.close()
+ const details=await fixture('member','<div class="cra1-native-page__content"><div class="template" id="product_detail_cloud"><div class="main-card"><div class="card-top"><div class="top-operation"><div class="operation-row1"><span class="top-product-name">云服务器</span><div class="host-status Active">正常</div></div><div class="operation-row2"><div class="row2-left"><span class="name">server-example</span></div></div></div><div class="top-msg"><div class="msg-l"><div class="l-t"><span class="l-t-l-text">配置信息</span><span class="copy-btn">复制登录信息</span></div><div class="l-b"><div class="info-item"><div class="label">CPU:</div><div class="value">4核</div></div><div class="info-item"><div class="label">操作系统:</div><div class="value"><span>Debian-12.0_x64</span></div></div></div></div><div class="msg-r"><div class="r-b"><div class="row"><div class="row-l"><div class="label">到期时间:</div><div class="value">2026-12-12 16:50:00</div></div><div class="row-r"><div class="label">价格:</div><div class="value">￥123.45</div></div></div></div></div></div></div></div></div></div>', ['public/cra1-shared/src/tokens.css','public/cra1-shared/theme-sources/member/cra1-shell.css','public/cra1-shared/src/adapters.css'])
+ await details.addStyleTag({content:fs.readFileSync(path.join(native,'public/plugins/server/mf_cloud/template/clientarea/pc/default/css/cloudTop.css'),'utf8')})
+ for(const width of [320,390,767]){
+  await details.setViewportSize({width,height:900});await details.addStyleTag({content:`html{font-size:${width/7.5}px}`})
+  check(await details.locator('.host-status').evaluate(e=>parseFloat(getComputedStyle(e).fontSize)>=12),`native server status remains readable at ${width}`)
+  check(await details.locator('.top-msg .label,.top-msg .value,.copy-btn').evaluateAll(es=>es.every(e=>parseFloat(getComputedStyle(e).fontSize)>=12)),`native configuration and copy action are readable at ${width}`)
+  check(await details.locator('.info-item .label').evaluateAll(es=>es.every(e=>e.getBoundingClientRect().height<=23)),`native configuration labels stay on one line at ${width}`)
+  check(await details.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`native server summary stays within ${width}`)
+  check(await details.locator('.info-item').evaluateAll(es=>es.every(e=>e.scrollWidth<=e.clientWidth+1)),`native long configuration values wrap at ${width}`)
+ }
+ await details.close()
+ const phones=await fixture('member','<div id="app" class="chinac-cloud-phone-list"><div class="l-nav" :class="{isFlod:folded}"><div class="opt"><div class="icon">＋</div><div class="icon">✓</div><div class="icon">▦</div><div class="icon">↻</div><el-input class="group-search" placeholder="ID/名称"></el-input></div><div class="l-group">默认分组</div></div><div class="r-content"><div class="com-top-opt"><div class="btns"><el-button>升降级</el-button><el-button>续费</el-button><el-button>同步操作</el-button></div><el-dropdown><el-button>更多</el-button><el-dropdown-menu slot="dropdown"><el-dropdown-item>查看详情</el-dropdown-item></el-dropdown-menu></el-dropdown></div><el-table :data="rows"><el-table-column prop="name" label="名称" min-width="500"></el-table-column><el-table-column prop="status" label="状态" min-width="400"></el-table-column></el-table><div class="flod" :class="{isFlod:folded}" @click="folded=!folded" role="button" aria-label="折叠分组">⇆</div></div></div>', ['public/cra1-shared/src/tokens.css','public/cra1-shared/src/adapters.css'])
+ await phones.addStyleTag({content:fs.readFileSync(path.join(native,'public/plugins/server/chinac_cloud_phone/template/clientarea/pc/default/css/chinac_cloud_phone_list.css'),'utf8')})
+ await phones.addStyleTag({content:reference('theme/default/element-ui.css')})
+ await phones.evaluate(()=>new Vue({el:'#app',data:{folded:false,rows:[{name:'测试云手机',status:'已关机'}]}}))
+ for(const width of [390,320,768,1440,390]){
+  await phones.setViewportSize({width,height:900});await phones.waitForTimeout(80)
+  const phoneBounds=await phones.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,outside:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>innerWidth+1&&!e.closest('.el-table__body-wrapper,.el-table__header-wrapper')}).slice(0,8).map(e=>({tag:e.tagName,class:e.className,width:e.getBoundingClientRect().width,right:e.getBoundingClientRect().right}))}))
+  check(phoneBounds.scroll<=width+1,`cloud phone list does not widen page at ${width}: ${JSON.stringify(phoneBounds)}`)
+  const layout=await phones.locator('#app').evaluate(e=>({nav:e.querySelector('.l-nav').getBoundingClientRect().toJSON(),content:e.querySelector('.r-content').getBoundingClientRect().toJSON()}))
+  check(width<768?layout.nav.bottom<=layout.content.top+1:layout.nav.right<=layout.content.left+1,`cloud phone tree uses the appropriate layout at ${width}`)
+  if(width<768){
+   await phones.getByRole('button',{name:'折叠分组'}).click();check(!await phones.locator('.l-nav').isVisible(),`phone tree folds at ${width}`)
+   await phones.getByRole('button',{name:'折叠分组'}).click();check(await phones.locator('.l-nav').isVisible(),`phone tree reopens at ${width}`)
+   check(await phones.locator('.el-table__body-wrapper').evaluate(e=>e.scrollWidth>e.clientWidth),`wide cloud phone columns scroll inside table at ${width}`)
+  }
+ }
+ await phones.close()
+ // Installed list plugins can prepend an entry to the flex-based native card.
+ // Keep the additional entry on a separate row at both desktop and mobile sizes.
+ const entryPhones=await fixture('member','<div id="app" class="chinac-cloud-phone-list"><div class="ue-list-entry"><span>选择服务器后统一续费日期，可先查看差价。</span><button>统一到期日期</button></div><div class="l-nav" :class="{isFlod:folded}">分组</div><div class="r-content"><el-table :data="rows"><el-table-column prop="name" label="名称" min-width="500"></el-table-column></el-table><button @click="folded=!folded" aria-label="折叠分组">折叠分组</button></div></div>', ['public/cra1-shared/src/tokens.css','public/cra1-shared/src/adapters.css'])
+ await entryPhones.addStyleTag({content:fs.readFileSync(path.join(native,'public/plugins/server/chinac_cloud_phone/template/clientarea/pc/default/css/chinac_cloud_phone_list.css'),'utf8')})
+ await entryPhones.addStyleTag({content:reference('theme/default/element-ui.css')+'\n.ue-list-entry{display:flex;justify-content:space-between;align-items:center;padding:16px;background:#f9fafb;gap:16px;flex-wrap:wrap}'})
+ await entryPhones.evaluate(()=>new Vue({el:'#app',data:{folded:false,rows:[{name:'测试云手机'}]}}))
+ for(const width of[320,390,768,1440]){
+  await entryPhones.setViewportSize({width,height:900});await entryPhones.waitForTimeout(80)
+  check(await entryPhones.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`plugin list entry does not widen cloud phone page at ${width}`)
+  check(await entryPhones.locator('.chinac-cloud-phone-list').evaluate(e=>{const entry=e.querySelector('.ue-list-entry').getBoundingClientRect(),nav=e.querySelector('.l-nav').getBoundingClientRect(),content=e.querySelector('.r-content').getBoundingClientRect();return entry.bottom<=nav.top+1&&entry.bottom<=content.top+1&&content.width>=innerWidth/3}),`plugin entry stays above usable cloud phone tree and table at ${width}`)
+  await entryPhones.getByRole('button',{name:'折叠分组'}).click();await entryPhones.waitForFunction(()=>{const e=document.querySelector('.l-nav');return getComputedStyle(e).display==='none'||e.getBoundingClientRect().width<=1});check(true,`cloud phone tree folds with plugin entry at ${width}`)
+  await entryPhones.getByRole('button',{name:'折叠分组'}).click();await entryPhones.waitForFunction(()=>document.querySelector('.l-nav').getBoundingClientRect().width>1)
+ }
+ await entryPhones.close()
  assert.deepEqual(errors,[],'no browser errors')
  console.log(JSON.stringify({status:'passed',checks:checks.length,errors}))
 }finally{await browser.close()}

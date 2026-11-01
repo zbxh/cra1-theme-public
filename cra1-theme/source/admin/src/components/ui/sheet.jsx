@@ -19,6 +19,7 @@ export function SheetContent({ className, children, side = 'left', onOpenAutoFoc
         className={cn(
           'fixed inset-0 z-[100] bg-black/50',
           'data-[state=open]:animate-[cra1-fade-in_180ms_ease-out]',
+          'data-[state=closed]:hidden',
           'data-[state=closed]:animate-[cra1-fade-out_140ms_ease-out]'
         )}
       />

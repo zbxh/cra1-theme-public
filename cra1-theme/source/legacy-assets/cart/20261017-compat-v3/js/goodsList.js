@@ -143,6 +143,8 @@
         dockDetailOpen: false,
         couponOpen: false,   // idle | bridged | fallback
           railLoading: false,
+          railAvailability: "loading",
+          railDurationRequired: true,
           railDurations: [],
           railDurationId: 0,
           railQty: { allow: false, min: 1, max: 999, cur: 1 },
@@ -281,6 +283,10 @@
         },
       },
       computed: {
+        railStatusText() {
+          if (this.railAvailability === "unavailable") return "暂未获取到可用订购周期，请刷新页面或选择其他商品。";
+          return this.railDurationRequired && !this.railDurations.length ? "正在加载订购周期…" : "正在计算配置费用…";
+        },
         // 当前类型：'normal' | 'domain' | 'ssl'
         currentType() {
           const type = this.select_second_obj.type;
@@ -1575,7 +1581,10 @@
           this.configErrorText = "";
           // v6：重置价格计算器桥接状态（等壳侧 rail-data）
           this.railState = "idle";
-          this.railLoading = false;
+          this.railLoading = true;
+          this.railAvailability = "loading";
+          this.railDurationRequired = true;
+          this.railPrice = { currency: "", suffix: "", calcText: "", originText: "", hasDiscount: false };
           this.railCoupon = "";
           this.railDurations = [];
           this.railDurationId = 0;
@@ -1761,9 +1770,15 @@
         },
         /* ---- 价格计算器（v6）：父侧状态与方法 ---- */
         applyRailData(p) {
-          if (Array.isArray(p.durations) && p.durations.length) this.railDurations = p.durations;
+          this.railAvailability = p.availability || "ready";
+          this.railLoading = this.railAvailability !== "ready";
+          this.railDurationRequired = p.durationRequired !== false;
+          if (Array.isArray(p.durations)) this.railDurations = p.durations;
           if (p.current !== undefined && p.current !== null) {
-            this.railDurationId = Number(p.current) || (this.railDurations[0] && this.railDurations[0].id) || 0;
+            const duration = this.railDurations.find(d => String(d.id) === String(p.current));
+            this.railDurationId = duration ? duration.id : "";
+          } else {
+            this.railDurationId = "";
           }
           if (p.qty) this.railQty = {
             allow: !!p.qty.allow,
@@ -1840,6 +1855,7 @@
           this.railPost("rail-set", { field: "coupon", value: code });
         },
         railAddCart() {
+          if (this.railLoading || this.railAvailability !== "ready") return;
           if (this.isMobileCart && !this.mobileNativeFrame) {
             this.railLoading = true;
             try { this.railVM.handlerCart(); } catch (e) { }
@@ -1867,6 +1883,7 @@
           this.railAddTimer = setTimeout(() => { this.railLoading = false; }, 6000);
         },
         railBuyNow() {
+          if (this.railLoading || this.railAvailability !== "ready") return;
           if (this.isMobileCart && !this.mobileNativeFrame) {
             this.railLoading = true;
             try {
@@ -1882,6 +1899,7 @@
           this.railBuyTimer = setTimeout(() => { this.railLoading = false; }, 6000);
         },
         railPrimaryAction() {
+          if (this.railLoading || this.railAvailability !== "ready") return;
           if (!this.isEditingCartItem) { this.railBuyNow(); return; }
           this.railLoading = true;
           if (this.isMobileCart && !this.mobileNativeFrame) {
@@ -1993,6 +2011,9 @@
           const vm = this.railVM;
           if (!vm || this.railState !== "bridged") return;
           this.applyRailData({
+            availability: Array.isArray(vm.cycleList) && vm.cycleList.some(d => String(d.id) === String(vm.params?.duration_id))
+              && vm.calcTotalPrice !== "" && vm.calcTotalPrice != null && Number.isFinite(Number(vm.calcTotalPrice))
+              && !vm.loadingPrice ? "ready" : "loading",
             durations: vm.cycleList || [],
             current: vm.params ? vm.params.duration_id : "",
             qty: {
@@ -2068,8 +2089,20 @@
             this.selectSecondType(spg);
           }
         },
+        // Move only the horizontal model strip; never scroll the page or config panel.
+        scrollSelectedProduct() {
+          const grid = this.$refs.goodsGrid;
+          if (!grid || !window.matchMedia("(max-width: 768px)").matches) return;
+          const card = grid.querySelector('.cl-goods-card[aria-selected="true"]');
+          if (!card || grid.scrollWidth <= grid.clientWidth) return;
+          const strip = grid.getBoundingClientRect(), selected = card.getBoundingClientRect();
+          const left = strip.left + grid.clientLeft, right = left + grid.clientWidth;
+          if (selected.left < left) grid.scrollLeft += selected.left - left;
+          else if (selected.right > right) grid.scrollLeft += selected.right - right;
+        },
         handleViewportChange() {
           this.$data.__viewportW = window.innerWidth;
+          this.$nextTick(() => this.scrollSelectedProduct());
         },
         /* ================= 融合页结束 ================= */
         // 滚动计算
@@ -2094,6 +2127,7 @@
       beforeDestroy() { ++this.mobileLoadSeq; this.disposeMobileConfig(); },
       watch: {
         selectedProductId(pid) {
+          this.$nextTick(() => this.scrollSelectedProduct());
           /* v12 手机档：选中商品即直渲染进父页（含深链默认选中与卡片切换） */
           if (this.isMobileCart) {
             if (pid) this.loadMobileConfig();

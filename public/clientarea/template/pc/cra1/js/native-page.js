@@ -1,6 +1,44 @@
 /* Add navigation around a native module without remounting its business view. */
 (function (root) {
   'use strict';
+  function groupPluginAction(content) {
+    if (!/^\/module\/(?:mf_cloud|mf_dcim)\/product_detail\.htm$/.test(root.location.pathname)) return;
+    var doc = root.document;
+    var business = content.querySelector('#product_detail_cloud');
+    var action = content.querySelector(':scope > a.sch-ip-change-btn');
+    if (!business || !action) return;
+    var origin = doc.createComment('CRA1 plugin action fallback');
+    content.insertBefore(origin, action);
+    var column = doc.createElement('div');
+    column.className = 'el-col el-col-8 cra1-native-action';
+    var card = doc.createElement('div');
+    card.className = 'manage-item cra1-native-action-card';
+    var description = doc.createElement('div');
+    description.className = 'item-bottom';
+    description.textContent = /[\u3400-\u9fff]/.test(action.textContent)
+      ? '查看更换规则，按需申请更换 IP。'
+      : 'View replacement rules and request an IP change.';
+    card.appendChild(description);
+    column.appendChild(card);
+    function place() {
+      var row = business.querySelector('.main-card .manage-content > .el-row');
+      if (row && row.querySelector('.manage-item')) {
+        // Move the actual hook link: keep its URL, permission decision and listeners.
+        if (action.parentNode !== card) card.insertBefore(action, description);
+        if (column.parentNode !== row) row.appendChild(column);
+      } else {
+        // A newer module may replace its management view. Keep the entry reachable.
+        if (action.parentNode !== content) content.insertBefore(action, origin.nextSibling);
+        if (column.parentNode) column.remove();
+      }
+    }
+    place();
+    // Native Vue may create the management tab later or replace its children.
+    var observer = new MutationObserver(place);
+    observer.observe(business, {childList: true, subtree: true});
+    root.addEventListener('pagehide', function () { observer.disconnect(); }, {once: true});
+    root.addEventListener('pageshow', function (event) { if (event.persisted) { place(); observer.observe(business, {childList: true, subtree: true}); } });
+  }
   function mount() {
     var doc = root.document;
     if (root.__CRA1_NATIVE_PAGE__ || !/^\/module\/[A-Za-z][A-Za-z0-9_]*\/product_(?:list|detail)\.htm$/.test(root.location.pathname)) return;
@@ -26,6 +64,7 @@
       }}
     }).$mount(shell.firstElementChild);
     new root.Vue({components: {topMenu: topMenu}}).$mount(shell.querySelector('.cra1-shell__body').firstElementChild);
+    groupPluginAction(content);
   }
   if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', mount, {once: true});
   else mount();

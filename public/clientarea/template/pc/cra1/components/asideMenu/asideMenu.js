@@ -76,6 +76,8 @@
         flag.recharge_min = f.recharge_min || ''
         flag.recharge_max = f.recharge_max || ''
         flag.certification = f.certification || null
+        flag.ssh = !!f.ssh
+        flag.security_group = !!f.security_group
         flag.ready = true
         try { global.dispatchEvent(new CustomEvent('cra1:feature-flags')) } catch (e) {}
         return flag
@@ -749,7 +751,13 @@
         var tag = (menuItem && menuItem.id
                   && String(menuItem.url || '').indexOf('productList.htm') === 0)
                  ? 'cloud_menu=' + menuItem.id : ''
-        return def.filter(function(pg){return !global.CRA1Shared?.Access || global.CRA1Shared.Access.canUrl(pg.url)}).map(function (pg) {
+        return def.filter(function (pg) {
+          if (feat && feat.ready) {
+            if (pg.url === 'security.htm?tab=ssh' && !feat.ssh) return false
+            if (pg.url === 'security.htm?tab=group' && !feat.security_group) return false
+          }
+          return !global.CRA1Shared?.Access || global.CRA1Shared.Access.canUrl(pg.url)
+        }).map(function (pg) {
           var pu = pg.url
           if (tag && pu.indexOf('productList.htm') === 0) {
             pu += (pu.indexOf('?') === -1 ? '?' : '&') + tag

@@ -27,6 +27,8 @@ html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-
 .cra1-account__menu--rich {max-height:calc(100dvh - var(--header-h,64px) - 24px);overflow-y:auto;overscroll-behavior:contain;max-width:calc(100vw - 24px);}
 .cra1-header-support__icon {display:inline-flex;color:var(--cui-icon-ink,currentColor);}
 .cra1-header-support__icon :is(img,svg) {display:block;width:16px;height:16px;object-fit:contain;}
+.cra1-account-mobile,.cra1-account__unread,.cra1-account--guest {display:none;}
+.cra1-account-mobile [hidden] {display:none!important;}
 @media (max-width:767px) {
   html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) {gap:2px;}
   html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-header__icon-btn,
@@ -45,22 +47,53 @@ html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-
   html[data-cra1-theme] .cra1-header-support__trigger {transition:none;}
 }
 
-/* The member shell also hosts cart and plugin pages. Keep all header actions
-   reachable there, rather than fixing individual React entry pages. */
-@media (max-width:480px) {
-  html[data-cra1-theme="member"] .cra1-header,
-  html[data-cra1-theme="cart"] .cra1-header {padding-inline:8px;column-gap:4px;}
-  html[data-cra1-theme] .cra1-header .cra1-header__left {flex:1 1 0;}
-  html[data-cra1-theme] .cra1-header .cra1-header__brand {flex:0 1 auto;min-width:0;padding-inline:3px;}
-  html[data-cra1-theme] .cra1-header .cra1-header__brand-logo {min-width:0;max-width:100%;}
-  html[data-cra1-theme] .cra1-header .cra1-header__right {gap:0;}
-}
-@media (max-width:350px) {
-  html[data-cra1-theme="member"],html[data-cra1-theme="cart"] {--header-h:100px;}
-  html[data-cra1-theme] .cra1-header {height:auto;min-height:var(--header-h);flex-wrap:wrap;row-gap:4px;padding-block:4px;}
-  html[data-cra1-theme] .cra1-header .cra1-header__left,
-  html[data-cra1-theme] .cra1-header .cra1-header__right {flex:0 0 100%;min-height:44px;}
-  html[data-cra1-theme] .cra1-header .cra1-header__right {justify-content:space-between;margin-left:0;}
-  html[data-cra1-theme] .cra1-header .cra1-header-search__panel,
-  html[data-cra1-theme] .cra1-header .cra1-header-support__panel {top:calc(var(--header-h) + 8px);}
+/* A single compact header is shared by member, cart and native module pages.
+   The website has its own header and does not opt into the mobile account view. */
+@media (max-width:767px) {
+  html:is([data-cra1-theme="member"],[data-cra1-theme="cart"]) {--header-h:48px;}
+  html[data-cra1-theme] .cra1-header {height:48px;min-height:48px;flex-wrap:nowrap;padding:2px 6px;gap:6px;-webkit-tap-highlight-color:transparent;}
+  html[data-cra1-theme] .cra1-header .cra1-header__left {flex:1 1 0;min-width:0;gap:6px;}
+  html[data-cra1-theme] .cra1-header .cra1-header__menu-btn {flex:0 0 44px;width:44px;height:44px;}
+  html[data-cra1-theme] .cra1-header .cra1-header__brand {position:relative;isolation:isolate;flex:0 1 112px;min-width:0;max-width:112px;height:44px;padding:0 2px;background:transparent;}
+  html[data-cra1-theme] .cra1-header .cra1-header__brand::before {content:'';position:absolute;inset:8px 0;z-index:-1;border-radius:4px;background:var(--sidebar-primary,#212327);}
+  html[data-cra1-theme] .cra1-header .cra1-header__brand-logo {width:auto;min-width:0;max-width:100%;height:18px;object-fit:contain;object-position:left center;}
+  html[data-cra1-theme] .cra1-header .cra1-header__right {flex:0 0 auto;min-width:0;gap:6px;margin-left:0;}
+  html[data-cra1-theme] .cra1-header .cra1-header__right>:is(.cra1-header-support,.cra1-header-docs,.cra1-header__cart,.cra1-header__msg,.cra1-lang,.cra1-header__login) {display:none!important;}
+  html[data-cra1-theme] .cra1-header .cra1-account--guest {display:inline-flex;}
+  .cra1-header .cra1-account--mobile-actions .cra1-account__desktop {display:none;}
+  .cra1-header .cra1-account--mobile-actions .cra1-account-mobile {display:block;}
+  .cra1-header .cra1-account--mobile-actions .cra1-account__menu {
+    position:fixed;top:calc(var(--header-h,48px) + 6px);right:8px;left:auto;
+    width:280px;max-width:calc(100vw - 16px);max-height:calc(100dvh - var(--header-h,48px) - 14px);
+    overflow:auto;border-radius:12px;box-shadow:0 6px 20px rgba(128,99,47,.12);
+  }
+  .cra1-header .cra1-account__trigger {position:relative;}
+  .cra1-header .cra1-account__unread:not([hidden]) {display:block;position:absolute;top:5px;right:5px;width:7px;height:7px;border:1.5px solid #fff;border-radius:50%;background:#987537;}
+  .cra1-account-mobile {padding:4px 8px 8px;color:var(--up-ink);font-size:13px;}
+  .cra1-account-mobile__identity {display:flex;align-items:center;gap:10px;min-height:56px;padding:6px 8px;}
+  .cra1-account-mobile__identity-copy {display:grid;min-width:0;gap:2px;}
+  .cra1-account-mobile__name,.cra1-account-mobile__sub {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:20px;}
+  .cra1-account-mobile__name {font-size:13px;font-weight:500;}
+  .cra1-account-mobile__sub {font-size:11px;color:#61656b;}
+  .cra1-account-mobile__group {display:grid;gap:2px;}
+  .cra1-account-mobile__group+.cra1-account-mobile__group {border-top:1px solid var(--up-line);margin-top:7px;padding-top:7px;}
+  .cra1-account-mobile__item,.cra1-account-mobile__back {
+    display:flex;align-items:center;gap:10px;width:100%;min-width:0;min-height:44px;
+    padding:8px 10px;border:0;border-radius:7px;background:transparent;color:var(--up-ink);
+    font:inherit;font-size:13px;line-height:20px;text-decoration:none;text-align:left;cursor:pointer;
+  }
+  .cra1-account-mobile__item:hover,.cra1-account-mobile__back:hover {background:#f4f3ef;color:#35383c;}
+  .cra1-account-mobile__item:focus-visible,.cra1-account-mobile__back:focus-visible {outline:2px solid #987537;outline-offset:-2px;}
+  .cra1-account-mobile__item .cra1-header-glyph svg,.cra1-account-mobile__back .cra1-header-glyph svg {width:17px;height:17px;color:#61656b;}
+  .cra1-account-mobile__label {flex:1 1 0;min-width:0;overflow-wrap:anywhere;}
+  .cra1-account-mobile__count {flex:0 0 auto;min-width:23px;padding:1px 6px;border-radius:5px;background:#f0f1f2;color:#61656b;font-size:11px;font-variant-numeric:tabular-nums;text-align:center;}
+  .cra1-account-mobile__count--unread {background:#f2eee5;color:#80632f;}
+  .cra1-account-mobile__back {color:#80632f;}
+  .cra1-account-mobile__heading {margin:0;padding:8px 10px 4px;font-size:13px;font-weight:500;}
+  .cra1-account-mobile__content .cra1-header-support__section {padding:6px 2px;}
+  .cra1-account-mobile__content .cra1-header-support__title {color:#61656b;}
+  .cra1-account-mobile__content .cra1-header-support__item {color:#35383c;}
+  .cra1-account-mobile__content .cra1-header-support__status {padding:10px;overflow-wrap:anywhere;}
+  .cra1-account-mobile__content [aria-pressed="true"] {background:#f4f3ef;color:#80632f;}
+  .cra1-header .cra1-account__avatar svg {width:17px;height:17px;}
 }

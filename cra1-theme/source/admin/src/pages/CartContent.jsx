@@ -529,13 +529,13 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
                   >
                     <DragHandle {...recDrag.handleProps(i, '拖拽排序：' + recName(item.product_id))} />
                     {recDrag.isOver(i) && <DropBadge pos={recDrag.dropPos} />}
-                    <div className="min-w-0 flex-1">
+                    <div className="cra1-row-content min-w-0 flex-1">
                       <div className="truncate text-[13px] font-medium text-ink">
                         {item.title_override || recName(item.product_id)}
                         {item.enabled === false && <span className="ml-2 text-xs text-muted">已隐藏</span>}
                       </div>
                     </div>
-                    <RowIconBtn label={item.enabled === false ? '显示' : '隐藏'} onClick={() => {
+                    <div className="cra1-row-actions flex shrink-0 items-center gap-0.5"><RowIconBtn label={item.enabled === false ? '显示' : '隐藏'} onClick={() => {
                       const list = recItems.map((x, xi) => xi === i ? { ...x, enabled: x.enabled === false } : x)
                       setPath('shoppingcar', 'recommendations', { items: list })
                     }}>
@@ -548,7 +548,7 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
                       setPath('shoppingcar', 'recommendations', { items: recItems.filter((_, x) => x !== i) })
                     }}>
                       <Trash2 className="size-4" />
-                    </RowIconBtn>
+                    </RowIconBtn></div>
                   </div>
                 ))}
               </div>

@@ -11,7 +11,7 @@ try{
  await page.addScriptTag({path:vue});
  await page.evaluate(()=>{window.NativeVue=window.Vue;window.Vue=function(options){window.cartOptions=options;return {$mount(){}};};window.Vue.prototype={};window.lang={};for(const name of ['asideMenu','topMenu','scrollText','discountCode','eventCode'])window[name]={};});
  await page.addScriptTag({path:source});
- await page.evaluate(()=>{window.onload();window.Vue=window.NativeVue;const o=window.cartOptions;window.cartVm=new Vue({data:o.data,computed:{viewportW:o.computed.viewportW,currentColumns:o.computed.currentColumns,gridStyle:o.computed.gridStyle,limitFromGrid:o.computed.limitFromGrid},methods:{handleViewportChange:o.methods.handleViewportChange}});window.cartVm.gridConf={desktop_columns:2,tablet_columns:3,mobile_columns:1,rows_per_load:2};window.addEventListener('resize',()=>window.cartVm.handleViewportChange());});
+ await page.evaluate(()=>{window.onload();window.Vue=window.NativeVue;const o=window.cartOptions;window.cartVm=new Vue({data:o.data,computed:{viewportW:o.computed.viewportW,currentColumns:o.computed.currentColumns,gridStyle:o.computed.gridStyle,limitFromGrid:o.computed.limitFromGrid},methods:{handleViewportChange:o.methods.handleViewportChange,scrollSelectedProduct:o.methods.scrollSelectedProduct}});window.cartVm.gridConf={desktop_columns:2,tablet_columns:3,mobile_columns:1,rows_per_load:2};window.addEventListener('resize',()=>window.cartVm.handleViewportChange());});
  const checks=[];
  for(const [width,columns]of [[1440,2],[900,3],[390,1],[1440,2]]){
   await page.setViewportSize({width,height:900});await page.waitForFunction(w=>innerWidth===w,width);

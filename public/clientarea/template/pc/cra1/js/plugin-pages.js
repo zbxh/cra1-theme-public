@@ -29,6 +29,22 @@
   function enabled(pluginName) {
     return plugins().some(function (item) { return item.name === pluginName && available(item); });
   }
+  function validForm(vm, ref) {
+    return new Promise(function (resolve, reject) {
+      try { vm.$refs[ref].validate(function (valid) { resolve(!!valid); }); }
+      catch (failure) { reject(failure); }
+    });
+  }
+  function submissionButton(handler) {
+    var host = root.document.getElementsByClassName && root.document.getElementsByClassName('template')[0];
+    if (!host) return;
+    Array.from(host.querySelectorAll('el-button')).forEach(function (button) {
+      if (button.getAttribute('@click') === handler) {
+        button.setAttribute(':loading', 'cra1InvoiceSubmitting');
+        button.setAttribute(':disabled', 'cra1InvoiceSubmitting');
+      }
+    });
+  }
   function url(value) {
     try {
       var target = new URL(String(value || ''), root.location.origin);
@@ -103,6 +119,65 @@
       return;
     }
     if (!plugin || this.$options.parent) return;
+    if (name === 'EContract' && view === 'signContract' && methods.saveImage) {
+      this.$options.methods = Object.assign({}, methods, {saveImage: async function () {
+        var vm = this;
+        if (vm.loading) return;
+        if (!vm.isSign) return vm.$message.warning(vm.lang.contract_text31);
+        vm.loading = true;
+        try {
+          var canvas = await root.html2canvas(root.document.querySelector('#signature-canvas'));
+          var file = vm.dataURLtoFile(canvas.toDataURL('image/png'), 'sign.png', 'image/png');
+          var body = new root.FormData(); body.append('file', file);
+          var uploaded = await root.uploadSign(body), saved = uploaded.data?.data?.save_name;
+          if (!saved || Number(uploaded.data?.status) !== 200) throw new Error('页面错误，请刷新重试');
+          var signed = await root.signContract({id: vm.id, sign_name: saved});
+          if (Number(signed.data?.status) !== 200) throw new Error('页面错误，请刷新重试');
+          if (vm._isDestroyed) return;
+          vm.$message.success(vm.lang.contract_text32); vm.signClose();
+          root.sessionStorage.financeActiveIndex = '5'; root.location.href = '/finance.htm?isActive=true';
+        } catch (failure) { error(vm, failure); }
+        finally { vm.loading = false; }
+      }});
+    }
+    if (name === 'IdcsmartInvoice' && ((view === 'issuedInvoice' && methods.handlePay) || (view === 'invoice' && methods.handleSaveAddress))) {
+      submissionButton(view === 'issuedInvoice' ? 'handlePay' : 'handleSaveAddress');
+      var invoiceData = this.$options.data;
+      this.$options.data = function () { return Object.assign({}, typeof invoiceData === 'function' ? invoiceData.call(this) : invoiceData, {cra1InvoiceSubmitting: false}); };
+      if (view === 'issuedInvoice') this.$options.methods = Object.assign({}, methods, {handlePay: async function () {
+        var vm = this;
+        if (vm.cra1InvoiceSubmitting) return;
+        vm.cra1InvoiceSubmitting = true;
+        try {
+          if (!await validForm(vm, 'openInvoiceFormRef') || !vm.isOk) return;
+          var response = await root.addInvoicelAPI(Object.assign({}, vm.openInvoiceForm, {order_id: vm.orderIDList.slice()}));
+          var data = response.data?.data;
+          if (!data || Number(response.data?.status) !== 200) throw new Error('页面错误，请刷新重试');
+          vm.$message.success(vm.lang.invoice_text138); vm.openInvoiceVisible = false;
+          await vm.getTableData();
+          if (!vm._isDestroyed && data.id) vm.$refs.payDialog.showPayDialog(data.id);
+        } catch (failure) { error(vm, failure); }
+        finally { vm.cra1InvoiceSubmitting = false; }
+      }});
+      else this.$options.methods = Object.assign({}, methods, {handleSaveAddress: async function () {
+        var vm = this;
+        if (vm.cra1InvoiceSubmitting) return;
+        vm.cra1InvoiceSubmitting = true;
+        try {
+          if (!await validForm(vm, 'addInvoiceAddressFormRef')) return;
+          var parts = vm.addInvoiceAddressForm.cityArr || [];
+          var body = Object.assign({}, vm.addInvoiceAddressForm, {province: parts[0] || '', city: parts[1] || '', region: parts[2] || ''});
+          delete body.cityArr;
+          var response = await (vm.isEditInvoiceAddress ? root.editInvoicelAddressAPI : root.addInvoicelAddressAPI)(body);
+          if (Number(response.data?.status) !== 200) throw new Error('页面错误，请刷新重试');
+          await vm.getInvoicelAddress();
+          if (vm._isDestroyed) return;
+          vm.$message.success(vm.isEditInvoiceAddress ? vm.lang.invoice_text150 : vm.lang.invoice_text133);
+          vm.invoiceAddressVisible = false;
+        } catch (failure) { error(vm, failure); }
+        finally { vm.cra1InvoiceSubmitting = false; }
+      }});
+    }
     if (name === 'IdcsmartTicket' && view === 'ticketDetails' && methods.getDetails) {
       var ticketData = this.$options.data;
       this.$options.data = function () { return Object.assign({}, typeof ticketData === 'function' ? ticketData.call(this) : ticketData, {cra1TicketState: 'loading'}); };

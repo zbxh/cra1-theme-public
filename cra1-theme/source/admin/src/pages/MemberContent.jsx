@@ -372,13 +372,13 @@ function QuickLinksCard({ content, setContentSection }) {
                 className={dragRowClass({ isDragging: drag.isDragging(i), isOver: drag.isOver(i) })}
               >
                 <DragHandle {...drag.handleProps(i, '拖拽排序：' + it.label)} />
-                <div className="flex min-w-0 flex-1 items-center gap-2">
+                <div className="cra1-row-content flex min-w-0 flex-1 items-center gap-2">
                   <span className="min-w-0 truncate text-[13px] text-ink">{it.label || '（未命名）'}</span>
-                  <span className="truncate font-mono text-[11px] text-muted-foreground">{it.url}</span>
+                  <span className="cra1-row-secondary truncate font-mono text-[11px] text-muted-foreground">{it.url}</span>
                   {Number(it.enabled) !== 1 && <Badge tone="muted">停用</Badge>}
                 </div>
                 {drag.isOver(i) && <DropBadge pos={drag.dropPos} />}
-                <div className="flex shrink-0 items-center gap-0.5">
+                <div className="cra1-row-actions flex shrink-0 items-center gap-0.5">
                   <RowIconBtn label="编辑" onClick={() => setEditing({ ...it, __index: i })}>
                     <Pencil className="size-3.5" />
                   </RowIconBtn>
@@ -611,15 +611,15 @@ function HomeBannerCard({ content, setContentSection }) {
             还没有推荐内容。点击「添加推荐」创建，或保持关闭隐藏该区块。
           </p>
         ) : (
-          <ul className="space-y-2">
+          <ul className="cra1-sort-list space-y-2">
             {items.map((it, i) => (
-              <li key={it.id || i} className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2.5">
-                <div className="flex min-w-0 flex-1 items-center gap-2">
+              <li key={it.id || i} className="cra1-flat-row flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2.5">
+                <div className="cra1-row-content flex min-w-0 flex-1 items-center gap-2">
                   <span className="min-w-0 truncate text-[13px] text-ink">{it.title || '（未命名）'}</span>
-                  <span className="truncate font-mono text-[11px] text-muted-foreground">{it.link}</span>
+                  <span className="cra1-row-secondary truncate font-mono text-[11px] text-muted-foreground">{it.link}</span>
                   {Number(it.enabled) !== 1 && <Badge tone="muted">停用</Badge>}
                 </div>
-                <div className="flex shrink-0 items-center gap-0.5">
+                <div className="cra1-row-actions flex shrink-0 items-center gap-0.5">
                   <RowIconBtn label="编辑" onClick={() => setEditing({ ...it, __index: i })}>
                     <Pencil className="size-3.5" />
                   </RowIconBtn>
