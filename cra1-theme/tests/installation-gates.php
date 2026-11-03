@@ -21,6 +21,7 @@ try{
  $inspect=Inspector::inspect($base,$options);
  check($inspect['installation_ready']&&$inspect['installation_counts']['blocked']===0,'matching runtime and original byte checks allow installation acceptance');
  check($inspect['compatible']&&$inspect['counts']['blocked']===0,'customer compatibility reflects technical requirements only');
+ check($inspect['overview']['files']['pass']===1&&$inspect['overview']['contracts']['pass']===2,'theme files and native verification are counted separately');
  check(strpos(json_encode($inspect),'commercial')===false&&!isset($inspect['license']),'customer check does not expose repository-only records');
  $testRelease=$release;$testRelease['release_channel']='test';Files::putJson($base.'/cra1-theme/release.json',$testRelease);
  $testInspect=Inspector::inspect($base,$options);
@@ -29,7 +30,8 @@ try{
  $unknown=$options;$unknown['context']['system_version']='10.7.5';check(!Inspector::inspect($base,$unknown)['installation_ready'],'unknown runtime cannot install');
  $insecure=$options;$insecure['https']=false;check(!Inspector::inspect($base,$insecure)['installation_ready'],'HTTPS remains mandatory');
  $badOrigin=$options;$badOrigin['origin']='https://different.invalid';$diagnostic=Inspector::inspect($base,$badOrigin);check($diagnostic['installation_ready']&&$diagnostic['counts']['warning']===1,'private-path proof cannot transfer across origins and remains an optional diagnostic');
- Files::atomic($base.'/app/native.php','changed');check(!Inspector::inspect($base,$options)['installation_ready'],'same version with unverified native bytes cannot install');
+ Files::atomic($base.'/app/native.php','changed');$changed=Inspector::inspect($base,$options);check(!$changed['installation_ready'],'same version with unverified native bytes cannot install');
+ check($changed['overview']['files']['pass']===1&&$changed['overview']['files']['unverified']===0&&$changed['overview']['contracts']['unverified']===1,'unknown native files never become theme corruption or a verified contract');
  unlink($base.'/app/native.php');check(!Inspector::inspect($base,$options)['installation_ready'],'missing native dependency blocks installation');
  Files::atomic($base.'/app/native.php','official fixture');
  $hard=$release;$hard['release_blockers']=['unsafe technical condition'];Files::putJson($base.'/cra1-theme/release.json',$hard);check(!Inspector::inspect($base,$options)['installation_ready'],'legacy hard package gates still block installation');

@@ -3,6 +3,9 @@ declare(strict_types=1);
 define('CRA1_THEME_BACKEND',dirname(__DIR__).'/backend');
 require CRA1_THEME_BACKEND.'/bootstrap.php';
 require CRA1_THEME_BACKEND.'/Support/cra1_theme_security.php';
+// Match the native application's warning-to-exception behavior, including when
+// the hosting account restricts OPcache. Suppressed warnings stay suppressed.
+set_error_handler(static function($level,$message,$file,$line){if(error_reporting()&$level)throw new ErrorException($message,0,$level,$file,$line);return false;});
 use CRA1\Theme\Files;
 use CRA1\Theme\Release\Overlay;
 use CRA1\Theme\Release\ThemeCache;
@@ -72,5 +75,21 @@ try{
  rejects(static function()use($overlay,$ready){$overlay->recover($ready['confirmation']);},'only confirmed pending journal can recover');
  check($overlay->recover($pending['confirmation'])['restored'],'fixed entry reuses ordinary transaction recovery');
  check(!is_file($site.'/runtime/cra1_theme/distribution/pending.json'),'successful recovery clears maintenance marker');
+ // A real file replacement failure must preserve the administrator, not merely
+ // report that the release pointer was restored.
+ [$failedDoc,$kept]=fixture($base.'/failed');$failedSite=$base.'/failed';$failedOverlay=new Overlay($failedSite,$context);
+ $ready=$failedOverlay->prepare();$archive=$failedSite.'/runtime/cra1_theme/distribution/overlay/'.$ready['confirmation']['archive'];
+ $failing=new Updater($failedSite,'customadmin',$context,static function($path,$bytes,$mode){Files::atomic($path,$bytes,$mode);throw new RuntimeException('isolated failure token=PRIVATE-TEST-TOKEN');});
+ try{$failing->apply($archive,$ready['confirmation']['sha256']);throw new LogicException('failed transaction must throw');}
+ catch(RuntimeException $error){
+  check(strpos($error->getMessage(),'替换主题文件')!==false&&strpos($error->getMessage(),'已恢复')!==false,'failure identifies stage and confirms completed recovery');
+  check(preg_match('/参考编号：[A-F0-9]{12}/u',$error->getMessage())===1,'failure supplies a correlation reference');
+  check(strpos($error->getMessage(),'PRIVATE-TEST-TOKEN')===false&&strpos($error->getMessage(),$failedSite)===false,'public failure omits internal errors and sensitive values');
+ }
+ foreach($kept as$path=>$value)check(file_get_contents($failedSite.'/'.$path)===$value,'failed transaction preserves: '.$path);
+ $security=new CRA1ThemeSecurity($failedSite);
+ check($security->checkPassword('fixture-admin','Fixture-password-123!')!==null,'original administrator password works after failed transaction');
+ check((new CRA1\Theme\Release\Installer($failedSite))->state()['mode']==='maintenance','failed update never re-enters first installation');
+ Overlay::discard($failedSite,$ready['confirmation']);
  echo json_encode(['status'=>'passed','checks'=>$checks,'production_writes'=>0]).PHP_EOL;
 }finally{clean($base);}

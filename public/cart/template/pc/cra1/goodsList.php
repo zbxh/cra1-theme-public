@@ -223,13 +223,14 @@
                           </div>
                           <div class="cl-card-foot" v-if="sec === 'price'">
                             <div class="cl-card-price">
-                              <span class="cl-price">
+                              <span class="cl-price" v-if="catalogPriceKnown(item)">
                                 <span class="cl-price-prefix">{{commonData.currency_prefix}}</span><span
-                                  class="cl-price-num">{{item.price_discounted || item.price}}{{commonData.currency_suffix}}</span><span
+                                  class="cl-price-num">{{catalogPriceAmount(item)}}{{commonData.currency_suffix}}</span><span
                                   class="cl-price-cycle" v-if="item.cycle">/{{item.cycle}}</span>
                               </span>
+                              <span class="cl-price-pending" v-else>选择配置后报价</span>
                               <span class="cl-price-origin"
-                                v-if="item.price_discounted && item.price != item.price_discounted">
+                                v-if="catalogPriceKnown(item) && item.price_discounted != null && item.price_discounted !== '' && item.price != item.price_discounted">
                                 <span class="cl-price-prefix">{{commonData.currency_prefix}}</span>{{item.price}}{{commonData.currency_suffix}}
                               </span>
                             </div>
@@ -245,6 +246,7 @@
                   </section>
                   <!-- 选配区与导航、产品型号同级；保留模块原有选择控件、卡片与计价逻辑 -->
                   <div class="cl-config-panel" v-if="selectedProduct" ref="configPanel">
+                    <button type="button" class="cl-native-purchase-jump" v-if="isMobileCart && mobileNativeFrame && railState === 'fallback' && frameHeight > 1200" @click="focusNativePurchase">查看价格与订购 <i class="el-icon-arrow-down" aria-hidden="true"></i></button>
                     <div class="cl-config-body">
                       <div class="cl-config-skeleton" v-if="configState === 'loading'" aria-hidden="true">
                         <div class="cl-skel-line" style="width: 30%"></div>

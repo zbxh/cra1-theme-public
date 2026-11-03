@@ -471,7 +471,7 @@ final class MemberCenterStore
                 'second_reminder' => (int) ($n['second_reminder'] ?? 0),
             ];
             if(!empty($n['icon_style']))$item['icon_style']=cra1_icon_style_clean($n['icon_style']);
-            if(!preg_match('/^icon-[a-z0-9-]+$/i',$item['icon'])&&$item['icon']!=='') { $d=cra1_icons_resolve($item['icon'],'member-sidebar');if($d['available'])$item['icon_resolved']=['url'=>$d['url'],'colorable'=>$d['colorable']]; }
+            if($item['icon']!=='') { $d=cra1_icons_resolve($item['icon'],'member-sidebar');if($d['available'])$item['icon_resolved']=['url'=>$d['url'],'colorable'=>$d['colorable']]; }
             // 模块类菜单需要模块标识，前端据此决定是否为产品列表入口
             if (!empty($n['module']) || !empty($n['res_module']) || !empty($n['product_id'])) {
                 $item['module']     = $n['module'] ?? [];
@@ -1695,6 +1695,8 @@ final class MemberCenterStore
         $sidebar = $this->sidebarForEditor($sidebar);
         $existing = $mode === 'merge' ? ($sidebar['nodes'] ?? []) : [];
         $incoming = $this->wrapImportUnderServiceGroup($this->importFromSystem($catalog), ['sidebar' => ['nodes' => $existing]]);
+        $warnings=[];
+        $incoming=\cra1_icons_prepare_import($incoming,$warnings);
         $added = 0;
         $nodes = $this->mergeImported($existing, $incoming, $added);
         $errors = $this->validateTree($nodes, true);
@@ -1702,7 +1704,7 @@ final class MemberCenterStore
         $count = function (array $list) use (&$count): int {
             $n = 0; foreach ($list as $item) $n += 1 + $count($item['children'] ?? []); return $n;
         };
-        return ['nodes' => $nodes, 'shape' => 3, 'added' => $added,
+        return ['nodes' => $nodes, 'shape' => 3, 'added' => $added, 'warnings'=>$warnings,
             'skipped' => max(0, $count($incoming) - $added), 'failed' => 0];
     }
 

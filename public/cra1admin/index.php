@@ -101,7 +101,7 @@ header('Content-Security-Policy: default-src \'self\'; script-src \'self\' \'non
 
 /* ---------- 通用工具 ---------- */
 function json_out(array $data,int $code=200): void {
-    if(($data['status']??0)===200&&in_array($GLOBALS['THEME_WRITE']['action']??'',['seo.save','workspace.editor.save','workspace.save','save','reset'],true)){try{require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_seo.php';theme_generate_seo($GLOBALS['ROOT'],$GLOBALS['THEME_SETTINGS']['canonical_url']);}catch(Throwable $e){$data['data']['seo_ok']=false;$data['msg']='配置已保存，搜索引擎文件同步失败，请通过维护命令重建。';}}
+    if(($data['status']??0)===200&&strpos($GLOBALS['THEME_WRITE']['target']??'','website:')===0&&in_array($GLOBALS['THEME_WRITE']['action']??'',['seo.save','workspace.editor.save','workspace.save','save','reset'],true)){try{require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_seo.php';theme_generate_seo($GLOBALS['ROOT'],$GLOBALS['THEME_SETTINGS']['canonical_url']);}catch(Throwable $e){$data['data']['seo_ok']=false;$data['msg']='配置已保存，搜索引擎文件同步失败，请通过维护命令重建。';}}
     $data=theme_api_complete($data);$status=(int)($data['status']??$code);
     $data['code']=$data['code']??([200=>'OK',400=>'INVALID_REQUEST',401=>'SESSION_INVALID',403=>'PERMISSION_DENIED',404=>'NOT_FOUND',409=>'CONFIG_CONFLICT',429=>'RATE_LIMITED',500=>'SERVER_ERROR',503=>'SERVICE_UNAVAILABLE'][$status]??'REQUEST_FAILED');
     $data['request_id']=$GLOBALS['THEME_REQUEST_ID'];if(($data['msg']??'')==='success')$data['msg']='已读取';

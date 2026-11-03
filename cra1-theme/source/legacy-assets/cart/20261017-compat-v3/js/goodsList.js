@@ -1244,6 +1244,13 @@
           this.goodSLoading = true;
           this.scrollDisabled = false;
         },
+        resetProductSelection() {
+          this.selectedProductId = 0;
+          this.selectedProduct = null;
+          this.configState = "idle";
+          this.embedDirty = false;
+          this.railState = "idle";
+        },
         // 重置二级分组状态并作废旧请求
         resetSecondGroupState() {
           this.secondGroupRequestId++;
@@ -1367,44 +1374,48 @@
         async initData() {
           this.catalogError = "";
           this.goodSLoading = true;
+          this.resetProductSelection();
+          this.goodsListRequestId++;
+          this.goodsList = [];
           const requestId = ++this.secondGroupRequestId;
           try {
-          // 商品深链：先经公开商品详情定位其所属一二级分组（跨组深链），无效则回退默认
-          if (this.urlProductId) {
-            try {
-              const d = await apiProductDetail({ id: this.urlProductId });
-              const pd = d.data?.data?.product;
-              if (pd && pd.hidden != 1 && pd.product_group_id) {
-                this.fpg_id = pd.product_group_id_first || this.fpg_id;
-                this.spg_id = pd.product_group_id;
-              } else {
-                this.urlProductId = 0;
-              }
-            } catch (e) {
-              this.urlProductId = 0;
-            }
-          }
-          // 获取一级分类
-          await productGroupFirst().then((res) => {
-            this.first_group_list = res.data.data.list;
-          });
+          // Independent reads start together. A supplied category is a hint only;
+          // the public product and actual category lists still decide ownership.
+          const settled = promise => promise.then(value => ({ value }), error => ({ error }));
+          const firstTask = settled(productGroupFirst());
+          const detailTask = this.urlProductId ? settled(apiProductDetail({ id: this.urlProductId })) : Promise.resolve({ value: null });
+          const seconds = new Map();
+          const secondTask = id => {
+            if (!seconds.has(Number(id))) seconds.set(Number(id), settled(productGroupSecond(id)));
+            return seconds.get(Number(id));
+          };
+          if (this.fpg_id) secondTask(this.fpg_id);
+          const [first, detail] = await Promise.all([firstTask, detailTask]);
           if (requestId !== this.secondGroupRequestId) return;
+          if (first.error || detail.error) throw first.error || detail.error;
+          const pd = detail.value?.data?.data?.product;
+          if (this.urlProductId) {
+            if (pd && pd.hidden != 1 && pd.product_group_id) {
+              this.fpg_id = Number(pd.product_group_id_first) || this.fpg_id;
+              this.spg_id = Number(pd.product_group_id);
+            } else this.urlProductId = 0;
+          }
+          this.first_group_list = first.value.data.data.list;
           if (this.first_group_list[0]) {
-            this.select_first_obj.id =
-              this.fpg_id || this.first_group_list[0].id;
+            const firstGroup = this.first_group_list.find(item => Number(item.id) === Number(this.fpg_id)) || this.first_group_list[0];
+            this.select_first_obj.id = firstGroup.id;
             this.secondLoading = true;
-            // 获取二级分类
-            await productGroupSecond(this.select_first_obj.id).then((ress) => {
-              if (requestId === this.secondGroupRequestId) this.second_group_list = ress.data.data.list;
-            });
+            const second = await secondTask(this.select_first_obj.id);
             if (requestId !== this.secondGroupRequestId) return;
+            if (second.error) throw second.error;
+            this.second_group_list = second.value.data.data.list;
             if (this.second_group_list[0]) {
               // spg_id 必须确属当前一级组；不匹配回退首个二级组并修正 URL
               const spgValid = this.second_group_list.find(
-                (item) => item.id === this.spg_id
+                (item) => Number(item.id) === Number(this.spg_id)
               );
               const secondId = spgValid
-                ? this.spg_id
+                ? spgValid.id
                 : this.second_group_list[0].id;
               this.select_second_obj.id = secondId;
               const selectItem = this.second_group_list.find(
@@ -1425,7 +1436,7 @@
               if (this.isSsl) {
                 this.getSslBrands();
               }
-              this.getProductGoodList();
+              return this.getProductGoodList();
             } else {
               this.resetGoodsListState();
               this.goodSLoading = false;
@@ -1441,6 +1452,8 @@
         // 点击一级分类
         selectFirstType(val) {
           if (val !== this.select_first_obj.id) this.clearProductEntry();
+          this.resetProductSelection();
+          this.updateUrlParam("product_id", null, "replace");
           this.select_first_obj.id = val;
           this.resetSecondGroupState();
           this.resetGoodsListState();
@@ -1450,6 +1463,8 @@
         // 点击二级分类
         selectSecondType(val) {
           if (val !== this.select_second_obj.id) this.clearProductEntry();
+          this.resetProductSelection();
+          this.updateUrlParam("product_id", null, "replace");
           this.select_second_obj.id = val;
           const clickItem = this.second_group_list.find((item) => {
             return item.id === val;
@@ -1548,6 +1563,29 @@
         },
         isSellable(item) {
           return !(item.stock_control === 1 && item.qty <= 0);
+        },
+        catalogPriceAmount(item) {
+          if (item.pay_type === "free") return "0.00";
+          const discount = item.price_discounted;
+          return discount !== null && discount !== undefined && String(discount).trim() !== "" && Number.isFinite(Number(discount)) && Number(discount) >= 0 ? discount : item.price;
+        },
+        catalogPriceKnown(item) {
+          if (item.pay_type === "free") return true;
+          const price = this.catalogPriceAmount(item);
+          if (price === null || price === undefined || String(price).trim() === "" || !Number.isFinite(Number(price)) || Number(price) < 0) return false;
+          // Module catalogues may return 0 as a placeholder before configuration.
+          // Explicit free products and real zero discounts retain their semantics.
+          return Number(price) > 0 || Number(item.price) > 0 || !(item.module || item.res_module);
+        },
+        focusNativePurchase() {
+          const frame = this.$refs.configPanel?.querySelector("iframe");
+          try {
+            const win = frame?.contentWindow;
+            const target = win?.document.querySelector(".f-order, .order-right");
+            if (!target || !target.getClientRects().length) return;
+            // Scroll to the module's own controls; never move or clone business nodes.
+            target.scrollIntoView({ block: "start", behavior: "smooth" });
+          } catch (_) { /* a navigating frame has no usable target */ }
         },
         selectProduct(item) {
           if (!this.isSellable(item)) {
@@ -1934,6 +1972,11 @@
           this.configErrorText = "";
           this.railState = "idle";
           try {
+            const module = String(this.selectedProduct?.module || "").toLowerCase();
+            if (this.selectedProduct?.res_module || (module && module !== "mf_cloud")) {
+              this.mobileNativeFrame = true;
+              return;
+            }
             const res = await getOrederConfig({ id: pid, flag: false });
             if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
             const content = res.data?.status===200 && res.data?.data?.content;
@@ -2135,21 +2178,12 @@
           }
         },
         "select_first_obj.id": function (val) {
-          // 切分组：作废上一组的商品选择，URL 移除 product_id（分组规范化用 replace）
-          this.selectedProductId = 0;
-          this.selectedProduct = null;
-          this.configState = "idle";
-          this.embedDirty = false;
+          // User category changes reset selection in the explicit handlers.
+          // Normalising an entry must preserve its product/configuration query.
           this.updateUrlParam("fpg_id", val, "replace");
-          this.updateUrlParam("product_id", null, "replace");
         },
         "select_second_obj.id": function (val) {
-          this.selectedProductId = 0;
-          this.selectedProduct = null;
-          this.configState = "idle";
-          this.embedDirty = false;
           this.updateUrlParam("spg_id", val, "replace");
-          this.updateUrlParam("product_id", null, "replace");
         },
       },
     }).$mount(template);

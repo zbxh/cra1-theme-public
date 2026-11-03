@@ -25,30 +25,32 @@ final class References
         }
     }
     /** Expand virtual directories from installed files, staged payload and declared child dependencies. */
-    public static function copyPlan(string $root,array $references,string $stage=''): array
+    public static function copyPlan(string $root,array $references,string $stage='',array $payload=[]): array
     {
         $root=rtrim($root,'/');$stage=rtrim($stage,'/');$old=\CRA1\Theme\Files::json(self::copyRegistry($root),true)['files']??[];
+        $plannedChildren=[];
+        foreach($payload as$path=>$row)for($p=$path;dirname($p)!=='.';$p=dirname($p))$plannedChildren[dirname($p)][basename($p)]=true;
         $plan=[];$walk=null;
-        $walk=static function(string $dest,string $source,array $seen=[])use(&$walk,&$plan,$root,$stage,$references,$old):void{
+        $walk=static function(string $dest,string $source,array $seen=[])use(&$walk,&$plan,$root,$stage,$references,$old,$payload,$plannedChildren):void{
             if(isset($seen[$source])||count($seen)>48)throw new \RuntimeException('原生依赖形成循环');
             $seen[$source]=true;
             foreach($references as$from=>$to)if($source===$from||strpos($source,$from.'/')===0){$walk($dest,$to.substr($source,strlen($from)),$seen);return;}
             $candidate=$stage!==''&&is_file($stage.'/'.$source)?$stage.'/'.$source:$root.'/'.$source;
-            if(is_file($candidate)){
-                \CRA1\Theme\Files::noLinks($candidate);
+            if(isset($payload[$source])||is_file($candidate)){
+                if(!isset($payload[$source]))\CRA1\Theme\Files::noLinks($candidate);
                 $target=$root.'/'.$dest;
                 if(is_link($target))return; // Existing legal dependency links remain linked.
                 \CRA1\Theme\Files::noLinks($target);
                 if(file_exists($target)&&!is_file($target))throw new \RuntimeException('依赖目标不是普通文件：'.$dest);
-                $after=hash_file('sha256',$candidate);$before=is_file($target)?hash_file('sha256',$target):null;
+                $after=$payload[$source]['sha256']??hash_file('sha256',$candidate);$before=is_file($target)?hash_file('sha256',$target):null;
                 if($before!==null&&!hash_equals($before,$after)&&!hash_equals((string)($old[$dest]??''),$before))throw new \RuntimeException('依赖副本已有未登记修改：'.$dest);
                 if($before!==null&&strpos($dest,'/releases/')!==false&&!hash_equals($before,$after))throw new \RuntimeException('不可变依赖副本有差异：'.$dest);
-                $plan[$dest]=['source'=>$candidate,'before'=>$before,'after'=>$after,'bytes'=>filesize($candidate)];
+                $plan[$dest]=['source'=>$candidate,'before'=>$before,'after'=>$after,'bytes'=>$payload[$source]['bytes']??filesize($candidate)];
                 if(count($plan)>Manifest::MAX_FILES)throw new \RuntimeException('原生依赖副本数量过多');
                 return;
             }
             if(is_link($root.'/'.$dest))return;
-            $children=[];
+            $children=$plannedChildren[$source]??[];
             foreach([$root,$stage]as$base){
                 if($base===''||!is_dir($base.'/'.$source))continue;
                 \CRA1\Theme\Files::noLinks($base.'/'.$source);

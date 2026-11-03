@@ -327,7 +327,13 @@ body.rail-fallback .common-config .common-box {
 /* ≤768px（iframe 视口）：摘要栏回退到表单下方全宽 */
 @media (max-width: 768px) {
   .cart-embed .template { flex-direction: column; }
-  .cart-embed .f-order { width: 100%; flex: 1 1 auto; }
+  .cart-embed .f-order {
+    width: 100% !important;
+    max-width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    box-sizing: border-box;
+  }
   .cart-embed .f-order .right .buy { height: 44px; line-height: 44px; }
   .cart-embed .common-config .common-box { flex-direction: column; }
   .cart-embed .common-config .order-right { width: 100% !important; flex: 1 1 auto; }

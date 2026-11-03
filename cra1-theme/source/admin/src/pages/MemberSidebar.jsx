@@ -195,6 +195,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
       const r = workspace ? await workspaceApi.editorImport(mode, nodes, shape) : await memberApi.import({ mode, version })
       if (r.status === 200) {
         toast(r.msg || '已导入系统导航')
+        if(r.data.warnings?.length)toast(r.data.warnings.join(' '),'warning')
         setConfirmImport(null)
         if (workspace) {
           // Release the import lock before the queued draft update. setValues
@@ -297,6 +298,8 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
           </div>
         }
       />
+
+      {!total&&<Alert tone="warning">当前菜单为空，前台不会显示业务导航。可在下方导入菜单文件或系统导航，也可手动新增；检查草稿并保存后才会生效。</Alert>}
 
       {workspace && <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={() => setEditing({ ...emptyNode() })}><Plus className="size-4" />新增菜单</Button><Button variant="outline" onClick={addSeparator} disabled={workspace.saving}><Minus className="size-4" />新增分界线</Button></div>}
       {bootInfo.role!=='operator'&&<Card><CardHeader><CardTitle>菜单导入与导出</CardTitle><CardDescription>可选择一级分组、二级分组、三级页面和最近访问设置；跨站导入后请复核商品关联。</CardDescription></CardHeader><CardContent><MenuTransfer sidebar={{shape,nodes,recent}} disabled={saving||workspace?.saving} onBusy={value=>{setSaving(value);workspace?.setBusy(value)}} onApply={next=>{

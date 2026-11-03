@@ -8,6 +8,7 @@ import pwd
 import shutil
 import subprocess
 import tempfile
+import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--php', default='php')
@@ -84,6 +85,34 @@ check($again['files']===0,'re-uploading identical contents does not produce file
 $updater->rollback($again['history']);check(file_get_contents($site.'/public/web/cra1/page.js')==='after','repeat-upload rollback preserves the actual preceding version');
 $updater->rollback($result['history']);check(file_get_contents($site.'/public/web/cra1/page.js')==='before','the preceding real update remains recoverable');
 check(file_get_contents($site.'/runtime/keep.json')==='private-preserved','configuration remains unchanged through update, failure and rollback');
+// Dependency destinations are not archive members. Check the actual derived
+// write plan using candidate hashes, rather than the currently installed source.
+$reference='public/cart/template/pc/cra1/js/native.js';$source='public/cart/template/pc/default/js/native.js';
+Files::putJson(CRA1\Theme\Release\References::copyRegistry($site),['files'=>[$reference=>hash('sha256','old native')]]);
+$zip=new ZipArchive();$zip->open($archive);$doc=json_decode($zip->getFromName('manifest.json'),true);$zip->close();
+$candidate='public/cart/template/pc/cra1/new-source.js';
+$doc['references']=[$reference=>$source,'public/cart/template/mobile/cra1/js/candidate.js'=>$candidate];
+$files[$candidate]='candidate only source';
+$doc['files'][$candidate]=['sha256'=>hash('sha256','candidate only source'),'bytes'=>strlen('candidate only source')];
+$zip=new ZipArchive();$zip->open($archive,ZipArchive::CREATE|ZipArchive::OVERWRITE);$zip->addFromString('manifest.json',json_encode($doc));foreach($files as$p=>$b)$zip->addFromString('payload/'.$p,$b);$zip->close();
+$check=$updater->preflight($archive);
+check(!$check['can_apply'],'changed derived dependencies in read-only directories stop at preflight');
+check((bool)array_filter($check['blockers'],static function($message){return strpos($message,'public/cart/template/pc/cra1/js/')!==false;}),'derived dependency error names only the actual relative directory');
+check(file_get_contents($site.'/'.$candidate)==='installed source','preflight does not extract prospective dependency sources');
+check(CRA1\Theme\Release\References::copyPlan($site,$doc['references'],'',$doc['files'])['public/cart/template/mobile/cra1/js/candidate.js']['after']===hash('sha256','candidate only source'),'dependency preflight reads the candidate hash instead of old source bytes');
+check(file_get_contents($site.'/'.$reference)==='old native','dependency permission check never rewrites old copies');
+// Cache deletion needs permission on its parent, not merely the file. Native
+// template caches are unrelated to this update and must not block it.
+$hash=archive($archive,['public/web/cra1/page.js'=>'after']);
+$nativeCache=$site.'/runtime/temp/'.str_repeat('b',32).'.php';
+check($updater->preflight($archive)['can_apply'],'a read-only cache directory containing only native templates does not block');
+$cache=$site.'/runtime/temp/'.str_repeat('a',32).'.php';
+$trigger=$site.'/runtime/theme-cache-trigger';Files::atomic($trigger,'ready');
+while(!is_file($site.'/runtime/theme-cache-placed'))usleep(10000);
+$check=$updater->preflight($archive);
+check(!$check['can_apply'],'a theme cache that PHP cannot delete is reported before the update');
+check((bool)array_filter($check['blockers'],static function($message){return strpos($message,'runtime/temp/')!==false;}),'theme cache failure has an actionable relative path');
+check(file_get_contents($site.'/public/web/cra1/page.js')==='before','cache preflight failure leaves theme files and pointer intact');
 echo json_encode(['status'=>'passed','checks'=>count($checks),'results'=>$checks,'production_writes'=>0],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
 ''')
     (site / 'lib/cra1_theme_media.php').write_text('stable-helper')
@@ -93,7 +122,26 @@ echo json_encode(['status'=>'passed','checks'=>count($checks),'results'=>$checks
     (site / 'public/web/cra1/page.js').write_text('before')
     os.chown(site / 'public/web/cra1/page.js', account.pw_uid, account.pw_gid)
     (site / 'runtime/keep.json').write_text('private-preserved')
-    result = subprocess.run([*prefix, args.php, str(script), str(site)], text=True, capture_output=True)
+    native = site / 'public/cart/template/pc/default/js/native.js'
+    native.parent.mkdir(parents=True)
+    native.write_text('new native')
+    reference = site / 'public/cart/template/pc/cra1/js/native.js'
+    reference.parent.mkdir(parents=True)
+    reference.write_text('old native')
+    (site / 'public/cart/template/pc/cra1/new-source.js').write_text('installed source')
+    cache_directory = site / 'runtime/temp'
+    cache_directory.mkdir()
+    (cache_directory / ('b' * 32 + '.php')).write_text('<?php /*' + str(site / 'public/cart/template/pc/default/page.php') + '*/ native')
+    process = subprocess.Popen([*prefix, args.php, str(script), str(site)], text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    for _ in range(500):
+        if (site / 'runtime/theme-cache-trigger').is_file() or process.poll() is not None:
+            break
+        time.sleep(0.01)
+    if process.poll() is None:
+        (cache_directory / ('a' * 32 + '.php')).write_text('<?php /*' + str(site / 'public/web/cra1/page.php') + '*/ theme')
+        (site / 'runtime/theme-cache-placed').write_text('ready')
+    stdout, stderr = process.communicate(timeout=15)
+    result = subprocess.CompletedProcess(process.args, process.returncode, stdout, stderr)
     if result.returncode:
         raise RuntimeError(result.stderr + result.stdout)
     report = json.loads(result.stdout)

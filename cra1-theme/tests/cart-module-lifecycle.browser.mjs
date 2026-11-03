@@ -13,8 +13,8 @@ const json=(route,data)=>route.fulfill({json:{status:200,msg:'操作成功',data
 function check(ok,label){assert.ok(ok,label);checks.push(label);console.log(label)}
 let page
 try{
- for(const width of (process.env.CRA1_TEST_WIDTHS||'1920,1440,768,390').split(',').map(Number)){
-  const mobile=width===390
+ for(const width of (process.env.CRA1_TEST_WIDTHS||'1920,1440,768,390,320').split(',').map(Number)){
+  const mobile=width<768
   const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:960},...(mobile?{isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148'}:{})})
   let failNext=false,delayNext=false
   await context.route('**/*',async route=>{
@@ -29,7 +29,7 @@ try{
    const config=/^\/console\/v1\/product\/(50[123])\/config_option$/.exec(p)
    if(config){
     if(delayNext&&config[1]==='503'){delayNext=false;await new Promise(r=>setTimeout(r,700))}
-    return json(route,{content:'<style>.third-party-module{padding:12px;box-sizing:border-box;max-width:100%;font-size:14px}.third-party-module select{max-width:100%;height:40px}.third-party-module .f-order{position:static!important;width:100%!important;box-sizing:border-box}</style><div class="template third-party-module" data-pid="'+config[1]+'"><main><h2>原生模块 '+config[1]+'</h2><label>规格 <select v-model="plan"><option>标准版</option><option>专业版</option></select></label></main><div class="f-order"><p>当前价格 ¥12.00 / 月</p><button type="button" @click="bought++">原生订购 {{bought}}</button></div></div><script src="/fixture/vendor-boot.js"></scr'+'ipt>'})
+    return json(route,{content:'<style>.third-party-module{padding:12px;box-sizing:border-box;max-width:100%;font-size:14px}.third-party-module select{max-width:100%;height:40px}.third-party-module .f-order{position:static!important;box-sizing:border-box}</style><div class="template third-party-module" data-pid="'+config[1]+'"><main><h2>原生模块 '+config[1]+'</h2><label>规格 <select v-model="plan"><option>标准版</option><option>专业版</option></select></label></main><div class="f-order"><p>当前价格 ¥12.00 / 月</p><button type="button" @click="bought++">原生订购 {{bought}}</button></div></div><script src="/fixture/vendor-boot.js"></scr'+'ipt>'})
    }
    if(p==='/fixture/vendor-boot.js'){
     if(failNext){failNext=false;return route.abort()}

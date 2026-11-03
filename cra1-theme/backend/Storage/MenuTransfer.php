@@ -190,6 +190,7 @@ final class MenuTransfer
         if(!in_array($mode,['append','replace'],true)||(!$ids&&!$recent))throw new \InvalidArgumentException('请选择导入内容与方式');
         $incoming=self::select($doc['sidebar']['nodes'],$ids);$warnings=[];
         $incoming=$this->remap($incoming,$doc['bindings'],hash_equals($this->siteKey(),$doc['site_key']),$warnings);
+        $incoming=\cra1_icons_prepare_import($incoming,$warnings);
         $out=$current;
         if($ids){
             $seen=[];$collect=function(array $ns)use(&$collect,&$seen){foreach($ns as$n){$seen[$n['id']]=true;$collect($n['children']??[]);}};$collect($current['nodes']??[]);
@@ -199,6 +200,7 @@ final class MenuTransfer
         if($recent){if(!is_array($doc['sidebar']['recent']??null))throw new \InvalidArgumentException('文件不包含最近访问设置');$out['recent']=$doc['sidebar']['recent'];}
         self::checkTree($out['nodes']);$errors=$this->store->validateTree($out['nodes'],true);if($errors)throw new \InvalidArgumentException(implode('；',array_slice($errors,0,3)));
         $out=$this->store->normalizedPreview(['sidebar'=>$out])['sidebar'];
+        \cra1_icons_validate_nodes($out['nodes'],$current['nodes']??[]);
         return ['sidebar'=>$out,'warnings'=>$warnings,'difference'=>ConfigurationDiff::compare(['member'=>['sidebar'=>$current]],['member'=>['sidebar'=>$out]])];
     }
     public function defaults(): array

@@ -83,7 +83,21 @@ final class Inspector
         if($pending)$add('interrupted','blocked','中断更新','发现更新恢复记录，请先恢复主题文件');
         $counts=['pass'=>0,'warning'=>0,'blocked'=>0,'unverified'=>0];foreach($rows as$row)$counts[$row['status']]++;
         $installationCounts=['pass'=>0,'warning'=>0,'blocked'=>0,'unverified'=>0];foreach($rows as$row)if($row['scope']==='installation')$installationCounts[$row['status']]++;
-        return ['release'=>$release['release']??'未登记','version'=>$release['version']??null,'release_channel'=>$release['release_channel']??'candidate','identity'=>$identity,'target'=>'10.7.4','context'=>$context,'checks'=>$rows,'counts'=>$counts,'installation_counts'=>$installationCounts,'installation_ready'=>$runtimeSupported&&$installationCounts['blocked']===0&&$installationCounts['unverified']===0,'compatible'=>$runtimeSupported&&$installationCounts['blocked']===0&&$installationCounts['unverified']===0,'read_only'=>true];
+        return ['release'=>$release['release']??'未登记','version'=>$release['version']??null,'release_channel'=>$release['release_channel']??'candidate','identity'=>$identity,'target'=>'10.7.4','context'=>$context,'checks'=>$rows,'counts'=>$counts,'overview'=>self::overview($rows),'installation_counts'=>$installationCounts,'installation_ready'=>$runtimeSupported&&$installationCounts['blocked']===0&&$installationCounts['unverified']===0,'compatible'=>$runtimeSupported&&$installationCounts['blocked']===0&&$installationCounts['unverified']===0,'read_only'=>true];
+    }
+    /** Presentation groups do not change preflight or sensitive-operation gates. */
+    public static function overview(array $rows): array
+    {
+        $groups=['files'=>[],'environment'=>[],'contracts'=>[]];
+        foreach($groups as &$group)$group=['total'=>0,'pass'=>0,'warning'=>0,'blocked'=>0,'unverified'=>0];unset($group);
+        foreach($rows as $row){
+            $id=(string)($row['id']??'');
+            $key=strpos($id,'file:')===0?'files':((strpos($id,'dependency:')===0||$id==='compatibility')?'contracts':'environment');
+            $status=$row['status']??'unverified';
+            if(!isset($groups[$key][$status]))$status='unverified';
+            $groups[$key]['total']++;$groups[$key][$status]++;
+        }
+        return $groups;
     }
     /** Runtime baseline is deliberately separate from a complete business support claim. */
     public static function runtimeMatch(array $release,array $context): bool

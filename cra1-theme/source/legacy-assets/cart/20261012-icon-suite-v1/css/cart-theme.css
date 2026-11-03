@@ -3015,6 +3015,15 @@ html[data-cra1-theme="cart"] .cl-cart-disk-compact > button { display:inline-fle
 }
 
 /* Read failures remain legible under V10's responsive root font size. */
+.cart-page .cl-price-pending { color:var(--cui-muted, #626970); font-size:13px; line-height:1.5; }
+.cart-page .cl-native-purchase-jump {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  width:100%; min-height:44px; margin:0 0 12px; padding:10px 14px;
+  border:1px solid var(--cui-border, #dddfe2); border-radius:10px;
+  background:var(--cui-surface, #fff); color:var(--cui-text, #30363d);
+  font:inherit; font-size:14px; cursor:pointer;
+}
+.cart-page .cl-native-purchase-jump:focus-visible { outline:2px solid #89744e; outline-offset:3px; }
 .cart-page .cra1-cart-read-error {
   display: flex;
   flex-wrap: wrap;

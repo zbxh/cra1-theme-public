@@ -61,8 +61,25 @@ final class Updater
                 $files[]=['path'=>$path,'owner'=>'酷锐A1主题','purpose'=>$row['purpose']??self::purpose($path),'status'=>$status,'before'=>$old,'after'=>$row['sha256'],'impact'=>$status==='一致'?'无变化':'旧版将备份；不涉及系统核心'];
             }catch(\Throwable $e){if(strpos($e->getMessage(),'此文件需要写入，但所在目录')!==0)$blockers[]=$path.'：'.$e->getMessage();$files[]=['path'=>$path,'status'=>'阻断','owner'=>'酷锐A1主题','purpose'=>self::purpose($path),'impact'=>$e->getMessage()];}
         }
+        try{
+            $references=References::inspect($this->root,$doc['references']??[],$this->entry);References::checkCopies($this->root);
+            if($references&&References::usesCopies($this->root,$references)){
+                // Include derived copies, even when their source exists only in
+                // the candidate ZIP. Preflight must not stage or write them.
+                $plan=References::copyPlan($this->root,$references,'',$doc['files']);
+                $registry=Files::json(References::copyRegistry($this->root),true);
+                foreach($plan as$path=>$row){
+                    if($row['before']!==$row['after'])$this->checkWriteParent($this->root.'/'.$path,$permissions);
+                    $registry['files'][$path]=$row['after'];
+                }
+                if(isset($registry['files']))ksort($registry['files']);
+                $bytes=json_encode($registry,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR)."\n";
+                $file=References::copyRegistry($this->root);
+                if(!is_file($file)||!hash_equals(hash_file('sha256',$file),hash('sha256',$bytes)))$this->checkWriteParent($file,$permissions);
+            }else foreach($references as$path=>$target)if(!file_exists($this->root.'/'.$path)&&!is_link($this->root.'/'.$path))$this->checkWriteParent($this->root.'/'.$path,$permissions);
+        }catch(\Throwable $e){$blockers[]=$e->getMessage();}
+        try{foreach(ThemeCache::preflight($this->root)as$warning)$warnings[]=$warning;}catch(\Throwable $e){$blockers[]=$e->getMessage();}
         if($permissions)$blockers[]='以下目录内有需要更新的主题文件，但 PHP 运行用户无写入权限：'.implode('、',array_keys($permissions)).'。请在网站面板调整这些目录的属主或写入权限后重新上传，无需将整站设为 777。';
-        try{References::inspect($this->root,$doc['references']??[],$this->entry);References::checkCopies($this->root);}catch(\Throwable $e){$blockers[]=$e->getMessage();}
         if(is_file($this->dir.'/pending.json'))$blockers[]='有未完成的更新，请先恢复';
         return $info+['release_channel'=>$doc['release_channel']??'candidate','files'=>$files,'native_dependencies'=>$dependencies,'blockers'=>$blockers,'warnings'=>array_values($warnings),'can_apply'=>!$blockers,'signature'=>'请核对更新包来源及 SHA-256 校验值'];
     }
@@ -95,7 +112,7 @@ final class Updater
             if(!hash_equals($check['sha256'],$expectedDigest))throw new \RuntimeException('候选包与已确认预检不一致');
             if(!$check['can_apply'])throw new \RuntimeException('更新检查未通过，请按页面提示处理后重新上传');
             $id=$check['manifest']['release'];$backup=$this->dir.'/history/'.$id.'-'.bin2hex(random_bytes(5));
-            $stage=$this->dir.'/staging/'.bin2hex(random_bytes(16));$prepared=false;
+            $stage=$this->dir.'/staging/'.bin2hex(random_bytes(16));$prepared=false;$phase='准备更新文件';
             try{
                 Package::stage($archive,$stage,$check);
                 $previous=Files::json($this->dir.'/current.json',true);
@@ -135,6 +152,7 @@ final class Updater
                 }else foreach($references as $path=>$target)if(!file_exists($this->root.'/'.$path)&&!is_link($this->root.'/'.$path))$journal['references'][$path]=$target;
                 Files::putJson($backup.'/journal.json',$journal,0600);
                 Files::putJson($this->dir.'/pending.json',$journal,0600);$prepared=true;
+                $phase='替换主题文件';
                 foreach($check['manifest']['files'] as $path=>$row){
                     $target=Manifest::destination($this->root,$path,$this->entry);
                     if(!isset($journal['files'][$path])){
@@ -146,26 +164,27 @@ final class Updater
                     if(!is_file($target)||!hash_equals($row['sha256'],hash_file('sha256',$target)))throw new \RuntimeException('落盘校验失败：'.$path);
                     self::invalidate($target);
                 }
-                References::apply($this->root,$check['manifest']['references']??[]);
+                $phase='同步页面依赖';References::apply($this->root,$check['manifest']['references']??[]);
                 // Candidate migration runs only in the write transaction, after its files
                 // passed verification. Read-only preflight never initializes user data.
-                self::migrateAnnouncements($this->root,$check['manifest']);
-                ThemeCache::refresh($this->root,$check['manifest'],$this->entry);
+                $phase='迁移通知数据';self::migrateAnnouncements($this->root,$check['manifest']);
+                $phase='刷新页面缓存';ThemeCache::refresh($this->root,$check['manifest'],$this->entry);
                 $current=['release'=>$id,'manifest'=>$check['manifest'],'security_epoch'=>$check['manifest']['security_epoch']??1,'archive_sha256'=>$expectedDigest,'installed_at'=>time(),'history'=>basename($backup),'previous_release'=>$previous['release']??null];
                 if(isset($check['manifest']['backend_root']))$current['backend_root']=$check['manifest']['backend_root'];
                 // New resource selection becomes visible only after all files are verified.
-                Files::putJson($this->dir.'/current.json',$current,0600);
+                $phase='保存生效版本';Files::putJson($this->dir.'/current.json',$current,0600);
                 $journal['state']='complete';Files::putJson($backup.'/journal.json',$journal,0600);
                 unlink($this->dir.'/pending.json');$prepared=false;
                 return ['release'=>$id,'history'=>basename($backup),'files'=>count($journal['files']),'preserved'=>['主配置','账号','密钥','媒体','页面覆盖','草稿'],'rollback_available'=>true];
             }catch(\Throwable $e){
+                $reference=$this->reportFailure($e,$phase);
                 if($prepared){
                     try{$this->restore($journal,false,false);}
-                    catch(\Throwable $recovery){throw new \RuntimeException('更新中断，自动恢复未完成；恢复记录已保留，请在主题管理执行恢复',0,$recovery);}
-                    throw new \RuntimeException('更新失败，主题文件和生效引用已恢复',0,$e);
+                    catch(\Throwable $recovery){$this->reportFailure($recovery,'恢复原版本',$reference);throw new \RuntimeException('更新中断，自动恢复未完成；恢复记录已保留，请重新检查并恢复。参考编号：'.$reference,0,$recovery);}
+                    throw new \RuntimeException('更新在“'.$phase.'”阶段失败，主题文件和生效引用已恢复。参考编号：'.$reference,0,$e);
                 }
-                throw $e;
-            }finally{$this->removeStage($stage);}
+                throw new \RuntimeException('更新在“'.$phase.'”阶段失败，尚未切换生效版本。参考编号：'.$reference,0,$e);
+            }finally{try{$this->removeStage($stage);}catch(\Throwable $cleanup){$this->reportFailure($cleanup,'清理更新暂存文件');}}
         });
     }
     public static function migrateAnnouncements(string $root,array $manifest): void
@@ -272,7 +291,23 @@ final class Updater
         foreach(glob($this->dir.'/history/*/journal.json')?:[] as $file){$j=Files::json($file);$row=['id'=>basename(dirname($file)),'release'=>$j['release'],'created_at'=>$j['created_at'],'state'=>$j['state']];if(isset($j['version']))$row['version']=$j['version'];if(isset($j['release_channel']))$row['release_channel']=$j['release_channel'];$out[]=$row;}
         return ['current'=>CustomerData::current(Files::json($this->dir.'/current.json',true)),'history'=>$out,'interrupted'=>is_file($this->dir.'/pending.json')];
     }
-    private static function invalidate(string $target): void{if(function_exists('opcache_invalidate')&&substr($target,-4)==='.php')opcache_invalidate($target,true);}
+    private function checkWriteParent(string $target,array &$permissions): void
+    {
+        Files::noLinks($target);$parent=dirname($target);while(!is_dir($parent))$parent=dirname($parent);
+        if(!is_writable($parent)||!is_executable($parent)){$relative=substr($parent,strlen($this->root)+1);$permissions[$relative!==''?$relative.'/':'网站根目录']=true;}
+    }
+    /** No request bodies or trace arguments; details stay in the PHP error log. */
+    private function reportFailure(\Throwable $error,string $phase,?string $reference=null): string
+    {
+        $reference=$reference??strtoupper(bin2hex(random_bytes(6)));$chain=[];
+        for($current=$error;$current!==null&&count($chain)<6;$current=$current->getPrevious()){
+            $message=preg_replace('/(?:password|secret|token|csrf|cookie|jwt|authorization)\s*[=:]\s*[^\s,;]+/i','[敏感信息已隐藏]',$current->getMessage());
+            $chain[]=['type'=>get_class($current),'file'=>$current->getFile(),'line'=>$current->getLine(),'message'=>mb_substr(str_replace(["\r","\n","\0"],' ',(string)$message),0,1000)];
+        }
+        try{error_log('CRA1 update '.json_encode(['reference'=>$reference,'phase'=>$phase,'errors'=>$chain],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_INVALID_UTF8_SUBSTITUTE));}catch(\Throwable $ignored){}
+        return $reference;
+    }
+    private static function invalidate(string $target): void{ThemeCache::invalidate($target);}
     private function removeStage(string $dir): void
     {
         if(!is_dir($dir))return;

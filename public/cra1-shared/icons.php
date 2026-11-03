@@ -241,7 +241,30 @@ function cra1_icon_validate_change($value,$old,string $context='website'): void 
 }
 function cra1_icons_validate_nodes(array $nodes,array $oldNodes,string $context='member-sidebar'): void {
     $before=[];$flatten=function($list)use(&$flatten,&$before){foreach($list as $n){$before[$n['id']??'']=$n;$flatten($n['children']??[]);}};$flatten($oldNodes);
-    $walk=function($list)use(&$walk,$before,$context){foreach($list as $n){cra1_icon_validate_change($n['icon']??'', $before[$n['id']??'']['icon']??null,$context);if(isset($n['icon_style']))cra1_icon_style_clean($n['icon_style']);$walk($n['children']??[]);}};$walk($nodes);
+    $walk=function($list,string $parent='')use(&$walk,$before,$context){foreach($list as $n){
+        $label=mb_substr(strip_tags((string)($n['label']??$n['name']??'未命名菜单')),0,100);
+        $path=$parent===''?$label:$parent.' / '.$label;
+        try{cra1_icon_validate_change($n['icon']??'', $before[$n['id']??'']['icon']??null,$context);if(isset($n['icon_style']))cra1_icon_style_clean($n['icon_style']);}
+        catch(InvalidArgumentException $error){throw new InvalidArgumentException('「'.$path.'」：'.$error->getMessage());}
+        $walk($n['children']??[],$path);
+    }};$walk($nodes);
+}
+/** Imported references are not guaranteed to exist on the destination site.
+ * Only incoming nodes are adapted. Existing merchant values are never repaired here.
+ */
+function cra1_icons_prepare_import(array $nodes,array &$warnings,string $context='member-sidebar'): array {
+    $walk=function(array $list,string $parent='')use(&$walk,&$warnings,$context):array{
+        foreach($list as &$node){
+            $label=mb_substr(strip_tags((string)($node['label']??'未命名菜单')),0,100);
+            $path=$parent===''?$label:$parent.' / '.$label;
+            $value=trim((string)($node['icon']??''));
+            if($value!==''&&empty(cra1_icons_resolve($value,$context)['available'])){
+                $node['icon']='';
+                $warnings[]='「'.$path.'」的图标在本站不可用，已使用默认图标，可在导入后重新选择。';
+            }
+            $node['children']=$walk($node['children']??[],$path);
+        }unset($node);return $list;
+    };return $walk($nodes);
 }
 function cra1_icons_validate_row_text(string $value,string $old,int $iconColumn): void {
     if($value===$old)return;$oldIcons=[];
