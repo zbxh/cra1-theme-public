@@ -24,8 +24,8 @@ try {
  $options=['https'=>true,'origin'=>'https://fixture.invalid','context'=>['database'=>true,'system_version'=>'10.7.4','modules'=>[]]];
  $installer=new Installer($base);$result=$installer->preflight($options);
  check($result['installation_ready'],'ordinary 10.7.4 installation is allowed without identical modules and native file hashes');
- check(array_column($result['checks'],'id')===['php','extensions','database','directories','https','private-paths'],'only the six grouped runtime checks are returned');
- check($result['counts']['pass']===6,'no per-file rows leak into the installer');
+ check(array_column($result['checks'],'id')===['php','extensions','database'],'only PHP, necessary extensions and database checks are returned');
+ check($result['counts']['pass']===3,'no per-file rows leak into the installer');
  check(!isset($result['context'])&&!isset($result['files'])&&!isset($result['native_dependencies']),'no backend settings, module inventory or file manifest is sent to the page');
  check($result['environment']['system_version']==='10.7.4','actual V10 version remains available as display information');
  check(Inspector::nativeDependency($base,$release['native_dependencies'][0])['status']==='unverified','detailed compatibility inspection still reports unknown native files');
@@ -38,29 +38,27 @@ try {
  check($result['installation_ready']&&$result['environment']['system_version']==='10.7.5','version display is not an exact test-site whitelist');
  $failed=$options;$failed['context']['database']=false;
  check(!$installer->preflight($failed)['installation_ready'],'database connection failure blocks installation');
- $failed=$options;$failed['https']=false;
- check(!$installer->preflight($failed)['installation_ready'],'HTTPS remains required');
- $failed=$options;$failed['origin']='https://other.invalid';
- $result=$installer->preflight($failed);
- check($result['installation_ready']&&$result['checks'][5]['status']==='warning','a report from another site is not trusted and does not block the running environment');
- proof($base,['checked_at'=>time()-86401]);
- check($installer->preflight($options)['installation_ready'],'an expired diagnostic does not block otherwise usable installation');
- proof($base,['passed'=>false,'checks'=>[['passed'=>false,'status'=>0]]]);$result=$installer->preflight($options);
- $row=$result['checks'][5];
- check($result['installation_ready']&&$row['status']==='warning'&&strpos($row['detail'],'不影响安装')!==false,'network failure is advisory and does not instruct the user to change a correct public root');
- proof($base,['passed'=>false,'checks'=>[['passed'=>true,'status'=>200],['passed'=>false,'status'=>200]]]);$result=$installer->preflight($options);
- check($result['installation_ready']&&$result['checks'][5]['status']==='warning','legacy HTTP 200 alone no longer blocks installation');
- proof($base,['format'=>2,'passed'=>false,'outcome'=>'exposed']);$result=$installer->preflight($options);
- check(!$result['installation_ready']&&$result['checks'][5]['status']==='blocked','only a current-site report with actual file-content evidence blocks setup');
- check(strpos(json_encode($result),'root_hash')===false&&strpos(json_encode($result),'cra1-check-')===false,'the page does not receive private diagnostic paths or probe details');
- proof($base,['format'=>2,'passed'=>false,'outcome'=>'inconclusive']);$result=$installer->preflight($options);
- check($result['installation_ready']&&$result['counts']['warning']===1,'an inconclusive diagnostic does not count as a runtime failure');
+ $http=$options;$http['https']=false;$http['origin']='http://fixture.invalid';
+ check($installer->preflight($http)['installation_ready'],'HTTP is supported without a TLS or website-directory probe');
+ foreach([
+  ['format'=>2,'passed'=>false,'outcome'=>'exposed'],
+  ['format'=>2,'passed'=>false,'outcome'=>'inconclusive'],
+  ['passed'=>true,'checked_at'=>time()-86401],
+ ]as$legacy){
+  proof($base,$legacy);$path=$base.'/runtime/cra1_theme/private-path-check.json';$hash=hash_file('sha256',$path);
+  $result=$installer->preflight($http);
+  check($result['installation_ready']&&$result['counts']['warning']===0,'legacy file-access diagnostics are no longer installation conditions');
+  check(hash_file('sha256',$path)===$hash,'installation inspection neither rewrites nor renews old file probes');
+ }
  Files::atomic($base.'/runtime/cra1_theme/private-path-check.json','malformed optional diagnostic');
- check($installer->preflight($options)['installation_ready'],'a damaged optional diagnostic does not stop installation');
+ check($installer->preflight($http)['installation_ready'],'an unused damaged diagnostic is not read during installation');
  unlink($base.'/runtime/cra1_theme/private-path-check.json');
- check($installer->preflight($options)['installation_ready'],'a missing optional diagnostic does not stop installation');
- proof($base);Files::atomic($base.'/config','not a directory');
- check(!$installer->preflight($options)['installation_ready'],'invalid configuration directory prevents initialization');unlink($base.'/config');
+ $before=array_keys(iterator_to_array(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($base,FilesystemIterator::SKIP_DOTS))));
+ $installer->preflight($http);
+ $after=array_keys(iterator_to_array(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($base,FilesystemIterator::SKIP_DOTS))));
+ check($before===$after,'checking the environment creates no probe files or directories');
+ Files::atomic($base.'/config','not a directory');
+ check($installer->preflight($http)['installation_ready'],'directory layout is not a separate installation scan');unlink($base.'/config');
  Files::putJson($base.'/runtime/cra1_theme/distribution/pending.json',['state'=>'interrupted']);
  check(!$installer->preflight($options)['installation_ready'],'an interrupted update cannot be overwritten by initialization');
  unlink($base.'/runtime/cra1_theme/distribution/pending.json');

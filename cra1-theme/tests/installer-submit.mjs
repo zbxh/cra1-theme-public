@@ -1,4 +1,4 @@
-import https from 'node:https';
+import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -19,9 +19,7 @@ const adminRequire=createRequire(path.join(root,'cra1-theme/source/admin/package
 const entry=path.join(temp,'admin.jsx'),bundle=path.join(temp,'admin.js');
 fs.writeFileSync(entry,`import React from ${JSON.stringify(path.join(root,'cra1-theme/source/admin/node_modules/react/index.js'))};import{createRoot}from ${JSON.stringify(path.join(root,'cra1-theme/source/admin/node_modules/react-dom/client.js'))};import Security from ${JSON.stringify(path.join(root,'cra1-theme/source/admin/src/pages/Security.jsx'))};createRoot(document.getElementById('root')).render(<Security mode="accounts"/>);`);
 adminRequire('esbuild').buildSync({entryPoints:[entry],outfile:bundle,bundle:true,format:'iife',jsx:'automatic',loader:{'.css':'empty'},nodePaths:[path.join(root,'cra1-theme/source/admin/node_modules')],alias:{'@ui':path.join(root,'cra1-theme/source/admin/src/components/ui')},logLevel:'silent'});
-const certificate=spawnSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-days','1','-keyout',path.join(temp,'key.pem'),'-out',path.join(temp,'cert.pem'),'-subj','/CN=127.0.0.1','-addext','subjectAltName=IP:127.0.0.1'],{encoding:'utf8'});
-if(certificate.status!==0)throw Error('Unable to create isolated HTTPS fixture.');
-const server=https.createServer({key:fs.readFileSync(path.join(temp,'key.pem')),cert:fs.readFileSync(path.join(temp,'cert.pem'))},(req,res)=>{
+const server=http.createServer((req,res)=>{
   const url=new URL(req.url,'http://fixture.invalid');
   if(url.pathname==='/cra1-install/'){
     res.setHeader('Content-Type','text/html; charset=utf-8');res.end(rendered.stdout);return;
@@ -35,7 +33,7 @@ const server=https.createServer({key:fs.readFileSync(path.join(temp,'key.pem')),
   res.writeHead(404);res.end('Fixture not found');
 });
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-const origin='https://127.0.0.1:'+server.address().port;
+const origin='http://127.0.0.1:'+server.address().port;
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const checks=[],errors=[],consoles=[];
 let totalWrites=0;
@@ -64,6 +62,7 @@ async function fixture({width=1440,fastTimeout=false}={}){
     }
     check(input.action==='install','only registered installation actions are sent');
     check(!Object.hasOwn(input,'confirm'),'confirmation password is not sent to the server');
+    check(!Object.hasOwn(input,'canonical'),'installation derives the website origin on the server');
     state.installs++;totalWrites++;
     if(state.mode==='hold')await new Promise(resolve=>state.release=resolve);
     if(state.mode==='timeout'){await new Promise(resolve=>setTimeout(resolve,250));await route.abort().catch(()=>{});return;}
@@ -82,7 +81,7 @@ async function fixture({width=1440,fastTimeout=false}={}){
   await page.evaluate(()=>localStorage.setItem('backJwt','isolated-native-admin'));
   async function inspect(){await page.locator('#check').click();await page.waitForFunction(()=>!document.getElementById('check').disabled||document.getElementById('status').textContent.includes('已安装酷锐A1'));}
   async function fill(values={}){
-    for(const [name,value]of Object.entries({entry:'exampleadmin',username:'example_admin',password,confirm:password,canonical:origin,...values}))await page.locator(`[name=${name}]`).fill(value);
+    for(const [name,value]of Object.entries({entry:'exampleadmin',username:'example_admin',password,confirm:password,...values}))await page.locator(`[name=${name}]`).fill(value);
   }
   return {context,page,state,inspect,fill,close:()=>context.close()};
 }
@@ -91,8 +90,8 @@ try{
   for(const [name,value,description]of [
     ['entry','','missing entry'],['entry','abc','short entry'],['entry','ExampleAdmin','uppercase entry'],
     ['username','ab','short username'],['username','测试账号','non-ASCII username'],['username','user@example.com','invalid username punctuation'],
-    ['password','short-pass','short password'],['confirm','','missing confirmation'],['confirm','Different-password!','mismatching confirmation'],
-    ['canonical','https://other.invalid','different installation origin'],['canonical','http://example.invalid','HTTP origin'],['canonical','https://example.invalid/a','origin with path'],['canonical','https://example.invalid/?q=a','origin with query'],['canonical','','missing origin']
+    ['password','short-pass','short password'],['confirm','','missing confirmation'],['confirm','Different-password!','mismatching confirmation']
+
   ]){
     await f.fill({[name]:value});const before=f.state.installs;
     await f.page.locator('#install').click();
@@ -122,7 +121,7 @@ try{
   for(const username of ['test-user','test_user','abc']){
     const f=await fixture();await f.inspect();await f.fill({username});
     check(await f.page.locator('[name=username]').evaluate(node=>node.validity.valid),'HTML pattern accepts '+username);
-    await f.page.locator('[name=canonical]').press('Enter');await f.page.locator('#success').waitFor({state:'visible'});
+    await f.page.locator('[name=confirm]').press('Enter');await f.page.locator('#success').waitFor({state:'visible'});
     check(f.state.installs===1,'keyboard submits valid username '+username+' exactly once');await f.close();
   }
   for(const mode of ['rejected','auth','auth-forbidden','html','forbidden-html','missing-api','network','http-error','timeout','incomplete']){

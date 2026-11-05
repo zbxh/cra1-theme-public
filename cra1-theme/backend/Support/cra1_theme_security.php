@@ -141,7 +141,7 @@ SQL
         $current=$this->settings();$v=array_replace($current,$p);if((int)$v['idle_timeout']<300||(int)$v['idle_timeout']>3600||(int)$v['absolute_timeout']<1800||(int)$v['absolute_timeout']>86400||(int)$v['idle_timeout']>(int)$v['absolute_timeout'])throw new CRA1ThemeSecurityError('空闲时长需为 5–60 分钟，总有效期为 30 分钟–24 小时');
         foreach(['trusted_proxies','ip_allowlist']as$k){if(!is_array($v[$k])||count($v[$k])>64)throw new CRA1ThemeSecurityError('地址名单格式不正确');foreach($v[$k]as$ip)if(!self::validCidr((string)$ip))throw new CRA1ThemeSecurityError('地址名单需填写有效 IP 或 CIDR');}
         $url=rtrim((string)$v['canonical_url'],'/');$u=parse_url($url);if(!$u||!in_array($u['scheme']??'',['http','https'],true)||empty($u['host'])||isset($u['user'])||isset($u['pass'])||isset($u['query'])||isset($u['fragment'])||!empty($u['path'])||!filter_var($url,FILTER_VALIDATE_URL))throw new CRA1ThemeSecurityError('规范站点地址需为完整 http/https 域名或 IP，不包含路径');
-        if((!empty($v['force_https'])||empty($v['http_test']))&&$u['scheme']!=='https')throw new CRA1ThemeSecurityError('正式部署或强制 HTTPS 前，请先配置有效的 HTTPS 站点');
+        if(!empty($v['force_https'])&&$u['scheme']!=='https')throw new CRA1ThemeSecurityError('开启强制 HTTPS 前，请先配置有效的 HTTPS 站点');
         $v['canonical_url']=$url;$this->tx(function()use($v){$s=$this->db->prepare('INSERT OR REPLACE INTO settings VALUES(?,?)');foreach($v as$k=>$x)$s->execute([$k,json_encode($x,JSON_UNESCAPED_SLASHES)]);$this->db->prepare('UPDATE sessions SET revoked_at=? WHERE revoked_at=0')->execute([time()]);});
     }
     public static function validCidr(string $s): bool { $p=explode('/',$s);$raw=inet_pton($p[0]);return $raw!==false&&count($p)<=2&&(!isset($p[1])||(ctype_digit($p[1])&&(int)$p[1]<=strlen($raw)*8)); }

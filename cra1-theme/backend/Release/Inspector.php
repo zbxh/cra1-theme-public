@@ -66,19 +66,6 @@ final class Inspector
             $check=self::nativeDependency($root,$dependency,$release['integration_profiles']??[]);
             $add('dependency:'.$check['path'],$check['status'],$check['purpose'],$check['detail'],$check['path'],$check['impact']);
         }
-        // Renaming a backend entry checks its parent when requested. Ordinary
-        // use and uploads into theme-owned directories do not write public/ itself.
-        foreach(['runtime/cra1_theme','config','public/upload']as$dir){
-            $path=$root.'/'.$dir;while(!file_exists($path)&&dirname($path)!==$path)$path=dirname($path);
-            $add('writable:'.$dir,is_writable($path)?'pass':'blocked','目录权限',is_writable($path)?'目标可写':'目标不可写',$dir);
-        }
-        $https=$options['https']??(!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off');
-        $add('https',$https?'pass':'blocked','HTTPS',$https?'已通过 HTTPS 访问':'安装需要有效 HTTPS；不信任未经配置的转发请求头');
-        // Inspection never makes network requests to localhost or downloads private canaries.
-        try{$proof=Files::json($root.'/runtime/cra1_theme/private-path-check.json',true);}
-        catch(\Throwable $error){$proof=[];}
-        $diagnostic=PrivatePaths::assessment($proof,$root,$options['origin']??null);
-        $add('private-paths',$diagnostic['status'],'文件访问诊断',$diagnostic['detail']);
         $pending=is_file($root.'/runtime/cra1_theme/distribution/pending.json');
         if($pending)$add('interrupted','blocked','中断更新','发现更新恢复记录，请先恢复主题文件');
         $counts=['pass'=>0,'warning'=>0,'blocked'=>0,'unverified'=>0];foreach($rows as$row)$counts[$row['status']]++;

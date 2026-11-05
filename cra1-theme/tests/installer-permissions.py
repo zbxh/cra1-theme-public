@@ -71,7 +71,7 @@ try {
         path.chmod(0o555)
 
     def exercise(action='inspect', entry='cra1admin', flags=()):
-        result = subprocess.run([*prefix, php, *flags, str(script), str(site), action, entry], capture_output=True, text=True)
+        result = subprocess.run([*prefix, php, '-d', 'display_errors=0', *flags, str(script), str(site), action, entry], capture_output=True, text=True)
         if result.returncode:
             raise RuntimeError(result.stderr + result.stdout)
         return result.stdout if action == 'render' else json.loads(result.stdout)
@@ -79,24 +79,24 @@ try {
     try:
         result = exercise()
         check(result['installation_ready'], 'read-only uploaded programs and public root permit default-entry initialization')
-        check(len(result['checks']) == 6, 'permission cases remain inside the six existing check groups')
+        check(len(result['checks']) == 3, 'only runtime requirements are checked, independently of directory permissions')
         result = exercise('install', 'exampleadmin')
-        check('public/' in result.get('error', '') and 'cra1admin' in result['error'], 'custom entry explains the required parent rename permission')
-        check(not (site / 'config/cra1_theme_security.key').exists(), 'rename permission failure occurs before any identity is created')
+        check('无法设置后台地址' in result.get('error', ''), 'an actual failed custom-entry rename reports the operation to fix')
+        check(not (site / 'config/cra1_theme_security.key').exists(), 'a failed rename rolls back the newly created identity')
 
         (site / 'config').chmod(0o500)
         result = exercise()
-        check(not result['installation_ready'] and 'config' in result['checks'][3]['detail'], 'unwritable key directory reports its relative path')
+        check(result['installation_ready'], 'configuration-directory permissions are not separately scanned')
         (site / 'config').chmod(0o700)
         (site / 'runtime/cra1_theme').chmod(0o500)
         result = exercise()
-        check(not result['installation_ready'] and 'runtime/cra1_theme' in result['checks'][3]['detail'], 'unwritable data directory reports its relative path')
+        check(result['installation_ready'], 'data-directory permissions are not separately scanned')
         (site / 'runtime/cra1_theme').chmod(0o700)
         distribution = site / 'runtime/cra1_theme/distribution'
         distribution.mkdir()
         distribution.chmod(0o555)
         result = exercise()
-        check(not result['installation_ready'] and 'runtime/cra1_theme/distribution' in result['checks'][3]['detail'], 'an existing read-only version-pointer directory is reported before installation')
+        check(result['installation_ready'], 'read-only distribution directories are not preemptive environment gates')
         distribution.rmdir()
 
         (site / 'public').chmod(0o755)
@@ -110,7 +110,7 @@ try {
         manifest['references'] = {'public/cart/template/pc/cra1/assets': 'public/cart/template/pc/default'}
         release.write_text(json.dumps(manifest))
         result = exercise()
-        check(not result['installation_ready'] and 'public/cart/template/pc/cra1/assets' in result['checks'][3]['detail'], 'a pre-existing dependency directory is checked when its missing child needs a write')
+        check(result['installation_ready'], 'dependency directories are prepared during actual installation rather than scanned')
         shutil.copyfile(native / 'asset.js', destination / 'asset.js')
         check(exercise()['installation_ready'], 'complete unchanged dependency copies need no program-directory write permission')
         manifest['references'] = {}
@@ -119,7 +119,7 @@ try {
         api = site / 'public/cra1-install/api.php'
         api.chmod(0o000)
         result = exercise()
-        check(not result['installation_ready'] and 'api.php' in result['checks'][3]['detail'], 'unreadable installation controller is not treated as a writable-directory issue')
+        check(result['installation_ready'], 'environment checks do not enumerate website controllers')
         api.chmod(0o644)
 
         html = exercise('render', flags=('-d', 'session.save_path=' + str(base / 'missing-session-directory')))

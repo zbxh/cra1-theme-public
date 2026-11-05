@@ -21,6 +21,17 @@ try{
  check($rejected,'installation fields cannot be coerced from arrays');
  $result=$originInstaller->install(array_replace($input,['canonical'=>'https://FIXTURE.invalid:8443/']),$passed,$origin);
  $security=new CRA1ThemeSecurity($base.'/origin');check($security->settings()['canonical_url']===$origin,'equivalent canonical URLs are saved using the actual installation origin');unset($security);
+ $httpInstaller=fixture($base.'/http');$httpInput=$input;unset($httpInput['canonical']);
+ $httpOrigin='http://fixture.invalid:8080';
+ $result=$httpInstaller->install($httpInput,$passed,$httpOrigin);
+ $security=new CRA1ThemeSecurity($base.'/http');
+ check($result['installed']&&$security->settings()['canonical_url']===$httpOrigin,'HTTP installation uses the browser origin without a website-address form field');
+ check(!$security->settings()['force_https']&&!$security->settings()['http_test'],'HTTP is a supported installation without forced redirect or a test-only policy');
+ $security->updateSettings(['canonical_url'=>$httpOrigin]);
+ check($security->settings()['canonical_url']===$httpOrigin,'HTTP administrators can save ordinary security settings');
+ $rejected=false;try{$security->updateSettings(['force_https'=>true]);}catch(CRA1ThemeSecurityError $error){$rejected=true;}
+ check($rejected&&!$security->settings()['force_https'],'explicitly enabling HTTPS still requires a matching site address');
+ check($security->checkPassword($input['username'],$input['password'])!==null,'the new HTTP administrator retains the entered login credentials');unset($security);
  foreach(['key','database','marker']as$partial){
   $dir=$base.'/partial-'.$partial;$incomplete=fixture($dir);
   $file=$partial==='key'?'/config/cra1_theme_security.key':($partial==='database'?'/runtime/cra1_theme/security.sqlite':'/runtime/cra1_theme/install.json');
@@ -45,7 +56,7 @@ try{
  $installer=fixture($base.'/fail');
  $inspectionOptions=['https'=>true,'context'=>['database'=>true,'system_version'=>'10.7.4','modules'=>[]]];
  $inspection=$installer->preflight($inspectionOptions+['entry'=>'untrusted']);
- check($inspection['scope']==='environment'&&count($inspection['checks'])===6,'fresh installation checks only the six environment groups');
+ check($inspection['scope']==='environment'&&count($inspection['checks'])===3,'fresh installation checks only the three essential environment groups');
  check(strpos(json_encode($inspection),'untrusted')===false,'administrator entry comes from the installation record, never supplied inspection options');
  $rejected=false;try{$installer->install($input,['counts'=>['blocked'=>1,'unverified'=>0]]);}catch(RuntimeException $e){$rejected=true;}
  check($rejected&&!is_file($base.'/fail/runtime/cra1_theme/security.sqlite'),'preflight failure never initializes identities');
@@ -60,7 +71,7 @@ try{
  Files::putJson($base.'/success/native-theme-settings.json',$previous);$settingsHash=hash_file('sha256',$base.'/success/native-theme-settings.json');
  Files::putJson($base.'/success/runtime/cra1_theme/member_center.json',['version'=>42,'unknown'=>'keep']);$hash=hash_file('sha256',$base.'/success/runtime/cra1_theme/member_center.json');
  $warning=$installer->preflight($inspectionOptions);
- check($warning['installation_ready']&&$warning['counts']['warning']===1,'a missing optional network diagnostic permits installation');
+ check($warning['installation_ready']&&$warning['counts']['warning']===0,'installation does not require network diagnostics');
  $result=$installer->install($input,$warning);
  check($result['installed']&&$result['password']===$input['password'],'password displayed only on success response');
  check(hash_file('sha256',$base.'/success/runtime/cra1_theme/member_center.json')===$hash,'existing content and unknown fields preserved');

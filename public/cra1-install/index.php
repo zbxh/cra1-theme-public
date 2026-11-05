@@ -4,7 +4,7 @@ ini_set('display_errors','0');
 header('Cache-Control: no-store');header('X-Robots-Tag: noindex, nofollow');header('X-Content-Type-Options: nosniff');header('X-Frame-Options: DENY');header('Referrer-Policy: no-referrer');
 header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'none'");
 ini_set('session.use_strict_mode','1');session_name('CRA1INSTALL');
-session_set_cookie_params(['lifetime'=>0,'path'=>'/cra1-install/','secure'=>true,'httponly'=>true,'samesite'=>'Strict']);$sessionReady=@session_start();
+session_set_cookie_params(['lifetime'=>0,'path'=>'/cra1-install/','secure'=>!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off','httponly'=>true,'samesite'=>'Strict']);$sessionReady=@session_start();
 if($sessionReady&&empty($_SESSION['csrf']))$_SESSION['csrf']=bin2hex(random_bytes(32));
 $csrf=$sessionReady?$_SESSION['csrf']:'';
 $assetsReady=is_readable(__DIR__.'/installer.js')&&is_readable(__DIR__.'/installer.css');
@@ -13,14 +13,13 @@ $startupError=!$sessionReady?'安装会话无法保存，请在网站面板检�
 ?><!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>酷锐A1主题安装与维护</title><link rel="stylesheet" href="installer.css?v=<?=$assetVersion?>"></head><body>
 <main id="installer" data-csrf="<?=htmlspecialchars($csrf,ENT_QUOTES,'UTF-8')?>">
 <h1>酷锐A1主题安装与维护</h1><p>先在同一浏览器登录 V10 超级管理员账号，再开始检查。首次安装设置主题后台；已有主题完整解压新版安装包后，可在这里完成更新。两种操作均保留当前主题启用状态。</p>
-<ol><li>验证管理员与检查文件</li><li>首次安装或完成更新</li><li>进入主题后台</li></ol>
+<ol><li>验证管理员与运行环境</li><li>首次安装或完成更新</li><li>进入主题后台</li></ol>
 <button type="button" id="check"<?=$startupError!==''?' disabled':''?>>验证并检查</button><p id="status" role="status"><?=htmlspecialchars($startupError,ENT_QUOTES,'UTF-8')?></p><div id="checks"></div>
 <form id="setup" hidden autocomplete="off" novalidate><h2>设置主题后台</h2>
 <label>后台地址<input name="entry" pattern="[a-z][a-z0-9]{5,31}" minlength="6" maxlength="32" required placeholder="例如 cra1admin"></label>
 <label>管理账号<input name="username" pattern="[A-Za-z0-9_\-]{3,32}" minlength="3" maxlength="32" required autocomplete="off"></label>
 <label>管理密码<input name="password" type="password" minlength="12" maxlength="128" required autocomplete="new-password"></label>
 <label>确认密码<input name="confirm" type="password" minlength="12" maxlength="128" required autocomplete="new-password"></label>
-<label>本站 HTTPS 地址<input name="canonical" type="url" required></label>
 <p id="setup-status" role="status" aria-live="polite" tabindex="-1" hidden></p>
 <button type="submit" id="install" disabled>完成安装</button></form>
 <section id="maintenance" hidden><h2 id="maintenance-title">完成主题更新</h2><p id="maintenance-summary"></p>

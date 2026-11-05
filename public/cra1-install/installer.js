@@ -60,12 +60,6 @@
     if(passwordLength<12||passwordLength>128||fields.password.value.includes('\0'))errors.push([fields.password,'管理密码需为 12–128 个字符。']);
     if(!fields.confirm.value)errors.push([fields.confirm,'请再次输入管理密码。']);
     else if(fields.password.value!==fields.confirm.value)errors.push([fields.confirm,'两次密码不一致，请重新确认。']);
-    let validUrl=false;
-    try{
-      const raw=fields.canonical.value,url=new URL(raw);
-      validUrl=raw===raw.trim()&&url.protocol==='https:'&&!!url.hostname&&!url.username&&!url.password&&url.pathname==='/'&&!url.search&&!url.hash&&url.origin===location.origin;
-    }catch(_){}
-    if(!validUrl)errors.push([fields.canonical,'请填写与当前安装页面一致的本站 HTTPS 地址，不带页面路径。']);
     errors.forEach(([input,value])=>fieldError(input,value));
     if(errors.length){message('请先修改标红的填写项，再点击“完成安装”。');errors[0][0].focus();return false;}
     message('');return true;
@@ -78,7 +72,7 @@
   }
   backup.addEventListener('change',()=>lock(false));
   checkButton.addEventListener('click',async()=>{
-    if(busy||installed)return;ready=false;confirmation=null;updateState=null;backup.checked=false;lock(true,'check');message('');status.textContent='正在验证身份并检查主题文件，请稍候…';form.hidden=true;maintenance.hidden=true;document.getElementById('update-success').hidden=true;updateFeedback.hidden=true;
+    if(busy||installed)return;ready=false;confirmation=null;updateState=null;backup.checked=false;lock(true,'check');message('');status.textContent='正在验证身份并检查运行环境，请稍候…';form.hidden=true;maintenance.hidden=true;document.getElementById('update-success').hidden=true;updateFeedback.hidden=true;
     document.getElementById('checks').replaceChildren();
     try{
       const data=await request({action:'check'}),out=document.getElementById('checks');
@@ -103,7 +97,6 @@
       }
       ready=data.installation_ready===true;
       status.textContent=ready?'运行环境检查通过，请设置主题后台。':'运行环境暂不满足，请处理下面提示后重新检查。';form.hidden=!ready;
-      if(!form.elements.canonical.value)form.elements.canonical.value=location.origin;
     }catch(error){status.textContent=error.message;}finally{lock(false);}
   });
   updateButton.addEventListener('click',async()=>{

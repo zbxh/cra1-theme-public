@@ -28,8 +28,8 @@ try{
  check($testInspect['release_channel']==='test'&&$testInspect['installation_ready']&&$testInspect['compatible'],'test channel separates install readiness from complete commercial support');
  Files::putJson($base.'/cra1-theme/release.json',$release);
  $unknown=$options;$unknown['context']['system_version']='10.7.5';check(!Inspector::inspect($base,$unknown)['installation_ready'],'unknown runtime cannot install');
- $insecure=$options;$insecure['https']=false;check(!Inspector::inspect($base,$insecure)['installation_ready'],'HTTPS remains mandatory');
- $badOrigin=$options;$badOrigin['origin']='https://different.invalid';$diagnostic=Inspector::inspect($base,$badOrigin);check($diagnostic['installation_ready']&&$diagnostic['counts']['warning']===1,'private-path proof cannot transfer across origins and remains an optional diagnostic');
+ $insecure=$options;$insecure['https']=false;check(Inspector::inspect($base,$insecure)['installation_ready'],'HTTP does not invalidate theme compatibility');
+ $badOrigin=$options;$badOrigin['origin']='https://different.invalid';$diagnostic=Inspector::inspect($base,$badOrigin);check($diagnostic['installation_ready']&&$diagnostic['counts']['warning']===0,'compatibility inspection does not depend on website-access probes');
  Files::atomic($base.'/app/native.php','changed');$changed=Inspector::inspect($base,$options);check(!$changed['installation_ready'],'same version with unverified native bytes cannot install');
  check($changed['overview']['files']['pass']===1&&$changed['overview']['files']['unverified']===0&&$changed['overview']['contracts']['unverified']===1,'unknown native files never become theme corruption or a verified contract');
  unlink($base.'/app/native.php');check(!Inspector::inspect($base,$options)['installation_ready'],'missing native dependency blocks installation');
@@ -38,6 +38,6 @@ try{
  Files::putJson($base.'/cra1-theme/release.json',$release);
  $sqlMode=$options;$sqlMode['context']['database_sql_mode']='ONLY_FULL_GROUP_BY';check(!Inspector::inspect($base,$sqlMode)['installation_ready'],'native SQL environment remains checked');
  Files::putJson($base.'/runtime/cra1_theme/private-path-check.json',['passed'=>true,'root_hash'=>hash('sha256',realpath($base)),'checked_at'=>time()-86401,'origin'=>'https://fixture.invalid']);check(Inspector::inspect($base,$options)['installation_ready'],'an expired network diagnostic does not invalidate otherwise compatible files');
- Files::putJson($base.'/runtime/cra1_theme/private-path-check.json',['format'=>2,'outcome'=>'exposed','passed'=>false,'root_hash'=>hash('sha256',realpath($base)),'checked_at'=>time(),'origin'=>'https://fixture.invalid']);check(!Inspector::inspect($base,$options)['installation_ready'],'a confirmed private-file leak remains actionable in detailed compatibility');
+ Files::putJson($base.'/runtime/cra1_theme/private-path-check.json',['format'=>2,'outcome'=>'exposed','passed'=>false,'root_hash'=>hash('sha256',realpath($base)),'checked_at'=>time(),'origin'=>'https://fixture.invalid']);check(Inspector::inspect($base,$options)['installation_ready'],'legacy website-access reports are no longer compatibility gates');
  echo json_encode(['status'=>'passed','checks'=>$checks,'commercial_release_accepted'=>false,'production_writes'=>0]).PHP_EOL;
 }finally{cleanup($base);}

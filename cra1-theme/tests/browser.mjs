@@ -114,7 +114,7 @@ try{
   ready=true;await page.getByRole('button',{name:'验证并检查'}).click();await page.locator('#setup').waitFor({state:'visible'})
   check(!/商业授权|商用发行|许可证|发行验收|免费商用/.test(await page.locator('body').innerText()),`installer contains only setup steps ${width}`)
   await page.screenshot({path:path.join(output,`installer-${width}.png`),fullPage:true})
-  await page.locator('[name=entry]').fill('fixtureadmin');await page.locator('[name=username]').fill('fixture-admin');await page.locator('[name=password]').fill('Fixture-password-2026!');await page.locator('[name=confirm]').fill('Fixture-password-2026!');await page.locator('[name=canonical]').fill(origin)
+  await page.locator('[name=entry]').fill('fixtureadmin');await page.locator('[name=username]').fill('fixture-admin');await page.locator('[name=password]').fill('Fixture-password-2026!');await page.locator('[name=confirm]').fill('Fixture-password-2026!')
   await page.getByRole('button',{name:'完成安装'}).click();await page.getByText('安装成功，初始化入口已锁定。').waitFor()
   check((await page.locator('#success').innerText()).includes('安装不会自动切换当前网站。'),`installer preserves the current website ${width}`)
   check(await page.getByRole('link',{name:'登录主题后台'}).getAttribute('href')==='/fixtureadmin/index.php',`installer links to independent administrator login ${width}`)
