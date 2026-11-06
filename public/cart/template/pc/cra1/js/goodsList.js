@@ -1978,6 +1978,7 @@
           if (
             scrollTop + clientHeight >= scrollHeight &&
             !this.goodSLoading &&
+            !this.catalogError &&
             !this.scrollDisabled
           ) {
             this.goodsParmas.page++;

@@ -29,7 +29,7 @@ class ViewClientController extends \app\home\controller\ViewClientController
         $params=$this->request->param();
         $pc=(string)($params['theme']??(cookie('clientarea_theme')?:configuration('clientarea_theme')));
         $mobile=(string)($params['theme_mobile']??(cookie('clientarea_theme_mobile')?:configuration('clientarea_theme_mobile')));
-        if (!\CRA1\Theme\Context::isCRA1($pc) || (use_mobile() && $mobile!=='' && $mobile!=='default' && !\CRA1\Theme\Context::isCRA1($mobile))) return parent::plugin();
+        if (!\CRA1\Theme\Context::isCRA1(use_mobile() ? $mobile : $pc)) return parent::plugin();
         $id=(int)($params['plugin_id']??0);
         $plugins=(new \app\admin\model\PluginModel())->plugins('addon')['list']??[];
         $plugin=null;
@@ -72,13 +72,14 @@ class ViewClientController extends \app\home\controller\ViewClientController
         $pc=(string)($params['theme']??(cookie('clientarea_theme')?:configuration('clientarea_theme')));
         $mobile=(string)($params['theme_mobile']??(cookie('clientarea_theme_mobile')?:configuration('clientarea_theme_mobile')));
         if (!\CRA1\Theme\Context::isCRA1($mobile)) return null;
-        $logic=new \app\common\logic\ClientareaTemplateLogic();
+        $logic=new \CRA1\Theme\Presentation\ClientareaTemplates();
         if (!$logic->validName($view)) return null;
         $pc=$logic->normalizeName($pc,(string)configuration('clientarea_theme'));
         $mobile=$logic->normalizeName($mobile,(string)configuration('clientarea_theme_mobile'));
         $business=$logic->resolveBusinessTemplate($type,$name,$view,true,$pc,$mobile);
-        // Preserve native missing-page handling and theme-specific mobile views.
-        if (empty($business['template_file']) || \CRA1\Theme\Context::isCRA1((string)$business['themes'])) return null;
+        // Resolve native mobile and PC fallbacks alike; older V10 controllers
+        // cannot render a PC-only module template from a mobile request.
+        if (empty($business['template_file'])) return null;
         $shell=$logic->resolvePublicShell(true,$pc,$mobile);
         if (empty($shell['header_file']) || empty($shell['footer_file']) || !\CRA1\Theme\Context::isCRA1((string)$shell['themes'])) return null;
         if ($type==='addon' && $name!=='idcsmart_certification') {

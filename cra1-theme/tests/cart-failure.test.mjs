@@ -79,3 +79,17 @@ test('an old category failure cannot replace a newer category result',async()=>{
  pending[1].resolve({data:{data:{list:[]}}});await newer;pending[0].reject(new Error('late private'));await older
  assert.equal(f.page.catalogError,'');assert.equal(f.page.select_first_obj.id,2);assert.equal(f.page.secondLoading,false)
 })
+test('a full catalog page settles loading while more products may remain',async()=>{
+ const f=catalogFixture();f.page.cartConfigReady=false;f.page.goodsParmas.limit=1
+ f.page.sanitizeHtml=value=>value;f.page.applyDescMeta=()=>{}
+ let resolve;f.products(()=>new Promise(done=>{resolve=done}))
+ const task=f.page.getProductGoodList();assert.equal(f.page.goodSLoading,true)
+ resolve({data:{data:{list:[{id:3,name:'fixture',description:''}]}}});await task
+ assert.equal(f.page.goodSLoading,false);assert.equal(f.page.scrollDisabled,false);assert.equal(f.page.goodsList.length,1)
+})
+test('scrolling after a failed catalog read cannot start uncontrolled retries',()=>{
+ const f=catalogFixture();let reads=0;f.page.catalogError='暂时无法读取商品';f.page.scrollDisabled=false
+ f.page.getProductGoodList=()=>{reads++};f.page.goodsParmas.page=1
+ f.page.scrollBottom();f.page.needScroll()
+ assert.equal(reads,0);assert.equal(f.page.goodsParmas.page,1)
+})

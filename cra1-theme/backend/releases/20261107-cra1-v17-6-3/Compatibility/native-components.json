@@ -1,0 +1,93 @@
+{
+  "paths": {
+    "asideMenu": "components/asideMenu/asideMenu.js",
+    "topMenu": "components/topMenu/topMenu.js",
+    "pagination": "components/pagination/pagination.js",
+    "productFilter": "components/productFilter/productFilter.js",
+    "batchRenewpage": "components/batchRenewpage/batchRenewpage.js",
+    "autoRenew": "components/autoRenew/autoRenew.js",
+    "trafficWarning": "components/trafficWarning/trafficWarning.js",
+    "payDialog": "components/payDialog/payDialog.js",
+    "safeConfirm": "components/safeConfirm/safeConfirm.js",
+    "captchaDialog": "components/captchaDialog/captchaDialog.js",
+    "hostStatus": "components/hostStatus/hostStatus.js",
+    "discountCode": "components/discountCode/discountCode.js",
+    "cashBack": "components/cashBack/cashBack.js",
+    "flowPacket": "components/flowPacket/flowPacket.js",
+    "ipDefase": "components/ipDefase/ipDefase.js",
+    "renewDialog": "components/renewDialog/renewDialog.js",
+    "unsubscribe": "components/unsubscribe/unsubscribe.js",
+    "countDownButton": "components/countDownButton/countDownButton.js",
+    "securityVerification": "components/securityVerification/securityVerification.js",
+    "resetAuth": "components/resetAuth/resetAuth.js",
+    "eventCode": "components/eventCode/eventCode.js",
+    "customGoods": "components/customGoods/customGoods.js"
+  },
+  "dependencies": {
+    "batchRenewpage": [
+      "payDialog",
+      "discountCode",
+      "safeConfirm"
+    ],
+    "flowPacket": [
+      "pagination"
+    ],
+    "ipDefase": [
+      "pagination",
+      "payDialog",
+      "discountCode",
+      "cashBack"
+    ],
+    "renewDialog": [
+      "discountCode"
+    ],
+    "unsubscribe": [
+      "securityVerification"
+    ],
+    "securityVerification": [
+      "captchaDialog",
+      "countDownButton"
+    ]
+  },
+  "groups": {
+    "list": [
+      "pagination",
+      "productFilter",
+      "batchRenewpage",
+      "autoRenew",
+      "trafficWarning"
+    ],
+    "detail": [
+      "payDialog",
+      "pagination",
+      "discountCode",
+      "cashBack",
+      "flowPacket",
+      "safeConfirm",
+      "captchaDialog",
+      "hostStatus",
+      "autoRenew",
+      "ipDefase",
+      "renewDialog",
+      "unsubscribe"
+    ],
+    "detailCommon": [
+      "payDialog",
+      "pagination",
+      "flowPacket",
+      "discountCode",
+      "cashBack",
+      "safeConfirm",
+      "hostStatus",
+      "autoRenew",
+      "renewDialog",
+      "unsubscribe"
+    ],
+    "config": [
+      "payDialog",
+      "discountCode",
+      "eventCode",
+      "customGoods"
+    ]
+  }
+}

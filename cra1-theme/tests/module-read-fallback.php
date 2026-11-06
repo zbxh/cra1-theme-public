@@ -28,9 +28,9 @@ namespace {
     if(!defined('CRA1_THEME_BACKEND'))define('CRA1_THEME_BACKEND',dirname(__DIR__).'/backend');
     require dirname(__DIR__).'/backend/bootstrap.php';
     use CRA1\Theme\Compatibility\ModuleAdapter;
-    $checks=0;$reads=0;$throw=false;$allowed=true;$visible=null;$client=7;
+    $checks=0;$reads=0;$throw=false;$allowed=true;$visible=null;$client=7;$system='10.7.2';
     function check($ok,$label){if(!$ok)throw new RuntimeException($label);$GLOBALS['checks']++;}
-    function configuration($name){return $name==='system_version'?'10.7.4':0;}function parse_name($name,$type){return 'MfCloud';}function get_client_id($parent=true){return $GLOBALS['client'];}
+    function configuration($name){return $name==='system_version'?$GLOBALS['system']:0;}function parse_name($name,$type){return 'MfCloud';}function get_client_id($parent=true){return $GLOBALS['client'];}
     function hook($name,$args=[]){if($name==='home_check_access')return [['status'=>$GLOBALS['allowed']?200:403]];if($name==='get_client_host_id'&&$GLOBALS['visible']!==null)return [['status'=>200,'data'=>['host'=>$GLOBALS['visible']]]];return [];}
     class Reply {private array $data;function __construct($data){$this->data=$data;}function getData(){return $this->data;}}
     class Req {public string $verb='GET';public int $id=24;function method(){return $this->verb;}function param($key){return $key==='id'?$this->id:1;}}
@@ -39,6 +39,12 @@ namespace {
         'flow'=>['status'=>200,'data'=>['total'=>'100GB','used'=>'20GB','total_num'=>100,'used_num'=>20,'reset_flow_time'=>'2026-11-04 00:00:00','flow_reset_cycle'=>'month','flow_reset_cycle_num'=>1,'flow_packet'=>['leave_size'=>27,'total_size'=>30,'used_size'=>3,'secret'=>'private'],'api_secret'=>'private']],
     ];
     try {
+        foreach(['10.7.2','10.7.4'] as $system){
+            $r=new Req();
+            check(ModuleAdapter::run('disks',$r)['status']===200,'native disk read does not require a newer V10 API on '.$system);
+            check(ModuleAdapter::run('flow',$r)['status']===200,'native flow read does not require a newer V10 API on '.$system);
+        }
+        $system='10.7.2';
         $r=new Req();$disks=ModuleAdapter::run('disks',$r);
         check($disks['status']===200&&$disks['data']['list'][0]['id']===55,'ordinary native disk read works without enhanced contract');
         check($disks['data']['list'][0]['can_delete']===false,'fallback cannot enable enhanced failed disk deletion');

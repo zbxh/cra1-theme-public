@@ -14,7 +14,7 @@ import { ConfirmDialog } from '../ui/dialog'
 import { DataTable } from '../ui/data-table'
 import { useToast } from '../ui/toast'
 import { cn } from '../ui/utils'
-import { get, del, formatDateTime, formatMoney, featureFlags, commonData, creditTypeText, ORDER_TYPE, orderTypeText } from '../lib'
+import { get, del, formatDateTime, formatMoney, featureFlags, creditTypeText, ORDER_TYPE, orderTypeText } from '../lib'
 
 /**
  * 财务中心（shadcn dashboard 布局）
@@ -44,6 +44,12 @@ export default function FinancePage() {
   const [tab, setTab] = usePageTab('orders', FINANCE_TABS.filter(t => !tabRules[t] || can(tabRules[t])))
   const [stats, setStats] = useState(null)
   const [frozen, setFrozen] = useState(null)     // null = 未确认；读取失败不能当作零元
+  const [refreshKey, setRefreshKey] = useState(0)
+  const refreshFinance = useCallback(() => {
+    setStats(null)
+    setFrozen(null)
+    setRefreshKey(n => n + 1)
+  }, [])
   // 财务功能特征位：提现规则关闭 → 隐藏「申请提现」；充值开关关闭 → 隐藏充值
   const [feat, setFeat] = useState(() => featureFlags())
 
@@ -55,22 +61,31 @@ export default function FinancePage() {
   }, [])
 
   useEffect(() => {
+    const restored = event => { if (event.persisted) refreshFinance() }
+    window.addEventListener('cra1:finance-updated', refreshFinance)
+    window.addEventListener('pageshow', restored)
+    return () => {
+      window.removeEventListener('cra1:finance-updated', refreshFinance)
+      window.removeEventListener('pageshow', restored)
+    }
+  }, [refreshFinance])
+
+  useEffect(() => {
     // 费用概览指标：账户汇总；接口失败不阻断页面（指标显示 —）
+    let active = true
     get('/index')
       .then((res) => {
+        if (!active) return
         const acc = res.data?.account || {}
-        setStats((s) => ({
-          ...(s || {}),
+        setStats({
           credit: acc.credit, consume: acc.consume, totalConsume: acc.consume,
           unpaid: acc.unpaid_order,
           thisMonth: acc.this_month_consume,
-        }))
+        })
       })
-      .catch(() => {})
-  }, [])
-
-  const currency = commonData().currency_prefix || ''
-  const thisMonth = stats?.thisMonth ?? '—'
+      .catch(() => { if (active) setStats(null) })
+    return () => { active = false }
+  }, [refreshKey])
 
   return (
     <div className="space-y-4">
@@ -126,10 +141,10 @@ export default function FinancePage() {
             </TabsList>
           </Tabs>
           <div className="mt-4">
-            {tab === 'orders' && <Guard permission="Order::list"><OrderPanel /></Guard>}
-            {tab === 'credit' && <Guard permission="Account::creditList"><CreditPanel /></Guard>}
-            {tab === 'freeze' && <FreezePanel onLoaded={setFrozen} />}
-            {tab === 'transactions' && <Guard permission="Transaction::list"><TransactionPanel /></Guard>}
+            {tab === 'orders' && <Guard permission="Order::list"><OrderPanel refreshKey={refreshKey} onRefresh={refreshFinance} /></Guard>}
+            {tab === 'credit' && <Guard permission="Account::creditList"><CreditPanel refreshKey={refreshKey} /></Guard>}
+            {tab === 'freeze' && <FreezePanel refreshKey={refreshKey} onLoaded={setFrozen} />}
+            {tab === 'transactions' && <Guard permission="Transaction::list"><TransactionPanel refreshKey={refreshKey} /></Guard>}
           </div>
         </CardContent>
       </Card>
@@ -175,7 +190,7 @@ function goOrderDetail(id) {
   window.location.href = '/orderDetail.htm?id=' + id
 }
 
-function OrderPanel() {
+function OrderPanel({ refreshKey, onRefresh }) {
   const {can}=useAccess()
   const toast = useToast()
   const [rows, setRows] = useState([])
@@ -191,29 +206,44 @@ function OrderPanel() {
   })
   const [type, setType] = useState('')
   const [confirmDel, setConfirmDel] = useState(null)
+  const [deleting, setDeleting] = useState(false)
+  const removing = useRef(false)
   const limit = 10
-
-  const load = useCallback(() => {
-    setLoading(true)
-    setError('')
-    get('/order', { page, limit, keywords, status, type })
-      .then((res) => { setRows(res.data?.list || []); setTotal(res.data?.count || 0) })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
-  }, [page, keywords, status, type])
 
   // 筛选条件变化时回到第 1 页
   useEffect(() => { setPage(1) }, [keywords, status, type])
-  useEffect(load, [load])
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    setError('')
+    get('/order', { page, limit, keywords, status, type })
+      .then((res) => {
+        if (!active) return
+        const count = Number(res.data?.count) || 0
+        setTotal(count)
+        const lastPage = Math.max(1, Math.ceil(count / limit))
+        if (page > lastPage) { setPage(lastPage); return }
+        setRows(res.data?.list || [])
+      })
+      .catch((e) => { if (active) setError(e.message) })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [page, keywords, status, type, refreshKey])
 
   async function remove(id) {
+    if (removing.current) return
+    removing.current = true
+    setDeleting(true)
     try {
       await del(`/order/${id}`)
       toast('订单已删除', 'success')
       setConfirmDel(null)
-      load()
+      onRefresh()
     } catch (e) {
       toast(e.message, 'error')
+    } finally {
+      removing.current = false
+      setDeleting(false)
     }
   }
 
@@ -255,7 +285,7 @@ function OrderPanel() {
             <Eye className="size-3.5" />
           </Button>
           <Button permission="Order::delete" variant="ghost" size="sm" className="text-danger hover:bg-danger/8"
-                  onClick={() => setConfirmDel(r)} aria-label="删除订单">
+                  disabled={deleting} onClick={() => setConfirmDel(r)} aria-label="删除订单">
             <Trash2 className="size-3.5" />
           </Button>
         </div>
@@ -286,7 +316,7 @@ function OrderPanel() {
             </Select>
           </>
         }
-        actions={<Button variant="outline" size="sm" onClick={load}><RefreshCw className="size-3.5" />刷新</Button>}
+        actions={<Button variant="outline" size="sm" onClick={onRefresh}><RefreshCw className="size-3.5" />刷新</Button>}
         page={page}
         total={total}
         limit={limit}
@@ -307,6 +337,7 @@ function OrderPanel() {
         description={confirmDel ? `确认删除订单 ${confirmDel.id}？删除后不可恢复。` : ''}
         confirmText="删除"
         tone="danger"
+        busy={deleting}
         onConfirm={() => remove(confirmDel.id)}
         onCancel={() => setConfirmDel(null)}
       />
@@ -317,7 +348,7 @@ function OrderPanel() {
 /* -------------------------------------------------------------------------- */
 /* 余额 / 冻结                                                                  */
 /* -------------------------------------------------------------------------- */
-function CreditPanel() {
+function CreditPanel({ refreshKey }) {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -326,12 +357,15 @@ function CreditPanel() {
   const limit = 10
 
   useEffect(() => {
+    let active = true
     setLoading(true)
+    setError('')
     get('/credit', { page, limit })
-      .then((res) => { setRows(res.data?.list || []); setTotal(res.data?.count || 0) })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
-  }, [page])
+      .then((res) => { if (active) { setRows(res.data?.list || []); setTotal(res.data?.count || 0) } })
+      .catch((e) => { if (active) setError(e.message) })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [page, refreshKey])
 
   const columns = [
     { key: 'create_time', title: '时间', width: 150,
@@ -368,7 +402,7 @@ function CreditPanel() {
   )
 }
 
-function FreezePanel({ onLoaded }) {
+function FreezePanel({ onLoaded, refreshKey }) {
   const [rows, setRows] = useState([])
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
@@ -386,12 +420,13 @@ function FreezePanel({ onLoaded }) {
         if (!alive) return
         const list = res.data?.list || []
         setRows(list)
+        setPage(current => Math.min(current, Math.max(1, Math.ceil(list.length / limit))))
         onLoaded(list.reduce((sum, row) => sum + Math.abs(Number(row.amount) || 0), 0).toFixed(2))
       })
       .catch((e) => { if (alive) { setError(e.message); onLoaded(null) } })
       .finally(() => { if (alive) setLoading(false) })
     return () => { alive = false }
-  }, [attempt, onLoaded])
+  }, [attempt, onLoaded, refreshKey])
 
   const columns = [
     { key: 'create_time', title: '时间', width: 150,
@@ -421,10 +456,10 @@ function FreezePanel({ onLoaded }) {
   )
 }
 
-function TransactionPanel(){
+function TransactionPanel({ refreshKey }){
  const {can}=useAccess()
  const [rows,setRows]=useState([]),[total,setTotal]=useState(0),[page,setPage]=useState(1),[loading,setLoading]=useState(true),[error,setError]=useState('')
- useEffect(()=>{let alive=true;setLoading(true);setError('');get('/transaction',{page,limit:10}).then(r=>{if(alive){setRows(r.data?.list||[]);setTotal(r.data?.count||0)}}).catch(e=>{if(alive)setError(e.message)}).finally(()=>{if(alive)setLoading(false)});return()=>{alive=false}},[page])
+ useEffect(()=>{let alive=true;setLoading(true);setError('');get('/transaction',{page,limit:10}).then(r=>{if(alive){setRows(r.data?.list||[]);setTotal(r.data?.count||0)}}).catch(e=>{if(alive)setError(e.message)}).finally(()=>{if(alive)setLoading(false)});return()=>{alive=false}},[page,refreshKey])
  const columns=[{key:'create_time',title:'时间',render:r=>formatDateTime(r.create_time)},{key:'transaction_number',title:'交易流水号'},{key:'order_id',title:'订单',render:r=>can('Order::index')?<a href={`/orderDetail.htm?id=${r.order_id}`}>{r.order_id}</a>:r.order_id},{key:'type',title:'类型',render:r=>orderTypeText(r.type)},{key:'gateway',title:'支付方式'},{key:'amount',title:'金额',render:r=>formatMoney(r.amount)}]
  return <DataTable columns={columns} rows={rows} total={total} page={page} limit={10} loading={loading} error={error} onPageChange={setPage}/>
 }

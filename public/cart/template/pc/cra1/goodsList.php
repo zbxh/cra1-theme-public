@@ -242,7 +242,7 @@
                   </div>
                   <p class="cl-goods-scroll-hint" v-if="goodsList.length > 1 && !goodSLoading">左右滑动查看更多型号</p>
                   <!-- 底部加载提示 -->
-                  <p v-if="isNormal && !catalogError && !scrollDisabled && goodsList.length !== 0" class="cl-loadtip">{{lang.goods_loading}}</p>
+                  <p v-if="isNormal && goodSLoading && !catalogError && goodsList.length !== 0" class="cl-loadtip" role="status">{{lang.goods_loading}}</p>
                   </section>
                   <!-- 选配区与导航、产品型号同级；保留模块原有选择控件、卡片与计价逻辑 -->
                   <div class="cl-config-panel" v-if="selectedProduct" ref="configPanel">
