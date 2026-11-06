@@ -175,7 +175,7 @@
           var response = await raw(certificationPath + '/create', { account: item.account, phone_code: item.phone_code, security_verify_token: item.security_verify_token });
           if (!active || generation !== methodGeneration) return;
           var url = new URL(response.data.certify_url, root.location.origin);
-          if (url.protocol !== 'https:' || url.username || url.password) throw new Error('身份验证地址无效，请联系客服');
+          if (!['http:','https:'].includes(url.protocol) || url.username || url.password) throw new Error('身份验证地址无效，请联系客服');
           cert = response.data.certify_id;
           certification.replaceChildren(el('a', '打开身份验证页面', { href: url.href, target: '_blank', rel: 'noopener noreferrer' }), el('p', '请在新窗口完成验证后返回本窗口。'));
           async function poll() {

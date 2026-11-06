@@ -13,10 +13,13 @@ $input=['entry'=>'cloudcustom','username'=>'fixture_admin','password'=>'Isolated
 try{
  $noAuth=\CRA1\Theme\Http\NativeAdmin::run($base,'',static function(){throw new RuntimeException('must not run');});check($noAuth['status']===401,'anonymous first visitor cannot create admin');
  $originInstaller=fixture($base.'/origin');$origin='https://fixture.invalid:8443';
- $rejected=false;try{$originInstaller->install($input,$passed,$origin);}catch(InvalidArgumentException $e){$rejected=true;}
- check($rejected&&!is_file($base.'/origin/config/cra1_theme_security.key'),'a different port is rejected before creating credentials');
- $rejected=false;try{$originInstaller->install(array_replace($input,['canonical'=>'https://other.invalid:8443']),$passed,$origin);}catch(InvalidArgumentException $e){$rejected=true;}
- check($rejected,'a different hostname cannot lock the new administrator out');
+ foreach(['https://other.invalid:8443','http://fixture.invalid','https://fixture.invalid'] as $i=>$legacyOrigin){
+  $dir=$base.'/origin-legacy-'.$i;$legacyInstaller=fixture($dir);
+  $result=$legacyInstaller->install(array_replace($input,['canonical'=>$legacyOrigin]),$passed,$origin);
+  $legacySecurity=new CRA1ThemeSecurity($dir);
+  check($result['installed']&&$legacySecurity->settings()['canonical_url']===$origin,'actual browser origin takes precedence over a historical domain, port or scheme');
+  unset($legacySecurity);
+ }
  $rejected=false;try{$originInstaller->install(array_replace($input,['username'=>['invalid']]),$passed,$origin);}catch(InvalidArgumentException $e){$rejected=true;}
  check($rejected,'installation fields cannot be coerced from arrays');
  $result=$originInstaller->install(array_replace($input,['canonical'=>'https://FIXTURE.invalid:8443/']),$passed,$origin);
@@ -29,8 +32,8 @@ try{
  check(!$security->settings()['force_https']&&!$security->settings()['http_test'],'HTTP is a supported installation without forced redirect or a test-only policy');
  $security->updateSettings(['canonical_url'=>$httpOrigin]);
  check($security->settings()['canonical_url']===$httpOrigin,'HTTP administrators can save ordinary security settings');
- $rejected=false;try{$security->updateSettings(['force_https'=>true]);}catch(CRA1ThemeSecurityError $error){$rejected=true;}
- check($rejected&&!$security->settings()['force_https'],'explicitly enabling HTTPS still requires a matching site address');
+ $security->updateSettings(['force_https'=>true,'ip_allowlist'=>['192.0.2.1'],'http_test'=>true]);
+ check(!$security->settings()['force_https']&&!$security->settings()['http_test']&&!$security->settings()['ip_allowlist'],'legacy access restrictions are accepted but no longer applied or written');
  check($security->checkPassword($input['username'],$input['password'])!==null,'the new HTTP administrator retains the entered login credentials');unset($security);
  foreach(['key','database','marker']as$partial){
   $dir=$base.'/partial-'.$partial;$incomplete=fixture($dir);

@@ -14,12 +14,13 @@ import LinkPicker from './LinkPicker'
 import { DragHandle, DropBadge, DRAG_LIST_BASE, RowIconBtn, dragRowClass, useFlatDrag, DragAnnouncer } from '../ui/dragSort'
 import { api } from '../lib/api'
 import { useWorkspaces } from '../lib/workspace'
+import { randomId } from '../lib/random-id'
 import { announcementDrafts, importedAnnouncementItems, consumeAnnouncementDraft } from '../lib/announcement-legacy'
 import './announcements.css'
 
 const THEMES = { website: '官网主题', member: '会员中心', cart: '购物车' }
 const clone = value => JSON.parse(JSON.stringify(value))
-const newId = () => 'notice-' + crypto.randomUUID()
+const newId = () => 'notice-' + randomId()
 const emptyTargets = () => Object.fromEntries(Object.keys(THEMES).map(theme => [theme, { all: false, pages: [] }]))
 const newItem = () => ({ id: newId(), title: '', label: '通知', icon: 'megaphone', summary: '', detail: '', action: 'detail', action_label: '查看详情', url: '', new_tab: false, targets: { ...emptyTargets(), member: { all: true, pages: [] } }, starts_at: '', ends_at: '', priority: 0, dismissible: true, dismiss_for: 'day', enabled: true, extra_actions: [] })
 function Field({ label, children, hint }) {
@@ -91,7 +92,7 @@ function AnnouncementPreview({ workspace: w }) {
         const response = await api('api.announcements.preview', { values: w.values, theme, path: page.paths[0] }, { signal: controller.signal })
         if (response.status !== 200) throw new Error(response.msg)
         if (id !== sequence.current) return
-        nonce.current = crypto.randomUUID()
+        nonce.current = randomId()
         const encoded = JSON.stringify({ payload: response.data, theme, nonce: nonce.current }).replace(/</g, '\\u003c').replace(/&/g, '\\u0026')
         const origin = window.location.origin
         // srcDoc inherits the admin CSP. Authorize its scripts with the current

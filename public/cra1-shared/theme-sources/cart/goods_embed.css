@@ -145,41 +145,14 @@ body {
   }
 }
 
-/* ---- 模块底条 → 右侧摘要栏（mf_cloud / mf_dcim；CSS-only 不改模块模板） ----
-   v6.2：原生侧栏**默认隐藏**（模块 HTML 注入即生效，加载等待期不再闪现旧 f-order）；
-   仅壳侧桥接超时降级（body.rail-fallback）时以 v5 卡片形态显示。 */
-.cart-embed .f-order,
-.cart-embed .order-right {
-  display: none !important;
-}
-
-.cart-embed .template {
-  display: block;
-}
-
-.cart-embed .common-config .common-box {
-  display: block;
-}
-
-body.rail-fallback .f-order,
-body.rail-fallback .order-right {
-  display: block !important;
-}
-
-body.rail-fallback .template {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-body.rail-fallback .common-config .common-box {
-  display: flex;
-}
-
-.cart-embed .template > .main-card {
-  flex: 1 1 auto;
-  min-width: 0;
-}
+/* Hide native purchasing only after a supported module has joined the bridge.
+   Unrecognised modules keep their original controls throughout loading. */
+body.rail-bridged .f-order,
+body.rail-bridged .order-right,
+body.rail-bridged .m-cloud-m .botton-buy-btn,
+body.rail-bridged .m-dcim-m .botton-buy-btn { display: none !important; }
+body.rail-native .f-order,
+body.rail-fallback .f-order { display: block !important; }
 
 /* ---- v4 配置去卡化：配置内容与父页卡片融为一体，无独立白卡 ---- */
 /* 左栏主配置卡（mf_cloud .mf-cloud / mf_dcim .mf-dcim 白底大卡） */
@@ -328,7 +301,7 @@ body.rail-fallback .common-config .common-box {
 /* ≤768px（iframe 视口）：摘要栏回退到表单下方全宽 */
 @media (max-width: 768px) {
   .cart-embed .template { flex-direction: column; }
-  .cart-embed .f-order { width: 100%; flex: 1 1 auto; }
+  .cart-embed .f-order { width: 100% !important; flex: 1 1 auto; }
   .cart-embed .f-order .right .buy { height: 44px; line-height: 44px; }
   .cart-embed .common-config .common-box { flex-direction: column; }
   .cart-embed .common-config .order-right { width: 100% !important; flex: 1 1 auto; }
@@ -343,7 +316,7 @@ body.rail-fallback .common-config .common-box {
   /* ---- 表单上下结构：label 置顶，控件区全宽（取代 100px 左结构挤压） ---- */
   .cart-embed .el-form-item__label {
     float: none !important;
-    display: block !important;
+    display: block;
     width: auto !important;
     text-align: left !important;
     padding: 0 0 6px !important;
@@ -408,13 +381,13 @@ body.rail-fallback .common-config .common-box {
      两层都设网格会把卡片宽度二次对折（实测 390 档压到 66px，文字全挤）。
      卡片取消模块定宽 1.9rem 与左外边距，改由网格列宽 + gap 控制。 ---- */
   .cart-embed .image-box {
-    display: block !important;
+    display: block;
     max-width: 100% !important;
     overflow-x: visible;
   }
 
   .cart-embed .image-ul {
-    display: grid !important;
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     width: 100% !important;
@@ -541,60 +514,33 @@ body.rail-fallback .common-config .common-box {
     background: transparent;
   }
 
-  /* ---- el-select 下拉底部抽屉化（对标大厂：选项从底部滑出） ----
-     注意：部分模块（mf_dcim）的弹层 append 到 body 直下（不在 .cart-embed 内），
-     选择器必须不带 .cart-embed 前缀——goods_embed.css 本就只在 iframe 文档内生效 */
+  /* Keep dropdowns next to their control. A fixed drawer would attach to
+     the bottom of the tall iframe, outside the phone's visible screen. */
   .el-select-dropdown {
-    position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    top: auto !important;
-    width: auto !important;
-    min-width: 0 !important;
     max-width: 100% !important;
-    min-height: 180px !important;
-    transform: none !important;
-    border-radius: 14px 14px 0 0 !important;
-    max-height: 45vh !important;
-    box-shadow: 0 -8px 30px -10px color-mix(in srgb,var(--cui-night) 30.0%,transparent) !important;
-    z-index: 3000 !important;
-    animation: cl-drawer-up 0.22s ease;
+    min-width: 0 !important;
+    border-radius: 10px !important;
     box-sizing: border-box;
-    padding-top: 8px;
-    /* 底部安全区：iPhone 底部黑条不遮挡末项 */
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   }
-
-  .el-select-dropdown .el-scrollbar__wrap {
-    max-height: 44vh !important;
-  }
-
-  .el-select-dropdown .popper__arrow {
-    display: none !important;
-  }
-
+  .el-select-dropdown .el-scrollbar__wrap { max-height: 220px !important; }
   .el-select-dropdown .el-select-dropdown__item {
-    height: 44px;
-    line-height: 44px;
-    font-size: 15px;
+    min-height: 40px;
+    line-height: 40px;
+    font-size: 14px;
   }
-
-  @keyframes cl-drawer-up {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
+  .cart-embed .el-input__inner {
+    width: 100% !important;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
-
-  /* 抽屉顶部的 popper 定位可能带 margin 偏移，清掉 */
-  .el-select-dropdown[x-placement] {
-    margin: 0 !important;
-  }
+  .cart-embed .common-config .unit:empty { display: none; }
 
   /* ---- radio 按钮组：换行排布，**不横滑** ----
      v7 曾改 nowrap + 横滑；实测选项超出容器时（如 3 个按钮 432px > 容器 286px）
      被判为"要左右滑"的体验缺陷，此处恢复换行（选项多时折行，全部可见可点）。 */
   .cart-embed .el-radio-group {
-    display: flex !important;
+    display: flex;
     flex-wrap: wrap !important;
     overflow-x: visible;
     gap: 8px 0;
@@ -637,9 +583,7 @@ body.rail-fallback .common-config .common-box {
    手机 UA 时 iframe 内渲染「整行字段 + 底部抽屉」形态的独立手机组件；
    价格与加购/购买由父页 dock 承担 → 隐藏组件自带吸底价格栏。
    ========================================================================== */
-.cart-embed .m-cloud-m .botton-buy-btn {
-  display: none !important;
-}
+/* Native mobile purchase controls remain visible until bridge activation. */
 
 .cart-embed .m-cloud-m .buy-box {
   padding-bottom: 8px;
@@ -654,4 +598,10 @@ body.rail-fallback .common-config .common-box {
 /* 手机组件在 iframe 内的根容器留白与透明底（与父页卡片连续） */
 .cart-embed .m-cloud-m {
   background: transparent;
+}
+
+body:not(.rail-bridged) .m-cloud-m .botton-buy-btn,
+body:not(.rail-bridged) .m-dcim-m .botton-buy-btn {
+  position: relative !important; inset: auto !important; width: 100% !important;
+  box-sizing: border-box; margin-top: 16px;
 }

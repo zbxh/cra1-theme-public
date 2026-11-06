@@ -1,0 +1,26 @@
+{
+  "version": "1.1.0",
+  "release": "20261106-cra1-v17-6",
+  "files": {
+    "announcements-preview.js": {
+      "bytes": 26985,
+      "sha256": "14c5a164a990dc77dcdccc13ed3d62726298aa65cfdc233d6a3a0cf268e67e7e"
+    },
+    "cra1-shared.css": {
+      "bytes": 143497,
+      "sha256": "4d4fa05dd42f08959693c1005b07ae6a38c44c67bc74c3d7c37cef5f1a5fb6b6"
+    },
+    "cra1-shared.js": {
+      "bytes": 194878,
+      "sha256": "2ed3759d8252bc18755585690c81c74601951f7c73b87c35dfe6de687e661705"
+    },
+    "member-session.js": {
+      "bytes": 16804,
+      "sha256": "429ab0f837c72b8c095535d5d61a2e22e5104be1daeddbd033e825df4f4b4123"
+    },
+    "v10-axios.js": {
+      "bytes": 7771,
+      "sha256": "034a9c814e6a30b17739f6de53a3a7b17bdb93566309ca27f99588ddfeb782b4"
+    }
+  }
+}

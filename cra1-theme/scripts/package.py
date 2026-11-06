@@ -7,7 +7,7 @@ RUNTIME_ROOTS=['cra1-theme/backend','cra1-theme/docs','cra1-theme/licenses','pub
 LEGACY_HELPERS=['lib/cra1_theme_admin.php','lib/cra1_theme_security.php','lib/cra1_theme_media.php','lib/cra1_theme_seo.php','lib/cra1_theme_client_actions.php','bin/cra1-theme-security.php','bin/cra1-theme-media.php']
 # Runtime consumers load the selected private backend directly. Existing legacy
 # wrappers remain on disk; updating them would needlessly require system-directory writes.
-HELPERS=['cra1-theme/scripts/security.php','cra1-theme/scripts/media.php','cra1-theme/THIRD_PARTY_NOTICES.md','cra1-theme/scripts/private-path-check.php']
+HELPERS=['cra1-theme/scripts/security.php','cra1-theme/scripts/media.php','cra1-theme/THIRD_PARTY_NOTICES.md']
 NATIVE_CONTRACTS={
  'app/event/AppInit.php':'主题钩子装载时机',
  'app/http/middleware/CheckHome.php':'原生会员身份及会话校验',

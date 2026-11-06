@@ -23,7 +23,7 @@ final class Inspector
     {
         $rows=[];
         $add=static function($id,$status,$label,$detail,$path='',$impact='',$scope='installation')use(&$rows){$rows[]=['id'=>$id,'status'=>$status,'label'=>$label,'detail'=>$detail,'path'=>$path,'scope'=>$scope,'owner'=>preg_match('~^(?:app|route|vendor|public/plugins)/|/default/~',$path)?'V10 或原生模块文件（只读）':'CRA1 或运行环境','impact'=>$impact];};
-        $add('php',(PHP_MAJOR_VERSION===7&&PHP_MINOR_VERSION===4)?'pass':(version_compare(PHP_VERSION,'7.4','<')?'blocked':'unverified'),'PHP',PHP_VERSION,'','当前适配 PHP 7.4；其他版本请先检查兼容性');
+        $add('php',version_compare(PHP_VERSION,'7.4','>=')?'pass':'blocked','PHP',PHP_VERSION,'','主题需要 PHP 7.4 或更高版本');
         foreach(['pdo_mysql','pdo_sqlite','sodium','fileinfo','gd','zip','mbstring','dom','curl']as$ext)$add('extension:'.$ext,extension_loaded($ext)?'pass':'blocked',$ext,extension_loaded($ext)?'已加载':'缺少必要扩展');
         $add('password',defined('PASSWORD_ARGON2ID')?'pass':'blocked','密码存储',defined('PASSWORD_ARGON2ID')?'Argon2id 可用':'缺少 Argon2id');
         $context=$options['context']??self::context($root);

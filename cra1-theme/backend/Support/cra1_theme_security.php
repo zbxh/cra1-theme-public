@@ -138,24 +138,31 @@ SQL
     public function mfaAction(int $id,string $action): array { return $this->tx(function()use($id,$action){$a=$this->account($id);if(empty($a['mfa_secret']))throw new CRA1ThemeSecurityError('尚未启用双重验证');$codes=[];if($action==='disable')$this->db->prepare("UPDATE accounts SET mfa_secret=NULL,recovery_hashes='[]',last_totp_step=-1 WHERE id=?")->execute([$id]);elseif($action==='recovery')$codes=$this->recovery($id);else throw new CRA1ThemeSecurityError('未知双重验证操作');$this->db->prepare('UPDATE accounts SET epoch=epoch+1,updated_at=? WHERE id=?')->execute([time(),$id]);$this->revoke($id);return ['recovery_codes'=>$codes];}); }
     public function updateSettings(array $p): void {
         $allowed=['idle_timeout','absolute_timeout','trusted_proxies','ip_allowlist','canonical_url','http_test','force_https'];if(array_diff(array_keys($p),$allowed))throw new CRA1ThemeSecurityError('安全设置含未知字段');
+        // Retain historical network-policy values on disk, without applying them
+        // to access or letting an older editor reintroduce deployment restrictions.
+        $active=['idle_timeout','absolute_timeout','trusted_proxies','canonical_url'];
+        $p=array_intersect_key($p,array_flip($active));
         $current=$this->settings();$v=array_replace($current,$p);if((int)$v['idle_timeout']<300||(int)$v['idle_timeout']>3600||(int)$v['absolute_timeout']<1800||(int)$v['absolute_timeout']>86400||(int)$v['idle_timeout']>(int)$v['absolute_timeout'])throw new CRA1ThemeSecurityError('空闲时长需为 5–60 分钟，总有效期为 30 分钟–24 小时');
-        foreach(['trusted_proxies','ip_allowlist']as$k){if(!is_array($v[$k])||count($v[$k])>64)throw new CRA1ThemeSecurityError('地址名单格式不正确');foreach($v[$k]as$ip)if(!self::validCidr((string)$ip))throw new CRA1ThemeSecurityError('地址名单需填写有效 IP 或 CIDR');}
-        $url=rtrim((string)$v['canonical_url'],'/');$u=parse_url($url);if(!$u||!in_array($u['scheme']??'',['http','https'],true)||empty($u['host'])||isset($u['user'])||isset($u['pass'])||isset($u['query'])||isset($u['fragment'])||!empty($u['path'])||!filter_var($url,FILTER_VALIDATE_URL))throw new CRA1ThemeSecurityError('规范站点地址需为完整 http/https 域名或 IP，不包含路径');
-        if(!empty($v['force_https'])&&$u['scheme']!=='https')throw new CRA1ThemeSecurityError('开启强制 HTTPS 前，请先配置有效的 HTTPS 站点');
-        $v['canonical_url']=$url;$this->tx(function()use($v){$s=$this->db->prepare('INSERT OR REPLACE INTO settings VALUES(?,?)');foreach($v as$k=>$x)$s->execute([$k,json_encode($x,JSON_UNESCAPED_SLASHES)]);$this->db->prepare('UPDATE sessions SET revoked_at=? WHERE revoked_at=0')->execute([time()]);});
+        foreach(['trusted_proxies']as$k){if(!is_array($v[$k])||count($v[$k])>64)throw new CRA1ThemeSecurityError('地址名单格式不正确');foreach($v[$k]as$ip)if(!self::validCidr((string)$ip))throw new CRA1ThemeSecurityError('地址名单需填写有效 IP 或 CIDR');}
+        $url=rtrim(trim((string)$v['canonical_url']),'/');$u=parse_url($url);if($url!==''&&(!$u||!in_array($u['scheme']??'',['http','https'],true)||empty($u['host'])||isset($u['user'])||isset($u['pass'])||isset($u['query'])||isset($u['fragment'])||!empty($u['path'])||!filter_var($url,FILTER_VALIDATE_URL)))throw new CRA1ThemeSecurityError('站点链接地址请填写完整 http/https 地址，或留空自动识别');
+        $v['canonical_url']=$url;$this->tx(function()use($v,$active){$s=$this->db->prepare('INSERT OR REPLACE INTO settings VALUES(?,?)');foreach($active as$k)$s->execute([$k,json_encode($v[$k],JSON_UNESCAPED_SLASHES)]);$this->db->prepare('UPDATE sessions SET revoked_at=? WHERE revoked_at=0')->execute([time()]);});
     }
     public static function validCidr(string $s): bool { $p=explode('/',$s);$raw=inet_pton($p[0]);return $raw!==false&&count($p)<=2&&(!isset($p[1])||(ctype_digit($p[1])&&(int)$p[1]<=strlen($raw)*8)); }
     public static function contains(string $ip,string $cidr): bool { $p=explode('/',$cidr);$a=@inet_pton($ip);$b=@inet_pton($p[0]);if(!$a||!$b||strlen($a)!==strlen($b))return false;$bits=isset($p[1])?(int)$p[1]:strlen($a)*8;for($i=0;$i<strlen($a);$i++){$n=min(8,max(0,$bits-$i*8));$m=$n?((255<<(8-$n))&255):0;if((ord($a[$i])&$m)!==(ord($b[$i])&$m))return false;}return true; }
     public static function network(array $server,array $st): array {
-        $ip=(string)($server['REMOTE_ADDR']??'');$https=!empty($server['HTTPS'])&&$server['HTTPS']!=='off';$trusted=false;foreach($st['trusted_proxies']??[]as$c)if(self::contains($ip,(string)$c))$trusted=true;
+        // The protocol is a cookie/link hint, never an access requirement.
+        // Client IP forwarding remains opt-in for accurate audit/rate-limit data.
+        $ip=(string)($server['REMOTE_ADDR']??'');$https=(!empty($server['HTTPS'])&&$server['HTTPS']!=='off')||strtolower(trim(explode(',',(string)($server['HTTP_X_FORWARDED_PROTO']??''))[0]))==='https';$trusted=false;foreach($st['trusted_proxies']??[]as$c)if(self::contains($ip,(string)$c))$trusted=true;
         if($trusted){$chain=array_filter(array_map('trim',explode(',',(string)($server['HTTP_X_FORWARDED_FOR']??''))));$chain[]=$ip;for($i=count($chain)-1;$i>=0;$i--){$candidate=$chain[$i];if(!filter_var($candidate,FILTER_VALIDATE_IP))break;$isProxy=false;foreach($st['trusted_proxies']??[]as$c)if(self::contains($candidate,(string)$c))$isProxy=true;if(!$isProxy){$ip=$candidate;break;}}$https=$https||($server['HTTP_X_FORWARDED_PROTO']??'')==='https';}
         return ['ip'=>$ip,'https'=>$https];
     }
-    public static function sameOrigin(array $server,string $canonical,bool $https): bool {
-        if(isset($server['HTTP_SEC_FETCH_SITE'])&&!in_array($server['HTTP_SEC_FETCH_SITE'],['same-origin','none'],true))return false;
-        $expected=parse_url($canonical);$host=strtolower((string)($server['HTTP_HOST']??''));$authority=strtolower(($expected['host']??'').(isset($expected['port'])?':'.$expected['port']:''));if($authority!==''&&$host!==$authority)return false;
-        $o=$server['HTTP_ORIGIN']??null;if($o===null){$ref=$server['HTTP_REFERER']??'';if($ref==='')return false;$p=parse_url($ref);}else{$p=parse_url($o);}
-        if(!$p||isset($p['user'])||isset($p['pass']))return false;$actual=strtolower(($p['host']??'').(isset($p['port'])?':'.$p['port']:''));return $actual===$host&&($p['scheme']??'')===($https?'https':'http');
+    public static function currentOrigin(array $server): string {
+        // Only used to generate links. Browser requests carry the public origin
+        // even when a reverse proxy rewrites Host or terminates TLS upstream.
+        $url=parse_url((string)($server['HTTP_ORIGIN']??''));
+        if($url&&in_array($url['scheme']??'',['http','https'],true)&&!empty($url['host'])&&!isset($url['user'])&&!isset($url['pass']))return $url['scheme'].'://'.$url['host'].(isset($url['port'])?':'.$url['port']:'');
+        $network=self::network($server,[]);
+        return ($network['https']?'https':'http').'://'.(string)($server['HTTP_HOST']??$server['SERVER_NAME']??'localhost');
     }
     public static function safeDetail($value): string { $s=mb_substr((string)$value,0,600);$s=preg_replace('/(?:password|secret|token|csrf|cookie|jwt|recovery|sid|st|hd|pt)\s*[:=]\s*[^\s,;]+/i','[敏感信息已隐藏]',$s);return str_replace(["\r","\n","\0"],' ',$s); }
     public function event(string $action,string $result,array $ctx=[],array $diff=[],?string $importKey=null): int {

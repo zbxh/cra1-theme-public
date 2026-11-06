@@ -47,7 +47,7 @@ checks.push('invalid product aliases do not become native module ids')
  let purchases=0;
  const productVM={cycleList:[],params:{},qty:1,calcTotalPrice:0,totalPrice:0,preview:[],handlerCart(){purchases++},submitOrder(){purchases++},changeCart(){purchases++}};
  const body={scrollHeight:640,classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)}};
- const document={body,documentElement:{scrollHeight:640},getElementById:()=>({style:{}}),querySelectorAll:()=>[{__vue__:productVM}],querySelector:s=>['.cart-embed','.f-order'].includes(s)?{style:{}}:null};
+ const document={body,documentElement:{scrollHeight:640},getElementById:()=>({style:{}}),querySelectorAll:()=>[{__vue__:productVM}],querySelector:s=>['.cart-embed','.f-order','.f-order, .m-cloud-m .botton-buy-btn, .m-dcim-m .botton-buy-btn'].includes(s)?{style:{}}:null};
  const window={location:new URL('https://fixture.invalid/cart/goods_embed.htm?id=4&embed=1&embed_nonce=fixture'),addEventListener:(type,fn)=>handlers.set(type,fn),parent:{postMessage:m=>messages.push(m)},CRA1Shared:{Runtime:{common:()=>({currency_prefix:'¥',currency_suffix:''})}}};
  vm.runInNewContext(bridge,{window,document,location:window.location,URLSearchParams,Date:{now:()=>now},setInterval:(fn,ms)=>{timers.set(++nextId,{fn,ms});return nextId},clearInterval:id=>timers.delete(id)});
  window.__CART_EMBED__.markReady();
@@ -75,7 +75,7 @@ checks.push('invalid product aliases do not become native module ids')
 for(const pay_type of ['free','onetime']){
  const messages=[],classes=new Set(),timers=new Map();let id=0;
  const productVM={custom_cycles:[],pay_type,curCycle:0,totalPrice:pay_type==='free'?0:99,original_price:99,orderData:{qty:1},basicInfo:{allow_qty:1},addCart(){},buyNow(){}};
- const document={body:{scrollHeight:640,classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)}},documentElement:{scrollHeight:640},getElementById:()=>({style:{}}),querySelectorAll:s=>s==='.template'?[{__vue__:productVM}]:[],querySelector:s=>['.cart-embed','.order-right'].includes(s)?{style:{}}:null};
+ const document={body:{scrollHeight:640,classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)}},documentElement:{scrollHeight:640},getElementById:()=>({style:{}}),querySelectorAll:s=>s==='.m-cloud-m, .m-dcim-m, .template'?[{__vue__:productVM}]:[],querySelector:s=>['.cart-embed','.order-right'].includes(s)?{style:{}}:null};
  const window={location:new URL('https://fixture.invalid/cart/goods_embed.htm?id=4&embed=1&embed_nonce=fixture'),addEventListener(){},parent:{postMessage:m=>messages.push(m)},CRA1Shared:{Runtime:{common:()=>({currency_prefix:'¥',currency_suffix:''})}}};
  vm.runInNewContext(bridge,{window,document,location:window.location,URLSearchParams,Date,setInterval:(fn,ms)=>{timers.set(++id,{fn,ms});return id},clearInterval:i=>timers.delete(i)});
  window.__CART_EMBED__.markReady();const data=messages.at(-1).payload;

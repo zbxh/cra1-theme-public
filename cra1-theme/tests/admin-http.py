@@ -25,7 +25,7 @@ with tempfile.TemporaryDirectory(prefix='cra1-release-http-') as tmp:
  (public/'fixture-page.php').write_text('<?php require __DIR__."/cra1-shared/assets.php";echo cra1_theme_asset_url("shared","cra1-shared.js");')
  # Fixture-only endpoint to model a retained older backend session without exposing any secret values.
  (public/'testadmin'/'fixture-session.php').write_text('''<?php
-session_name('CRA1THEMEID');session_start();
+session_name('CRA1THEMEID_HTTP');session_start();
 if(($_SERVER['REQUEST_METHOD']??'GET')==='POST'){
  $_SESSION['cloud_admin']=$_SESSION['cra1_admin'];$_SESSION['cloud_csrf']=$_SESSION['cra1_csrf'];
  unset($_SESSION['cra1_admin'],$_SESSION['cra1_csrf']);

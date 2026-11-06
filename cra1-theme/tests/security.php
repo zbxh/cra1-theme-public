@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace think\facade { class Cache {public static array $values=[];static function get($key){return self::$values[$key]??null;}static function set($key,$value,$ttl){self::$values[$key]=$value;return true;}static function delete($key){unset(self::$values[$key]);}} }
+namespace think\facade { class Db {static function name($name){return new self();}function where(...$args){return $this;}function find(){return null;}} class Cache {public static array $values=[];static function get($key){return self::$values[$key]??null;}static function set($key,$value,$ttl){self::$values[$key]=$value;return true;}static function delete($key){unset(self::$values[$key]);}} }
 namespace app\common\model {
  class ClientModel {static array $client=['operate_password'=>'hash:operation-test','password'=>'login-hash','phone_code'=>'86','phone'=>'13900000000','email'=>'fixture@example.invalid'];static function find($id){return $id>0?self::$client:null;}}
  class HostModel {static function where(...$args){return new self();}function find(){return ['id'=>1,'product_id'=>2,'client_id'=>1];}}
@@ -68,18 +68,21 @@ namespace {
   check($res->headers['Cache-Control']==='no-store, private','summary cannot enter ordinary browser caches');
   $res=Verify::filterResponse($r,new Reply(['status'=>400,'msg'=>'private provider path','data'=>['password'=>'secret']]));
   check($res->value===['status'=>503,'msg'=>'实例信息暂时无法获取，请稍后重试'],'summary failures contain no native diagnostics or data');
+  Verify::revoke(1);
   $guard=new \CRA1\Theme\Http\MemberGuard();$r=new Req();$r->authenticated=false;$order=[];
   $reply=$guard->handle($r,function(){ $GLOBALS['order'][]='native-action';return json(['status'=>200]);});check($reply->value['status']===401&&$order===['native-auth'],'native auth rejects before theme guard or action');
   $r->authenticated=true;$r->verb='GET';$r->path='/console/v1/index';$order=[];$guard->handle($r,function(){ $GLOBALS['order'][]='native-action';return json(['status'=>200]);});check($order===['native-auth','native-action'],'authenticated native action preserved');
-  $r->verb='POST';$r->path='/console/v1/mf_cloud/1/reboot';$order=[];$reply=$guard->handle($r,function(){ $GLOBALS['order'][]='native-action';return json(['status'=>200]);});check($reply->value['status']===503&&$order===['native-auth'],'unverified native source blocks a sensitive action after authentication');
-  $r->verb='GET';$r->path='/console/v1/idcsmart_common/host/1/configoption';$r->params=['credentials_only'=>'1'];$order=[];$reply=$guard->handle($r,function(){ $GLOBALS['order'][]='native-action';return json(['status'=>200]);});check($reply->value['status']===503&&$order===['native-auth'],'credential-only request also requires a registered source contract');
+  $r->verb='POST';$r->path='/console/v1/mf_cloud/1/reboot';$order=[];$reply=$guard->handle($r,function(){ $GLOBALS['order'][]='native-action';return json(['status'=>200]);});check($reply->value['status']===400&&isset($reply->value['data']['operate_password'])&&$order===['native-auth'],'native authenticated action uses the operation challenge without requiring identical system bytes');
+  Verify::verifyPassword(1,'operation-test');$order=[];$reply=$guard->handle($r,function(){ $GLOBALS['order'][]='native-action';return json(['status'=>200]);});
+  check($reply->value['status']===200&&$order===['native-auth','native-action'],'verified operation proceeds on an otherwise valid deployment without a hash profile');Verify::revoke(1);
+  $r->verb='GET';$r->path='/console/v1/idcsmart_common/host/1/configoption';$r->params=['credentials_only'=>'1'];$order=[];$reply=$guard->handle($r,function(){ $GLOBALS['order'][]='native-action';return json(['status'=>200]);});check($reply->value['status']===400&&isset($reply->value['data']['operate_password'])&&$order===['native-auth'],'credential-only requests retain password verification across system differences');
   $r->path='/console/v1/mf_cloud/1/remote_info';$r->params=['metadata_only'=>'1'];$order=[];
   $operationGuard=new \CRA1\Theme\Http\OperationGuard();
   $reply=$guard->handle($r,function($request)use($operationGuard,$summaryPayload){return $operationGuard->handle($request,function()use($summaryPayload){$GLOBALS['order'][]='native-summary';return json($summaryPayload);});});
   check($reply->value['status']===200&&$order===['native-auth','native-summary'],'both theme guards allow an authenticated safe summary on a historical native installation');
   check(!isset($reply->value['data']['password'],$reply->value['data']['future_credential']),'guard chain filters native summary before responding');
   $r->params=[];$reply=$operationGuard->handle($r,function(){throw new RuntimeException('credential action reached');});
-  check($reply->value['status']===503,'explicit credential reads still fail closed without a source contract');
+  check($reply->value['status']===400&&isset($reply->value['data']['operate_password']),'explicit credentials still require server-side verification');
   $r->client_id=0;$r->params=['metadata_only'=>'1'];$reply=$operationGuard->handle($r,function(){throw new RuntimeException('anonymous action reached');});
   check($reply->value['status']===401,'metadata flag cannot bypass authentication');
   check(\CRA1\Theme\Context::isCRA1('pc/cra1')&&!\CRA1\Theme\Context::isCRA1('mycra1')&&!\CRA1\Theme\Context::isCRA1('cra1-custom'),'exact theme identity');

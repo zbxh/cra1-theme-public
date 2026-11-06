@@ -60,7 +60,11 @@ test('catalog zero placeholders differ from explicit free products and zero disc
  assert.equal(f.page.catalogPriceAmount({price:'41.00',price_discounted:0}),0)
  for(const price of ['',null,undefined,'bad',-1])assert.equal(f.page.catalogPriceKnown({price}),false)
 })
-test('identified third-party modules use their native mobile document without a duplicate configuration fetch',async()=>{
- const f=fixture();f.page.selectedProductId=7;f.page.selectedProduct={id:7,res_module:'cloud_service'};f.page.disposeMobileConfig=()=>{}
- await f.page.loadMobileConfig();assert.equal(f.page.mobileNativeFrame,true);assert.equal(f.page.configState,'loading')
+test('mobile and third-party products use an isolated native document regardless of user agent',()=>{
+ const f=fixture();f.page.selectedProductId=7;f.page.selectedProduct={id:7,res_module:'cloud_service'};f.page.configState='loading';f.page.embedNonce='test-frame'
+ f.page.$data.__viewportW=390
+ assert.equal(f.page.isMobileCart,true);assert.match(f.page.embedSrc,/goods_embed\.htm/);assert.match(f.page.embedSrc,/embed_nonce=test-frame/)
+ assert.equal(f.options.methods.loadMobileConfig,undefined)
+ f.page.$data.__viewportW=900;assert.equal(f.page.isMobileCart,true)
+ f.page.$data.__viewportW=1440;assert.equal(f.page.isMobileCart,false)
 })

@@ -44,6 +44,41 @@ try {
   })
   assert.equal(preserved, true, 'a manual collapse before configuration arrives is preserved')
   checks.push({ manualChoiceDuringLoadPreserved: true })
+
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.addStyleTag({ content: fs.readFileSync(path.join(root, 'public/cra1-shared/theme-sources/member/cra1-shell.css'), 'utf8') })
+  await page.evaluate(async () => {
+    localStorage.removeItem('cra1_aside_collapsed')
+    const component = { ...asideMenu, created() {}, mounted() {}, updated() {}, beforeDestroy() {} }
+    window.appearanceFixture = new Vue({
+      el: '#root', components: { 'aside-menu': component }, template: '<div><aside-menu ref="nav" /></div>'
+    }).$refs.nav
+    const vm = window.appearanceFixture
+    vm.menu = [{ id: 'root', name: '产品管理', child: [{ id: 'group', name: '我的产品', url: 'productList.htm', child: [] }] }]
+    vm.navShape = 3
+    vm.primaryKey = 'root'
+    vm.loading = false
+    vm.navOpen = true
+    vm.applyAsideDefault({ appearance: { sidebar_default_open: 0 } })
+    await Vue.nextTick()
+  })
+  const width = () => page.locator('.cra1-aside').evaluate(n => n.getBoundingClientRect().width)
+  assert.equal(await width(), 48, 'configured collapsed navigation is visibly narrow when open')
+  await page.getByRole('button', { name: '产品管理', exact: true }).click()
+  assert.equal(await width(), 860, 'selecting an icon expands its actual page panel')
+  assert.ok(await page.getByRole('group', { name: '产品管理', exact: true }).isVisible())
+  await page.getByRole('button', { name: '折叠侧边栏', exact: true }).click()
+  assert.equal(await width(), 48, 'the visible resize handle really collapses the panel')
+  await page.getByRole('button', { name: '展开侧边栏', exact: true }).click()
+  assert.equal(await width(), 860, 'the handle restores the full panel')
+  checks.push({ visibleDesktopWidths: [48, 860, 48, 860] })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.evaluate(async () => { const vm = window.appearanceFixture; vm.onResize(); vm.collapsed = true; vm.navOpen = true; await Vue.nextTick() })
+  assert.ok(await width() > 200, 'desktop collapse does not narrow a mobile drawer')
+  assert.ok(await page.locator('.cra1-primary-item__label').isVisible(), 'mobile drawer retains text labels')
+  await page.getByRole('button', { name: '产品管理', exact: true }).click()
+  assert.ok(await page.getByRole('button', { name: '返回上一级', exact: true }).isVisible(), 'mobile navigation still switches to its detail panel')
+  checks.push({ mobileDrawerUnaffected: true })
   console.log(JSON.stringify({ status: 'passed', checks, production_writes: 0 }))
 } finally {
   await browser.close()

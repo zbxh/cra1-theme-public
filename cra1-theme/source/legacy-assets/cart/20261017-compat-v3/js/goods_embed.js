@@ -112,11 +112,12 @@
   var railAwaitSince = null;
 
   function railFindVM() {
-    var els = document.querySelectorAll('.template');
+    var els = document.querySelectorAll('.m-cloud-m, .m-dcim-m, .template');
+    var fallback = null;
     for (var i = 0; i < els.length; i++) {
-      if (els[i].__vue__) return els[i].__vue__;
+      if (els[i].__vue__) { if (railContract(els[i].__vue__)) return els[i].__vue__; fallback = fallback || els[i].__vue__; }
     }
-    return null;
+    return fallback;
   }
 
   function railFmt(n) {
@@ -386,20 +387,22 @@
       if (!railCanSubmit()) return;
       var ok = railKind === 'order-right'
         ? railClick('.order-right .f-btn .buy-btn')
-        : railClick('.f-order .right .buy');
+        : railClick('.f-order .right .buy, .botton-buy-btn .buy-btn, .botton-buy-btn .buy');
       if (!ok) {
         try {
           if (railKind === 'order-right' && typeof railVM.buyNow === 'function') railVM.buyNow();
-          else if (typeof railVM.submitOrder === 'function') railVM.submitOrder();
+          else if (typeof railVM.submitOrder === 'function') railVM.submitOrder(new MouseEvent('click'));
         } catch (e) { }
       }
     }
   });
 
   function railContract(vm) {
-    if (document.querySelector('.f-order') && Array.isArray(vm.cycleList) && vm.params
+    // Native templates may not render their order bar until models/periods
+    // arrive. Detect the callable VM contract, not that conditional DOM node.
+    if (Array.isArray(vm.cycleList) && vm.params
         && vm.calcTotalPrice !== undefined && typeof vm.handlerCart==='function' && typeof vm.submitOrder==='function') return 'f-order';
-    if (document.querySelector('.order-right') && Array.isArray(vm.custom_cycles)
+    if (Array.isArray(vm.custom_cycles)
         && vm.totalPrice !== undefined && typeof vm.addCart==='function' && typeof vm.buyNow==='function') return 'order-right';
     return '';
   }

@@ -10,6 +10,7 @@ import LinkPicker from './LinkPicker'
 import SwitchControl from '../ui/Switch'
 import { DragHandle, DropBadge, DRAG_LIST_BASE, RowIconBtn, dragRowClass, useFlatDrag, DragAnnouncer } from '../ui/dragSort'
 import { useScopedState } from '../lib/workspace'
+import { randomId } from '../lib/random-id'
 import defaults from '../../../../backend/Storage/auth-pages.defaults.json'
 
 function TextField({ label, value, onChange, multiline, maxLength, placeholder }) {
@@ -23,7 +24,7 @@ function Highlights({ items, onChange }) {
     const next = [...items], [item] = next.splice(from, 1); next.splice(to, 0, item); onChange(next)
   }})
   return <div className="space-y-3">
-    <div className="flex flex-wrap items-center justify-between gap-3"><Label>介绍条目</Label><Button size="sm" variant="outline" disabled={items.length >= 6} onClick={() => setEditing({id: crypto.randomUUID(), title: '', description: '', enabled: 1})}><Plus className="size-4"/>添加条目</Button></div>
+    <div className="flex flex-wrap items-center justify-between gap-3"><Label>介绍条目</Label><Button size="sm" variant="outline" disabled={items.length >= 6} onClick={() => setEditing({id: randomId(), title: '', description: '', enabled: 1})}><Plus className="size-4"/>添加条目</Button></div>
     <p className="text-xs text-muted-foreground">最多 6 条。拖动手柄排序，也可聚焦手柄后按空格和方向键调整。</p>
     {items.length ? <ul className={DRAG_LIST_BASE}>{items.map((item, i) => <li key={item.id} draggable {...drag.itemProps(i)} className={dragRowClass({isDragging: drag.isDragging(i), isOver: drag.isOver(i)})}>
       <DragHandle {...drag.handleProps(i, '拖拽排序：' + (item.title || '未命名条目'))}/>

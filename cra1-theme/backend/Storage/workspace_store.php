@@ -383,7 +383,7 @@ final class ThemeWorkspaceStore
         if ($scope['domain']==='cart' && isset($patch['content']['goodslist']['heading_icon_styles'])) CartThemeStore::validateHeadingIconStyles($patch['content']['goodslist']['heading_icon_styles']);
         if ($scope['domain']==='cart' && isset($patch['content']['shoppingcar']['empty']['button_target'])) {
             $target=trim((string)$patch['content']['shoppingcar']['empty']['button_target']);
-            if($target!==''&&(strpos($target,'//')===0||!preg_match('~^(?:/|#|https://|tel:|mailto:)~i',$target)||preg_match('/[<>"\'\s]/',$target)))throw new InvalidArgumentException('按钮跳转目标：请选择站内页面、商品、联系方式或 HTTPS 网址');
+            if($target!==''&&(strpos($target,'//')===0||!preg_match('~^(?:/|#|https?://|tel:|mailto:)~i',$target)||preg_match('/[<>"\'\s]/',$target)))throw new InvalidArgumentException('按钮跳转目标：请选择站内页面、商品、联系方式或 HTTP/HTTPS 网址');
         }
         if($section==='custom_code')foreach($patch[$section]as$key=>$v){if(in_array($key,['css','js'],true)&&(!is_string($v)||strlen($v)>1048576))throw new InvalidArgumentException('自定义代码必须是文本且不超过 1MB');if(in_array($key,['css_enabled','js_enabled'],true)&&!is_bool($v))throw new InvalidArgumentException('代码启用状态必须是开关值');}
         if ($section === 'sidebar' && isset($patch['sidebar']['nodes'])) {

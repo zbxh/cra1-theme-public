@@ -889,7 +889,7 @@ final class MemberCenterStore
             if ($url === '') {
                 return '';
             }
-            // 拒绝危险协议与协议相对地址；保留站内相对/绝对、https、锚点、mailto、tel
+            // 保留站内链接及 HTTP/HTTPS；拒绝可执行协议与协议相对地址。
             if (preg_match('~^\s*(javascript|vbscript|data|file)\s*:~i', $url)) {
                 return '';
             }
@@ -897,7 +897,7 @@ final class MemberCenterStore
                 return '';
             }
             if (preg_match('~^[a-z][a-z0-9+.-]*:~i', $url)
-                && !preg_match('~^(https|mailto|tel):~i', $url)) {
+                && !preg_match('~^(https?|mailto|tel):~i', $url)) {
                 return '';
             }
             return $url;
@@ -1210,7 +1210,7 @@ final class MemberCenterStore
         if (!preg_match('~^[a-z][a-z0-9+.-]*:~i', $url)) {
             return true;
         }
-        return (bool) preg_match('~^(#|/|https://|tel:|mailto:)~i', $url);
+        return (bool) preg_match('~^(#|/|https?://|tel:|mailto:)~i', $url);
     }
 
     public static function uuid(): string

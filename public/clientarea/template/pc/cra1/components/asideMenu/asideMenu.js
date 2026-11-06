@@ -628,6 +628,7 @@
       selectPrimary(key) {
         this.primaryKey = key
         if (global.innerWidth <= 1024) this.mobileDetail = true
+        else if (this.collapsed) this.toggleCollapse()
         this.initMobileGroups()
       },
       /**

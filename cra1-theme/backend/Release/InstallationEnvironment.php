@@ -28,8 +28,8 @@ final class InstallationEnvironment
         $add = static function (string $id, string $status, string $label, string $detail) use (&$rows): void {
             $rows[] = ['id'=>$id,'status'=>$status,'label'=>$label,'detail'=>$detail];
         };
-        $php = PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION === 4;
-        $add('php',$php?'pass':'blocked','PHP 版本',$php?'PHP '.PHP_VERSION:'请使用 V10 对应的 PHP 7.4 环境，当前为 '.PHP_VERSION);
+        $php = version_compare(PHP_VERSION,'7.4','>=');
+        $add('php',$php?'pass':'blocked','PHP 版本',$php?'PHP '.PHP_VERSION:'主题需要 PHP 7.4 或更高版本，当前为 '.PHP_VERSION);
 
         $missing = [];
         foreach (['pdo_mysql','pdo_sqlite','sodium','fileinfo','gd','zip','mbstring','dom','curl'] as $extension) {

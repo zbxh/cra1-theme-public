@@ -12,7 +12,7 @@
 <script src="{:cra1_theme_asset_url('native', 'js/module-deps.js', '/clientarea/template/pc/cra1/js/module-deps.js')}"></script>
 </head>
 
-<body>
+<body class="cra1-cart-embed">
   <div id="mainLoading">
     <div class="ddr ddr1"></div>
     <div class="ddr ddr2"></div>

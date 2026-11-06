@@ -1738,22 +1738,24 @@ body {
   to { opacity: 1; transform: translateX(0); }
 }
 
-/* 折叠为图标态：只留左栏图标列（更窄），面板隐藏 */
-.cra1-aside.is-collapsed:not(.is-open) { width: var(--aside-w-icon); }
-.cra1-aside.is-collapsed:not(.is-open) .cra1-aside__rail-col {
+/* 桌面导航打开后仍可折叠；隐藏状态本身不决定宽度。 */
+@media (min-width: 1025px) {
+.cra1-aside.is-collapsed { width: var(--aside-w-icon); }
+.cra1-aside.is-collapsed .cra1-aside__rail-col {
   flex-basis: var(--aside-w-icon);
   width: var(--aside-w-icon);
   padding: 14px 6px 12px;
   border-right: 0;
 }
-.cra1-aside.is-collapsed:not(.is-open) .cra1-primary-item {
+.cra1-aside.is-collapsed .cra1-primary-item {
   justify-content: center;
   padding: 0;
   gap: 0;
 }
-.cra1-aside.is-collapsed:not(.is-open) .cra1-primary-item__label,
-.cra1-aside.is-collapsed:not(.is-open) .cra1-primary-item__chevron { display: none; }
-.cra1-aside.is-collapsed:not(.is-open) .cra1-aside__panel { display: none; }
+.cra1-aside.is-collapsed .cra1-primary-item__label,
+.cra1-aside.is-collapsed .cra1-primary-item__chevron { display: none; }
+.cra1-aside.is-collapsed .cra1-aside__panel { display: none; }
+}
 
 /* 减少动态 */
 @media (prefers-reduced-motion: reduce) {

@@ -217,7 +217,10 @@ trait ThemeEditorStore
         if(!is_dir($dir)&&!mkdir($dir,0750,true))throw new RuntimeException('预览目录不可写');
         foreach(glob($dir.'/*.json')?:[]as$file)if(filemtime($file)<time()-900)@unlink($file);
         $files=glob($dir.'/*.json')?:[];if(count($files)>200){usort($files,static function($a,$b){return filemtime($a)<=>filemtime($b);});foreach(array_slice($files,0,count($files)-200)as$file)@unlink($file);}
-        $token=bin2hex(random_bytes(32));$doc=['domain'=>$domain,'editorId'=>$id,'pageKey'=>$editor['pageKey']??null,'expires'=>time()+900,'config'=>$raw,'owner_id'=>(int)(theme_actor()['id']??0),'session_hash'=>CRA1ThemeSecurity::hashToken((string)($_SESSION['security_token']??'')),'message_nonce'=>bin2hex(random_bytes(24))];
+        // Capture the browser address from this authenticated POST. Preview GETs
+        // may carry an internal proxy Host and no Origin or Referer header.
+        $origin=$GLOBALS['THEME_ORIGIN']??CRA1ThemeSecurity::currentOrigin($_SERVER);
+        $token=bin2hex(random_bytes(32));$doc=['domain'=>$domain,'editorId'=>$id,'pageKey'=>$editor['pageKey']??null,'expires'=>time()+900,'config'=>$raw,'owner_id'=>(int)(theme_actor()['id']??0),'session_hash'=>CRA1ThemeSecurity::hashToken((string)($_SESSION['security_token']??'')),'message_nonce'=>bin2hex(random_bytes(24)),'origin'=>$origin];
         if(file_put_contents($dir.'/'.$token.'.json',$this->encode($doc))===false)throw new RuntimeException('无法生成预览');@chmod($dir.'/'.$token.'.json',0640);
         $base=basename(dirname($_SERVER['SCRIPT_NAME']??'/cra1admin/index.php'));
         $url='/'.$base.'/index.php?r=preview&__theme_preview='.$token;

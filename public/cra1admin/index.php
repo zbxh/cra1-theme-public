@@ -52,7 +52,6 @@ require_once __DIR__ . '/workspace_store.php';
 
 /* Fixed public projection is served without the administrator PHP session. */
 if (in_array((string)($_GET['r']??''),['member.sidebar.snapshot','cart.snapshot'],true)) {
-    if(time()>1794441600){http_response_code(410);exit;} // one release compatibility, 2026-11-12 UTC
     $GLOBALS['THEME_PUBLIC_DOMAIN']=($_GET['r']==='cart.snapshot')?'cart':'member';
     require $ROOT.'/public/cra1-shared/snapshot.php';exit;
 }
@@ -63,15 +62,18 @@ $THEME_REQUEST_ID=bin2hex(random_bytes(12));
 try {$THEME_SECURITY=new CRA1ThemeSecurity($ROOT);$THEME_SETTINGS=$THEME_SECURITY->settings();}
 catch(Throwable $e){http_response_code(503);header('Cache-Control: no-store');header('X-Robots-Tag: noindex, nofollow');header('X-Content-Type-Options: nosniff');if(strpos((string)($_GET['r']??''),'api.')===0){header('Content-Type: application/json; charset=utf-8');echo json_encode(['status'=>503,'msg'=>'后台安全服务不可用，请通过本地维护命令检查。','code'=>'SECURITY_UNAVAILABLE','request_id'=>$THEME_REQUEST_ID],JSON_UNESCAPED_UNICODE);}else{header('Content-Type: text/plain; charset=utf-8');echo '后台安全服务不可用，请通过本地维护命令检查。';}exit;}
 $THEME_NETWORK=CRA1ThemeSecurity::network($_SERVER,$THEME_SETTINGS);$https=$THEME_NETWORK['https'];
-$canonical=parse_url((string)$THEME_SETTINGS['canonical_url']);
-$authority=strtolower(($canonical['host']??'').(isset($canonical['port'])?':'.$canonical['port']:''));
-if($authority===''||strtolower((string)($_SERVER['HTTP_HOST']??''))!==$authority){http_response_code(404);exit;}
-$allowed=$THEME_SETTINGS['ip_allowlist']??[];
-if($allowed){$pass=false;foreach($allowed as$cidr)if(CRA1ThemeSecurity::contains($THEME_NETWORK['ip'],$cidr))$pass=true;if(!$pass){http_response_code(404);exit;}}
-if(!empty($THEME_SETTINGS['force_https'])&&!$https){http_response_code(403);header('Content-Type: text/plain; charset=utf-8');echo '请通过有效的 HTTPS 地址访问后台。';exit;}
-if($https&&!empty($THEME_SETTINGS['force_https']))header('Strict-Transport-Security: max-age=31536000');
+$THEME_ORIGIN=method_exists(CRA1ThemeSecurity::class,'currentOrigin')?CRA1ThemeSecurity::currentOrigin($_SERVER):(($https?'https':'http').'://'.($_SERVER['HTTP_HOST']??''));
 ini_set('session.use_strict_mode','1');ini_set('session.use_only_cookies','1');ini_set('session.use_trans_sid','0');
-session_name('CRA1THEMEID');session_set_cookie_params(['lifetime'=>0,'path'=>'/'.$SLUG,'secure'=>$https,'httponly'=>true,'samesite'=>'Lax']);session_start();
+// Separate HTTP sessions avoid browsers rejecting an HTTP cookie that would
+// overwrite a previously issued Secure cookie on the same domain.
+session_name($https?'CRA1THEMEID':'CRA1THEMEID_HTTP');session_set_cookie_params(['lifetime'=>0,'path'=>'/'.$SLUG,'secure'=>$https,'httponly'=>true,'samesite'=>'Lax']);
+// Continue a valid legacy HTTP session after upgrading its cookie name. Strict
+// mode still rejects unknown IDs; the stored login token is checked below.
+if(!$https&&!isset($_COOKIE['CRA1THEMEID_HTTP'])&&is_string($_COOKIE['CRA1THEMEID']??null)&&preg_match('/^[a-zA-Z0-9,-]{1,128}$/D',$_COOKIE['CRA1THEMEID']))session_id($_COOKIE['CRA1THEMEID']);
+session_start();
+// A legacy HTTP cookie may also reach HTTPS on the same host. Keep its valid
+// server session, while refreshing the attributes for the current transport.
+if($https&&isset($_COOKIE['CRA1THEMEID']))setcookie(session_name(),session_id(),['expires'=>0,'path'=>'/'.$SLUG,'secure'=>true,'httponly'=>true,'samesite'=>'Lax']);
 // 旧测试版可能仍由保留的后端写入会话键；只迁移本后台的 PHP 会话，保留登录与 CSRF 值。
 foreach (['cloud_admin'=>'cra1_admin','cloud_csrf'=>'cra1_csrf'] as $__oldKey=>$__newKey) {
     if (!array_key_exists($__newKey,$_SESSION) && isset($_SESSION[$__oldKey])) $_SESSION[$__newKey]=$_SESSION[$__oldKey];
@@ -97,11 +99,11 @@ function redirect_to(string $query): void
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');header('X-Robots-Tag: noindex, nofollow, noarchive');
 header('Referrer-Policy: no-referrer');header('Cache-Control: no-store');
-header('Content-Security-Policy: default-src \'self\'; script-src \'self\' \'nonce-'.$THEME_CSP_NONCE.'\'; style-src \'self\' \'unsafe-inline\'; img-src \'self\' data: blob: https:; font-src \'self\' data:; connect-src \'self\'; frame-src \'self\'; frame-ancestors \'none\'; object-src \'none\'; base-uri \'none\'; form-action \'self\'');
+header('Content-Security-Policy: default-src \'self\'; script-src \'self\' \'nonce-'.$THEME_CSP_NONCE.'\'; style-src \'self\' \'unsafe-inline\'; img-src \'self\' data: blob: http: https:; font-src \'self\' data:; connect-src \'self\'; frame-src \'self\'; frame-ancestors \'none\'; object-src \'none\'; base-uri \'none\'; form-action \'self\'');
 
 /* ---------- 通用工具 ---------- */
 function json_out(array $data,int $code=200): void {
-    if(($data['status']??0)===200&&strpos($GLOBALS['THEME_WRITE']['target']??'','website:')===0&&in_array($GLOBALS['THEME_WRITE']['action']??'',['seo.save','workspace.editor.save','workspace.save','save','reset'],true)){try{require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_seo.php';theme_generate_seo($GLOBALS['ROOT'],$GLOBALS['THEME_SETTINGS']['canonical_url']);}catch(Throwable $e){$data['data']['seo_ok']=false;$data['msg']='配置已保存，搜索引擎文件同步失败，请通过维护命令重建。';}}
+    if(($data['status']??0)===200&&strpos($GLOBALS['THEME_WRITE']['target']??'','website:')===0&&in_array($GLOBALS['THEME_WRITE']['action']??'',['seo.save','workspace.editor.save','workspace.save','save','reset'],true)){try{require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_seo.php';theme_generate_seo($GLOBALS['ROOT'],($GLOBALS['THEME_SETTINGS']['canonical_url']?:$GLOBALS['THEME_ORIGIN']));}catch(Throwable $e){$data['data']['seo_ok']=false;$data['msg']='配置已保存，搜索引擎文件同步失败，请通过维护命令重建。';}}
     $data=theme_api_complete($data);$status=(int)($data['status']??$code);
     $data['code']=$data['code']??([200=>'OK',400=>'INVALID_REQUEST',401=>'SESSION_INVALID',403=>'PERMISSION_DENIED',404=>'NOT_FOUND',409=>'CONFIG_CONFLICT',429=>'RATE_LIMITED',500=>'SERVER_ERROR',503=>'SERVICE_UNAVAILABLE'][$status]??'REQUEST_FAILED');
     $data['request_id']=$GLOBALS['THEME_REQUEST_ID'];if(($data['msg']??'')==='success')$data['msg']='已读取';
@@ -197,7 +199,7 @@ function url_ok(string $url): bool
     if (strpos($url, '//') === 0) {
         return false;
     }
-    return (bool) preg_match('~^(#|/|https://|tel:|mailto:)~i', $url);
+    return (bool) preg_match('~^(#|/|https?://|tel:|mailto:)~i', $url);
 }
 
 function text_urls_ok(string $value): bool
@@ -284,11 +286,11 @@ function config_normalize_value(string $key, $raw): array
     }
     if (substr($key, -4) === '_url' || substr($key, -5) === '_link') {
         if (!url_ok($value)) {
-            return [false, '链接必须以 #、/、https://、tel: 或 mailto: 开头：' . $key];
+            return [false, '链接必须以 #、/、http://、https://、tel: 或 mailto: 开头：' . $key];
         }
     }
     if (substr($key, -5) === '_text' && !text_urls_ok($value)) {
-        return [false, '「' . $key . '」包含不允许的链接，仅支持 #、/、https://、tel:、mailto:'];
+        return [false, '「' . $key . '」包含不允许的链接，仅支持 #、/、http://、https://、tel:、mailto:'];
     }
     // 自定义代码允许更长内容（最高 200KB），其余字段 2 万字符
     $maxLen = (strpos($key, 'custom_') === 0) ? 200000 : 20000;
@@ -1260,6 +1262,7 @@ if ($r==='preview') {
     $token=(string)($_GET['__theme_preview']??'');$doc=null;
     if(preg_match('/^[a-f0-9]{64}$/D',$token)){$file=$STORE.'/previews/'.$token.'.json';$doc=is_file($file)?json_decode((string)file_get_contents($file),true):null;}
     if(!is_array($doc)||($doc['expires']??0)<time()||(int)($doc['owner_id']??0)!==(int)theme_actor()['id']||!hash_equals((string)($doc['session_hash']??''),CRA1ThemeSecurity::hashToken((string)$_SESSION['security_token']))){http_response_code(410);exit;}
+    if(is_string($doc['origin']??null)&&preg_match('~^https?://[^/?#]+$~D',$doc['origin']))$THEME_ORIGIN=$doc['origin'];
     $GLOBALS['THEME_VERIFIED_PREVIEW']=$doc;session_write_close();require_once __DIR__.'/preview.php';theme_editor_preview($ROOT);exit;
 }
 /* JSON API */
@@ -1298,7 +1301,7 @@ if (strpos($r,'api.')===0) {
         $transfer=new \CRA1\Theme\Storage\ConfigurationTransfer($ROOT);
         if($action==='transfer.get')json_out(['status'=>200,'data'=>['interrupted'=>is_file($STORE.'/transfer-pending.json'),'history'=>$transfer->history()]]);
         if($action==='transfer.history.settings.save')json_out($transfer->saveHistoryLimit($body['limit']??null,$body['expected_limit']??null));
-        if($action==='transfer.export')json_out(['status'=>200,'data'=>!empty($body['images'])?$transfer->exportWithMedia((string)$THEME_SETTINGS['canonical_url'],(int)theme_actor()['id'],$THEME_SESSION_HASH):$transfer->export((string)$THEME_SETTINGS['canonical_url'])]);
+        if($action==='transfer.export')json_out(['status'=>200,'data'=>!empty($body['images'])?$transfer->exportWithMedia($THEME_ORIGIN,(int)theme_actor()['id'],$THEME_SESSION_HASH):$transfer->export($THEME_ORIGIN)]);
         if($action==='transfer.history.prepare')json_out(['status'=>200,'data'=>$transfer->prepareHistory((string)($body['id']??''),(int)theme_actor()['id'],$THEME_SESSION_HASH,(string)theme_actor()['username'])]);
         if($action==='transfer.media.download'){
             $path=(new \CRA1\Theme\Storage\ConfigurationMedia($ROOT))->download((string)($body['id']??''),(int)theme_actor()['id'],$THEME_SESSION_HASH);
@@ -1641,21 +1644,6 @@ if (strpos($r,'api.')===0) {
         }
 
         json_out(['status' => 200, 'msg' => 'success', 'data' => ['groups' => $out, 'total' => $total]]);
-    }
-
-    /** 服务端请求站内接口（返回 JSON 数组；失败返回空数组） */
-    if (!function_exists('cra1admin_get_json')) {
-        function cra1admin_get_json(string $path): array
-        {
-            $url = 'http://127.0.0.1' . $path;
-            $ctx = stream_context_create(['http' => ['timeout' => 8, 'header' => "Host: " . ($_SERVER['HTTP_HOST'] ?? 'localhost') . "\r\n"]]);
-            $raw = @file_get_contents($url, false, $ctx);
-            if (!is_string($raw) || $raw === '') {
-                return [];
-            }
-            $d = json_decode($raw, true);
-            return is_array($d) ? $d : [];
-        }
     }
 
     /* ---------- 菜单链接候选（主题页面 + v10 商品）：供后台「菜单导航」链接选择器 ---------- */
@@ -2209,7 +2197,6 @@ if ($r === 'dashboard') {
         'role' => theme_actor()['role'],
         'mfa_enabled' => !empty(theme_actor()['mfa_secret']),
         'must_change' => (bool)theme_actor()['must_change'],
-        'http_test' => !empty($THEME_SETTINGS['http_test'])&&!$https,
         'base' => 'index.php',
         'slug' => $SLUG,
         'release' => $assetBase,

@@ -417,6 +417,25 @@
   font-size: 15px;
 }
 
+.cart-page .cl-rail-status {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 22px;
+  color: var(--muted-foreground);
+}
+
+.cart-page .cl-rail-price-pending {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.cart-page .cl-rail-dock > .cl-rail-status {
+  flex: 0 0 100%;
+  margin: 0;
+  font-size: 12px;
+}
+
 .cart-page .cl-rail-empty {
   padding: 18px 4px 6px;
   font-size: 13px;
@@ -484,96 +503,7 @@
   }
 }
 
-/* ==========================================================================
-   v8 手机端吸底价格操作栏（≤1024 显示；对标大厂手机购买页）
-   桌面（>1024）完全隐藏——右栏 sticky 形态不变。
-   ========================================================================== */
-.cart-page .cl-rail-dock {
-  display: none;
-}
-
-@media (max-width: 1024px) {
-  .cart-page .cl-rail-dock {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
-    background: rgba(255, 255, 255, 0.92);
-    -webkit-backdrop-filter: blur(16px) saturate(1.3);
-    backdrop-filter: blur(16px) saturate(1.3);
-    border-top: 1px solid var(--border);
-    box-shadow: 0 -6px 24px -12px color-mix(in srgb,var(--cui-night) 25.0%,transparent);
-    box-sizing: border-box;
-  }
-
-  /* 内容防遮挡：主列预留 dock 高度（~64px + 安全区） */
-  .cart-page .el-main {
-    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
-  }
-
-  /* 侧栏卡片内的费用+按钮段隐藏（由 dock 承担）；交互段保留 */
-  .cart-page .cl-rail-card .cl-rail-price,
-  .cart-page .cl-rail-card .cl-rail-actions {
-    display: none;
-  }
-
-  .cart-page .cl-rail-dock-price {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    flex: 0 1 auto;
-  }
-
-  .cart-page .cl-rail-dock-label {
-    font-size: 12px;
-    color: var(--muted-foreground);
-    line-height: 16px;
-  }
-
-  .cart-page .cl-rail-dock-now {
-    display: flex;
-    align-items: baseline;
-    gap: 1px;
-    color: var(--danger);
-  }
-
-  .cart-page .cl-rail-dock-num {
-    font-size: 20px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    line-height: 26px;
-  }
-
-  .cart-page .cl-rail-dock .cl-rail-price-origin {
-    font-size: 11px;
-    margin-left: 4px;
-  }
-
-  .cart-page .cl-rail-dock-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1 1 auto;
-    justify-content: flex-end;
-  }
-
-  .cart-page .cl-rail-dock .cl-rail-addcart {
-    flex: 0 0 44px;
-    width: 44px;
-    height: 44px;
-  }
-
-  .cart-page .cl-rail-dock .cl-rail-buy {
-    flex: 1 1 auto;
-    max-width: 220px;
-    font-size: 15px;
-  }
-}
+.cart-page .cl-rail-dock { display: none; }
 
 /* ==========================================================================
    v7 手机适配（对标大厂手机购物车）
@@ -1764,9 +1694,10 @@
    ========================================================================== */
 @media (max-width: 768px) {
   /* ---- 1. 表单上下结构：label 置顶、控件区全宽 ---- */
+  /* display 保持普通优先级，交由原生 v-show 控制条件字段与提示的显隐。 */
   .cart-page .config-box .el-form-item__label {
     float: none !important;
-    display: block !important;
+    display: block;
     width: auto !important;
     text-align: left !important;
     padding: 0 0 6px !important;
@@ -1782,7 +1713,7 @@
 
   /* 表单项整行卡片（与融合页观感一致） */
   .cart-page .config-box .el-form-item {
-    display: block !important;
+    display: block;
     background: var(--muted) !important;
     border-radius: 10px;
     padding: 10px 12px 14px !important;
@@ -1845,13 +1776,13 @@
      结构 .image-box > .image-ul > .image-item（三模块一致）；
      只让直接装卡的 .image-ul 做网格，外层仅作容器（两层都设网格会把卡压到 66px）。 */
   .cart-page .config-box .image-box {
-    display: block !important;
+    display: block;
     max-width: 100% !important;
     overflow-x: visible;
   }
 
   .cart-page .config-box .image-ul {
-    display: grid !important;
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     width: 100% !important;
@@ -1889,7 +1820,7 @@
 
   /* ---- 4. radio 组：换行，不横滑 ---- */
   .cart-page .config-box .el-radio-group {
-    display: flex !important;
+    display: flex;
     flex-wrap: wrap !important;
     overflow-x: visible;
     gap: 8px 0;
@@ -1941,11 +1872,11 @@
 
   /* 行 → 卡片：单元格竖排，每格「标签 + 值」（标签取原表头文字，用 data 属性实现） */
   .cart-page .config-box .el-table__body tbody {
-    display: block !important;
+    display: block;
   }
 
   .cart-page .config-box .el-table__row {
-    display: block !important;
+    display: block;
     background: var(--background) !important;
     border: 1px solid var(--border) !important;
     border-radius: 10px;
@@ -1960,7 +1891,7 @@
   }
 
   .cart-page .config-box .el-table__row td {
-    display: flex !important;
+    display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: 10px;
@@ -1975,7 +1906,7 @@
 
   /* 单选框列：与机型名同行居左 */
   .cart-page .config-box .el-table__row td:first-child {
-    display: inline-flex !important;
+    display: inline-flex;
     width: auto !important;
     justify-content: flex-start;
     padding-right: 6px !important;
@@ -2283,8 +2214,9 @@
 }
 
 /* ==========================================================================
-   v12 手机端：产品型号卡片横向滑动（无滚动条）
+   手机端：产品型号卡片横向滑动
    ========================================================================== */
+.cart-page .cl-goods-scroll-hint { display: none; }
 @media (max-width: 768px) {
   .cart-page .cl-goods-grid,
   .cart-page .cl-goods-grid[style*="--cart-cols"] {
@@ -2304,7 +2236,15 @@
 
   .cart-page .cl-goods-grid .cl-goods-card {
     flex: 0 0 auto;
-    width: 250px;
+    width: min(250px, 100%);
+  }
+
+  .cart-page .cl-goods-scroll-hint {
+    display: block;
+    margin: 6px 0 0;
+    color: var(--text-muted, #6b7280);
+    font-size: 12px;
+    line-height: 20px;
   }
 
   /* 骨架屏同形态 */
@@ -2322,22 +2262,20 @@
 
   .cart-page .cl-skeleton .cl-skel-card {
     flex: 0 0 auto;
-    width: 250px;
+    width: min(250px, 100%);
   }
 }
 
 
 /* ==========================================================================
-   v14 手机端：点选下拉框底部抽屉化（el-select popper）
+   手机端外层下拉框使用底部抽屉（el-select popper）
    --------------------------------------------------------------------------
-   背景：Element 下拉弹层 append 到 body 直下，cart-theme.css 旧规则
-   （.cart-page .el-select-dropdown）永远匹配不到；iframe 时代的底部抽屉样式
-   在 goods_embed.css（父页不加载）。手机直渲染后所有点选下拉退回 PC 默认
-   样式——此处统一底部抽屉化（≤768 生效，PC 不受影响）。
+   Element 下拉弹层 append 到 body，外层抽屉只作用于主页面。
+   商品 iframe 的下拉框保留控件旁定位，避免被长文档推到屏幕之外。
    不覆盖弹层自身的 inline z-index（PopupManager 动态分配，避免层级错乱）。
    ========================================================================== */
 @media (max-width: 768px) {
-  .el-select-dropdown {
+  body:not(.cra1-cart-embed) .el-select-dropdown {
     position: fixed !important;
     top: auto !important;
     left: 0 !important;
@@ -2360,12 +2298,12 @@
   }
 
   /* 弹层箭头（PC 气泡形态）隐藏 */
-  .el-select-dropdown .popper__arrow {
+  body:not(.cra1-cart-embed) .el-select-dropdown .popper__arrow {
     display: none !important;
   }
 
   /* 选项行：44px 触控目标、主色选中态 */
-  .el-select-dropdown .el-select-dropdown__item {
+  body:not(.cra1-cart-embed) .el-select-dropdown .el-select-dropdown__item {
     height: 44px;
     line-height: 44px;
     font-size: 15px;
@@ -2374,23 +2312,23 @@
     box-sizing: border-box;
   }
 
-  .el-select-dropdown .el-select-dropdown__item.selected {
+  body:not(.cra1-cart-embed) .el-select-dropdown .el-select-dropdown__item.selected {
     color: var(--primary, var(--cui-titanium));
     font-weight: 600;
   }
 
   /* 多选（checkbox）底部抽屉 */
-  .el-select-dropdown.multiple .el-select-dropdown__item.selected::after {
+  body:not(.cra1-cart-embed) .el-select-dropdown.multiple .el-select-dropdown__item.selected::after {
     right: 16px;
   }
 
   /* 滚动区高度随抽屉收紧 */
-  .el-select-dropdown .el-scrollbar__wrap {
+  body:not(.cra1-cart-embed) .el-select-dropdown .el-scrollbar__wrap {
     max-height: 42vh !important;
   }
 
   /* 空态（无选项） */
-  .el-select-dropdown .el-select-dropdown__empty {
+  body:not(.cra1-cart-embed) .el-select-dropdown .el-select-dropdown__empty {
     padding: 24px 0;
     font-size: 13px;
     color: var(--muted-foreground, #737373);
@@ -2416,201 +2354,118 @@
 }
 
 
-/* ==========================================================================
-   v17 手机档：融合页底部「统一价格计算器」
-   --------------------------------------------------------------------------
-   页内价格计算器卡片（rail）与手机模板自带吸底条在手机档隐藏，
-   全部功能（时长/数量/优惠码/配置明细/价格/加购/购买）并入 dock：
-   dock 完全固定屏幕底部、跟随滑动。PC 档 dock 保持原紧凑形态。
-   ========================================================================== */
-
-/* 直渲染内容里的模板自带吸底条隐藏（与 dock 重复） */
-.cl-config-direct .m-cloud-m .botton-buy-btn,
-.cl-config-direct .m-dcim-m .botton-buy-btn {
-  display: none !important;
-}
-
-/* 手机档 dock 扩展块（时长/数量/优惠码/明细）：PC 隐藏 */
-.cl-dock-m {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  /* dock 纵向堆叠：明细(绝对定位) + 时长/数量行 + 优惠码行 + 价格/按钮行 */
-  .cart-page .cl-rail-dock {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+/* Compact calculator follows the viewport, including tablets and narrow desktop windows.
+   The measured height includes expanded controls and the device safe area. */
+.cl-dock-m { display: none; }
+@media (max-width: 1024px) {
+  .cart-page .el-main {
+    padding-bottom: calc(var(--cra1-cart-dock-height, 0px) + 20px) !important;
   }
-
+  .cart-page .cl-rail-dock {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 100;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px 14px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+    max-height: 65vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, .96);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -6px 24px -12px rgba(30, 35, 40, .2);
+  }
   .cart-page .cl-rail-dock .cl-dock-m {
     display: block;
-  }
-
-  /* 配置费用明细下拉（自 dock 顶向上展开） */
-  .cart-page .cl-rail-dock .cl-dock-m-detail {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 100%;
-    max-height: 40vh;
-    overflow-y: auto;
-    background: #ffffff;
-    border-top: 1px solid var(--border);
-    box-shadow: 0 -8px 30px -10px color-mix(in srgb,var(--cui-night) 25.0%,transparent);
-    border-radius: 14px 14px 0 0;
-    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
-    box-sizing: border-box;
-  }
-
-  .cart-page .cl-rail-dock .cl-dock-m-detail-item {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 10px;
-    font-size: 13px;
-    line-height: 20px;
-    padding: 5px 0;
-  }
-
-  .cart-page .cl-rail-dock .cl-dock-m-detail-item .n {
+    grid-column: 1 / -1;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: var(--muted-foreground);
   }
-
-  .cart-page .cl-rail-dock .cl-dock-m-detail-item .p {
-    flex: 0 0 auto;
-    color: var(--ink);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .cart-page .cl-rail-dock .cl-dock-m-detail-empty {
-    padding: 16px 0;
-    text-align: center;
-    font-size: 13px;
-    color: var(--muted-foreground);
-  }
-
-  /* 行分隔：发丝线 + 统一内边距 */
-  .cart-page .cl-rail-dock .cl-dock-m-row,
-  .cart-page .cl-rail-dock .cl-dock-m-coupon-toggle {
+  .cart-page .cl-dock-m-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    width: 100%;
-    padding: 9px 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .cart-page .cl-rail-dock .cl-dock-m-row:last-of-type {
-    border-bottom: none;
-    padding-bottom: 2px;
-  }
-
-  /* 优惠码点击展开行 */
-  .cart-page .cl-rail-dock .cl-dock-m-coupon-toggle {
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--muted-foreground);
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .cart-page .cl-rail-dock .cl-dock-m-coupon-toggle .cl-dock-m-coupon-hint {
-    flex: 1 1 auto;
+    gap: 12px;
     min-width: 0;
-    text-align: right;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: var(--primary);
   }
-
-  .cart-page .cl-rail-dock .cl-dock-m-coupon-toggle i {
-    flex: 0 0 auto;
-    font-size: 12px;
-  }
-
-  .cart-page .cl-rail-dock .cl-dock-m-field {
-    flex: 1 1 0;
-    min-width: 0;
+  .cart-page .cl-dock-m-field {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex: 1 1 0;
+    min-width: 0;
   }
-
-  .cart-page .cl-rail-dock .cl-dock-m-lbl {
+  .cart-page .cl-dock-m-lbl {
     flex: 0 0 auto;
-    font-size: 12px;
     color: var(--muted-foreground);
+    font-size: 12px;
+    line-height: 18px;
     white-space: nowrap;
   }
-
-  .cart-page .cl-rail-dock .cl-dock-m-field .el-select,
-  .cart-page .cl-rail-dock .cl-dock-m-field .el-input-number {
+  .cart-page .cl-dock-m-field .el-select,
+  .cart-page .cl-dock-m-field .el-input-number {
     flex: 1 1 auto;
     min-width: 0;
     width: 100% !important;
   }
-
-  .cart-page .cl-rail-dock .cl-dock-m-row .el-input-number .el-input__inner {
+  .cart-page .cl-dock-m-field .el-input-number .el-input__inner {
+    padding-left: 32px;
+    padding-right: 32px;
     text-align: center;
   }
-
-  /* 优惠码展开行（输入 + 兑换） */
-  .cart-page .cl-rail-dock .cl-dock-m-coupon .el-input {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  .cart-page .cl-rail-dock .cl-dock-m-exchange {
-    flex: 0 0 auto;
-  }
-
-  /* 行 3：价格 + 按钮（原 dock 行改全宽，末行无分隔线） */
-  .cart-page .cl-rail-dock .cl-rail-dock-price {
-    display: flex;
-    align-items: baseline;
-    width: 100%;
-    gap: 6px;
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  /* 「配置费用」可点按钮态（展开明细） */
-  .cart-page .cl-rail-dock .cl-rail-dock-label.cl-dock-m-toggle {
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    font-size: 12px;
-  }
-
-  /* 按钮行 */
-  .cart-page .cl-rail-dock .cl-rail-dock-actions {
+  .cart-page .cl-dock-m-coupon-toggle {
     display: flex;
     align-items: center;
     gap: 10px;
     width: 100%;
+    margin-top: 8px;
+    padding: 8px 0 0;
+    border-top: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-size: 12px;
+    cursor: pointer;
   }
-
-  .cart-page .cl-rail-dock .cl-rail-dock-actions .cl-rail-addcart {
-    flex: 0 0 44px;
-    width: 44px;
-    height: 44px;
-  }
-
-  .cart-page .cl-rail-dock .cl-rail-dock-actions .cl-rail-buy {
+  .cart-page .cl-dock-m-coupon-hint {
     flex: 1 1 auto;
-    font-size: 15px;
+    min-width: 0;
+    overflow: hidden;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--primary);
   }
-
-  /* 配置底部预留 = dock 实高（--dock-h 由 syncDockPadding 联动写入）+ 16px 间距 */
-  .cart-page .el-main {
-    padding-bottom: calc(var(--dock-h, 150px) + 16px + env(safe-area-inset-bottom, 0px)) !important;
+  .cart-page .cl-dock-m-coupon { margin-top: 8px; }
+  .cart-page .cl-dock-m-coupon .el-input { flex: 1 1 auto; min-width: 0; }
+  .cart-page .cl-dock-m-exchange { flex: 0 0 auto; }
+  .cart-page .cl-rail-dock-price { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .cart-page .cl-rail-dock-label {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 4px;
+    color: var(--muted-foreground);
+    font-size: 12px;
+    line-height: 18px;
+    cursor: pointer;
   }
+  .cart-page .cl-rail-dock-now { display: flex; align-items: baseline; flex-wrap: wrap; color: var(--danger); min-width: 0; }
+  .cart-page .cl-rail-dock-num { font-size: 20px; font-weight: 700; line-height: 26px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .cart-page .cl-rail-dock .cl-rail-price-origin { margin: 0; font-size: 11px; overflow-wrap: anywhere; }
+  .cart-page .cl-rail-dock-actions { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .cart-page .cl-rail-dock .cl-rail-addcart { flex: 0 0 40px; width: 40px; height: 40px; }
+  .cart-page .cl-rail-dock .cl-rail-buy { flex: 0 1 auto; width: auto; min-height: 40px; height: auto; max-width: 180px; padding: 10px 14px; font-size: 14px; }
+  .cart-page .cl-rail-dock > .cl-rail-status { grid-column: 1 / -1; margin: 0; line-height: 18px; font-size: 12px; }
+  .cart-page .cl-dock-m-detail { max-height: 22vh; overflow-y: auto; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .cart-page .cl-dock-m-detail-item { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 12px; line-height: 18px; }
+  .cart-page .cl-dock-m-detail-item .n { min-width: 0; color: var(--muted-foreground); overflow-wrap: anywhere; }
+  .cart-page .cl-dock-m-detail-item .p { flex: 0 0 auto; color: var(--ink); }
+  .cart-page .cl-dock-m-detail-empty { color: var(--muted-foreground); font-size: 12px; line-height: 20px; }
+}
+@media (max-width: 560px) {
+  .cart-page .cl-dock-m-field { flex-direction: column; align-items: stretch; gap: 4px; }
 }
 
 .cl-config-toggle { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:44px; padding:10px 14px; border:1px solid #e4e4e7; border-radius:8px; background:#fff; color:#27272a; cursor:pointer; margin-bottom:12px; }
@@ -2736,34 +2591,6 @@ html[data-cra1-theme="cart"] .cart-embed--flat .con > .el-form > .com-tit:first-
 html[data-cra1-theme="cart"] .cart-embed--flat .common-config .l-config > .config-item:first-child > .config-tit {
   margin-top: 0 !important;
   padding-top: 0;
-  border-top: 0;
-}
-
-/* 手机直渲染：区块标题与上方导航对齐，专用控件规则见下方。 */
-html[data-cra1-theme="cart"] .cart-page--flat .cl-config-direct .m-cloud-m {
-  /* 旧手机页面漏载外壳资源；补齐后仍保留模块本来的字体，避免改变内部控件。 */
-  font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-html[data-cra1-theme="cart"] .cart-page--flat .cl-config-direct .m-cloud-m .custom-label {
-  gap: 9px;
-  padding: 24px 0 0;
-  margin: 24px 0 16px;
-  border-top: 1px solid var(--cui-edge);
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 24px;
-}
-
-html[data-cra1-theme="cart"] .cart-page--flat .cl-config-direct .m-cloud-m .custom-label::before {
-  flex: 0 0 3px;
-  height: 14px;
-}
-
-html[data-cra1-theme="cart"] .cart-page--flat .cl-config-direct .m-cloud-m .buy-box > .custom-label:first-child,
-html[data-cra1-theme="cart"] .cart-page--flat .cl-config-direct .m-dcim-m .fast-box > .el-form > .custom-label:first-child {
-  padding-top: 0;
-  margin-top: 0;
   border-top: 0;
 }
 
@@ -2980,4 +2807,35 @@ html[data-cra1-theme="cart"] .cl-cart-disk-compact > button { display:inline-fle
 @media (prefers-reduced-motion:reduce) {
   html[data-cra1-theme="cart"] .cl-cart-controls *,
   html[data-cra1-theme="cart"] .cl-cart-controls *::after { transition:none; }
+}
+
+/* Read failures remain legible under V10's responsive root font size. */
+.cart-page .cl-price-pending { color:var(--cui-muted, #626970); font-size:13px; line-height:1.5; }
+.cart-page .cl-native-purchase-jump {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  width:100%; min-height:44px; margin:0 0 12px; padding:10px 14px;
+  border:1px solid var(--cui-border, #dddfe2); border-radius:10px;
+  background:var(--cui-surface, #fff); color:var(--cui-text, #30363d);
+  font:inherit; font-size:14px; cursor:pointer;
+}
+.cart-page .cl-native-purchase-jump:focus-visible { outline:2px solid #89744e; outline-offset:3px; }
+.cart-page .cra1-cart-read-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.cart-page .cra1-cart-read-error p { margin: 0; }
+.cart-page .cra1-cart-read-error-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--cui-danger, #b42318);
+}
+@media (max-width: 767px) {
+  .cart-page .cl-m-cart-invalid:has(.cra1-cart-read-error-text) { flex-wrap: wrap; }
+  .cart-page .cl-m-cart-invalid .cra1-cart-read-error-text { flex-basis: 100%; }
 }

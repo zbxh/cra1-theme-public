@@ -2,8 +2,8 @@
 declare(strict_types=1);
 ini_set('display_errors','0');
 header('Content-Type: application/json; charset=utf-8');header('Cache-Control: no-store');header('X-Content-Type-Options: nosniff');header('X-Robots-Tag: noindex');
-$https=!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off';
-ini_set('session.use_strict_mode','1');session_name('CRA1INSTALL');session_set_cookie_params(['lifetime'=>0,'path'=>'/cra1-install/','secure'=>$https,'httponly'=>true,'samesite'=>'Strict']);$sessionReady=@session_start();
+$https=(!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off')||strtolower(trim(explode(',',(string)($_SERVER['HTTP_X_FORWARDED_PROTO']??''))[0]))==='https';
+ini_set('session.use_strict_mode','1');session_name($https?'CRA1INSTALL':'CRA1INSTALL_HTTP');session_set_cookie_params(['lifetime'=>0,'path'=>'/cra1-install/','secure'=>$https,'httponly'=>true,'samesite'=>'Strict']);$sessionReady=@session_start();
 $root=dirname(__DIR__,2);
 try{
     if(!$sessionReady)throw new RuntimeException('安装会话无法保存，请在网站面板检查 PHP 会话目录的写入权限后重新打开安装页');
@@ -12,10 +12,8 @@ try{
     define('CRA1_THEME_INSTALLER_CANDIDATE',true);
     require_once $root.'/cra1-theme/backend/bootstrap.php';
     if(($_SERVER['REQUEST_METHOD']??'')!=='POST'||!is_string($_SESSION['csrf']??null)||!hash_equals($_SESSION['csrf'],(string)($_SERVER['HTTP_X_CSRF_TOKEN']??'')))throw new RuntimeException('请求校验失败，请重新打开安装页');
-    $origin=parse_url((string)($_SERVER['HTTP_ORIGIN']??''));
-    $authority=strtolower(($origin['host']??'').(isset($origin['port'])?':'.$origin['port']:''));
-    if(!in_array($origin['scheme']??'',['http','https'],true)||$authority!==strtolower((string)($_SERVER['HTTP_HOST']??''))||($_SERVER['HTTP_SEC_FETCH_SITE']??'')==='cross-site')throw new RuntimeException('请从本站安装页面执行');
-    $siteOrigin=$origin['scheme'].'://'.$authority;
+    require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_security.php';
+    $siteOrigin=method_exists(CRA1ThemeSecurity::class,'currentOrigin')?CRA1ThemeSecurity::currentOrigin($_SERVER):(($https?'https':'http').'://'.($_SERVER['HTTP_HOST']??''));
     $raw=(string)file_get_contents('php://input',false,null,0,16385);if(strlen($raw)>16384)throw new RuntimeException('请求过大');
     $input=json_decode($raw,true,32,JSON_THROW_ON_ERROR);if(!is_array($input)||!in_array($input['action']??'',['check','install','update','recover_update'],true))throw new RuntimeException('未知安装操作');
     $bearer=(string)($_SERVER['HTTP_AUTHORIZATION']??'');

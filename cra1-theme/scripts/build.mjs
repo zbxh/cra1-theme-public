@@ -82,6 +82,17 @@ fs.mkdirSync(path.join(memberRelease,'20261012-nav-auth-v1/css'),{recursive:true
 fs.copyFileSync(path.join(root,'public/cra1-shared/theme-sources/member/cra1-shell.css'),path.join(memberRelease,'20261012-nav-auth-v1/css/cra1-shell.css'))
 const cartRelease=path.join(output,'public/cart/template/pc/cra1/releases',release)
 for(const old of ['20261011-titanium-v1','20261012-icon-suite-v1','20261012-cart-entry-v1','20261013-security-snapshot-v1','20261017-compat-v3'])copyRegularTree(path.join(root,'cra1-theme/source/legacy-assets/cart',old),path.join(cartRelease,old))
+// Unversioned fallback entries use the same maintained scripts as the release.
+for (const name of ['goodsList.js','goods_embed.js']) {
+  const target=path.join(output,'public/cart/template/pc/cra1/js',name)
+  fs.mkdirSync(path.dirname(target),{recursive:true})
+  fs.copyFileSync(path.join(cartRelease,'20261017-compat-v3/js',name),target)
+}
+// One maintained source feeds the catalog and embedded configuration consumers.
+for (const [source,target] of [
+  ['cart-theme.css','20261012-icon-suite-v1/css/cart-theme.css'],
+  ['goods_embed.css','20261011-titanium-v1/css/goods_embed.css'],
+]) fs.copyFileSync(path.join(root,'public/cra1-shared/theme-sources/cart',source),path.join(cartRelease,target))
 // Purchase pages replace their existing stylesheet with one combined resource.
 // Other cart pages keep their original CSS; no extra first-screen request.
 const purchaseTheme=path.join(cartRelease,'20261017-compat-v3/css/purchase-theme.css')

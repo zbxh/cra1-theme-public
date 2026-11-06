@@ -49,17 +49,42 @@ function cra1_preview_stylesheet(string $root,string $url,string $origin,int $de
     },$css);
 }
 
+/** Image policy follows the public URLs used by the draft, including HTTP sites. */
+function cra1_preview_image_sources(string $html,array $values,string $origin): array
+{
+    $images=[];
+    $collect=static function($url)use(&$images,$origin){
+        $url=html_entity_decode(trim((string)$url),ENT_QUOTES,'UTF-8');
+        if(strpos($url,'/')===0&&strpos($url,'//')!==0)$url=$origin.$url;
+        $u=parse_url($url);$scheme=strtolower($u['scheme']??'');
+        if(!$u||!in_array($scheme,['http','https'],true)||empty($u['host'])||isset($u['user'])||isset($u['pass'])||preg_match('/[\s;\'"<>\\\\\x00-\x1f]/',$url))return;
+        $path=$u['path']??'/';
+        if($path==='/'||substr($path,-1)==='/')return;
+        $images[]=$scheme.'://'.$u['host'].(isset($u['port'])?':'.$u['port']:'').$path;
+    };
+    preg_match_all('~<img\b[^>]*\bsrc=["\']([^"\']+)["\']~i',$html,$tags);
+    foreach($tags[1]as$url)$collect($url);
+    $walk=static function($value)use(&$walk,$collect){
+        if(is_array($value)){foreach($value as$v)$walk($v);return;}
+        if(!is_string($value))return;
+        if(preg_match('~^/(?!/)[^\s"\'<>|)]+\.(?:png|jpe?g|svg|gif|webp|avif|ico)(?:\?[^\s"\'<>|)]*)?$~i',$value))$collect($value);
+        preg_match_all('~https?://[^\s"\'<>|)]+\.(?:png|jpe?g|svg|gif|webp|avif|ico)(?:\?[^\s"\'<>|)]*)?~i',$value,$urls);
+        foreach($urls[0]as$url)$collect($url);
+    };
+    $walk($values);
+    return array_slice(array_values(array_unique($images)),0,128);
+}
+
 /** Render real theme templates against a temporary display-only configuration. */
 function cra1_render_editor_preview(string $root): void
 {
-    $origin=rtrim((string)$GLOBALS['THEME_SETTINGS']['canonical_url'],'/');
+    $origin=rtrim((string)$GLOBALS['THEME_ORIGIN'],'/');
     header_remove('X-Frame-Options');
-    $paths=['/web/cra1/releases/','/web/cra1/assets/','/clientarea/template/','/cart/template/','/home/template/','/upload/common/','/upload/cra1-theme/','/cra1-shared/releases/','/cra1-shared/icons/','/cra1-shared/preview-runtime.js'];foreach(glob($root.'/public/plugins/*/*/template',GLOB_ONLYDIR)?:[]as$dir)$paths[]=substr($dir,strlen($root.'/public')).'/';$sources=implode(' ',array_map(static function($p)use($origin){return $origin.$p;},$paths));
-    // Some installed ticket versions use these exact native public helpers.
-    // Do not allow the entire /common path, which also serves business APIs.
-    foreach(['/common/ticketContent.js','/common/ticketContent.css']as$helper)if(is_file($root.'/public'.$helper))$sources.=' '.$origin.$helper;
-    $previewCsp="sandbox allow-scripts; default-src 'none'; script-src ".$sources." 'unsafe-inline' 'unsafe-eval'; style-src ".$sources." 'unsafe-inline'; img-src ".$sources." data: blob: IMAGE_SOURCES; font-src ".$sources." data:; connect-src ".$sources."; frame-src 'none'; frame-ancestors ".$origin."; object-src 'none'; base-uri 'none'; form-action 'none'";
-    header('Content-Security-Policy: '.str_replace('IMAGE_SOURCES','',$previewCsp));
+    // Keep response headers small on ordinary Nginx/FastCGI defaults. Resource
+    // rules are emitted as the first head element; sandbox and frame-ancestors
+    // must remain in an HTTP header because browsers ignore them in a meta tag.
+    $frameCsp="sandbox allow-scripts; frame-ancestors ".$origin."; object-src 'none'; base-uri 'none'; form-action 'none'";
+    header('Content-Security-Policy: '.$frameCsp."; default-src 'none'");
     require_once $root.'/public/web/cra1/controller/PageContent.php';
     $doc=cra1_admin_preview_document($root);
     if(!$doc){http_response_code(410);echo '<!DOCTYPE html><html lang="zh-CN"><meta charset="utf-8"><body><p data-theme-preview-error>预览已过期，请重新生成预览。</p></body></html>';return;}
@@ -120,7 +145,7 @@ function cra1_render_editor_preview(string $root): void
         $tpl->config(['view_path'=>$base,'view_suffix'=>'php']);
     }
     if($domain==='cart'&&$name==='goodslist'){
-        $example='<div class="cl-preview-config" v-if="!isMobileCart" style="padding:22px"><h3 style="margin:0 0 20px">实例配置</h3><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px"><label>CPU 与内存<select aria-label="示例 CPU 与内存" style="display:block;width:100%;margin-top:8px;padding:10px;border:1px solid #dfe3e9;border-radius:8px"><option>2 核 CPU · 4GB 内存</option><option>4 核 CPU · 8GB 内存</option></select></label><label>系统盘<select aria-label="示例系统盘" style="display:block;width:100%;margin-top:8px;padding:10px;border:1px solid #dfe3e9;border-radius:8px"><option>50GB SSD</option><option>100GB SSD</option></select></label></div><p style="margin-top:20px;color:#858b97;font-size:12px">示例配置</p></div>';
+        $example='<style>.cl-preview-config{padding:22px}.cl-preview-config>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}@media(max-width:560px){.cl-preview-config{padding:14px}.cl-preview-config>div{grid-template-columns:minmax(0,1fr);gap:14px}}</style><div class="cl-preview-config"><h3 style="margin:0 0 20px">实例配置</h3><div><label>CPU 与内存<select aria-label="示例 CPU 与内存" style="display:block;width:100%;margin-top:8px;padding:10px;border:1px solid #dfe3e9;border-radius:8px"><option>2 核 CPU · 4GB 内存</option><option>4 核 CPU · 8GB 内存</option></select></label><label>系统盘<select aria-label="示例系统盘" style="display:block;width:100%;margin-top:8px;padding:10px;border:1px solid #dfe3e9;border-radius:8px"><option>50GB SSD</option><option>100GB SSD</option></select></label></div><p style="margin-top:20px;color:#858b97;font-size:12px">示例配置</p></div>';
         $source=preg_replace('/<iframe\b[^>]*class="cl-config-frame"[^>]*>.*?<\/iframe>/s',$example,$source);
     }
     if(!$source)throw new RuntimeException('对应主题模板缺失');
@@ -153,15 +178,23 @@ function cra1_render_editor_preview(string $root): void
         $src=\CRA1\Theme\Release\Assets::url('shared','preview/member/'.$entry.'.js','',$root);
         return '<script src="'.htmlspecialchars($src,ENT_QUOTES,'UTF-8').'"></script>';
     },$html);
-    $html=preg_replace('/<head(?:\s[^>]*)?>/i', '$0'.$bootstrap,$html,1);
+    $html=preg_replace_callback('/<head(?:\s[^>]*)?>/i',static function($m)use($bootstrap){return $m[0].$bootstrap;},$html,1);
     $banner='<div data-theme-preview-status="ready" style="position:fixed;bottom:8px;right:8px;z-index:2147483647;padding:6px 10px;border-radius:6px;background:#18181b;color:white;font:12px system-ui">草稿预览'.($domain==='website'?'':' · 示例数据').' · 不执行业务操作</div>';
     // Image requests must not provide a side channel to real business endpoints.
     // Permit exact external image paths already present in this draft; same-site
     // resources remain restricted to the public static prefixes above.
-    $images=[];$site=parse_url($origin);$collect=static function($url)use(&$images,$site){$url=html_entity_decode((string)$url,ENT_QUOTES,'UTF-8');$u=parse_url($url);if(!$u||($u['scheme']??'')!=='https'||empty($u['host'])||isset($u['user'])||isset($u['pass'])||strtolower($u['host'])===strtolower($site['host']??'')||preg_match('/[\s;\x00-\x1f]/',$url))return;$path=$u['path']??'/';if($path==='/'||substr($path,-1)==='/')return;$images[]='https://'.$u['host'].(isset($u['port'])?':'.$u['port']:'').$path;};
-    preg_match_all('~<img\b[^>]*\bsrc=["\'](https://[^"\']+)["\']~i',$html,$imageTags);foreach($imageTags[1]as$url)$collect($url);
-    $walk=static function($value)use(&$walk,$collect){if(is_array($value)){foreach($value as$v)$walk($v);}elseif(is_string($value)){preg_match_all('~https://[^\s"\'<>|)]+\.(?:png|jpe?g|svg|gif|webp|avif|ico)(?:\?[^\s"\'<>|)]*)?~i',$value,$urls);foreach($urls[0]as$url)$collect($url);}};$walk($raw);
-    header('Content-Security-Policy: '.str_replace('IMAGE_SOURCES',implode(' ',array_slice(array_unique($images),0,128)),$previewCsp));
+    $images=cra1_preview_image_sources($html,$raw,$origin);
+    $paths=['/web/cra1/releases/','/web/cra1/assets/','/clientarea/template/','/cart/template/','/home/template/','/upload/common/','/upload/cra1-theme/','/cra1-shared/releases/','/cra1-shared/icons/','/cra1-shared/preview-runtime.js'];
+    // Include the plugin assets actually used by this draft, rather than every
+    // installed plugin. Business API paths are never resource sources.
+    preg_match_all('~/plugins/(?:addon|server)/[a-zA-Z0-9_]+/template/~',$html.' '.($boot['moduleHtml']??''),$pluginPaths);
+    $paths=array_merge($paths,array_unique($pluginPaths[0]));
+    foreach(['/common/ticketContent.js','/common/ticketContent.css']as$helper)if(is_file($root.'/public'.$helper))$paths[]=$helper;
+    $sources=implode(' ',array_map(static function($p)use($origin){return $origin.$p;},$paths));
+    $resourceCsp="default-src 'none'; script-src ".$sources." 'unsafe-inline' 'unsafe-eval'; style-src ".$sources." 'unsafe-inline'; img-src ".$sources." data: blob: ".implode(' ',$images)."; font-src ".$sources." data:; connect-src ".$sources."; frame-src 'none'";
+    header('Content-Security-Policy: '.$frameCsp);
+    $policy='<meta http-equiv="Content-Security-Policy" content="'.htmlspecialchars($resourceCsp,ENT_QUOTES,'UTF-8').'">';
+    $html=preg_replace_callback('/<head(?:\s[^>]*)?>/i',static function($m)use($policy){return $m[0].$policy;},$html,1);
     echo preg_replace('/<\/body>/i',$banner.'</body>',$html,1);
 }
 
@@ -176,7 +209,7 @@ function theme_editor_preview(string $root): void
         http_response_code(500);
         $nonce=bin2hex(random_bytes(16));
         $doc=$GLOBALS['THEME_VERIFIED_PREVIEW']??[];
-        $origin=rtrim((string)($GLOBALS['THEME_SETTINGS']['canonical_url']??''),'/');
+        $origin=rtrim((string)$GLOBALS['THEME_ORIGIN'],'/');
         header("Content-Security-Policy: default-src 'none'; script-src 'nonce-".$nonce."'; frame-ancestors ".$origin."; form-action 'none'; base-uri 'none'");
         echo '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><body><p>预览暂时无法显示，请返回重试。</p><script nonce="'.$nonce.'">parent.postMessage('.json_encode(['type'=>'theme-preview','state'=>'error','nonce'=>$doc['message_nonce']??''],15).','.json_encode($origin,15).');</script></body></html>';
     }

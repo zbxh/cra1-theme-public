@@ -109,15 +109,15 @@
   var railKind = ''; // 'f-order' | 'order-right'
   var railLastSnap = '';
   var railWatchTimer = null;
-  var railAwaitSince = 0;
-  var railUnavailable = false;
+  var railAwaitSince = null;
 
   function railFindVM() {
-    var els = document.querySelectorAll('.template');
+    var els = document.querySelectorAll('.m-cloud-m, .m-dcim-m, .template');
+    var fallback = null;
     for (var i = 0; i < els.length; i++) {
-      if (els[i].__vue__) return els[i].__vue__;
+      if (els[i].__vue__) { if (railContract(els[i].__vue__)) return els[i].__vue__; fallback = fallback || els[i].__vue__; }
     }
-    return null;
+    return fallback;
   }
 
   function railFmt(n) {
@@ -181,7 +181,8 @@
       var cycles = (vm.custom_cycles || []).map(function (c, i) {
         return { id: i, name: String((c && (c.name || c.cycle_name)) || '周期' + (i + 1)) };
       });
-      if (!cycles.length) return null;
+      var durationRequired = vm.pay_type !== 'free' && vm.pay_type !== 'onetime';
+      if (!cycles.length && durationRequired) return null;
       var pay = railIsFiniteNum(vm.totalPrice) ? Number(vm.totalPrice) : null;
       var orig = railIsFiniteNum(vm.original_price) ? Number(vm.original_price) : null;
       // 配置预览行在 .order-right .info .des（name/price 同行文本），从 DOM 提取
@@ -196,6 +197,7 @@
       } catch (e) { }
       snap = {
         kind: railKind,
+        durationRequired: durationRequired,
         durations: cycles,
         current: Number(vm.curCycle) || 0,
         qty: {
@@ -214,28 +216,45 @@
         preview: cItems,
       };
     }
+    if (snap) {
+      var selected = snap.durationRequired === false || snap.durations.some(function (d) {
+        return String(d.id) === String(snap.current);
+      });
+      var priced = railKind === 'f-order' ? calc !== null : pay !== null;
+      snap.availability = selected && priced && !vm.loadingPrice && !vm.dataLoading ? 'ready' : 'loading';
+      if (snap.availability !== 'ready') {
+        snap.price.calcText = '';
+        snap.price.originText = '';
+      }
+    }
     return snap;
   }
 
   function railPush(force) {
     var snap = railCollect();
     if (!snap) {
-      // A native VM may exist before it has billing periods, or the product may
-      // have none. Do not hide its controls or leave the parent loading forever.
-      if (!railUnavailable && Date.now() - railAwaitSince >= 12000) {
-        railUnavailable = true;
-        document.body.classList.remove('rail-bridged');
-        document.body.classList.add('rail-fallback');
-        post('rail-fallback', { message: '暂时无法获取可用付款周期，请检查商品配置、重试或选择其他商品。' });
-        postHeight();
-      }
-      return;
+      // A supported VM can exist before its periods. Keep the parent rail in
+      // place, but never project the module's initial zero as a valid quote.
+      if (railAwaitSince === null) railAwaitSince = Date.now();
+      var common = window.CRA1Shared.Runtime.common();
+      snap = {
+        kind: railKind,
+        availability: Date.now() - railAwaitSince >= 12000 ? 'unavailable' : 'loading',
+        durationRequired: true,
+        durations: [],
+        current: null,
+        qty: { allow: false, min: 1, max: 999, cur: 1 },
+        price: { currency: String(common.currency_prefix ?? railVM.currency_prefix ?? '¥'),
+          suffix: String(common.currency_suffix ?? railVM.currency_suffix ?? ''),
+          calcText: '', originText: '', hasDiscount: false },
+        preview: [],
+      };
+    } else {
+      railAwaitSince = null;
     }
     document.body.classList.remove('rail-fallback');
     document.body.classList.add('rail-bridged');
-    if (railUnavailable) force = true;
-    railUnavailable = false;
-    var sig = JSON.stringify([snap.current, snap.qty.cur, snap.price.calcText, snap.price.originText]);
+    var sig = JSON.stringify(snap);
     if (!force && sig === railLastSnap) return;
     railLastSnap = sig;
     post(force ? 'rail-data' : 'rail-updated', { payload: snap });
@@ -243,7 +262,6 @@
 
   function railStartBridge() {
     railAwaitSince = Date.now();
-    railUnavailable = false;
     railPush(true);
     if (railWatchTimer) clearInterval(railWatchTimer);
     railWatchTimer = setInterval(function () { railPush(false); }, RAIL_POLL_MS);
@@ -286,6 +304,11 @@
       }
     } catch (e) { /* 模块方法异常：轮询会把实际状态回传父页 */ }
     setTimeout(function () { railPush(false); }, 900);
+  }
+
+  function railCanSubmit() {
+    var snap = railCollect();
+    return !!snap && snap.availability === 'ready';
   }
 
   function railClick(selector) {
@@ -352,35 +375,62 @@
       }
     }
     else if (data.type === 'rail-set') railExec(data);
-    else if (data.type === 'rail-add') railDoAdd();
+    else if (data.type === 'rail-add' && railCanSubmit()) railDoAdd();
     else if (data.type === 'rail-save') {
+      if (!railCanSubmit()) return;
       // Editing updates the existing cart position through the module's own
       // validation and update API; it must never add another item or check out.
       if (railVM && typeof railVM.changeCart === 'function') railVM.changeCart();
     }
     else if (data.type === 'rail-close') railDoCloseDialog();
     else if (data.type === 'rail-buy') {
+      if (!railCanSubmit()) return;
       var ok = railKind === 'order-right'
         ? railClick('.order-right .f-btn .buy-btn')
-        : railClick('.f-order .right .buy');
+        : railClick('.f-order .right .buy, .botton-buy-btn .buy-btn, .botton-buy-btn .buy');
       if (!ok) {
         try {
           if (railKind === 'order-right' && typeof railVM.buyNow === 'function') railVM.buyNow();
-          else if (typeof railVM.submitOrder === 'function') railVM.submitOrder();
+          else if (typeof railVM.submitOrder === 'function') railVM.submitOrder(new MouseEvent('click'));
         } catch (e) { }
       }
     }
   });
 
+  function railContract(vm) {
+    // Native templates may not render their order bar until models/periods
+    // arrive. Detect the callable VM contract, not that conditional DOM node.
+    if (Array.isArray(vm.cycleList) && vm.params
+        && vm.calcTotalPrice !== undefined && typeof vm.handlerCart==='function' && typeof vm.submitOrder==='function') return 'f-order';
+    if (Array.isArray(vm.custom_cycles)
+        && vm.totalPrice !== undefined && typeof vm.addCart==='function' && typeof vm.buyNow==='function') return 'order-right';
+    return '';
+  }
+  function nativeControls() {
+    document.body.classList.remove('rail-bridged');
+    document.body.classList.add('rail-native');
+    postHeight();
+    post('rail-fallback', { message: '请在下方查看价格并完成订购。' });
+  }
   function railBoot(force) {
+    if (new URLSearchParams(location.search).get('native_controls')==='1') { nativeControls(); return; }
     if (railVM && !force) { railStartBridge(); return; }
+    var currentVM = railFindVM();
+    if (currentVM) {
+      railKind = railContract(currentVM);
+      if (!railKind) { nativeControls(); return; }
+      railVM = currentVM;
+      railStartBridge();
+      return;
+    }
     var waited = 0;
     var t = setInterval(function () {
       var vm = railFindVM();
       if (vm) {
         clearInterval(t);
+        railKind = railContract(vm);
+        if (!railKind) { nativeControls(); return; }
         railVM = vm;
-        railKind = document.querySelector('.order-right') ? 'order-right' : 'f-order';
         railStartBridge();
       } else if ((waited += 400) >= 12000) {
         clearInterval(t);

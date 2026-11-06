@@ -12,11 +12,13 @@ require CRA1_THEME_ROOT.'/public/web/cra1/controller/hooks.php';
 require CRA1_THEME_BACKEND.'/Storage/member_store.php';
 require CRA1_THEME_BACKEND.'/Storage/cart_store.php';
 require CRA1_THEME_BACKEND.'/Storage/workspace_store.php';
+require CRA1_THEME_BACKEND.'/Support/cra1_theme_security.php';
 use CRA1\Theme\Storage\ThemeWorkspaceStore;
 $root=sys_get_temp_dir().'/cra1-editor-'.bin2hex(random_bytes(6));
 mkdir($root.'/runtime/cra1_theme',0700,true);
 $checks=[];
 function check($value,string $label):void{if(!$value)throw new RuntimeException($label);$GLOBALS['checks'][]=$label;}
+function theme_actor():array{return ['id'=>1];}
 $remove=function($p)use(&$remove){if(is_dir($p)){foreach(scandir($p)as$n)if($n!=='.'&&$n!=='..')$remove($p.'/'.$n);rmdir($p);}else unlink($p);};
 try{
  $file=$root.'/runtime/cra1_theme/config.json';
@@ -37,5 +39,13 @@ try{
  check($disk['page_hero_rows_text']===$raw['page_hero_rows_text'],'page override leaves shared rows and other pages unchanged');
  $stale=$store->editorSave('website','page:404',$before['revisions'],['content'=>['page_hero_rows_text'=>$changed.'x']],'fixture');
  check($stale['status']===409,'numeric-page fix preserves stale-editor conflict protection');
+ $GLOBALS['THEME_ORIGIN']='https://public.example.test:8443';
+ $_SESSION=['security_token'=>'fixture-current-session'];$_SERVER['HTTP_HOST']='origin.internal';
+ $bytes=file_get_contents($file);$preview=$store->preview('website','page:404',[]);
+ parse_str((string)parse_url($preview['data']['url'],PHP_URL_QUERY),$query);
+ $doc=json_decode(file_get_contents($root.'/runtime/cra1_theme/previews/'.$query['__theme_preview'].'.json'),true);
+ check($doc['origin']===$GLOBALS['THEME_ORIGIN'],'draft preview retains the public authenticated origin rather than a proxy internal Host');
+ check($doc['owner_id']===1&&hash_equals($doc['session_hash'],CRA1ThemeSecurity::hashToken($_SESSION['security_token'])),'public origin preservation keeps preview ownership and session binding');
+ check(file_get_contents($file)===$bytes,'draft preview does not save live page settings');
  echo json_encode(['status'=>'passed','checks'=>$checks,'production_writes'=>0],JSON_UNESCAPED_UNICODE).PHP_EOL;
 }finally{$remove($root);}

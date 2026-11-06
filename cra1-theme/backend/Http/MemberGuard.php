@@ -28,13 +28,8 @@ class MemberGuard extends \app\http\middleware\CheckHome
                 && !\CRA1\Theme\Security\NativeAuthorization::hostVisible((int)$authenticated->param('host_id'))) {
                 return json(['status'=>404,'msg'=>'产品不存在'])->header(['Cache-Control'=>'no-store, private']);
             }
-            $sensitive = \CRA1\Theme\Security\OperationVerification::sensitive($path, strtoupper($authenticated->method()));
             $credentials=strtoupper($authenticated->method())==='GET'&&(string)$authenticated->param('credentials_only')==='1'
                 &&preg_match('~/(?:re)?idcsmart_common/host/[1-9][0-9]*/configoption$~D',$path);
-            $summary = \CRA1\Theme\Security\OperationVerification::remoteSummary($path, strtoupper($authenticated->method()), $authenticated->param());
-            if (!$authenticated->is_api && ($sensitive||$credentials) && !$summary && !\CRA1\Theme\Compatibility\KnownContracts::security()) {
-                return json(['status'=>503,'msg'=>'此功能暂时不可用，请稍后重试或联系客服']);
-            }
             $group=$credentials ? 'clientarea_auth_control_reinstall_rescue_reset_set_mount'
                 : \CRA1\Theme\Security\OperationVerification::requiredGroup($path,strtoupper($authenticated->method()),$authenticated->param());
             if (!$authenticated->is_api && $group!=='' && !\CRA1\Theme\Security\NativeAuthorization::group($group)) {

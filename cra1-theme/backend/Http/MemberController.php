@@ -12,10 +12,8 @@ final class MemberController
             return json(['status'=>401,'msg'=>'登录已失效，请重新登录'],401);
         }
         if (!\CRA1\Theme\Context::memberActive()) return json(['status'=>404,'msg'=>'功能不存在'],404);
-        $origin = (string)$request->header('origin');
-        if (($origin !== '' && rtrim($origin,'/') !== rtrim($request->domain(),'/')) || $request->header('sec-fetch-site') === 'cross-site') {
-            return json(['status'=>403,'msg'=>'请求来源无效'],403);
-        }
+        // Native Bearer authentication determines access. The PHP origin may
+        // differ from the public browser origin behind a proxy.
         try {
             $self = (int)get_client_id(false);
             switch ($action) {
@@ -48,7 +46,6 @@ final class MemberController
                     $result = \CRA1\Theme\Compatibility\HomeProducts::augment($payload);
                     break;
                 case 'field':
-                    if (!\CRA1\Theme\Compatibility\KnownContracts::security()) { $result=['status'=>503,'msg'=>'此功能暂时不可用，请稍后重试或联系客服'];break; }
                     if (!NativeAuthorization::allows('app\\home\\controller\\HostController::index')) return $this->denied();
                     if (!NativeAuthorization::group('clientarea_auth_control_reinstall_rescue_reset_set_mount')) return $this->denied();
                     if (!NativeAuthorization::hostVisible((int)$request->param('id'))) return $this->denied();

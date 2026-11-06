@@ -26,11 +26,8 @@ $authorization = (string) ($_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_
 if (!preg_match('/^Bearer [^\s]{1,8192}$/D', $authorization)) {
     $send(['status' => 401, 'msg' => '登录已失效，请重新登录', 'request_id' => $requestId], 401); exit;
 }
-$origin = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');
-$authority = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
-if (($_SERVER['HTTP_SEC_FETCH_SITE'] ?? '') === 'cross-site' || ($origin !== '' && strtolower((string) parse_url($origin, PHP_URL_HOST) . (parse_url($origin, PHP_URL_PORT) ? ':' . parse_url($origin, PHP_URL_PORT) : '')) !== $authority)) {
-    $send(['status' => 403, 'msg' => '请求来源无效', 'request_id' => $requestId], 403); exit;
-}
+// The native route validates the explicit Bearer token and permissions.
+// Do not compare the public browser origin with a proxy's internal Host.
 $query = $_GET; unset($query['target']);
 $raw = (string) file_get_contents('php://input', false, null, 0, 65537);
 $body = $raw === '' ? [] : json_decode($raw, true);

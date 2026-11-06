@@ -30,7 +30,7 @@
           </div>
           <div class="cl-dock-m-detail-empty" v-if="!railPreview.length">{{lang.goods_loading || '加载中…'}}</div>
         </div>
-        <div class="cl-dock-m-row">
+        <div class="cl-dock-m-row" v-if="railDurationRequired || railQty.allow">
           <div class="cl-dock-m-field" v-if="railDurationRequired">
             <span class="cl-dock-m-lbl">{{lang.cycle || '订购时长'}}</span>
             <el-select v-model="railDurationId" size="small" @change="railSetDuration" :loading="railAvailability === 'loading'" :disabled="!railDurations.length">
@@ -246,7 +246,7 @@
                   </section>
                   <!-- 选配区与导航、产品型号同级；保留模块原有选择控件、卡片与计价逻辑 -->
                   <div class="cl-config-panel" v-if="selectedProduct" ref="configPanel">
-                    <button type="button" class="cl-native-purchase-jump" v-if="isMobileCart && mobileNativeFrame && railState === 'fallback' && frameHeight > 1200" @click="focusNativePurchase">查看价格与订购 <i class="el-icon-arrow-down" aria-hidden="true"></i></button>
+                    <button type="button" class="cl-native-purchase-jump" v-if="isMobileCart && railState === 'fallback' && frameHeight > 1200" @click="focusNativePurchase">查看价格与订购 <i class="el-icon-arrow-down" aria-hidden="true"></i></button>
                     <div class="cl-config-body">
                       <div class="cl-config-skeleton" v-if="configState === 'loading'" aria-hidden="true">
                         <div class="cl-skel-line" style="width: 30%"></div>
@@ -259,9 +259,7 @@
                           <el-button @click="openStandalone">在独立页打开</el-button>
                         </el-empty>
                       </div>
-                      <div v-if="isMobileCart && !mobileNativeFrame" v-show="configState === 'ready'" class="cl-config-direct"
-                        ref="mobileConfigBody"></div>
-                      <iframe v-if="!isMobileCart || mobileNativeFrame" :key="embedSrc" :src="embedSrc" class="cl-config-frame"
+                      <iframe :key="embedSrc" :src="embedSrc" class="cl-config-frame"
                         :class="{'is-loading': configState === 'loading'}"
                         :style="configState === 'ready' && frameHeight ? { height: frameHeight + 'px' } : {}"
                         :title="selectedProduct.name + ' 配置'"

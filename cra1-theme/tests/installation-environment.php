@@ -29,7 +29,7 @@ try {
  check(!isset($result['context'])&&!isset($result['files'])&&!isset($result['native_dependencies']),'no backend settings, module inventory or file manifest is sent to the page');
  check($result['environment']['system_version']==='10.7.4','actual V10 version remains available as display information');
  check(Inspector::nativeDependency($base,$release['native_dependencies'][0])['status']==='unverified','detailed compatibility inspection still reports unknown native files');
- check(!\CRA1\Theme\Compatibility\KnownContracts::filesMatch($base,['app/common/model/HostModel.php'=>hash('sha256','official fixture')]),'installation readiness does not bypass runtime sensitive-operation contracts');
+ check(!\CRA1\Theme\Compatibility\KnownContracts::filesMatch($base,['app/common/model/HostModel.php'=>hash('sha256','official fixture')]),'read-only diagnostics still distinguish source differences from known official files');
  $custom=$options;$custom['context']['modules']=[['name'=>'OtherModule','version'=>'9.0.0','status'=>1]];
  check($installer->preflight($custom)['installation_ready'],'a third-party module does not block initial installation');
  $custom['context']['database_sql_mode']='ONLY_FULL_GROUP_BY';

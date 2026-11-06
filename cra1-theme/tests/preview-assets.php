@@ -17,5 +17,10 @@ try{
     previewAssetsCheck(strpos($next,$path)===false&&strpos($next,str_replace('/','\\/',$path))===false,'Both server-rendered and JSON-escaped dynamic icon paths are embedded');
     preg_match('~var items=(.*);</script>~',$next,$m);$decoded=json_decode($m[1],true);
     previewAssetsCheck(is_array($decoded)&&$decoded[0]['icon_img']===$data,'Inline preview icon data preserves valid JSON');
+    $sources=cra1_preview_image_sources('<img src="http://assets.invalid/logo.png?rev=1"><img src="/merchant-logo.png"><img src="https://site.invalid:9443/icon.svg">', ['background'=>'http://assets.invalid/banner.webp','icon'=>'/merchant-icon.svg'], 'http://site.invalid:8080');
+    previewAssetsCheck(in_array('http://assets.invalid/logo.png',$sources,true)&&in_array('http://assets.invalid/banner.webp',$sources,true),'HTTP images follow the same draft image policy as HTTPS');
+    previewAssetsCheck(in_array('http://site.invalid:8080/merchant-logo.png',$sources,true)&&in_array('http://site.invalid:8080/merchant-icon.svg',$sources,true),'Custom public image paths retain the current site port');
+    previewAssetsCheck(in_array('https://site.invalid:9443/icon.svg',$sources,true),'Same host with a different scheme or port is not silently discarded');
+    previewAssetsCheck(cra1_preview_image_sources('<img src="javascript:alert(1)"><img src="http://name:secret@assets.invalid/logo.png"><img src="http://assets.invalid/bad;script-src.png">', [], 'http://site.invalid')===[],'Executable schemes, credentials and policy delimiters are excluded');
     echo json_encode(['status'=>'passed','checks'=>$checks,'production_writes'=>0]).PHP_EOL;
 }finally{unlink($file);for($p=dirname($file);strpos($p,$root)===0;$p=dirname($p))rmdir($p);}

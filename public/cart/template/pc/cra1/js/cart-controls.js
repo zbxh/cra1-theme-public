@@ -70,7 +70,7 @@
   if (window.__CRA1_CART_SNAPSHOT_PROMISE__) window.__CRA1_CART_SNAPSHOT_PROMISE__.then(setHeadingSnapshot);
   function safeIconUrl(value) {
     if (typeof value !== 'string' || /[\s<>"'\\]/.test(value)) return '';
-    return /^(?:https:\/\/[^/]+\/|\/(?!\/)[^?#]*\.(?:svg|png|jpe?g|webp|gif|ico)(?:[?#]|$))/i.test(value) ? value : '';
+    return /^(?:https?:\/\/[^/]+\/|\/(?!\/)[^?#]*\.(?:svg|png|jpe?g|webp|gif|ico)(?:[?#]|$))/i.test(value) ? value : '';
   }
   Vue.component('cra1-cart-heading-icon', {
     props: ['label', 'kind', 'iconId'],

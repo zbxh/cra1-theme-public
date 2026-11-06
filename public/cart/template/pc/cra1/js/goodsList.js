@@ -101,6 +101,7 @@
         // 关闭loading
         document.getElementById("mainLoading").style.display = "none";
         document.getElementsByClassName("template")[0].style.display = "block";
+        this.syncDockPadding();
       },
       destroyed() {
         window.removeEventListener("scroll", this.scrollBottom);
@@ -135,11 +136,6 @@
           // ---- 价格计算器（v6）：桥接状态与数据 ----
           railTitle: "价格计算器",
           railState: "idle",
-        /* v12 手机档：配置直渲染进父页（无 iframe），抽屉/弹层全页覆盖 */
-        isMobileCart: /android|iphone|ipod|mobile/i.test(navigator.userAgent) && !/ipad/i.test(navigator.userAgent),
-        mobileRailTimer: null,
-        mobileLoadSeq: 0,
-        mobileNativeFrame: false,
         dockDetailOpen: false,
         couponOpen: false,   // idle | bridged | fallback
           railLoading: false,
@@ -305,6 +301,7 @@
           return this.currentType === 'ssl';
         },
         // ---- 融合页：受控响应式网格（快照 v2；缺省回落自适应规则） ----
+        isMobileCart() { return this.viewportW <= 1024; },
         viewportW() {
           return this.$data.__viewportW || (typeof window !== "undefined" ? window.innerWidth : 1440);
         },
@@ -326,12 +323,10 @@
           return Math.min(rows * this.currentColumns, 24);
         },
         embedSrc() {
-          if (this.isMobileCart && !this.mobileNativeFrame) return "";
           if (!this.selectedProductId || this.configState === "error") return "";
           if(window.__THEME_PREVIEW__){const u=new URL(window.location.href);u.searchParams.set('part','goods');u.searchParams.set('id','1');u.searchParams.set('embed','1');u.searchParams.set('embed_nonce',this.embedNonce);return u.pathname+u.search;}
           const url = this.productConfigUrl("/cart/goods_embed.htm", this.selectedProductId);
           url.searchParams.set("embed", "1");
-          if (this.isMobileCart && this.mobileNativeFrame) url.searchParams.set("native_controls", "1");
           url.searchParams.set("embed_nonce", this.embedNonce);
           // V10 module parsers decode percent escapes, but do not decode '+' spaces.
           return url.pathname + url.search.replace(/\+/g, "%20");
@@ -1244,6 +1239,13 @@
           this.goodSLoading = true;
           this.scrollDisabled = false;
         },
+        resetProductSelection() {
+          this.selectedProductId = 0;
+          this.selectedProduct = null;
+          this.configState = "idle";
+          this.embedDirty = false;
+          this.railState = "idle";
+        },
         // 重置二级分组状态并作废旧请求
         resetSecondGroupState() {
           this.secondGroupRequestId++;
@@ -1367,44 +1369,48 @@
         async initData() {
           this.catalogError = "";
           this.goodSLoading = true;
+          this.resetProductSelection();
+          this.goodsListRequestId++;
+          this.goodsList = [];
           const requestId = ++this.secondGroupRequestId;
           try {
-          // 商品深链：先经公开商品详情定位其所属一二级分组（跨组深链），无效则回退默认
-          if (this.urlProductId) {
-            try {
-              const d = await apiProductDetail({ id: this.urlProductId });
-              const pd = d.data?.data?.product;
-              if (pd && pd.hidden != 1 && pd.product_group_id) {
-                this.fpg_id = pd.product_group_id_first || this.fpg_id;
-                this.spg_id = pd.product_group_id;
-              } else {
-                this.urlProductId = 0;
-              }
-            } catch (e) {
-              this.urlProductId = 0;
-            }
-          }
-          // 获取一级分类
-          await productGroupFirst().then((res) => {
-            this.first_group_list = res.data.data.list;
-          });
+          // Independent reads start together. A supplied category is a hint only;
+          // the public product and actual category lists still decide ownership.
+          const settled = promise => promise.then(value => ({ value }), error => ({ error }));
+          const firstTask = settled(productGroupFirst());
+          const detailTask = this.urlProductId ? settled(apiProductDetail({ id: this.urlProductId })) : Promise.resolve({ value: null });
+          const seconds = new Map();
+          const secondTask = id => {
+            if (!seconds.has(Number(id))) seconds.set(Number(id), settled(productGroupSecond(id)));
+            return seconds.get(Number(id));
+          };
+          if (this.fpg_id) secondTask(this.fpg_id);
+          const [first, detail] = await Promise.all([firstTask, detailTask]);
           if (requestId !== this.secondGroupRequestId) return;
+          if (first.error || detail.error) throw first.error || detail.error;
+          const pd = detail.value?.data?.data?.product;
+          if (this.urlProductId) {
+            if (pd && pd.hidden != 1 && pd.product_group_id) {
+              this.fpg_id = Number(pd.product_group_id_first) || this.fpg_id;
+              this.spg_id = Number(pd.product_group_id);
+            } else this.urlProductId = 0;
+          }
+          this.first_group_list = first.value.data.data.list;
           if (this.first_group_list[0]) {
-            this.select_first_obj.id =
-              this.fpg_id || this.first_group_list[0].id;
+            const firstGroup = this.first_group_list.find(item => Number(item.id) === Number(this.fpg_id)) || this.first_group_list[0];
+            this.select_first_obj.id = firstGroup.id;
             this.secondLoading = true;
-            // 获取二级分类
-            await productGroupSecond(this.select_first_obj.id).then((ress) => {
-              if (requestId === this.secondGroupRequestId) this.second_group_list = ress.data.data.list;
-            });
+            const second = await secondTask(this.select_first_obj.id);
             if (requestId !== this.secondGroupRequestId) return;
+            if (second.error) throw second.error;
+            this.second_group_list = second.value.data.data.list;
             if (this.second_group_list[0]) {
               // spg_id 必须确属当前一级组；不匹配回退首个二级组并修正 URL
               const spgValid = this.second_group_list.find(
-                (item) => item.id === this.spg_id
+                (item) => Number(item.id) === Number(this.spg_id)
               );
               const secondId = spgValid
-                ? this.spg_id
+                ? spgValid.id
                 : this.second_group_list[0].id;
               this.select_second_obj.id = secondId;
               const selectItem = this.second_group_list.find(
@@ -1425,7 +1431,7 @@
               if (this.isSsl) {
                 this.getSslBrands();
               }
-              this.getProductGoodList();
+              return this.getProductGoodList();
             } else {
               this.resetGoodsListState();
               this.goodSLoading = false;
@@ -1441,6 +1447,8 @@
         // 点击一级分类
         selectFirstType(val) {
           if (val !== this.select_first_obj.id) this.clearProductEntry();
+          this.resetProductSelection();
+          this.updateUrlParam("product_id", null, "replace");
           this.select_first_obj.id = val;
           this.resetSecondGroupState();
           this.resetGoodsListState();
@@ -1450,6 +1458,8 @@
         // 点击二级分类
         selectSecondType(val) {
           if (val !== this.select_second_obj.id) this.clearProductEntry();
+          this.resetProductSelection();
+          this.updateUrlParam("product_id", null, "replace");
           this.select_second_obj.id = val;
           const clickItem = this.second_group_list.find((item) => {
             return item.id === val;
@@ -1499,7 +1509,7 @@
           window.open(`/cart/goodsList.htm?product_id=${encodeURIComponent(item.id)}`);
         },
         /* ================= 融合页：商品选择与配置嵌入 ================= */
-        // 商品描述安全净化：白名单标签 + 去事件属性 + 仅本地/HTTPS 协议
+        // 商品描述安全净化：白名单标签 + 去事件属性 + 本地与 HTTP/HTTPS 链接
         sanitizeHtml(html) {
           const allowed = new Set(["P", "BR", "STRONG", "EM", "B", "I", "U", "UL", "OL", "LI", "SPAN", "IMG", "A", "H3", "H4", "DIV"]);
           const tpl = document.createElement("template");
@@ -1516,7 +1526,7 @@
                 const val = String(attr.value || "");
                 if (name.startsWith("on")) { el.removeAttribute(attr.name); return; }
                 if ((el.tagName === "A" || el.tagName === "IMG") && (name === "href" || name === "src")) {
-                  const ok = val.startsWith("/") || /^https:/i.test(val);
+                  const ok = val.startsWith("/") || /^https?:/i.test(val);
                   if (!ok) { el.removeAttribute(attr.name); return; }
                   if (el.tagName === "A") el.setAttribute("rel", "noopener noreferrer");
                   if (el.tagName === "IMG") { el.setAttribute("loading", "lazy"); el.removeAttribute("srcset"); }
@@ -1548,6 +1558,29 @@
         },
         isSellable(item) {
           return !(item.stock_control === 1 && item.qty <= 0);
+        },
+        catalogPriceAmount(item) {
+          if (item.pay_type === "free") return "0.00";
+          const discount = item.price_discounted;
+          return discount !== null && discount !== undefined && String(discount).trim() !== "" && Number.isFinite(Number(discount)) && Number(discount) >= 0 ? discount : item.price;
+        },
+        catalogPriceKnown(item) {
+          if (item.pay_type === "free") return true;
+          const price = this.catalogPriceAmount(item);
+          if (price === null || price === undefined || String(price).trim() === "" || !Number.isFinite(Number(price)) || Number(price) < 0) return false;
+          // Module catalogues may return 0 as a placeholder before configuration.
+          // Explicit free products and real zero discounts retain their semantics.
+          return Number(price) > 0 || Number(item.price) > 0 || !(item.module || item.res_module);
+        },
+        focusNativePurchase() {
+          const frame = this.$refs.configPanel?.querySelector("iframe");
+          try {
+            const win = frame?.contentWindow;
+            const target = win?.document.querySelector(".f-order, .order-right");
+            if (!target || !target.getClientRects().length) return;
+            // Scroll to the module's own controls; never move or clone business nodes.
+            target.scrollIntoView({ block: "start", behavior: "smooth" });
+          } catch (_) { /* a navigating frame has no usable target */ }
         },
         selectProduct(item) {
           if (!this.isSellable(item)) {
@@ -1599,12 +1632,6 @@
           });
         },
         reloadConfig() {
-          if (this.isMobileCart && this.selectedProductId) {
-            this.embedSeq++;
-            this.embedNonce = `n${Date.now().toString(36)}${this.embedSeq}`;
-            this.loadMobileConfig();
-            return;
-          }
           if (!this.selectedProduct) return;
           this.configState = "loading";
           this.embedSeq++;
@@ -1812,71 +1839,21 @@
           } catch (e) { }
         },
         railSetDuration(id) {
-          if (this.isMobileCart && !this.mobileNativeFrame) {
-            if (this.railVM && this.railVM.params) {
-              this.railVM.params.duration_id = id;
-              if (typeof this.railVM.changeDuration === "function") this.railVM.changeDuration();
-              this.mobileRailPush();
-            }
-            return;
-          }
           this.railLoading = true;
           this.railPost("rail-set", { field: "duration", value: id });
         },
         railSetQty(val) {
-          if (this.isMobileCart && !this.mobileNativeFrame) {
-            if (this.railVM) {
-              this.railVM.qty = val;
-              if (typeof this.railVM.changQty === "function") this.railVM.changQty();
-              this.mobileRailPush();
-            }
-            return;
-          }
           this.railLoading = true;
           this.railPost("rail-set", { field: "qty", value: val });
         },
         railApplyCoupon() {
           const code = String(this.railCoupon || "").trim();
           if (!code) return;
-          if (this.isMobileCart && !this.mobileNativeFrame) {
-            // 手机档：直填组件内优惠码输入框并触发（与桥接同路径）
-            const inp = document.querySelector(".m-cloud-m .discount-code input, .m-dcim-m .discount-code input, .discount-box input");
-            if (inp) {
-              const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-              setter.call(inp, code);
-              inp.dispatchEvent(new Event("input", { bubbles: true }));
-              let btn = inp.closest(".discount-code, .discount-box");
-              btn = btn && btn.querySelector('button, .btn, [class*="confirm"], [class*="exchange"]');
-              if (btn) btn.click();
-            }
-            return;
-          }
           this.railLoading = true;
           this.railPost("rail-set", { field: "coupon", value: code });
         },
         railAddCart() {
           if (this.railLoading || this.railAvailability !== "ready") return;
-          if (this.isMobileCart && !this.mobileNativeFrame) {
-            this.railLoading = true;
-            try { this.railVM.handlerCart(); } catch (e) { }
-            // 轮询模块购物车弹窗：出现即关闭并走父页确认（与桥接同语义）
-            let tries = 0;
-            const t = setInterval(() => {
-              tries++;
-              const dlg = document.querySelector(".cartDialog");
-              if (dlg && dlg.offsetHeight > 0) {
-                clearInterval(t);
-                try { if (this.railVM.cartDialog === true) this.railVM.cartDialog = false; } catch (e) { }
-                this.railLoading = false;
-                this.railConfirmAfterAdd();
-                this.refreshTopCart();
-              } else if (tries > 100) {
-                clearInterval(t);
-                this.railLoading = false;
-              }
-            }, 60);
-            return;
-          }
           this.railLoading = true;
           this.railPost("rail-add");
           clearTimeout(this.railAddTimer);
@@ -1884,15 +1861,6 @@
         },
         railBuyNow() {
           if (this.railLoading || this.railAvailability !== "ready") return;
-          if (this.isMobileCart && !this.mobileNativeFrame) {
-            this.railLoading = true;
-            try {
-              this.railVM.submitOrder({ data: { type: "iframeBuy" } });
-            } catch (e) { }
-            clearTimeout(this.railBuyTimer);
-            this.railBuyTimer = setTimeout(() => { this.railLoading = false; }, 6000);
-            return;
-          }
           this.railLoading = true;
           this.railPost("rail-buy");
           clearTimeout(this.railBuyTimer);
@@ -1902,135 +1870,28 @@
           if (this.railLoading || this.railAvailability !== "ready") return;
           if (!this.isEditingCartItem) { this.railBuyNow(); return; }
           this.railLoading = true;
-          if (this.isMobileCart && !this.mobileNativeFrame) {
-            try { this.railVM.changeCart(); } catch (_) { this.railLoading = false; }
-          } else {
-            this.railPost("rail-save");
-          }
+          this.railPost("rail-save");
           clearTimeout(this.railBuyTimer);
           this.railBuyTimer = setTimeout(() => { this.railLoading = false; }, 6000);
         },
 
-        disposeMobileConfig() {
-          clearInterval(this.mobileRailTimer);
-          if (this.__mobileController) this.__mobileController.abort();
-          const body = this.$refs.mobileConfigBody;
-          if (body) {
-            const vms=new Set([body,...body.querySelectorAll('*')].map(el=>el.__vue__).filter(Boolean));
-            vms.forEach(vm=>{if(!vm._isDestroyed)vm.$destroy();if(window.__cloudMobileVm===vm)window.__cloudMobileVm=null;});
-            body.replaceChildren();
-          }
-          this.railVM=null;
-          document.documentElement.style.removeProperty('--dock-h');
-        },
-        async loadMobileConfig() {
-          const pid = this.selectedProductId;
-          if (!pid) return;
-          this.disposeMobileConfig();
-          const seq = ++this.mobileLoadSeq;
-          const controller = this.__mobileController = new AbortController();
-          this.mobileNativeFrame=false;
-          this.configState = "loading";
-          this.configErrorText = "";
-          this.railState = "idle";
-          try {
-            const res = await getOrederConfig({ id: pid, flag: false });
-            if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
-            const content = res.data?.status===200 && res.data?.data?.content;
-            if (typeof content !== 'string' || !content) throw new Error('商品配置暂时无法加载，请稍后重试');
-            const probe=document.createElement('template');probe.innerHTML=content;
-            const verifiedFork=probe.content.querySelector('.m-cloud-m') && Array.from(probe.content.querySelectorAll('script[src]')).some(node=>{
-              const u=new URL(node.getAttribute('src'),location.href);
-              return u.origin===location.origin && u.pathname==='/plugins/server/mf_cloud/template/clientarea/mobile/cloud/js/mf_cloud.js';
-            });
-            if (!verifiedFork) {
-              // Unknown module globals, CSS and boot scripts get a fresh document
-              // on each selection. Its own price and purchase controls remain live.
-              this.mobileNativeFrame=true;
-              return;
-            }
-            await this.$nextTick();
-            if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
-            const body = this.$refs.mobileConfigBody;
-            if (!body || !window.CRA1ModuleDeps) throw new Error('配置组件未能加载，请刷新重试');
-            await window.CRA1ModuleDeps.ensure('config');
-            if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
-            body.innerHTML = window.CRA1CartControls ? window.CRA1CartControls.transform(content) : content;
-            await window.CRA1ModuleDeps.mountScripts(body,{
-              signal:controller.signal,fetchScripts:true,
-              once:src=>!/\/mobile\/cloud\/js\//.test(src),
-            });
-            if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
-            this.configState = "ready";
-            this.$nextTick(() => this.initMobileRail(seq));
-          } catch (error) {
-            if (seq !== this.mobileLoadSeq || controller.signal.aborted) return;
-            this.disposeMobileConfig();
-            this.configState = "error";
-            this.configErrorText = '商品配置暂时无法加载，请重试；如仍失败，请联系管理员。';
-          }
-        },
-        initMobileRail(seq) {
-          clearInterval(this.mobileRailTimer);
-          let tries = 0;
-          this.mobileRailTimer = setInterval(() => {
-            if (seq !== this.mobileLoadSeq) { clearInterval(this.mobileRailTimer); return; }
-            tries++;
-            const root = this.$refs.mobileConfigBody?.querySelector(".m-cloud-m");
-            const vm = root && root.__vue__;
-            if (vm && vm.calcTotalPrice !== undefined) {
-              clearInterval(this.mobileRailTimer);
-              this.railVM = vm;
-              this.railState = "bridged";
-              this.mobileRailPush();
-              this.syncDockPadding();
-              this.mobileRailTimer = setInterval(() => {
-                if (seq !== this.mobileLoadSeq) { clearInterval(this.mobileRailTimer); return; }
-                this.mobileRailPush();
-              }, 800);
-            } else if (tries > 50) {
-              clearInterval(this.mobileRailTimer);
-              this.railState = "fallback";
-            }
-          }, 300);
-        },
-        /* dock 实高 → 主体底部垫高（防遮挡主体内容），展开/收起均同步 */
+        // Measure the actual dock in every module/layout, including delayed
+        // quotes and coupon expansion. No UA or module-specific height guesses.
         syncDockPadding() {
-          this.$nextTick(() => {
-            const dock = document.querySelector('.cl-rail-dock');
-            if (dock) {
-              document.documentElement.style.setProperty('--dock-h', Math.round(dock.offsetHeight + 16) + 'px');
+          const dock = this.$el?.querySelector('.cl-rail-dock');
+          if (dock !== this.__dockElement) {
+            this.__dockObserver?.disconnect();
+            this.__dockElement = dock;
+            if (dock && typeof ResizeObserver !== 'undefined') {
+              this.__dockObserver = new ResizeObserver(() => this.syncDockPadding());
+              this.__dockObserver.observe(dock);
             }
-          });
+          }
+          const height = dock && this.isMobileCart ? Math.ceil(dock.getBoundingClientRect().height) : 0;
+          this.$el?.style.setProperty('--cra1-cart-dock-height', height + 'px');
         },
         toggleCoupon() {
           this.couponOpen = !this.couponOpen;
-          this.$nextTick(() => this.syncDockPadding());
-        },
-        mobileRailPush() {
-          const vm = this.railVM;
-          if (!vm || this.railState !== "bridged") return;
-          this.applyRailData({
-            availability: Array.isArray(vm.cycleList) && vm.cycleList.some(d => String(d.id) === String(vm.params?.duration_id))
-              && vm.calcTotalPrice !== "" && vm.calcTotalPrice != null && Number.isFinite(Number(vm.calcTotalPrice))
-              && !vm.loadingPrice ? "ready" : "loading",
-            durations: vm.cycleList || [],
-            current: vm.params ? vm.params.duration_id : "",
-            qty: {
-              allow: true,
-              min: 1,
-              max: Number(vm.calcQtyMax) > 0 ? Number(vm.calcQtyMax) : 999,
-              cur: vm.qty,
-            },
-            price: {
-              currency: this.commonData.currency_prefix ?? vm.currency_prefix ?? "¥",
-              suffix: this.commonData.currency_suffix ?? vm.currency_suffix ?? "",
-              calcText: vm.calcTotalPrice,
-              originText: vm.totalPrice,
-              hasDiscount: !!vm.hasDiscount,
-            },
-            preview: vm.preview || [],
-          });
         },
         railRetryBridge() {
           this.railLoading = true;
@@ -2124,32 +1985,22 @@
           }
         },
       },
-      beforeDestroy() { ++this.mobileLoadSeq; this.disposeMobileConfig(); },
+      beforeDestroy() {
+        this.__dockObserver?.disconnect();
+        clearTimeout(this.railAddTimer);
+        clearTimeout(this.railBuyTimer);
+      },
       watch: {
         selectedProductId(pid) {
           this.$nextTick(() => this.scrollSelectedProduct());
-          /* v12 手机档：选中商品即直渲染进父页（含深链默认选中与卡片切换） */
-          if (this.isMobileCart) {
-            if (pid) this.loadMobileConfig();
-            else { ++this.mobileLoadSeq; this.disposeMobileConfig(); this.mobileNativeFrame=false; }
-          }
         },
         "select_first_obj.id": function (val) {
-          // 切分组：作废上一组的商品选择，URL 移除 product_id（分组规范化用 replace）
-          this.selectedProductId = 0;
-          this.selectedProduct = null;
-          this.configState = "idle";
-          this.embedDirty = false;
+          // User category changes reset selection in the explicit handlers.
+          // Normalising an entry must preserve its product/configuration query.
           this.updateUrlParam("fpg_id", val, "replace");
-          this.updateUrlParam("product_id", null, "replace");
         },
         "select_second_obj.id": function (val) {
-          this.selectedProductId = 0;
-          this.selectedProduct = null;
-          this.configState = "idle";
-          this.embedDirty = false;
           this.updateUrlParam("spg_id", val, "replace");
-          this.updateUrlParam("product_id", null, "replace");
         },
       },
     }).$mount(template);

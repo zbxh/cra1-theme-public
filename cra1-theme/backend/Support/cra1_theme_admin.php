@@ -8,7 +8,7 @@ function theme_context(array $extra=[]): array { $a=theme_actor();return $extra+
 function theme_device(): string { $ua=(string)($_SERVER['HTTP_USER_AGENT']??'');$os=preg_match('/Windows|Android|iPhone|iPad|Macintosh|Linux/i',$ua,$m)?$m[0]:'未知设备';$browser=preg_match('/Edg|Firefox|Chrome|Safari/i',$ua,$m)?$m[0]:'其他浏览器';return $os.' · '.$browser.' · '.substr(hash('sha256',$ua),0,10); }
 function theme_event(string $action,string $result,array $extra=[],array $diff=[]): void { theme_security()->event($action,$result,theme_context($extra),$diff); }
 function theme_request_check(): void {
-    if(($_SERVER['REQUEST_METHOD']??'GET')!=='POST'||!csrf_ok()||!CRA1ThemeSecurity::sameOrigin($_SERVER,(string)$GLOBALS['THEME_SETTINGS']['canonical_url'],(bool)$GLOBALS['THEME_NETWORK']['https'])){theme_event('csrf','denied',['category'=>'security','risk'=>'high','reason'=>'CSRF 或同源校验失败']);throw new CRA1ThemeSecurityError('请求校验失败，请刷新页面重试。',403,'CSRF_FAILED');}
+    if(($_SERVER['REQUEST_METHOD']??'GET')!=='POST'||!csrf_ok()){theme_event('csrf','denied',['category'=>'security','risk'=>'high','reason'=>'请求方法或会话 CSRF 校验失败']);throw new CRA1ThemeSecurityError('页面会话已失效，请刷新页面后重试。',403,'CSRF_FAILED');}
 }
 function theme_require_role(array $roles): void { $a=theme_actor();if(!$a||!in_array($a['role'],$roles,true)){theme_event('permission.denied','denied',['category'=>'security','risk'=>'high','reason'=>'角色无权执行该操作','target'=>(string)($_GET['r']??'')]);throw new CRA1ThemeSecurityError('当前账号无权执行该操作。',403,'PERMISSION_DENIED');} }
 function theme_new_login(array $a): array {
@@ -136,8 +136,8 @@ function theme_security_api(string $action,array $p): void {
     if($action==='security.accounts.list'){$where=$a['role']==='admin'?" WHERE role='operator'":'';json_out(['status'=>200,'msg'=>'已读取','data'=>['list'=>array_map([CRA1ThemeSecurity::class,'publicAccount'],$s->rows('SELECT * FROM accounts'.$where.' ORDER BY id LIMIT 200'))]]);}
     if($action==='security.accounts.create')json_out(['status'=>200,'msg'=>'账号已创建，首次登录需修改密码','data'=>$s->createAccount($a,$p)]);
     if($action==='security.accounts.update')json_out(['status'=>200,'msg'=>'账号已更新，相关会话已撤销','data'=>$s->changeAccount($a,(int)($p['id']??0),array_intersect_key($p,array_flip(['role','enabled','password','reset_mfa']))) ]);
-    if($action==='security.settings.get')json_out(['status'=>200,'msg'=>'已读取','data'=>$s->settings()+['entry'=>$GLOBALS['SLUG']]]);
-    if($action==='security.settings.save'){if(!empty($p['settings']['force_https'])&&!$GLOBALS['THEME_NETWORK']['https'])throw new CRA1ThemeSecurityError('请先通过已生效的 HTTPS 访问后台，再开启强制 HTTPS。');$s->updateSettings((array)($p['settings']??[]));json_out(['status'=>200,'msg'=>'安全策略已更新，请重新登录','data'=>['relogin'=>true]]);}
+    if($action==='security.settings.get')json_out(['status'=>200,'msg'=>'已读取','data'=>array_intersect_key($s->settings(),array_flip(['idle_timeout','absolute_timeout','trusted_proxies','canonical_url']))+['entry'=>$GLOBALS['SLUG'],'ip_allowlist'=>[],'force_https'=>false,'http_test'=>false]]);
+    if($action==='security.settings.save'){$s->updateSettings((array)($p['settings']??[]));json_out(['status'=>200,'msg'=>'设置已更新，请重新登录','data'=>['relogin'=>true]]);}
     if($action==='security.audit.list'||$action==='logs')json_out(['status'=>200,'msg'=>'已读取','data'=>$s->logs($a,$p)]);
     if($action==='security.audit.detail')json_out(['status'=>200,'msg'=>'已读取','data'=>$s->logDetail($a,(int)($p['id']??0))]);
     if($action==='security.audit.export'){

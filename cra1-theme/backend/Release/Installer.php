@@ -64,15 +64,10 @@ final class Installer
             References::inspect($this->root,$release['references']??[]);
             require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_security.php';
             \CRA1ThemeSecurity::username((string)($input['username']??''));$hash=\CRA1ThemeSecurity::password((string)($input['password']??''));
-            $address=$input['canonical']??$origin;
+            $address=$origin??($input['canonical']??null);
             if(!is_string($address))throw new \InvalidArgumentException('无法识别本站地址，请重新打开安装页');
             $canonical=rtrim($address,'/');$url=parse_url($canonical);
             if(!filter_var($canonical,FILTER_VALIDATE_URL)||!in_array($url['scheme']??'',['http','https'],true)||!empty($url['path'])||isset($url['user'])||isset($url['pass'])||isset($url['query'])||isset($url['fragment']))throw new \InvalidArgumentException('无法识别本站地址，请重新打开安装页');
-            if($origin!==null){
-                $expected=parse_url($origin);
-                if(!$expected||($url['scheme']??'')!==($expected['scheme']??'')||strtolower((string)($url['host']??''))!==strtolower((string)($expected['host']??''))||($url['port']??($url['scheme']==='https'?443:80))!==($expected['port']??($expected['scheme']==='https'?443:80)))throw new \InvalidArgumentException('本站地址须与当前安装页面一致，请重新打开安装页');
-                $canonical=rtrim($origin,'/');
-            }
             $created=[$this->root.'/runtime/cra1_theme/security.sqlite',$this->root.'/config/cra1_theme_security.key'];$renamed=false;
             try{
                 \CRA1ThemeSecurity::install($this->root,(string)$input['username'],$hash,['canonical_url'=>$canonical,'force_https'=>false,'http_test'=>false]);

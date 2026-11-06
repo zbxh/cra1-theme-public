@@ -693,12 +693,12 @@ final class CartThemeStore
         return $out;
     }
 
-    /** Match the visual link picker: site pages, HTTPS, anchors and contacts. */
+    /** Match the visual link picker: site pages, HTTP/HTTPS, anchors and contacts. */
     private function safePath(string $v, string $fallback): string
     {
         $v = $this->cleanText($v, 200);
         if ($v === '') return $fallback;
-        if (strncmp($v, '//', 2) === 0 || !preg_match('~^(?:/|#|https://|tel:|mailto:)~i', $v)) return $fallback;
+        if (strncmp($v, '//', 2) === 0 || !preg_match('~^(?:/|#|https?://|tel:|mailto:)~i', $v)) return $fallback;
         if (preg_match('/[<>"\'\s]/', $v)) return $fallback;
         return $v;
     }
