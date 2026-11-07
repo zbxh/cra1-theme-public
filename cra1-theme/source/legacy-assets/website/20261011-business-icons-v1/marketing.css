@@ -111,9 +111,8 @@
   letter-spacing: -.045em;
   font-weight: 700;
   color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .marketing-hero-description {
   margin: 0; max-width: 31rem; font-size: 1rem; line-height: 1.9; color: var(--hero-body);

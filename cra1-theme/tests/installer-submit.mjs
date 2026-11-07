@@ -40,15 +40,17 @@ let totalWrites=0;
 const ready={mode:'install',installation_ready:true,version:'v17.1',release_channel:'test',checks:[{status:'pass',label:'运行环境',detail:'检查通过'}]};
 const password='Example-password-123!';
 function check(value,label){if(!value)throw Error(label);checks.push(label);}
-async function fixture({width=1440,fastTimeout=false}={}){
+async function fixture({width=1440,fastTimeout=false,blockedStorage=false,nativeToken=false}={}){
   const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:1000}}),page=await context.newPage();
+  if(blockedStorage)await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new DOMException('Storage disabled','SecurityError');}}));
+  if(nativeToken)await page.addInitScript(()=>localStorage.setItem('backJwt','isolated-native-admin'));
   if(fastTimeout)await page.addInitScript(()=>{const original=window.setTimeout;window.setTimeout=(fn,ms,...args)=>original(fn,ms===60000?100:ms,...args);});
   page.on('pageerror',error=>errors.push(error.message));
   page.on('console',message=>{if(message.type()==='error')consoles.push(message.text());});
   const state={mode:'success',checkResponse:structuredClone(ready),calls:0,installs:0,updates:0,recoveries:0,release:null};
   await page.route('**/cra1-install/api.php',async route=>{
     const input=route.request().postDataJSON();state.calls++;
-    check(route.request().headers().authorization==='Bearer isolated-native-admin','native administrator authentication retained');
+    check(nativeToken?route.request().headers().authorization==='Bearer isolated-native-admin':!route.request().headers().authorization,nativeToken?'optional maintenance authentication forwarded':'fresh installation sends requests without a V10 login');
     check(!!route.request().headers()['x-csrf-token'],'installer CSRF retained');
     if(input.action==='check'){await route.fulfill({json:{status:200,data:state.checkResponse}});return;}
     if(['update','recover_update'].includes(input.action)){
@@ -70,7 +72,7 @@ async function fixture({width=1440,fastTimeout=false}={}){
     if(state.mode==='html'){await route.fulfill({contentType:'text/html',body:'<h1>Temporary error</h1>'});return;}
     if(state.mode==='forbidden-html'){await route.fulfill({status:403,contentType:'text/html',body:'<h1>Access denied</h1>'});return;}
     if(state.mode==='missing-api'){await route.fulfill({status:404,contentType:'text/html',body:'<h1>Not found</h1>'});return;}
-    if(state.mode==='http-error'){await route.fulfill({status:503,json:{status:400,msg:'Internal exception details'}});return;}
+    if(state.mode==='http-error'){await route.fulfill({status:503,json:{status:400,msg:'操作在“创建主题后台”时失败。原因：SQLite near ON: syntax error；参考编号：TEST12345678',error:{needs_check:true}}});return;}
     if(state.mode==='auth'){await route.fulfill({status:401,json:{status:401}});return;}
     if(state.mode==='auth-forbidden'){await route.fulfill({status:403,json:{status:403}});return;}
     if(state.mode==='rejected'){await route.fulfill({json:{status:400,msg:'后台地址已存在，请更换地址。'}});return;}
@@ -78,7 +80,7 @@ async function fixture({width=1440,fastTimeout=false}={}){
     await route.fulfill({json:{status:200,data:{installed:true,admin_url:'/exampleadmin/index.php',username:input.username,password:input.password}}});
   });
   await page.goto(origin+'/cra1-install/');
-  await page.evaluate(()=>localStorage.setItem('backJwt','isolated-native-admin'));
+  await page.waitForFunction(()=>!document.getElementById('check').disabled);
   async function inspect(){await page.locator('#check').click();await page.waitForFunction(()=>!document.getElementById('check').disabled||document.getElementById('status').textContent.includes('已安装酷锐A1'));}
   async function fill(values={}){
     for(const [name,value]of Object.entries({entry:'exampleadmin',username:'example_admin',password,confirm:password,...values}))await page.locator(`[name=${name}]`).fill(value);
@@ -128,9 +130,10 @@ try{
     const f=await fixture({fastTimeout:mode==='timeout'});await f.inspect();await f.fill();f.state.mode=mode;
     await f.page.locator('#install').click();await f.page.waitForFunction(()=>document.getElementById('setup').getAttribute('aria-busy')==='false');
     check(await f.page.locator('#setup-status').isVisible(),mode+' shows a visible failure');
-    check(!(await f.page.locator('#setup-status').innerText()).includes('Internal exception'),mode+' does not expose internal response text');
-    if(['forbidden-html','missing-api'].includes(mode))check((await f.page.locator('#setup-status').innerText()).includes('目录访问权限')&&!(await f.page.locator('#setup-status').innerText()).includes('登录已失效'),mode+' identifies a blocked controller rather than an expired login');
-    if(['auth','auth-forbidden'].includes(mode))check((await f.page.locator('#setup-status').innerText()).includes('登录已失效'),mode+' retains the native authentication message');
+    check(!(await f.page.locator('#setup-status').innerText()).includes('Internal exception'),mode+' does not render unrelated raw response markup');
+    if(['forbidden-html','missing-api'].includes(mode))check((await f.page.locator('#setup-status').innerText()).includes('HTTP '+(mode==='missing-api'?'404':'403'))&&!(await f.page.locator('#setup-status').innerText()).includes('登录已失效'),mode+' identifies a blocked controller rather than an expired login');
+    if(['auth','auth-forbidden'].includes(mode))check((await f.page.locator('#setup-status').innerText()).includes('本站已安装主题'),mode+' explains that only updates need native authentication');
+    if(mode==='http-error')check((await f.page.locator('#setup-status').innerText()).includes('SQLite near ON: syntax error'),'structured server errors keep the actual failing step and reason even on HTTP 503');
     check(await f.page.locator('#check').isEnabled(),mode+' permits an explicit state check');
     check(f.state.installs===1,mode+' is never automatically retried');
     if(mode==='rejected'){
@@ -145,13 +148,17 @@ try{
     }
     await f.close();
   }
-  const guard=await fixture();await guard.page.evaluate(()=>localStorage.removeItem('backJwt'));const calls=guard.state.calls;
-  await guard.inspect();check(guard.state.calls===calls,'anonymous check sends no request');
-  check((await guard.page.locator('#status').innerText()).includes('请先'),'anonymous visitor gets a login instruction');
-  await guard.page.evaluate(()=>localStorage.setItem('backJwt','isolated-native-admin'));guard.state.checkResponse={...ready,installation_ready:false};await guard.inspect();
-  check(await guard.page.locator('#setup').isHidden(),'failed preflight never exposes an enabled form');await guard.close();
+  const guard=await fixture();
+  check(guard.state.calls===1&&await guard.page.locator('#setup').isVisible(),'a new browser automatically opens first-time setup without a login');
+  check(!await guard.page.locator('#environment').evaluate(node=>node.open),'successful environment details stay collapsed');
+  guard.state.checkResponse={...ready,installation_ready:false};await guard.inspect();
+  check(await guard.page.locator('#setup').isHidden(),'missing required runtime prevents submission');
+  check(await guard.page.locator('#environment').evaluate(node=>node.open),'failed runtime explains the requirement inline');await guard.close();
+  const privateBrowser=await fixture({blockedStorage:true});await privateBrowser.fill();
+  await privateBrowser.page.locator('#install').click();await privateBrowser.page.locator('#success').waitFor();
+  check(privateBrowser.state.installs===1,'disabled localStorage does not block first-time setup');await privateBrowser.close();
   const maintenance={mode:'maintenance',version:'v17.3',release_channel:'test',checks:[],update_state:'ready',can_update:true,confirmation:'a'.repeat(64),admin_url:'/customadmin/index.php'};
-  const update=await fixture();update.state.checkResponse=maintenance;await update.inspect();
+  const update=await fixture({nativeToken:true});update.state.checkResponse=maintenance;await update.inspect();
   check(await update.page.locator('#setup').isHidden(),'existing installation never exposes new account fields');
   check(await update.page.locator('#update').isDisabled(),'completion waits for backup confirmation');
   await update.page.locator('#backup-confirmed').check();check(await update.page.locator('#update').isEnabled(),'backup enables explicit completion');
@@ -174,7 +181,7 @@ try{
   const recovery=await fixture();recovery.state.checkResponse={...maintenance,update_state:'interrupted',can_update:false,can_recover:true};await recovery.inspect();
   check(await recovery.page.locator('#update-options').isHidden(),'interrupted update offers recovery instead of another completion');
   await recovery.page.getByRole('button',{name:'恢复未完成的更新',exact:true}).click();
-  await recovery.page.getByText('已恢复，请点击“验证并检查”后继续更新。',{exact:true}).first().waitFor();check(recovery.state.recoveries===1&&recovery.state.updates===0,'recovery is explicit and never applies automatically');await recovery.close();
+  await recovery.page.getByText('已恢复，请点击“重新检测”后继续更新。',{exact:true}).first().waitFor();check(recovery.state.recoveries===1&&recovery.state.updates===0,'recovery is explicit and never applies automatically');await recovery.close();
   const context=await browser.newContext({ignoreHTTPSErrors:true}),page=await context.newPage();page.on('console',m=>{if(m.type()==='error')consoles.push(m.text());});page.on('pageerror',e=>errors.push(e.message));
   let accountWrites=0;await page.route('**/admin.php?*',async route=>{
     const action=new URL(route.request().url()).searchParams.get('r');

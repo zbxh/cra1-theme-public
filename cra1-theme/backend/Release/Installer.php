@@ -47,11 +47,14 @@ final class Installer
     {
         $ready=$preflight['installation_ready']??(($preflight['counts']['blocked']??1)===0&&($preflight['counts']['unverified']??1)===0);
         if($ready!==true)throw new \RuntimeException('安装检查尚未通过，请按向导提示处理后重试');
-        return Files::locked($this->root.'/runtime/cra1_theme/install.lock',function()use($input,$origin){
+        $phase='创建安装事务';
+        try{return Files::locked($this->root.'/runtime/cra1_theme/install.lock',function()use($input,$origin,&$phase){
+            $phase='读取原有安装资料';
             if($this->state()['mode']!=='install')throw new \RuntimeException('已经安装，禁止重新初始化账号或配置');
             foreach(['entry','username','password']as$field)if(!is_string($input[$field]??null))throw new \InvalidArgumentException('请完整填写后台地址、账号和密码');
             $entry=(string)($input['entry']??'');
             if(!preg_match('/^[a-z][a-z0-9]{5,31}$/D',$entry)||in_array($entry,['console','public','config','upload','plugins','clientarea','cra1-shared','cra1-install'],true))throw new \InvalidArgumentException('后台地址需为 6–32 位小写字母和数字');
+            $phase='设置主题后台目录';
             $from=$this->root.'/public/cra1admin';$to=$this->root.'/public/'.$entry;
             Files::noLinks($from);Files::noLinks($to);
             if(!is_dir($from)||($to!==$from&&file_exists($to)))throw new \RuntimeException('后台目录缺失或目标地址已存在');
@@ -60,9 +63,11 @@ final class Installer
             if(is_file($entryFile))$previousEntry=(string)file_get_contents($entryFile);
             $pointer=$this->root.'/runtime/cra1_theme/distribution/current.json';Files::noLinks($pointer);
             if(file_exists($pointer))throw new \RuntimeException('检测到已有发行指针，禁止覆盖安装记录');
+            $phase='读取主题安装文件';
             $release=Files::json($this->root.'/cra1-theme/release.json');
             References::inspect($this->root,$release['references']??[]);
             require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_security.php';
+            $phase='设置主题后台账号';
             \CRA1ThemeSecurity::username((string)($input['username']??''));$hash=\CRA1ThemeSecurity::password((string)($input['password']??''));
             $address=$origin??($input['canonical']??null);
             if(!is_string($address))throw new \InvalidArgumentException('无法识别本站地址，请重新打开安装页');
@@ -70,13 +75,19 @@ final class Installer
             if(!filter_var($canonical,FILTER_VALIDATE_URL)||!in_array($url['scheme']??'',['http','https'],true)||!empty($url['path'])||isset($url['user'])||isset($url['pass'])||isset($url['query'])||isset($url['fragment']))throw new \InvalidArgumentException('无法识别本站地址，请重新打开安装页');
             $created=[$this->root.'/runtime/cra1_theme/security.sqlite',$this->root.'/config/cra1_theme_security.key'];$renamed=false;
             try{
+                $phase='创建主题后台数据库与密钥';
                 \CRA1ThemeSecurity::install($this->root,(string)$input['username'],$hash,['canonical_url'=>$canonical,'force_https'=>false,'http_test'=>false]);
                 $created=[$this->root.'/runtime/cra1_theme/security.sqlite',$this->root.'/config/cra1_theme_security.key'];
-                if($to!==$from){if(!rename($from,$to))throw new \RuntimeException('无法设置后台地址，请检查 public/ 的属主及重命名权限，处理后重新检查');$renamed=true;}
+                $phase='设置主题后台地址';
+                if($to!==$from){if(!@rename($from,$to))throw new \RuntimeException('无法设置后台地址，请检查 public/ 的属主及重命名权限，处理后重新检查');$renamed=true;}
+                $phase='保存主题后台地址';
                 Files::putJson($entryFile,['entry'=>$entry],0600);if($previousEntry===null)$created[]=$entryFile;
+                $phase='准备页面依赖';
                 foreach(References::apply($this->root,$release['references']??[])as$createdLink)$created[]=$createdLink;
+                $phase='读取主题后台数据库';
                 $security=new \CRA1ThemeSecurity($this->root);
                 if($security->scalar('PRAGMA quick_check')!=='ok'||$security->scalar('SELECT COUNT(*) FROM accounts WHERE enabled=1 AND role=\'super_admin\'')!=1)throw new \RuntimeException('主题后台安装后自检失败');
+                $phase='初始化主题媒体库';
                 require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_media.php';
                 $mediaFile=$this->root.'/runtime/cra1_theme/attachments.sqlite';$newMedia=!is_file($mediaFile);
                 if($newMedia)foreach(['attachments.sqlite','attachments.sqlite-wal','attachments.sqlite-shm']as$file)$created[]=$this->root.'/runtime/cra1_theme/'.$file;
@@ -84,22 +95,26 @@ final class Installer
                 if($media->db->query('PRAGMA quick_check')->fetchColumn()!=='ok')throw new \RuntimeException('主题媒体库自检失败');
                 foreach(['attachments','member_avatars','media_rates','member_events']as$table)$media->db->query('SELECT * FROM '.$table.' LIMIT 0');
                 unset($media);
+                $phase='初始化主题配置';
                 foreach(['member_store.php','cart_store.php']as$file)require_once CRA1_THEME_BACKEND.'/Storage/'.$file;
                 $memberDefaults=\CRA1\Theme\Storage\MemberCenterStore::defaults();
                 // Seed only absent installations; an existing empty or customized menu is intentional.
                 if(!is_file($this->root.'/runtime/cra1_theme/member_center.json'))$memberDefaults['sidebar']=array_replace($memberDefaults['sidebar'],(new \CRA1\Theme\Storage\MenuTransfer($this->root))->defaults());
                 $defaults=['config'=>[],'member_center'=>$memberDefaults,'cart_theme'=>\CRA1\Theme\Storage\CartThemeStore::defaults()];
                 foreach($defaults as$name=>$value){$path=$this->root.'/runtime/cra1_theme/'.$name.'.json';if(!is_file($path)){Files::putJson($path,$value);$created[]=$path;}else Files::json($path);}
+                $phase='初始化主题通知';
                 $announcementFile=$this->root.'/runtime/cra1_theme/announcements.json';
                 if (!is_file($announcementFile)) $created[]=$announcementFile;
                 Updater::migrateAnnouncements($this->root,$release);
+                $phase='保存主题生效版本';
                 $created[]=$pointer;
                 $current=['release'=>$release['release']??'legacy-install','manifest'=>$release,'security_epoch'=>$release['security_epoch']??1,'installed_at'=>time()];
                 if(isset($release['backend_root']))$current['backend_root']=$release['backend_root'];
                 Files::putJson($pointer,$current,0600);
                 $record=['entry'=>$entry,'username'=>(string)$input['username'],'installed_at'=>time(),'initialized'=>true,'installer_locked'=>true];
                 Files::putJson($this->root.'/runtime/cra1_theme/install.json',$record,0600);
-                $security->event('distribution.install','ok',['category'=>'security','actor_id'=>1,'actor_name'=>(string)$input['username'],'role'=>'super_admin','target'=>'theme','reason'=>'通过原生超级管理员身份安装','risk'=>'high']);
+                $phase='写入安装日志';
+                $security->event('distribution.install','ok',['category'=>'security','actor_id'=>1,'actor_name'=>(string)$input['username'],'role'=>'super_admin','target'=>'theme','reason'=>'通过安装向导完成首次安装','risk'=>'high']);
                 // Plaintext exists only in this response; never write it to session, logs or files.
                 return ['admin_url'=>'/'.$entry.'/index.php','username'=>$input['username'],'password'=>$input['password'],'installed'=>true];
             }catch(\Throwable $e){
@@ -110,6 +125,7 @@ final class Installer
                 foreach(['security.sqlite-wal','security.sqlite-shm','install.json']as$file){$path=$this->root.'/runtime/cra1_theme/'.$file;if(is_file($path))unlink($path);}
                 throw $e;
             }
-        });
+        });}catch(\InvalidArgumentException $error){throw $error;}
+        catch(\Throwable $error){throw new InstallerFailure($phase,$error);}
     }
 }

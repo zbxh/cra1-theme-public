@@ -1883,7 +1883,8 @@ add_hook('clientarea_view_append', function ($param) {
         'security_ssh'   => 'SSH 密钥',
         'security_group' => '安全组',
         'newsView'       => '新闻详情',
-        'agreement'      => '服务协议',
+        // 文档加载完成后由页面使用实际标题，不能按固定 ID 猜测协议类型。
+        'agreement'      => '协议与文档',
         'login'          => '登录',
         'regist'         => '注册',
         'forget'         => '找回密码',

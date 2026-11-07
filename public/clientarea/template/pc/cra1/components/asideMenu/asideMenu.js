@@ -469,9 +469,9 @@
       global.addEventListener('resize', this.onResize)
       global.addEventListener('storage', this.onRecentStorage)
       global.addEventListener('cra1:recent-visits-clear', this.clearRecentItems)
-      // 默认展开/收起：用户本机手动切换过（localStorage 有记录）以本机为准；
-      // 无记录时读后台「外观设置 → 侧边栏默认展开」（此前恒 false，该开关是幽灵字段）
-      this.applyAsideDefault(global.__CRA1_MEMBER_SNAPSHOT__)
+      // 首次打开完整导航；只有会员主动折叠后才恢复图标栏。
+      // 菜单快照异步返回时不再改变宽度，避免刚打开又突然收起。
+      this.restoreCollapsePreference()
       // 收藏功能已下线：清掉遗留的本地数据，避免误导
       try { localStorage.removeItem('cra1_user_favorites') } catch (e) {}
       // v20：手机端二级菜单折叠档位（后台 appearance.aside_mobile_expand）
@@ -507,19 +507,13 @@
       },
     },
     methods: {
-      applyAsideDefault(snapshot) {
-        if (this._cra1AsideDefaultApplied) return
+      restoreCollapsePreference() {
         try {
           const saved = localStorage.getItem('cra1_aside_collapsed')
           if (saved === '0' || saved === '1') {
             this.collapsed = saved === '1'
-            this._cra1AsideDefaultApplied = true
-            return
           }
         } catch (e) {}
-        if (!snapshot || !snapshot.appearance) return
-        this.collapsed = Number(snapshot.appearance.sidebar_default_open) !== 1
-        this._cra1AsideDefaultApplied = true
       },
       publishNavState() {
         global.__CRA1_NAV_OPEN__ = this.navOpen === true
@@ -1115,10 +1109,12 @@
        */
       applySnapshot(snap) {
         var self = this
+        var language = 'zh-cn'
+        try { language = localStorage.getItem('lang') || language } catch (e) {}
         var toItem = function (n) {
           return {
             id: n.id,
-            name: (n.language && n.language[localStorage.getItem('lang') || 'zh-cn']) || n.name,
+            name: (n.language && n.language[language]) || n.name,
             language: n.language || {},
             select_field: n.select_field || [],
             select_field_set: n.select_field_set || false,
@@ -1144,7 +1140,6 @@
         return global.__cra1FeatureFlags().then(function (feat) {
           menu = self.stripGatedEntries(menu, feat || {})
           self.snapshotAppearance = snap.appearance || {}
-          self.applyAsideDefault(snap)
           // 首页最近访问展示策略；open_first 保留旧存储兼容，已不影响侧栏。
           if (snap.recent && typeof snap.recent === 'object') {
             self.recentCfg = {

@@ -99,7 +99,7 @@ final class MemberCenterStore
                 'show_cart'        => 1,
                 'show_language'    => 1,
                 'show_message'     => 1,
-                // 侧栏默认显隐
+                // 历史字段保留；导航首次打开完整显示，宽度由会员手动选择。
                 'sidebar_default_open' => 0,
                 // v20 手机端二级菜单折叠档位：one=展开一个 all=全部展开 none=全部关闭（仅手机端）
                 'aside_mobile_expand'  => 'one',

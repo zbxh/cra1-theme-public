@@ -17,7 +17,7 @@ function fixture(){
  const send=params=>{calls.push(['settle',params]);return settle(params)}
  vm.runInNewContext(code,{window,Vue,document:{getElementsByClassName:()=>[{}]},location:{pathname:'/cart/settlement.htm',search:'?cart=1'},localStorage:{},sessionStorage:{setItem(){}},asideMenu:{},topMenu:{},payDialog:{},eventCode:{},lang:{},cart_settle:send,product_settle:send})
  window.onload();Object.assign(instance,{checked:true,showGoodsList:[{quoteReady:true,qty:1}],selectGoodsList:[0]})
- return{page:instance,calls,messages,setSettle:f=>settle=f,setNavigate:f=>navigate=f}
+ return{page:instance,calls,messages,window,setSettle:f=>settle=f,setNavigate:f=>navigate=f}
 }
 test('checkout clicks share one submission, and retry after navigation failure uses the created order',async()=>{
  const f=fixture();let finish;f.setSettle(()=>new Promise(resolve=>finish=resolve));f.setNavigate(()=>{throw Error('asset unavailable')})
@@ -39,4 +39,15 @@ test('a definite business validation failure remains correctable',async()=>{
 test('failed quotes and missing agreement never submit an order',async()=>{
  const f=fixture();f.page.quoteError='价格读取失败';await f.page.goPay();assert.equal(f.calls.length,0)
  f.page.quoteError='';f.page.checked=false;await f.page.goPay();assert.equal(f.calls.length,0)
+})
+test('reading an existing order can be retried on the settlement page without an uncertain-creation lock',async()=>{
+ const f=fixture();f.page.checkoutIntent='visit';await f.page.goPay();await drain();assert.equal(f.page.createdOrderId,7)
+ f.page.createdOrderId=null
+ f.window.CRA1Shared.Request.request=async path=>{if(path.startsWith('/order/'))throw {status:503};return {status:200,data:{}}}
+ await f.page.goPay();await drain()
+ assert.equal(f.page.submissionUncertain,false);assert.equal(f.page.canSettle,true);assert.equal(f.calls.filter(c=>c[0]==='settle').length,1)
+ assert.match(f.messages.at(-1),/读取原订单/)
+ f.window.CRA1Shared.Request.request=async path=>({status:200,data:path.startsWith('/order/')?{order:{}}:{}})
+ f.setSettle(()=>Promise.resolve({data:{status:200,data:{order_id:8}}}));await f.page.goPay();await drain()
+ assert.equal(f.page.createdOrderId,8);assert.equal(f.calls.filter(c=>c[0]==='settle').length,2)
 })

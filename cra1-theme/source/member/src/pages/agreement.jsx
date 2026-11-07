@@ -26,13 +26,26 @@ export default function AgreementPage() {
 
   useEffect(() => {
     if (!id) { setLoading(false); return }
+    let active = true
+    setDocs(null)
     setLoading(true)
     setError('')
     get(`/help/${id}`)
-      .then((res) => setDocs(res.data?.help || null))
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
+      .then((res) => { if (active) setDocs(res.data?.help || null) })
+      .catch((e) => { if (active) setError(e.message) })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
   }, [id])
+
+  useEffect(() => {
+    const site = String(window.__CRA1_PAGE__?.website_name || '').trim()
+    const title = !id ? '缺少文档参数'
+      : loading ? '协议与文档'
+      : error ? '文档加载失败'
+      : docs?.id ? String(docs.title || '').trim() || '未命名文档'
+      : '文档不存在或已下架'
+    document.title = site && title !== site ? `${title}-${site}` : title
+  }, [id, loading, error, docs])
 
   if (!id) {
     return (

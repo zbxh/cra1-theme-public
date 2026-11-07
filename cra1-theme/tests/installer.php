@@ -11,7 +11,7 @@ function fixture($dir){mkdir($dir.'/public/cra1admin',0700,true);mkdir($dir.'/li
 $previous=['admin_theme'=>'default','clientarea_theme'=>'default','cart_theme'=>'default','web_theme'=>'default','cart_instruction'=>1,'cart_instruction_content'=>'merchant copy','home_host_theme'=>['mf_cloud'=>'default'],'home_host_theme_mobile'=>['mf_cloud'=>'default']];
 $input=['entry'=>'cloudcustom','username'=>'fixture_admin','password'=>'Isolated-password-123!','canonical'=>'https://fixture.invalid'];$passed=['counts'=>['blocked'=>0,'unverified'=>0]];
 try{
- $noAuth=\CRA1\Theme\Http\NativeAdmin::run($base,'',static function(){throw new RuntimeException('must not run');});check($noAuth['status']===401,'anonymous first visitor cannot create admin');
+ $noAuth=\CRA1\Theme\Http\NativeAdmin::run($base,'',static function(){throw new RuntimeException('must not run');});check($noAuth['status']===401,'maintenance bridge still rejects unauthenticated updates');
  $originInstaller=fixture($base.'/origin');$origin='https://fixture.invalid:8443';
  foreach(['https://other.invalid:8443','http://fixture.invalid','https://fixture.invalid'] as $i=>$legacyOrigin){
   $dir=$base.'/origin-legacy-'.$i;$legacyInstaller=fixture($dir);

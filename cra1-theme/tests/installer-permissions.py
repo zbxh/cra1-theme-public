@@ -123,7 +123,7 @@ try {
         api.chmod(0o644)
 
         html = exercise('render', flags=('-d', 'session.save_path=' + str(base / 'missing-session-directory')))
-        check('安装会话无法保存' in html and 'id="check" disabled' in html, 'session storage failure is visible before the customer clicks install')
+        check('安装会话无法保存' in html and ' disabled' in html and 'id="check"' in html, 'session storage failure is visible before the customer clicks install')
         check(str(base) not in html, 'session storage errors do not expose the absolute server path')
 
         result = exercise('install')

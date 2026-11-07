@@ -8,7 +8,7 @@ const payload={product_id:3,config_options:{cycle:7},qty:1}
 const reply=id=>({data:{status:200,data:{order_id:id}}})
 function fixture(records=new Map(),id=2,locks=true){
  const token='h.'+Buffer.from(JSON.stringify({info:{id}})).toString('base64')+'.s'
- const window={setTimeout,atob,navigator:locks?{locks:{request:(_key,run)=>run()}}:{},localStorage:{getItem:k=>records.get(k)||null,setItem:(k,v)=>records.set(k,v),removeItem:k=>records.delete(k)},CRA1Shared:{CheckoutHash:v=>createHash('sha256').update(v).digest('hex'),Request:{getToken:()=>token,request:async()=>({data:{order:{id:7,status:'Unpaid'}}})}}}
+ const window={setTimeout,atob,navigator:locks?{locks:{request:(_key,run)=>run()}}:{},localStorage:{getItem:k=>records.get(k)||null,setItem:(k,v)=>records.set(k,v),removeItem:k=>records.delete(k)},CRA1Shared:{CheckoutHash:v=>createHash('sha256').update(v).digest('hex'),Request:{getToken:()=>token,request:async()=>({status:200,data:{order:{id:7,status:'Unpaid'}}})}}}
  vm.runInNewContext(code,{window})
  return {submit:window.CRA1Shared.Checkout.submit,records,window}
 }
@@ -27,7 +27,7 @@ test('created order survives navigation failure and refresh; an unpaid order is 
  assert.equal((await b.submit('product',payload,send,{intent:'visit1'})).data.data.order_id,7)
  assert.equal((await b.submit('product',payload,send,{intent:'visit2'})).data.data.order_id,7)
  assert.equal(calls,1)
- b.window.CRA1Shared.Request.request=async()=>({data:{order:{id:7,status:'Paid'}}})
+ b.window.CRA1Shared.Request.request=async()=>({status:200,data:{order:{id:7,status:'Paid'}}})
  await b.submit('product',payload,send,{intent:'visit2'});assert.equal(calls,2)
 })
 test('definite rejection can be corrected, malformed and server responses remain uncertain',async()=>{
@@ -67,4 +67,64 @@ test('an interrupted document remains blocked, while a later deliberate selectio
  await assert.rejects(b.submit('product',payload,async()=>reply(8),{intent:'old'}),{code:'CHECKOUT_UNCERTAIN'})
  assert.equal((await b.submit('product',payload,async()=>reply(8),{intent:'new'})).data.data.order_id,8)
  release(reply(7));await pending
+ b.window.CRA1Shared.Request.request=async path=>({status:200,data:{order:{id:Number(path.split('/').pop()),status:'Unpaid'}}})
+ assert.equal((await b.submit('product',payload,async()=>reply(9),{intent:'new'})).data.data.order_id,8)
+ assert.equal((await b.submit('product',payload,async()=>reply(9),{intent:'third'})).data.data.order_id,8)
+ assert.equal(JSON.parse(records.get([...records.keys()].find(k=>k.endsWith(':old')))).orderId,7)
+})
+for(const kind of ['product','cart'])for(const revisit of ['same','fresh'])test(`${kind}: deleting a created order allows ${revisit} checkout without leaving a stale receipt`,async()=>{
+ const a=fixture();let calls=0
+ const send=async()=>reply(++calls===1?7:8),opts=intent=>({intent,identity:[payload]})
+ await a.submit(kind,payload,send,opts('first'))
+ const b=fixture(a.records)
+ b.window.CRA1Shared.Request.request=async()=>({status:200,data:{order:{}}})
+ assert.equal((await b.submit(kind,payload,send,opts(revisit==='same'?'first':'second'))).data.data.order_id,8)
+ b.window.CRA1Shared.Request.request=async()=>({status:200,data:{order:{id:8,status:'Unpaid'}}})
+ assert.equal((await b.submit(kind,payload,send,opts('first'))).data.data.order_id,8)
+ assert.equal((await b.submit(kind,payload,send,opts('third'))).data.data.order_id,8)
+ assert.equal(calls,2)
+})
+test('order lookup failures preserve the created receipt and recover on retry without sending a second purchase',async()=>{
+ for(const result of [()=>{throw {status:401}},()=>{throw {status:403}},()=>{throw {code:'NETWORK'}},()=>({status:503,data:{order:{}}}),()=>({status:200,data:{}}),()=>({status:200,data:{order:[]}}),()=>({status:200,data:{order:{id:8,status:'Unpaid'}}})]){
+  const a=fixture();let calls=0;const send=async()=>{calls++;return reply(7)}
+  await a.submit('product',payload,send,{intent:'first'})
+  const before=JSON.stringify([...a.records]);a.window.CRA1Shared.Request.request=async()=>result()
+  await assert.rejects(a.submit('product',payload,send,{intent:'second'}),{code:'CHECKOUT_LOOKUP_FAILED'})
+  assert.equal(JSON.stringify([...a.records]),before);assert.equal(calls,1)
+  a.window.CRA1Shared.Request.request=async()=>({status:200,data:{order:{id:7,status:'Unpaid'}}})
+  assert.equal((await a.submit('product',payload,send,{intent:'second'})).data.data.order_id,7);assert.equal(calls,1)
+ }
+})
+test('finished orders permit a new selection while an old paid visit continues its own order',async()=>{
+ for(const status of ['Paid','Cancelled','Refunded']){
+  const a=fixture();let calls=0;const send=async()=>reply(++calls===1?7:8)
+  await a.submit('cart',payload,send,{intent:'first'})
+  a.window.CRA1Shared.Request.request=async path=>({status:200,data:{order:{id:Number(path.split('/').pop()),status:path.endsWith('/7')?status:'Unpaid'}}})
+  assert.equal((await a.submit('cart',payload,send,{intent:'second'})).data.data.order_id,8)
+  assert.equal((await a.submit('cart',payload,send,{intent:'first'})).data.data.order_id,7)
+  assert.equal((await a.submit('cart',payload,send,{intent:'third'})).data.data.order_id,8);assert.equal(calls,2)
+ }
+})
+test('a deleted older visit cannot erase a newer unpaid order stored under the same product',async()=>{
+ const a=fixture();let calls=0;const send=async()=>reply(++calls===1?7:8)
+ await a.submit('product',payload,send,{intent:'first'})
+ a.window.CRA1Shared.Request.request=async path=>({status:200,data:{order:{id:Number(path.split('/').pop()),status:path.endsWith('/7')?'Paid':'Unpaid'}}})
+ await a.submit('product',payload,send,{intent:'second'})
+ a.window.CRA1Shared.Request.request=async path=>({status:200,data:{order:path.endsWith('/7')?{}:{id:8,status:'Unpaid'}}})
+ assert.equal((await a.submit('product',payload,send,{intent:'first'})).data.data.order_id,8)
+ assert.equal((await a.submit('product',payload,send,{intent:'third'})).data.data.order_id,8);assert.equal(calls,2)
+})
+test('offline review and future native order states keep their existing order instead of blocking or resubmitting',async()=>{
+ for(const status of ['WaitReview','ReviewFail','Pending',undefined]){
+  const a=fixture();let calls=0;const send=async()=>{calls++;return reply(7)}
+  await a.submit('product',payload,send,{intent:'first'})
+  a.window.CRA1Shared.Request.request=async()=>({status:200,data:{order:{id:7,...(status?{status}:{})}}})
+  assert.equal((await a.submit('product',payload,send,{intent:'second'})).data.data.order_id,7);assert.equal(calls,1)
+ }
+})
+test('changing accounts during a receipt query does not clear the original receipt or submit an order',async()=>{
+ const a=fixture();await a.submit('product',payload,async()=>reply(7),{intent:'first'});const before=JSON.stringify([...a.records]);let sent=0
+ a.window.CRA1Shared.Request.request=async()=>{a.window.CRA1Shared.Request.getToken=()=>'';return {status:200,data:{order:{}}}}
+ await assert.rejects(a.submit('product',payload,async()=>{sent++;return reply(8)},{intent:'second'}),{code:'CHECKOUT_UNCERTAIN'})
+ assert.equal(sent,0);assert.equal(JSON.stringify([...a.records]),before)
 })

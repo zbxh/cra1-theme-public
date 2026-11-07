@@ -166,7 +166,23 @@ SQL
     }
     public static function safeDetail($value): string { $s=mb_substr((string)$value,0,600);$s=preg_replace('/(?:password|secret|token|csrf|cookie|jwt|recovery|sid|st|hd|pt)\s*[:=]\s*[^\s,;]+/i','[敏感信息已隐藏]',$s);return str_replace(["\r","\n","\0"],' ',$s); }
     public function event(string $action,string $result,array $ctx=[],array $diff=[],?string $importKey=null): int {
-        return $this->tx(function()use($action,$result,$ctx,$diff,$importKey){if($importKey!==null&&$this->scalar('SELECT id FROM events WHERE import_key=?',[$importKey]))return 0;$risk=(string)($ctx['risk']??'low');$row=['time'=>(int)($ctx['time']??time()),'category'=>$ctx['category']??'operation','action'=>substr($action,0,100),'actor_id'=>$ctx['actor_id']??null,'actor_name'=>$ctx['actor_name']??null,'role'=>$ctx['role']??null,'target'=>mb_substr((string)($ctx['target']??''),0,120),'result'=>$result,'reason'=>self::safeDetail($ctx['reason']??''),'risk'=>$risk,'ip'=>substr((string)($ctx['ip']??''),0,48),'device'=>mb_substr((string)($ctx['device']??''),0,180),'request_id'=>substr((string)($ctx['request_id']??''),0,64),'session_hash'=>substr((string)($ctx['session_hash']??''),0,64),'diff'=>json_encode($diff,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),'previous_hash'=>(string)$this->scalar("SELECT value FROM meta WHERE key='chain_tail'")];$json=json_encode($row,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);$row['integrity']=hash_hmac('sha256',$json,$this->key);$row['import_key']=$importKey;$keys=array_keys($row);$st=$this->db->prepare('INSERT INTO events('.implode(',',$keys).') VALUES('.implode(',',array_fill(0,count($keys),'?')).')');$st->execute(array_values($row));$id=(int)$this->db->lastInsertId();$this->db->prepare("UPDATE meta SET value=? WHERE key='chain_tail'")->execute([$row['integrity']]);if($risk==='high'&&$result!=='attempt'){$k=hash('sha256',$action.'|'.$row['actor_id'].'|'.$row['target'].'|'.$row['ip']);$this->db->prepare('INSERT INTO alerts VALUES(?,?,?,?,?,1,0) ON CONFLICT(key) DO UPDATE SET last_at=excluded.last_at,count=count+1,read_at=0')->execute([$k,$action,$risk,$row['time'],$row['time']]);}return $id;});
+        return $this->tx(function()use($action,$result,$ctx,$diff,$importKey){
+            if($importKey!==null&&$this->scalar('SELECT id FROM events WHERE import_key=?',[$importKey]))return 0;
+            $risk=(string)($ctx['risk']??'low');
+            $row=['time'=>(int)($ctx['time']??time()),'category'=>$ctx['category']??'operation','action'=>substr($action,0,100),'actor_id'=>$ctx['actor_id']??null,'actor_name'=>$ctx['actor_name']??null,'role'=>$ctx['role']??null,'target'=>mb_substr((string)($ctx['target']??''),0,120),'result'=>$result,'reason'=>self::safeDetail($ctx['reason']??''),'risk'=>$risk,'ip'=>substr((string)($ctx['ip']??''),0,48),'device'=>mb_substr((string)($ctx['device']??''),0,180),'request_id'=>substr((string)($ctx['request_id']??''),0,64),'session_hash'=>substr((string)($ctx['session_hash']??''),0,64),'diff'=>json_encode($diff,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),'previous_hash'=>(string)$this->scalar("SELECT value FROM meta WHERE key='chain_tail'")];
+            $json=json_encode($row,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);$row['integrity']=hash_hmac('sha256',$json,$this->key);$row['import_key']=$importKey;
+            $keys=array_keys($row);$st=$this->db->prepare('INSERT INTO events('.implode(',',$keys).') VALUES('.implode(',',array_fill(0,count($keys),'?')).')');$st->execute(array_values($row));
+            $id=(int)$this->db->lastInsertId();$this->db->prepare("UPDATE meta SET value=? WHERE key='chain_tail'")->execute([$row['integrity']]);
+            if($risk==='high'&&$result!=='attempt'){
+                $k=hash('sha256',$action.'|'.$row['actor_id'].'|'.$row['target'].'|'.$row['ip']);
+                // The surrounding BEGIN IMMEDIATE serializes this pair. Keep
+                // first_at/count semantics without SQLite 3.24's UPSERT syntax.
+                $alert=$this->db->prepare('UPDATE alerts SET last_at=?,count=count+1,read_at=0 WHERE key=?');
+                $alert->execute([$row['time'],$k]);
+                if($alert->rowCount()===0)$this->db->prepare('INSERT INTO alerts(key,action,risk,first_at,last_at,count,read_at) VALUES(?,?,?,?,?,1,0)')->execute([$k,$action,$risk,$row['time'],$row['time']]);
+            }
+            return $id;
+        });
     }
     public static function actionLabel(string $a): string {
         if($a==='distribution.overlay_update')return '完成解压覆盖更新';

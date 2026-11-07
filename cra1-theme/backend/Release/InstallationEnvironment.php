@@ -15,11 +15,16 @@ final class InstallationEnvironment
             }
             $db = new \PDO('mysql:host='.DATABASE_HOSTNAME.';port='.DATABASE_PORT.';dbname='.DATABASE_NAME.';charset='.DATABASE_CHARSET,
                 DATABASE_USERNAME,DATABASE_PASSWORD,[\PDO::ATTR_ERRMODE=>\PDO::ERRMODE_EXCEPTION,\PDO::ATTR_TIMEOUT=>3]);
-            $query = \CRA1\Theme\Compatibility\Database::query($db,"SELECT value FROM idcsmart_configuration WHERE setting='system_version'");
-            return ['database'=>true,'system_version'=>(string)$query->fetchColumn()];
         } catch (\Throwable $error) {
-            return ['database'=>false,'system_version'=>''];
+            $failure=InstallerFailure::response($error,'连接 V10 数据库',$root);
+            return ['database'=>false,'system_version'=>'','database_error'=>$failure['msg']];
         }
+        // The version is display information. A missing version row/table must
+        // not be reported as a failed database connection.
+        $version='';
+        try{$query=\CRA1\Theme\Compatibility\Database::query($db,"SELECT value FROM idcsmart_configuration WHERE setting='system_version'");$version=(string)$query->fetchColumn();}
+        catch(\Throwable $ignored){}
+        return ['database'=>true,'system_version'=>$version];
     }
 
     public static function inspect(string $root, array $options = []): array
@@ -40,7 +45,7 @@ final class InstallationEnvironment
 
         // The optional context is used by isolated PHP fixtures, never accepted from HTTP input.
         $context = $options['context'] ?? self::context($root);
-        $add('database',!empty($context['database'])?'pass':'blocked','数据库连接',!empty($context['database'])?'数据库可连接':'无法连接 V10 数据库，请检查站点数据库配置');
+        $add('database',!empty($context['database'])?'pass':'blocked','数据库连接',!empty($context['database'])?'数据库可连接':($context['database_error']??'无法连接 V10 数据库，请检查站点数据库配置'));
 
         $release = Files::json($root.'/cra1-theme/release.json',true);
         $current = Files::json($root.'/runtime/cra1_theme/distribution/current.json',true);

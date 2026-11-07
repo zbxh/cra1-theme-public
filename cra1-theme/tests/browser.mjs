@@ -17,9 +17,9 @@ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'cra1-release-browser-'))
 const entry=path.join(temp,'entry.jsx')
 fs.writeFileSync(entry,`import React from ${JSON.stringify(path.join(root,'cra1-theme/source/admin/node_modules/react/index.js'))};import {createRoot} from ${JSON.stringify(path.join(root,'cra1-theme/source/admin/node_modules/react-dom/client.js'))};import ThemeManagement from ${JSON.stringify(path.join(root,'cra1-theme/source/admin/src/pages/ThemeManagement.jsx'))};import MemberAppearance from ${JSON.stringify(path.join(root,'cra1-theme/source/admin/src/pages/MemberAppearance.jsx'))};createRoot(document.getElementById('root')).render(location.pathname==='/appearance.html'?<MemberAppearance member={{appearance:{aside_mobile_expand:'one'}}} loading={false} reload={()=>{}}/>:<ThemeManagement/>);`)
 buildSync({entryPoints:[entry],outfile:path.join(temp,'management.js'),bundle:true,format:'iife',jsx:'automatic',nodePaths:[path.join(root,'cra1-theme/source/admin/node_modules')],alias:{'@ui':path.join(root,'cra1-theme/source/admin/src/components/ui')},logLevel:'silent'})
-let installer=fs.readFileSync(path.join(root,'public/cra1-install/index.php'),'utf8').replace(/^[\s\S]*?\?>/,'')
-installer=installer.replace(/<\?=htmlspecialchars\(\$csrf,ENT_QUOTES,'UTF-8'\)\?>/g,'fixture-csrf')
-installer=installer.replace(/<\?=\$assetVersion\?>/g,'fixture-current-assets')
+const renderedInstaller=spawnSync(process.env.CRA1_PHP||'php',[path.join(root,'public/cra1-install/index.php')],{encoding:'utf8'})
+if(renderedInstaller.status!==0)throw Error(renderedInstaller.stderr)
+const installer=renderedInstaller.stdout
 const assetDir=process.env.CRA1_ADMIN_ASSETS
 if(!assetDir)throw Error('Set CRA1_ADMIN_ASSETS to the staged admin release')
 const certificate=spawnSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-days','1','-keyout',path.join(temp,'key.pem'),'-out',path.join(temp,'cert.pem'),'-subj','/CN=127.0.0.1','-addext','subjectAltName=IP:127.0.0.1'],{encoding:'utf8'})
@@ -76,7 +76,7 @@ try{
   check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`management no document overflow ${width}`)
   await page.screenshot({path:path.join(output,`management-${width}.png`),fullPage:true})
   await page.getByRole('tab',{name:'安装与更新'}).click();check(await page.locator('input[type=file]').count()===1,`superadmin update upload ${width}`)
-  await page.getByLabel('上传主题安装包 ZIP（最多 80MB）').setInputFiles({name:'cra1-theme-install.zip',mimeType:'application/zip',buffer:Buffer.from('isolated upload fixture; PHP tests validate the real ZIP')})
+  await page.getByLabel('上传主题安装包 ZIP（推荐，最多 80MB）').setInputFiles({name:'cra1-theme-install.zip',mimeType:'application/zip',buffer:Buffer.from('isolated upload fixture; PHP tests validate the real ZIP')})
   const apply=page.getByRole('button',{name:'确认覆盖更新',exact:true})
   await apply.waitFor()
   check(await apply.isEnabled(),`installation preflight allows overwrite ${width}`)
@@ -85,7 +85,7 @@ try{
   page.once('dialog',dialog=>dialog.accept());await apply.click()
   await page.getByText('更新完成，请刷新页面加载对应资源。',{exact:true}).waitFor()
   check(applications===1,`confirmed install submits only once ${width}`)
-  check(await page.getByRole('tab').count()===4,`customer management has four tabs ${width}`)
+  check(await page.getByRole('tab').count()===5,`customer management has five tabs ${width}`)
   for(const name of ['版本与兼容','文件明细','安装与更新','备份与回退']){
    await page.getByRole('tab',{name,exact:true}).click()
    check(!/商业授权|商用发行|许可证|发行验收|免费商用/.test(await page.locator('body').innerText()),`customer tab contains only management content ${name} ${width}`)
@@ -100,18 +100,16 @@ try{
   check(await page.locator('tbody tr').count()===23&&await page.getByRole('button',{name:'下一页',exact:true}).isDisabled(),`file pagination last page ${width}`)
   await page.getByRole('textbox',{name:'搜索文件与作用'}).fill('file-0');await page.getByRole('status').filter({hasText:'第 1 / 1 页，共 1 项'}).waitFor()
   check(await page.locator('tbody tr').count()===1,`file search resets pagination ${width}`)
-  await page.goto(origin+'/management.html?role=admin');await page.getByRole('tab',{name:'安装与更新'}).click();await page.getByText('只有超级管理员可以上传和应用更新。').waitFor();check(await page.locator('input[type=file]').count()===0,`non-superadmin no upload ${width}`)
+  await page.goto(origin+'/management.html?role=admin');await page.getByRole('tab',{name:'安装与更新'}).click();await page.getByText('只有超级管理员可以上传、导入和应用更新。').waitFor();check(await page.locator('input[type=file]').count()===0,`non-superadmin no upload ${width}`)
   let ready=false
   await page.route('**/installer/api.php',async route=>{
-   const body=route.request().postDataJSON();check(route.request().headers().authorization==='Bearer fixture-native-jwt',`installer native bearer ${width}`)
+   const body=route.request().postDataJSON();check(!route.request().headers().authorization,`first-time installer needs no native bearer ${width}`)
    const data=body.action==='check'?{...compatibility,mode:'install',installation_ready:ready,checks:ready?[{id:'fixture',status:'pass',label:'环境与文件',detail:'检查通过'}]:compatibility.checks,counts:ready?{blocked:0,unverified:0}:compatibility.counts}:{installed:true,admin_url:'/fixtureadmin/index.php',username:body.username,password:body.password}
    if(body.action==='install')writes++
    await route.fulfill({json:{status:200,data}})
   })
-  await page.goto(origin+'/installer/');await page.getByRole('button',{name:'验证并检查'}).click();await page.getByText('请先在同一浏览器登录 V10 超级管理员账号，再返回此页。').waitFor()
-  await page.evaluate(()=>localStorage.setItem('backJwt','fixture-native-jwt'))
-  await page.getByRole('button',{name:'验证并检查'}).click();await page.getByText('运行环境暂不满足，请处理下面提示后重新检查。',{exact:true}).waitFor();check(!await page.locator('#setup').isVisible(),`installer blocks unverified ${width}`)
-  ready=true;await page.getByRole('button',{name:'验证并检查'}).click();await page.locator('#setup').waitFor({state:'visible'})
+  await page.goto(origin+'/installer/');await page.getByText('运行环境暂不满足，请处理运行信息中的提示后重新检测。',{exact:true}).waitFor();check(!await page.locator('#setup').isVisible(),`installer explains missing runtime ${width}`)
+  ready=true;await page.getByRole('button',{name:'重新检测'}).click();await page.locator('#setup').waitFor({state:'visible'})
   check(!/商业授权|商用发行|许可证|发行验收|免费商用/.test(await page.locator('body').innerText()),`installer contains only setup steps ${width}`)
   await page.screenshot({path:path.join(output,`installer-${width}.png`),fullPage:true})
   await page.locator('[name=entry]').fill('fixtureadmin');await page.locator('[name=username]').fill('fixture-admin');await page.locator('[name=password]').fill('Fixture-password-2026!');await page.locator('[name=confirm]').fill('Fixture-password-2026!')

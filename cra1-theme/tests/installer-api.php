@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 // Exercise the public API error boundary in separate PHP processes. Successful
-// native authentication and installation are covered by the browser flow.
+// anonymous first installation and authenticated maintenance are covered by the browser flow.
 $root=dirname(__DIR__,2);
 $base=sys_get_temp_dir().'/cra1-installer-api-'.bin2hex(random_bytes(6));
 mkdir($base,0700);$checks=0;
@@ -21,7 +21,7 @@ function response(string $name,?string $bootstrap,?string $manifest=null):array{
     $code=proc_close($process);$data=json_decode($body,true);
     check($code===0&&is_array($data)&&json_last_error()===JSON_ERROR_NONE,$name.' returns JSON instead of a blank page');
     check(($data['status']??0)===400&&is_string($data['msg']??null),$name.' has a visible installer error');
-    check(strpos($body,'INTERNAL-DATABASE-DETAIL')===false&&strpos($body,$GLOBALS['base'])===false,$name.' does not disclose internal details');
+    check(strpos($body,'example-db-secret')===false&&strpos($body,$GLOBALS['base'])===false,$name.' does not disclose internal details');
     return $data;
 }
 try{
@@ -29,7 +29,9 @@ try{
     check(strpos($data['msg'],'解压到 V10 网站根目录')!==false,'incomplete extraction gives an actionable instruction');
     $data=response('damaged-manifest',(string)file_get_contents($root.'/cra1-theme/backend/bootstrap.php'),'{damaged');
     check(strpos($data['msg'],'清单损坏')!==false,'damaged release metadata is caught by the API boundary');
-    $data=response('database-error','<?php throw new PDOException("INTERNAL-DATABASE-DETAIL");');
-    check($data['msg']==='安装服务暂不可用，请检查环境后重新点击“验证并检查”','database implementation errors use the generic customer message');
+    $data=response('database-error','<?php define("DATABASE_PASSWORD","example-db-secret"); throw new PDOException("SQLSTATE[HY000]: near ON: syntax error password=example-db-secret");');
+    check(strpos($data['msg'],'near ON: syntax error')!==false,'bootstrap database errors retain the actual cause');
+    check($data['error']['phase']==='读取安装程序'&&preg_match('/^[A-F0-9]{12}$/',$data['error']['reference']),'bootstrap failures identify their phase and log reference');
+    check(strpos($data['msg'],'example-db-secret')===false,'bootstrap fallback removes database credentials');
     echo json_encode(['status'=>'passed','checks'=>$checks,'production_writes'=>0])."\n";
 }finally{cleanup($base);}

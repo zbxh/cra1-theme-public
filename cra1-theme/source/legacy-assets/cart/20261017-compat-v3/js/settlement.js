@@ -360,6 +360,10 @@
               window.CRA1Shared.Payments.navigate({orderId:id,operation:'purchase',returnTo:'/cart/orderResult.htm?order_id='+id,gateway:this.payType});
             })
             .catch((err) => {
+              if(err.code === 'CHECKOUT_LOOKUP_FAILED') {
+                this.$message.error(err.message);
+                return;
+              }
               const status=Number(err.status || err.data?.status || err.response?.data?.status || err.response?.status);
               if(!this.createdOrderId && (!status || status >= 500 || status === 200 || err.code === 'BAD_RESPONSE')) {
                 this.submissionUncertain=true;

@@ -122,7 +122,7 @@ def bundle_install(install, output, source=ROOT, rendered=None):
         f'酷锐A1主题安装合集\n版本：{version}' + ('（测试版）' if metadata['release_channel'] == 'test' else '') + '\n\n'
         '1. 先在电脑上解压本合集，阅读“安装教程/安装教程.pdf”或“安装教程/安装教程.html”。\n'
         '2. 将 cra1-theme-install.zip 解压到智简魔方 V10 网站根目录，与 config.php、vendor 和 public 同级，同名文件夹合并。\n'
-        '3. 在同一浏览器登录 V10 超级管理员，打开 https://你的域名/cra1-install/，点击“验证并检查”。\n'
+        '3. 解压后直接打开 https://你的域名/cra1-install/，无需先登录 V10 系统后台。\n'
         '4. 设置主题后台地址、账号和密码，点击“完成安装”，完成后保存登录资料。\n'
         '5. 点击“登录主题后台”，输入自己设置的账号密码，先配置官网、会员中心和购物车内容。\n'
         '6. 内容准备好后，再到 V10 系统后台的主题设置中手动启用需要的主题。安装保留当前主题选择。\n\n'
