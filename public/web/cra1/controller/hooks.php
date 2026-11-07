@@ -1,6 +1,31 @@
 <?php
 if(PHP_SAPI!=='cli'&&realpath($_SERVER['SCRIPT_FILENAME']??'')===__FILE__){http_response_code(404);exit;}
 
+// Disabled installations keep their data but do not register theme routes or hooks.
+$cra1LifecycleFile=dirname(__DIR__,4).'/runtime/cra1_theme/lifecycle.json';
+if(is_file($cra1LifecycleFile)){
+    $cra1Lifecycle=json_decode((string)file_get_contents($cra1LifecycleFile),true);
+    if(($cra1Lifecycle['state']??'')==='disabled'){
+        // Native V10 template previews can persist in cookies. Remove only this
+        // disabled theme's preferences; account and third-party cookies stay intact.
+        if(function_exists('app')){
+            $cra1Request=app('request');$cra1Cookies=$cra1Request->cookie();
+            foreach(['web_theme','clientarea_theme','cart_theme','home_theme','clientarea_theme_mobile','cart_theme_mobile','home_theme_mobile']as$cra1Cookie){
+                if(($cra1Cookies[$cra1Cookie]??'')!=='cra1')continue;
+                unset($cra1Cookies[$cra1Cookie],$_COOKIE[$cra1Cookie]);app('cookie')->delete($cra1Cookie);
+            }
+            $cra1Request->withCookie($cra1Cookies);
+            // An old preview bookmark must not select the disabled template.
+            $cra1Uri=(string)($_SERVER['REQUEST_URI']??'/');$cra1Path=parse_url($cra1Uri,PHP_URL_PATH);$cra1Query=[];
+            parse_str((string)(parse_url($cra1Uri,PHP_URL_QUERY)??''),$cra1Query);$cra1Redirect=false;
+            foreach(['theme','theme_mobile']as$cra1Param)if(($cra1Query[$cra1Param]??'')==='cra1'){unset($cra1Query[$cra1Param]);$cra1Redirect=true;}
+            if($cra1Redirect&&($_SERVER['REQUEST_METHOD']??'GET')==='GET'&&is_string($cra1Path)&&strncmp($cra1Path,'//',2)!==0&&preg_match('~^/(?:[A-Za-z0-9_./-]*\.htm|index\.php)?/?$~D',$cra1Path)){
+                header('Location: '.$cra1Path.($cra1Query?'?'.http_build_query($cra1Query):''),true,302);exit;
+            }
+        }
+        return;
+    }
+}
 // V10 loads every website hook file, including inactive and partial installs.
 $cra1Required = [dirname(__DIR__,4).'/cra1-theme/backend/bootstrap.php', dirname(__DIR__,3).'/cra1-shared/icons.php', dirname(__DIR__,3).'/cra1-shared/assets.php', dirname(__DIR__,3).'/cra1-shared/cart-links.php'];
 foreach (['PageModuleRegistry.php','SeoRegistry.php','HeaderSupport.php','MenuCatalog.php','ThemeCode.php','MemberSession.php','Cra1.php','PageContent.php','ContentDefaults.php','BuiltinIcons.php','VisualPresentation.php'] as $cra1File) $cra1Required[] = __DIR__.'/'.$cra1File;

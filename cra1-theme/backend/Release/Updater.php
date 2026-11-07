@@ -22,7 +22,7 @@ final class Updater
         $info=Package::inspect($archive);$doc=$info['manifest'];$files=[];$permissions=[];$warnings=[];$blockers=$doc['release_blockers']??[];
         if(!is_array($blockers))throw new \InvalidArgumentException('更新包检查规则无效');
         $context=($this->contextReader)();
-        if(empty($context['database']))$blockers[]='无法读取系统信息，请确认数据库连接后重试';
+        if(empty($context['database']))$blockers[]=$context['error']??'无法读取系统信息，请确认数据库连接后重试';
         if(!Inspector::runtimeMatch($doc,$context))$warnings[]='当前系统或模块组合尚未完整验证，可更新主题文件；具体业务能力仍按实际可用性及接口契约检查。';
         // SQL query compatibility belongs to the native business diagnostics;
         // replacing theme files never changes this database setting.
@@ -79,7 +79,10 @@ final class Updater
             }else foreach($references as$path=>$target)if(!file_exists($this->root.'/'.$path)&&!is_link($this->root.'/'.$path))$this->checkWriteParent($this->root.'/'.$path,$permissions);
         }catch(\Throwable $e){$blockers[]=$e->getMessage();}
         try{foreach(ThemeCache::preflight($this->root)as$warning)$warnings[]=$warning;}catch(\Throwable $e){$blockers[]=$e->getMessage();}
-        if($permissions)$blockers[]='以下目录内有需要更新的主题文件，但 PHP 运行用户无写入权限：'.implode('、',array_keys($permissions)).'。请在网站面板调整这些目录的属主或写入权限后重新上传，无需将整站设为 777。';
+        if($permissions)foreach(array_keys($permissions)as$relative){
+            $parent=$relative==='网站根目录'?$this->root:$this->root.'/'.rtrim($relative,'/');
+            $blockers[]=(new \CRA1\Theme\Failure('创建临时文件',$parent.'/待写入的主题文件','Permission denied',strpos($relative,'runtime/')===0?0600:0644))->describe($this->root);
+        }
         if(is_file($this->dir.'/pending.json'))$blockers[]='有未完成的更新，请先恢复';
         return $info+['release_channel'=>$doc['release_channel']??'candidate','files'=>$files,'native_dependencies'=>$dependencies,'blockers'=>$blockers,'warnings'=>array_values($warnings),'can_apply'=>!$blockers,'signature'=>'请核对更新包来源及 SHA-256 校验值'];
     }
@@ -159,7 +162,7 @@ final class Updater
                         if(!is_file($target)||!hash_equals($row['sha256'],hash_file('sha256',$target)))throw new \RuntimeException('预检后目标已变更，请重新检查');
                         continue;
                     }
-                    if(strpos($path,'public/')===0&&!is_dir(dirname($target))&&!mkdir(dirname($target),0755,true))throw new \RuntimeException('主题资源目录无法创建');
+                    if(strpos($path,'public/')===0)Files::directory(dirname($target),0755);
                     ($this->fileWriter)($target,(string)file_get_contents($stage.'/'.$path),strpos($path,'public/')===0?0644:0640);
                     if(!is_file($target)||!hash_equals($row['sha256'],hash_file('sha256',$target)))throw new \RuntimeException('落盘校验失败：'.$path);
                     self::invalidate($target);
@@ -178,12 +181,13 @@ final class Updater
                 return ['release'=>$id,'history'=>basename($backup),'files'=>count($journal['files']),'preserved'=>['主配置','账号','密钥','媒体','页面覆盖','草稿'],'rollback_available'=>true];
             }catch(\Throwable $e){
                 $reference=$this->reportFailure($e,$phase);
+                $reason=\CRA1\Theme\Diagnostics::reason($e,$this->root);
                 if($prepared){
                     try{$this->restore($journal,false,false);}
-                    catch(\Throwable $recovery){$this->reportFailure($recovery,'恢复原版本',$reference);throw new \RuntimeException('更新中断，自动恢复未完成；恢复记录已保留，请重新检查并恢复。参考编号：'.$reference,0,$recovery);}
-                    throw new \RuntimeException('更新在“'.$phase.'”阶段失败，主题文件和生效引用已恢复。参考编号：'.$reference,0,$e);
+                    catch(\Throwable $recovery){$this->reportFailure($recovery,'恢复原版本',$reference);throw new \RuntimeException('更新在“'.$phase.'”阶段失败。原因：'.$reason.' 自动恢复也未完成：'.\CRA1\Theme\Diagnostics::reason($recovery,$this->root).' 恢复记录已保留，请重新检查并恢复。参考编号：'.$reference,0,$recovery);}
+                    throw new \RuntimeException('更新在“'.$phase.'”阶段失败。原因：'.$reason.' 主题文件和生效引用已恢复。参考编号：'.$reference,0,$e);
                 }
-                throw new \RuntimeException('更新在“'.$phase.'”阶段失败，尚未切换生效版本。参考编号：'.$reference,0,$e);
+                throw new \RuntimeException('更新在“'.$phase.'”阶段失败。原因：'.$reason.' 尚未切换生效版本。参考编号：'.$reference,0,$e);
             }finally{try{$this->removeStage($stage);}catch(\Throwable $cleanup){$this->reportFailure($cleanup,'清理更新暂存文件');}}
         });
     }

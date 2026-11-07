@@ -17,6 +17,44 @@ final class References
         return false;
     }
     public static function copyRegistry(string $root): string{return rtrim($root,'/').'/runtime/cra1_theme/native-reference-copies.json';}
+    /** Prepare only the directories actually used by a dependency write. */
+    private static function prepareDirectory(string $root,string $path): void
+    {
+        $root=rtrim($root,'/');$directory=dirname($path);$current=$root;
+        \CRA1\Theme\Files::noLinks($root.'/'.$directory);
+        foreach(explode('/',$directory)as$part){
+            $current.='/'.$part;$relative=substr($current,strlen($root)+1);
+            if(is_dir($current)){
+                // Some extractors retain a read-only mode on a theme-owned
+                // directory. The OS permits chmod only for its owner. Never
+                // alter public/, template/, default/ or other system paths.
+                if(preg_match('~^public/(?:clientarea|cart|home)/template/(?:pc|mobile)/cra1(?:/|$)~D',$relative)
+                    &&(!is_writable($current)||!is_executable($current))){
+                    $mode=fileperms($current);
+                    if($mode!==false)@chmod($current,($mode&07777)|0700);
+                    clearstatcache(true,$current);
+                }
+                continue;
+            }
+            if(file_exists($current))throw new \RuntimeException('依赖目录位置已被文件占用：'.$relative);
+            // Recheck after mkdir: another request/extractor may have created it.
+            if(!@mkdir($current,0755)&&!is_dir($current))self::writeFailure($root,$path,'创建依赖目录',$current);
+        }
+    }
+    private static function writeFailure(string $root,string $path,string $operation,?string $directory=null,?\Throwable $previous=null): void
+    {
+        $directory=$directory??dirname(rtrim($root,'/').'/'.$path);
+        $relative=substr($directory,strlen(rtrim($root,'/'))+1);
+        $relative=$relative!==''?$relative:'网站根目录';
+        $parent=$directory;while(!is_dir($parent)&&dirname($parent)!==$parent)$parent=dirname($parent);
+        $last=(string)(error_get_last()['message']??'');
+        if(!is_writable($parent)||!is_executable($parent))$cause='PHP 运行用户没有写入或进入上级目录的权限';
+        elseif(stripos($last,'No space left')!==false||stripos($last,'Disk quota')!==false)$cause='服务器磁盘空间或站点配额不足';
+        elseif(stripos($last,'Read-only file system')!==false)$cause='所在文件系统为只读';
+        elseif(stripos($last,'open_basedir')!==false)$cause='PHP 的目录访问范围不包含此位置';
+        else $cause=$previous!==null?$previous->getMessage():'服务器未允许创建或写入';
+        throw new \RuntimeException($operation.'失败：'.$path.'。原因：'.$cause.'。请在网站面板确认主题目录「'.$relative.'」存在，并允许网站运行用户写入，然后重试安装或更新。',0,$previous);
+    }
     public static function checkCopies(string $root): void
     {
         foreach(\CRA1\Theme\Files::json(self::copyRegistry($root),true)['files']??[]as$path=>$hash){
@@ -76,9 +114,12 @@ final class References
                 $target=$root.'/'.$path;
                 if($row['before']===$row['after'])continue;
                 $previous[$target]=$row['before']===null?null:(string)file_get_contents($target);
-                if(!is_dir(dirname($target))&&!mkdir(dirname($target),0755,true))throw new \RuntimeException('依赖副本目录不可写');
-                \CRA1\Theme\Files::atomic($target,(string)file_get_contents($row['source']),0644);
-                if(!hash_equals($row['after'],hash_file('sha256',$target)))throw new \RuntimeException('依赖副本写入校验失败');
+                self::prepareDirectory($root,$path);
+                $bytes=file_get_contents($row['source']);
+                if(!is_string($bytes))throw new \RuntimeException('依赖来源无法读取：'.$path);
+                try{\CRA1\Theme\Files::atomic($target,$bytes,0644);}
+                catch(\Throwable $error){self::writeFailure($root,$path,'写入依赖副本',null,$error);}
+                if(!hash_equals($row['after'],hash_file('sha256',$target)))throw new \RuntimeException('依赖副本写入校验失败：'.$path);
                 if($row['before']===null)$created[]=$target;
             }
             $registry=self::copyRegistry($root);$doc=\CRA1\Theme\Files::json($registry,true);
@@ -137,11 +178,11 @@ final class References
         if(self::usesCopies($root,$checked))return self::copyApply($root,$checked);
         try{foreach($checked as$path=>$target){
             $dest=$root.'/'.$path;if(file_exists($dest)||is_link($dest))continue;
-            if(!is_dir(dirname($dest))&&!mkdir(dirname($dest),0755,true))throw new \RuntimeException('无法创建依赖目录');
+            self::prepareDirectory($root,$path);
             $from=explode('/',dirname($path));$to=explode('/',$target);
             while($from&&$to&&$from[0]===$to[0]){array_shift($from);array_shift($to);}
             $relative=str_repeat('../',count($from)).implode('/',$to);
-            if(!symlink($relative,$dest))throw new \RuntimeException('无法登记原生依赖');$created[]=$dest;
+            if(!@symlink($relative,$dest))self::writeFailure($root,$path,'创建依赖链接');$created[]=$dest;
         }
         foreach($checked as $path=>$target)if(realpath($root.'/'.$path)===false||realpath($root.'/'.$path)!==realpath($root.'/'.$target))throw new \RuntimeException('依赖登记后自检失败：'.$path);
         return $created;}catch(\Throwable $e){foreach(array_reverse($created)as$path)unlink($path);throw $e;}

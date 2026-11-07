@@ -49,7 +49,7 @@
     panel.setAttribute('role', 'alert');
     panel.style.cssText = 'padding:24px;display:grid;gap:16px';
     const title = document.createElement('h2');
-    title.textContent = '页面错误，请刷新重试';
+    title.textContent = '工单内容暂时无法加载，请刷新重试';
     const detail = document.createElement('p');
     detail.textContent = '';
     const actions = document.createElement('div');
@@ -63,13 +63,12 @@
   }
   function normalized(error, config, httpStatus) {
     const value = error.response ? error.response.data : error.data;
-    const data = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
-    const status = httpStatus >= 400 ? httpStatus : Number(data.status) || 503;
-    const message = /^(get|head)$/i.test(String(config?.method || '')) && ![401, 403, 429].includes(status)
-      ? '页面错误，请刷新重试'
-      : shared.Errors.message({ message: data.msg || data.message || error.message, status, code:error.code }, { method:config?.method });
-    data.status = status;
-    data.msg = message;
+    const source = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    const status = httpStatus >= 400 ? httpStatus : Number(source.status) || 503;
+    const options = { method:config?.method, path:config?.url, status };
+    const message = shared.Errors.message({ message: source.msg || source.message || error.message, status, code:error.code }, options);
+    const data = shared.Errors.payload(source, options);
+    data.status = status; data.msg = message;
     if (Object.prototype.hasOwnProperty.call(data, 'message')) data.message = message;
     error.data = data; // Native callers use error.data.msg for both HTTP and business failures.
     if (error.response) error.response.data = data;

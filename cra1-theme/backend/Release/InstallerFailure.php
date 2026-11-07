@@ -23,8 +23,8 @@ final class InstallerFailure extends \RuntimeException
             $chain[]=['type'=>get_class($current),'file'=>self::clean($current->getFile(),$root,$secrets),
                 'line'=>$current->getLine(),'message'=>self::clean($current->getMessage(),$root,$secrets)];
         }
-        $reason=self::clean($error->getMessage(),$root,$secrets);
-        if($reason==='')$reason='服务未返回错误原因（'.get_class($error).'）';
+        $cause=$error instanceof self&&$error->getPrevious()?$error->getPrevious():$error;
+        $reason=\CRA1\Theme\Diagnostics::reason($cause,$root,$secrets);
         try{error_log('CRA1 installer '.json_encode(['reference'=>$reference,'phase'=>$phase,'errors'=>$chain],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_INVALID_UTF8_SUBSTITUTE));}catch(\Throwable $ignored){}
         return ['status'=>400,'msg'=>'操作在“'.$phase.'”时失败。'."\n".'原因：'.$reason."\n".'参考编号：'.$reference,
             'error'=>['phase'=>$phase,'reason'=>$reason,'reference'=>$reference,'needs_check'=>!($error instanceof \InvalidArgumentException)]];
@@ -32,14 +32,6 @@ final class InstallerFailure extends \RuntimeException
 
     private static function clean(string $value,string $root,array $secrets): string
     {
-        foreach($secrets as$secret)if(is_string($secret)&&strlen($secret)>=3)$value=str_replace($secret,'[已隐藏]',$value);
-        $value=str_replace(rtrim($root,'/').'/', '', $value);
-        $value=str_replace(rtrim($root,'/'), '网站根目录', $value);
-        $value=(string)preg_replace('/Bearer\s+[^\s,;]+/i','Bearer [已隐藏]',$value);
-        $value=(string)preg_replace('/\b(password|passwd|pwd|secret|token|csrf|cookie|jwt|authorization)\b["\x27]?\s*[:=]\s*(?:"[^"]*"|\x27[^\x27]*\x27|[^\s,;&]+)/i','$1=[已隐藏]',$value);
-        // Keep the relative theme path useful; hide unrelated absolute paths.
-        $value=(string)preg_replace('~(?<![\w/:])/(?:[^/\s()<>"\x27:]+/)+([^/\s()<>"\x27:]+)~u','[目录]/$1',$value);
-        $value=str_replace(["\r","\n","\0"],' ',$value);
-        return substr($value,0,1200);
+        return \CRA1\Theme\Diagnostics::clean($value,$root,$secrets);
     }
 }

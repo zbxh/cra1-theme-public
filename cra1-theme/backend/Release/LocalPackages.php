@@ -23,7 +23,7 @@ final class LocalPackages
     private function scan(): array
     {
         Files::noLinks($this->directory);
-        if(!is_dir($this->directory)&&!mkdir($this->directory,0700,true)&&!is_dir($this->directory))throw new \RuntimeException('无法创建本地安装包目录，请检查主题运行目录权限');
+        Files::directory($this->directory,0700);
         if(!is_readable($this->directory))throw new \RuntimeException('本地安装包目录不可读，请检查目录权限');
         $rows=[];$count=0;
         foreach(new \FilesystemIterator($this->directory,\FilesystemIterator::SKIP_DOTS) as $file){
@@ -54,12 +54,12 @@ final class LocalPackages
         $rows=$this->scan();$row=$rows[$id]??null;
         if(!$row)throw new \RuntimeException('本地安装包已变化或不可读取，请刷新列表后重新选择');
         $path=$this->directory.'/'.$row['name'];Files::noLinks($path);Files::noLinks($destination);
-        $in=@fopen($path,'rb');if(!$in)throw new \RuntimeException('本地安装包无法读取，请刷新列表后重试');
+        $in=\CRA1\Theme\Failure::attempt('读取本地安装包',$path,static function()use($path){return fopen($path,'rb');});
         $out=null;$created=false;
         try{
             $before=fstat($in);
             if(!$before||($before['mode']&0170000)!==0100000||$before['nlink']!==1||!hash_equals($id,self::identity($row['name'],$before)))throw new \RuntimeException('本地安装包已变化，请刷新列表后重试');
-            $out=@fopen($destination,'x+b');if(!$out)throw new \RuntimeException('安装包暂存目录不可写');$created=true;
+            $out=\CRA1\Theme\Failure::attempt('保存本地安装包',$destination,static function()use($destination){return fopen($destination,'x+b');},0600);$created=true;
             if(!chmod($destination,0600))throw new \RuntimeException('安装包暂存权限设置失败');
             $written=stream_copy_to_stream($in,$out,self::MAX_BYTES+1);
             $after=fstat($in);

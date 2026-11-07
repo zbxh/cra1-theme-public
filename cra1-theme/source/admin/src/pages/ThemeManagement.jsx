@@ -1,4 +1,4 @@
-import {useState,useEffect,useRef} from 'react'
+import {useState,useEffect,useRef,lazy,Suspense} from 'react'
 import {Button} from '@ui/button'
 import {Card,CardHeader,CardTitle,CardContent} from '@ui/card'
 import {Input} from '@ui/input'
@@ -6,14 +6,19 @@ import {MenuSelect as Select} from '@ui/select'
 import {Alert} from '@ui/feedback'
 import {api,bootInfo} from '../lib/api'
 import ConfigurationTransfer from '../components/ConfigurationTransfer'
+import OnlineUpdatesPanel from '../components/OnlineUpdatesPanel'
 import {releaseStatus} from '../lib/release-status'
 
+const ThemeLifecycle=lazy(()=>import('../components/ThemeLifecycle'))
 const versionLabel=data=>data?`${data.version||data.release||'未登记'}${data.release_channel==='test'?'（测试版）':''}`:'正在读取'
 const labels={pass:'通过',warning:'警告',blocked:'阻断',unverified:'未验证'}
 export default function ThemeManagement(){
  const [tab,setTab]=useState('version'),[check,setCheck]=useState(null),[history,setHistory]=useState(null),[candidate,setCandidate]=useState(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[filter,setFilter]=useState(''),[showPass,setShowPass]=useState(false)
  const [phase,setPhase]=useState(''),[uploadPercent,setUploadPercent]=useState(null),[localInfo,setLocalInfo]=useState(null),[localId,setLocalId]=useState('')
  const [diagnostics,setDiagnostics]=useState('')
+ const [removed,setRemoved]=useState(null)
+ const [online,setOnline]=useState(null),[includeTest,setIncludeTest]=useState(null)
+ const [onlineSettings,setOnlineSettings]=useState(null),[githubPrefix,setGithubPrefix]=useState('')
  const diagnosticsBox=useRef(null)
  const operation=useRef(false)
  const alive=useRef(true),superAdmin=bootInfo.role==='super_admin'
@@ -23,9 +28,9 @@ export default function ThemeManagement(){
  async function call(action,body,options={}){const r=await api('api.release.'+action,body,{...options,reauth:false});if(r.status!==200)throw new Error(r.msg||'操作未完成');return r.data}
  async function load(){
   setBusy(true);setError('')
-  const results=await Promise.allSettled([call('check'),call('history')])
+  const results=await Promise.allSettled([call('check'),call('history'),...(superAdmin?[call('online.settings.get')]:[])])
   if(!alive.current)return
-  const setters=[setCheck,setHistory],names=['兼容检查','更新记录']
+  const setters=[setCheck,setHistory,data=>{setOnlineSettings(data);if(data)setGithubPrefix(data.github_prefix)}],names=['兼容检查','更新记录','GitHub 连接设置']
   results.forEach((r,i)=>setters[i](r.status==='fulfilled'?r.value:null))
   setError(results.flatMap((r,i)=>r.status==='rejected'?[`${names[i]}读取失败：${r.reason.message||'请重试'}`]:[]).join('；'))
   setBusy(false)
@@ -39,22 +44,62 @@ export default function ThemeManagement(){
   catch{if(alive.current){setNotice('信息已生成，请在下方文本框中手动复制。');requestAnimationFrame(()=>{if(alive.current){diagnosticsBox.current?.focus();diagnosticsBox.current?.select()}})}}
  }
  async function localList(){setPhase('正在读取服务器安装包列表…');const data=await call('local.list');setLocalInfo(data);setLocalId('')}
- const tabs=[['version','版本与兼容'],['files','文件明细'],['update','安装与更新'],['backups','备份与回退'],['configuration','配置导入与导出']]
+ const prefixChanged=superAdmin&&onlineSettings!==null&&githubPrefix.trim()!==onlineSettings.github_prefix
+ async function saveOnlineSettings(){
+  setPhase('正在保存 GitHub 加速设置…')
+  const data=await call('online.settings.save',{github_prefix:githubPrefix})
+  if(!alive.current)return
+  setOnlineSettings(data);setGithubPrefix(data.github_prefix);setOnline(null)
+  setNotice(data.github_prefix?'GitHub 加速设置已保存。':'已恢复 GitHub 直连。')
+ }
+ async function checkUpdates(){
+  if(prefixChanged){await saveOnlineSettings();if(!alive.current)return}
+  setOnline(null);setPhase('正在从 GitHub 查询最新版本…')
+  const data=await call('online.check',{include_test:includeTest??check?.release_channel==='test'})
+  if(alive.current)setOnline(data)
+ }
+ async function applyCandidate(next){
+  setPhase('正在备份并更新主题，请稍候…')
+  await call('apply',{candidate:next.candidate,expectedDigest:next.sha256})
+  if(!alive.current)return
+  setNotice('更新完成，请刷新页面加载对应资源。');setCandidate(null);setOnline(null)
+  const results=await Promise.allSettled([call('history'),call('check')])
+  if(!alive.current)return
+  if(results[0].status==='fulfilled')setHistory(results[0].value)
+  if(results[1].status==='fulfilled')setCheck(results[1].value)
+  if(results.some(r=>r.status==='rejected'))setError('主题已更新完成，版本信息暂未刷新，请刷新页面确认。')
+ }
+ async function onlineUpdate(){
+  const version=online?.latest?.version
+  if(!online?.update_available||!version||!superAdmin)return
+  if(!window.confirm(`更新至 ${version}？配置与账号保留，旧版本将自动备份。`))return
+  await act(async()=>{
+   setCandidate(null);setPhase('正在从 GitHub 下载安装包，请稍候…')
+   const next=await call('online.download',{version})
+   if(!alive.current)return
+   setCandidate(next)
+   if(!next.can_apply){setNotice('安装包已下载，请处理下方提示后再更新。');return}
+   await applyCandidate(next)
+  })
+ }
+ const tabs=[['version','版本与兼容'],['files','文件明细'],['update','安装与更新'],['backups','备份与回退'],['configuration','配置导入与导出'],...(superAdmin?[['lifecycle','停用与卸载']]:[])]
  const rows=(candidate&&tab==='update'?candidate.files:check?.checks||[]).filter(row=>(showPass||!['pass','一致'].includes(row.status))&&(!filter||[row.label,row.path,row.detail,row.status,row.purpose].join(' ').toLowerCase().includes(filter.toLowerCase())))
  const pageCount=Math.max(1,Math.ceil(rows.length/50)),currentPage=Math.min(pageIndex,pageCount-1),visibleRows=rows.slice(currentPage*50,currentPage*50+50)
  const table=<div><div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr className="border-b"><th className="p-3">状态</th><th className="p-3">文件与作用</th><th className="p-3">说明与可能影响</th></tr></thead><tbody>{visibleRows.map((row,i)=><tr className="border-b align-top" key={row.id||row.path||i}><td className="p-3 whitespace-nowrap">{labels[row.status]||row.status}</td><td className="p-3"><p>{row.label||row.purpose}</p><p className="break-all text-xs text-muted-foreground">{row.path}</p><p className="text-xs text-muted-foreground">{row.owner}</p></td><td className="p-3 break-words"><p>{row.detail}</p><p className="text-muted-foreground">{row.impact}</p></td></tr>)}</tbody></table>{!rows.length&&<p className="p-4 text-muted-foreground">没有符合筛选的项目。</p>}</div><div className="mt-3 flex flex-wrap items-center justify-between gap-3"><p className="text-xs text-muted-foreground" role="status">第 {currentPage+1} / {pageCount} 页，共 {rows.length} 项</p>{pageCount>1&&<div className="flex gap-2"><Button variant="outline" disabled={currentPage===0} onClick={()=>setPageIndex(currentPage-1)}>上一页</Button><Button variant="outline" disabled={currentPage+1>=pageCount} onClick={()=>setPageIndex(currentPage+1)}>下一页</Button></div>}</div></div>
+ if(removed)return <Suspense fallback={<p>正在显示卸载结果…</p>}><ThemeLifecycle removed={removed}/></Suspense>
  return <div className="space-y-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><h1 className="text-2xl font-semibold">主题管理</h1><p className="mt-1 text-sm text-muted-foreground">兼容检查只读取文件和版本信息。更新与回退保留主题内容、账号、密钥和媒体。</p></div><Button variant="outline" disabled={busy} onClick={load}>重新检查</Button></div>
- <div role="tablist" aria-label="主题管理" className="flex flex-wrap gap-2">{tabs.map(([id,label])=><Button key={id} role="tab" aria-selected={tab===id} variant={tab===id?'default':'outline'} onClick={()=>setTab(id)}>{label}</Button>)}</div>
- {error&&<Alert tone="error">{error}</Alert>}{notice&&<Alert>{notice}</Alert>}{busy&&tab!=='configuration'&&<div role="status" className="space-y-2"><p>{phase||'正在处理，请稍候…'}</p>{uploadPercent!==null&&uploadPercent<100&&<progress aria-label="安装包上传进度" className="h-2 w-full max-w-md" max="100" value={uploadPercent}/>}</div>}
- {tab==='version'&&<Card><CardHeader><CardTitle>当前版本与兼容状态</CardTitle></CardHeader><CardContent className="space-y-4"><div className="flex flex-wrap items-center justify-between gap-3"><p>主题版本：{versionLabel(check)}</p><Button variant="outline" disabled={busy} onClick={()=>act(copyDiagnostics)}>复制排查信息</Button></div><p className="text-xs text-muted-foreground">排查信息仅包含版本、运行环境、资源统计和错误编号，生成后可展开核对。</p>{diagnostics&&<details open><summary className="cursor-pointer text-sm">查看排查信息</summary><textarea ref={diagnosticsBox} aria-label="排查信息" readOnly value={diagnostics} className="mt-2 min-h-56 w-full rounded-lg border bg-background p-3 font-mono text-xs"/></details>}<p className="text-sm">后续使用同一份安装包手动覆盖更新，保留配置，无需卸载重装。</p><p>V10：{check?.context?.system_version||'未确认'}；PHP 基准：7.4</p><p className="text-sm">{releaseStatus(check)}</p><div className="grid gap-3 sm:grid-cols-3">{Object.entries(check?.overview||{}).map(([id,group])=><div key={id} className="rounded-lg border p-3"><p className="text-sm font-medium">{{files:'主题运行文件',environment:'运行环境',contracts:'兼容记录'}[id]}</p><p className="mt-1 text-sm">{group.blocked?`${group.blocked} 项需要处理`:group.unverified?`${group.unverified} 项待核验`:group.warning?`${group.warning} 项提醒`:`${group.pass} 项通过`}</p>{id==='contracts'&&group.unverified>0&&<p className="mt-1 text-xs text-muted-foreground">当前系统或模块尚无完整核验记录；对应敏感操作继续单独校验。</p>}</div>)}</div><div className="flex flex-wrap gap-4">{Object.entries(check?.counts||{}).map(([id,count])=><span key={id}>{labels[id]} {count}</span>)}</div>{table}{check?.nginx_rules&&<details><summary className="cursor-pointer text-sm">本站 Nginx 规则说明</summary><p className="my-2 text-sm">与现有规则合并后先执行 Nginx 配置检查。兼容检查不会修改服务器配置。</p><pre className="max-h-80 overflow-auto rounded-lg border p-3 text-xs">{check.nginx_rules}</pre></details>}</CardContent></Card>}
+ <div role="tablist" aria-label="主题管理" className="flex flex-wrap gap-2">{tabs.map(([id,label])=><Button key={id} role="tab" disabled={busy} aria-selected={tab===id} variant={tab===id?'default':'outline'} onClick={()=>setTab(id)}>{label}</Button>)}</div>
+ {error&&<Alert tone="error">{error}</Alert>}{notice&&<Alert>{notice}</Alert>}{busy&&!['configuration','lifecycle'].includes(tab)&&<div role="status" className="space-y-2"><p>{phase||'正在处理，请稍候…'}</p>{uploadPercent!==null&&uploadPercent<100&&<progress aria-label="安装包上传进度" className="h-2 w-full max-w-md" max="100" value={uploadPercent}/>}</div>}
+ {tab==='version'&&<Card><CardHeader><CardTitle>当前版本与兼容状态</CardTitle></CardHeader><CardContent className="space-y-4"><div className="flex flex-wrap items-center justify-between gap-3"><p>主题版本：{versionLabel(check)}</p><Button variant="outline" disabled={busy} onClick={()=>act(copyDiagnostics)}>复制排查信息</Button></div><p className="text-xs text-muted-foreground">排查信息仅包含版本、运行环境、资源统计和错误编号，生成后可展开核对。</p>{diagnostics&&<details open><summary className="cursor-pointer text-sm">查看排查信息</summary><textarea ref={diagnosticsBox} aria-label="排查信息" readOnly value={diagnostics} className="mt-2 min-h-56 w-full rounded-lg border bg-background p-3 font-mono text-xs"/></details>}<p className="text-sm">可在“安装与更新”检查最新版本并在线更新，也可上传完整安装包；已有配置保留，无需卸载重装。</p><p>V10：{check?.context?.system_version||'未确认'}；PHP 基准：7.4</p><p className="text-sm">{releaseStatus(check)}</p><div className="grid gap-3 sm:grid-cols-3">{Object.entries(check?.overview||{}).map(([id,group])=><div key={id} className="rounded-lg border p-3"><p className="text-sm font-medium">{{files:'主题运行文件',environment:'运行环境',contracts:'兼容记录'}[id]}</p><p className="mt-1 text-sm">{group.blocked?`${group.blocked} 项需要处理`:group.unverified?`${group.unverified} 项待核验`:group.warning?`${group.warning} 项提醒`:`${group.pass} 项通过`}</p>{id==='contracts'&&group.unverified>0&&<p className="mt-1 text-xs text-muted-foreground">当前系统或模块尚无完整核验记录；对应敏感操作继续单独校验。</p>}</div>)}</div><div className="flex flex-wrap gap-4">{Object.entries(check?.counts||{}).map(([id,count])=><span key={id}>{labels[id]} {count}</span>)}</div>{table}{check?.nginx_rules&&<details><summary className="cursor-pointer text-sm">本站 Nginx 规则说明</summary><p className="my-2 text-sm">与现有规则合并后先执行 Nginx 配置检查。兼容检查不会修改服务器配置。</p><pre className="max-h-80 overflow-auto rounded-lg border p-3 text-xs">{check.nginx_rules}</pre></details>}</CardContent></Card>}
  {tab==='files'&&<Card><CardHeader><CardTitle>文件与依赖明细</CardTitle></CardHeader><CardContent><Input aria-label="搜索文件与作用" placeholder="搜索路径、作用、说明…" value={filter} onChange={e=>setFilter(e.target.value)}/><label className="my-3 flex gap-2 text-sm"><input type="checkbox" checked={showPass} onChange={e=>setShowPass(e.target.checked)}/>显示已通过项目</label>{table}</CardContent></Card>}
- {tab==='update'&&<Card><CardHeader><CardTitle>主题安装与更新</CardTitle></CardHeader><CardContent className="space-y-4"><p className="text-sm">直接上传下载的主题安装包 ZIP，检查后确认覆盖更新。配置、账号、密钥和媒体保留，无需再次输入密码。</p>{superAdmin?<><label className="block text-sm">上传主题安装包 ZIP（推荐，最多 80MB）<Input className="mt-2" type="file" accept=".zip,application/zip" disabled={busy} onChange={e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;act(async()=>{setCandidate(null);if(file.size>80*1024*1024)throw new Error('安装包超过 80MB');const data=new FormData();data.set('file',file);setUploadPercent(0);setPhase('正在上传安装包：0%');setCandidate(await call('upload',data,{onUploadProgress:percent=>{if(alive.current){setUploadPercent(percent);setPhase(percent===100?'安装包已上传，正在检查…':`正在上传安装包：${percent}%`)}}}));})}}/></label>
+ {tab==='update'&&<><OnlineUpdatesPanel current={check} latest={online} busy={busy} includeTest={includeTest??check?.release_channel==='test'} onIncludeTest={value=>{setIncludeTest(value);setOnline(null)}} onCheck={()=>act(checkUpdates)} onUpdate={onlineUpdate} canUpdate={superAdmin} githubPrefix={githubPrefix} settingsReady={onlineSettings!==null} prefixChanged={prefixChanged} onPrefixChange={value=>{setGithubPrefix(value);setOnline(null)}} onSaveSettings={()=>act(saveOnlineSettings)}/><Card><CardHeader><CardTitle>手动安装与更新</CardTitle></CardHeader><CardContent className="space-y-4"><p className="text-sm">也可以直接上传下载的主题安装包 ZIP，检查后确认覆盖更新。配置、账号、密钥和媒体保留，无需再次输入密码。</p>{superAdmin?<><label className="block text-sm">上传主题安装包 ZIP（推荐，最多 80MB）<Input className="mt-2" type="file" accept=".zip,application/zip" disabled={busy} onChange={e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;act(async()=>{setCandidate(null);if(file.size>80*1024*1024)throw new Error('安装包超过 80MB');const data=new FormData();data.set('file',file);setUploadPercent(0);setPhase('正在上传安装包：0%');setCandidate(await call('upload',data,{onUploadProgress:percent=>{if(alive.current){setUploadPercent(percent);setPhase(percent===100?'安装包已上传，正在检查…':`正在上传安装包：${percent}%`)}}}));})}}/></label>
  <p className="text-xs text-muted-foreground">请选择主题安装包本身，无需解压；包含图文教程的合集和 GitHub Source code 源码包不能在此更新。</p>
  <details className="rounded-lg border p-3" onToggle={e=>{if(e.currentTarget.open&&!localInfo)act(localList)}}><summary className="cursor-pointer text-sm font-medium">备用方式：服务器本地导入</summary><div className="mt-3 min-w-0 space-y-3"><p className="text-sm text-muted-foreground">浏览器上传较慢或受到上传大小限制时，可通过网站面板或 SFTP 将主题安装包 ZIP 放到网站根目录下的：</p><code className="block break-all text-xs">runtime/cra1_theme/distribution/imports/</code><p className="text-xs text-muted-foreground">安装包上传完成后刷新列表，选择文件并导入检查。无需解压，导入后仍需确认覆盖更新；原 ZIP 保留。</p><Button variant="outline" disabled={busy} onClick={()=>act(localList)}>刷新本地安装包</Button><label className="block min-w-0 text-sm">本地主题安装包<Select className="mt-2 w-full" aria-label="本地主题安装包" disabled={busy||!localInfo?.files?.length} value={localId} onChange={e=>{setLocalId(e.target.value);setCandidate(null)}}><option value="">请选择安装包</option>{(localInfo?.files||[]).map(file=><option key={file.id} value={file.id}>{file.name}（{(file.bytes/1024/1024).toFixed(1)} MB）</option>)}</Select></label>{localInfo&&!localInfo.files.length&&<p className="text-xs text-muted-foreground">目录中暂无可读取的安装包，仅列出不超过 80MB 的 ZIP 文件。</p>}<Button variant="outline" disabled={busy||!localId} onClick={()=>act(async()=>{setCandidate(null);setPhase('正在导入并检查服务器安装包…');setCandidate(await call('local.import',{file:localId}))})}>导入并检查</Button></div></details></>:<Alert tone="warning">只有超级管理员可以上传、导入和应用更新。</Alert>}
- {candidate&&<><p>待更新版本：{versionLabel(candidate)}</p><p className="text-sm">覆盖更新仅写入主题自有文件，保留配置与草稿，支持备份及回退。</p><p className="break-all text-xs">SHA-256：{candidate.sha256}</p><p>{candidate.signature}</p>{(candidate.warnings||[]).map((value,i)=><Alert key={"info-"+i}>{value}</Alert>)}{(candidate.blockers||[]).map((value,i)=><Alert key={i} tone="warning">{value}</Alert>)}{table}{superAdmin&&<Button disabled={busy||!candidate.can_apply} onClick={()=>{if(window.confirm('使用当前安装包覆盖更新主题？配置与账号保留，旧版本将备份。'))act(async()=>{setPhase('正在备份并更新主题，请稍候…');await call('apply',{candidate:candidate.candidate,expectedDigest:candidate.sha256});setNotice('更新完成，请刷新页面加载对应资源。');setCandidate(null);setHistory(await call('history'))})}}>确认覆盖更新</Button>}</>}
- </CardContent></Card>}
+ {candidate&&<><p>待更新版本：{versionLabel(candidate)}</p><p className="text-sm">覆盖更新仅写入主题自有文件，保留配置与草稿，支持备份及回退。</p><p className="break-all text-xs">SHA-256：{candidate.sha256}</p><p>{candidate.signature}</p>{(candidate.warnings||[]).map((value,i)=><Alert key={"info-"+i}>{value}</Alert>)}{(candidate.blockers||[]).map((value,i)=><Alert key={i} tone="warning">{value}</Alert>)}{table}{superAdmin&&<Button disabled={busy||!candidate.can_apply} onClick={()=>{if(window.confirm('使用当前安装包覆盖更新主题？配置与账号保留，旧版本将备份。'))act(()=>applyCandidate(candidate))}}>确认覆盖更新</Button>}</>}
+ </CardContent></Card></>}
  {tab==='backups'&&<Card><CardHeader><CardTitle>备份与回退</CardTitle></CardHeader><CardContent className="space-y-4">{history?.interrupted&&<Alert tone="warning">有中断更新记录。{superAdmin&&<Button disabled={busy} onClick={()=>act(async()=>{await call('recover');setNotice('主题文件已恢复，请重新检查。');setHistory(await call('history'))})}>恢复中断更新</Button>}</Alert>}<p>当前版本：{history?.current?.release?versionLabel(history.current):'历史部署，尚无发行记录'}</p>{history?.history?.map(row=><div key={row.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-4"><div><p>{versionLabel(row)}</p><p className="text-xs text-muted-foreground">{new Date(row.created_at*1000).toLocaleString()} · {row.state==='complete'?'已完成':'准备记录'}</p></div>{superAdmin&&row.id===history.current?.history&&<Button variant="outline" disabled={busy} onClick={()=>{if(window.confirm('恢复上一版主题界面与引用？已保存的主题内容保持不变。'))act(async()=>{await call('rollback',{history:row.id});setNotice('已回退，请刷新页面。');setHistory(await call('history'))})}}>回退此更新</Button>}</div>)}{!history?.history?.length&&<p className="text-muted-foreground">尚无通过安装程序执行的更新记录。</p>}</CardContent></Card>}
 
  {tab==='configuration'&&<ConfigurationTransfer/>}
+ {superAdmin&&tab==='lifecycle'&&<Suspense fallback={<p role="status">正在加载停用与卸载…</p>}><ThemeLifecycle onBusyChange={setBusy} onRemoved={setRemoved}/></Suspense>}
  </div>
 }

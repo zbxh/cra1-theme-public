@@ -54,11 +54,49 @@ function catalogFixture(){
  let instance,first=()=>Promise.reject(new Error('private')),second=first,products=first
  function Vue(options){instance=this;Object.assign(this,options.data());for(const[k,fn]of Object.entries(options.methods))this[k]=fn.bind(this);for(const[k,fn]of Object.entries(options.computed))Object.defineProperty(this,k,{get:()=>fn.call(this)});this.$mount=()=>this;this.$nextTick=fn=>fn()}
  Vue.prototype={}
- const window={},env={window,Vue,navigator:{userAgent:'fixture'},lang:{},asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},document:{getElementsByClassName:()=>[{}],documentElement:{scrollTop:0,clientHeight:500,scrollHeight:1000},body:{scrollTop:0}},localStorage:{},productGroupFirst:()=>first(),productGroupSecond:id=>second(id),productGoods:params=>products(params)}
+ const window={},env={window,Vue,clearTimeout(){},navigator:{userAgent:'fixture'},lang:{},asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},document:{getElementsByClassName:()=>[{}],documentElement:{scrollTop:0,clientHeight:500,scrollHeight:1000},body:{scrollTop:0}},localStorage:{},productGroupFirst:()=>first(),productGroupSecond:id=>second(id),productGoods:params=>products(params)}
  const source=fs.readFileSync(new URL('../source/legacy-assets/cart/20261017-compat-v3/js/goodsList.js',import.meta.url),'utf8')
  vm.runInNewContext(source,env);window.onload()
- return{page:instance,first:fn=>{first=fn},second:fn=>{second=fn},products:fn=>{products=fn}}
+ return{page:instance,env,first:fn=>{first=fn},second:fn=>{second=fn},products:fn=>{products=fn}}
 }
+
+function addFixture(){
+ const f=catalogFixture(),p=f.page,frame={contentWindow:{}};
+ let successes=0,refreshes=0;const warnings=[];
+ f.env.window.location={origin:'https://example.test'};
+ f.env.clearTimeout=()=>{};
+ p.selectedProductId=8;p.embedNonce='current';p.railAddRequestId='attempt-1';p.railLoading=true;
+ p.$refs={configPanel:{querySelector:()=>frame}};
+ p.railConfirmAfterAdd=()=>successes++;p.refreshTopCart=()=>refreshes++;
+ p.$message={warning:s=>warnings.push(s)};
+ return{...f,warnings,successes:()=>successes,refreshes:()=>refreshes,
+  receive:(data)=>p.handleEmbedMessage({origin:'https://example.test',source:frame.contentWindow,data:{v:1,productId:8,nonce:'current',type:'rail-added',requestId:'attempt-1',...data}})};
+}
+test('rejected native add never becomes a cart success, while remaining retryable',()=>{
+ const f=addFixture();f.receive({failed:true,success:false,reason:'rejected'});
+ assert.equal(f.successes(),0);assert.equal(f.refreshes(),0);assert.equal(f.page.railLoading,false);
+ assert.equal(f.page.railAddRequestId,'');assert.equal(f.warnings.length,0);
+});
+test('only a confirmed result from the current operation opens one success prompt',()=>{
+ const f=addFixture();f.receive({success:true,failed:false});f.receive({success:true,failed:false});
+ assert.equal(f.successes(),1);assert.equal(f.refreshes(),1);assert.equal(f.page.railLoading,false);
+});
+test('missing, contradictory and timed-out results never report success',()=>{
+ for(const data of [{},{success:true,failed:true},{success:false,failed:true,reason:'timeout'}]){
+  const f=addFixture();f.receive(data);assert.equal(f.successes(),0);assert.equal(f.page.railLoading,false);
+  assert.equal(f.warnings.length,data.reason==='timeout'?1:0);
+ }
+});
+test('old operations, old products and old frames cannot finish the pending add',()=>{
+ for(const data of [{requestId:'attempt-0',success:true},{nonce:'old',success:true},{productId:9,success:true}]){
+  const f=addFixture();f.receive(data);assert.equal(f.successes(),0);assert.equal(f.page.railAddRequestId,'attempt-1');
+ }
+});
+test('a quote refresh cannot release the pending add or permit a duplicate submission',()=>{
+ const f=addFixture();f.receive({type:'rail-updated',payload:{availability:'ready',durations:[]}});
+ assert.equal(f.page.railLoading,true);let submissions=0;f.page.railPost=()=>submissions++;
+ f.page.railAddCart();assert.equal(submissions,0);
+});
 test('catalog outage exits loading without claiming no products; retry clears the failure',async()=>{
  const f=catalogFixture();await f.page.initData()
  assert.match(f.page.catalogError,/暂时无法读取商品分类/);assert.equal(f.page.goodSLoading,false);assert.equal(f.page.scrollDisabled,true)

@@ -54,7 +54,7 @@ export default function Attachments() {
         if (targetPage > lastPage) { redirected = true; scrollToList.current = true; setPage(lastPage) }
         else setItems(r.data.items)
       }
-    } catch (e) { if (n === seq.current && e.name !== 'AbortError') setError('页面错误，请刷新重试') }
+    } catch (e) { if (n === seq.current && e.name !== 'AbortError') setError(e.message || '附件列表读取未完成，请重试') }
     finally { if (n === seq.current && !redirected) setLoading(false) }
   }
   useEffect(() => {

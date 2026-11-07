@@ -84,7 +84,7 @@
     error.code = code;
     error.status = status || 0;
     if (options && options.method) error.method = options.method;
-    if (data !== undefined) error.data = data;
+    if (data !== undefined) error.data = shared.Errors ? shared.Errors.payload(data, Object.assign({},options,{status:status})) : data;
     return error;
   }
   async function request(path, options) {
@@ -92,6 +92,7 @@
     path = String(path || '/');
     if (/^(?:[a-z]+:)?\/\//i.test(path) || /^[a-z]+:/i.test(path)) throw failure('请求地址无效', 'INVALID_URL');
     var method = String(options.method || 'GET').toUpperCase();
+    var errorOptions = { method:method, path:path, orderCreation:options.orderCreation };
     var url = BASE + (path.charAt(0) === '/' ? path : '/' + path);
     // Explicit theme projections only; never accepts an arbitrary external URL.
     if (/^\/theme\/(?:access|host\/[1-9]\d*(?:\/field\/[1-9]\d*|\/app-preset-task\/[1-9]\d*\/log)?)$/.test(path)) url = '/cra1-shared/compat.php?target=' + encodeURIComponent(path.slice(6));
@@ -123,19 +124,19 @@
       try { envelope = text ? JSON.parse(text) : {}; }
       catch (error) {
         if (response.status === 401) envelope = {};
-        else throw failure('服务响应异常，请稍后重试', 'BAD_RESPONSE', response.status);
+        else throw failure('服务响应异常，请稍后重试', 'BAD_RESPONSE', response.status >= 400 ? response.status : 503, undefined, errorOptions);
       }
       if (response.status === 401) envelope = envelope && typeof envelope === 'object' && !Array.isArray(envelope) ? envelope : {};
       if (!envelope || typeof envelope !== 'object' || Array.isArray(envelope)
           || (response.ok && envelope.status === undefined)) {
-        throw failure('服务响应异常，请稍后重试', 'BAD_RESPONSE', response.status);
+        throw failure('服务响应异常，请稍后重试', 'BAD_RESPONSE', response.status >= 400 ? response.status : 503, undefined, errorOptions);
       }
       var status = envelope && envelope.status !== undefined ? Number(envelope.status) : response.status;
       if (response.status === 401 || status === 401) {
         unauthorized({ policy: options.unauthorized || (requiresLogin() ? 'redirect' : 'notify'), token: token });
         envelope.msg = '登录已失效，请重新登录';
         if (Object.prototype.hasOwnProperty.call(envelope, 'message')) envelope.message = envelope.msg;
-        throw failure(envelope && envelope.msg || '登录已失效，请重新登录', 'UNAUTHORIZED', 401, envelope);
+        throw failure(envelope && envelope.msg || '登录已失效，请重新登录', 'UNAUTHORIZED', 401, envelope, errorOptions);
       }
       if (!response.ok || (envelope && envelope.status !== undefined && status !== 200)) {
         if (!options.securityHandled && shared.Security && shared.Security.setup(envelope)) {
@@ -151,22 +152,19 @@
           }, { signal: external, token: token });
         }
         var errorStatus = response.ok ? status : response.status;
-        if (shared.Errors) {
-          envelope.msg = shared.Errors.message(envelope, {status:errorStatus});
-          if (Object.prototype.hasOwnProperty.call(envelope, 'message')) envelope.message = envelope.msg;
-        }
-        throw failure(envelope.msg || '请求失败，请稍后重试', 'API_ERROR', errorStatus, envelope);
+        if (shared.Errors) envelope = shared.Errors.payload(envelope, Object.assign({},errorOptions,{status:errorStatus}));
+        throw failure(envelope.msg || '请求失败，请稍后重试', 'API_ERROR', errorStatus, envelope, errorOptions);
       }
       if (shared.Security && envelope.data && envelope.data.verification_expires_at) shared.Security.remember(envelope.data.verification_expires_at);
       return envelope;
     } catch (error) {
-      if (timedOut) error = failure('等待响应超时，请稍后重试', 'TIMEOUT', 0, undefined, {method:method});
+      if (timedOut) error = failure('等待响应超时，请稍后重试', 'TIMEOUT', 0, undefined, errorOptions);
       if (external && external.aborted) {
         var cancelled = failure('请求已取消', 'CANCELLED');
         cancelled.name = 'AbortError';
         error = cancelled;
       }
-      if (!error || !error.code) error = failure('网络异常，请检查网络连接', 'NETWORK');
+      if (!error || !error.code) error = failure('网络异常，请检查网络连接', 'NETWORK',0,undefined,errorOptions);
       error.method = method;
       if (options.orderCreation && method === 'POST') {
         var rejected = (error.code === 'UNAUTHORIZED' && error.status === 401) || error.code === 'SECURITY_CANCELLED' ||

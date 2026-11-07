@@ -268,7 +268,7 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
       setConfig(res.data.config)
       setOriginal(JSON.parse(JSON.stringify(res.data.config)))
       setVersion(res.data.config.version || 0)
-      toast(res.data?.snapshot_ok === false ? '已保存，但前台快照写入失败' : '已保存，购物车前台已生效')
+      toast(res.msg || '已保存，购物车前台已生效')
     } catch (e) {
       toast(e.message, 'error')
     } finally {
@@ -296,7 +296,7 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
   if (error || !config) {
     return (
       <div className="space-y-4 p-6">
-        <div className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger">页面错误，请刷新重试</div>
+        <div className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger whitespace-pre-wrap [overflow-wrap:anywhere]">{error || '未读取到购物车配置，请重新加载'}</div>
       </div>
     )
   }
@@ -445,7 +445,7 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
         }
       />
 
-      {productError && <Alert tone="warning">页面错误，请刷新重试</Alert>}
+      {productError && <Alert tone="warning">{productError}</Alert>}
       {block && !['card_sections','recommendations'].includes(block)?<Card><CardHeader><CardTitle>{RECORDS.find(r=>r.group===scope&&r.sub===block)?.label}</CardTitle></CardHeader><CardContent className="space-y-5">{GroupFormBody({group:scope,sub:block})}</CardContent></Card>:!block&&(<>
       {/* 页面文案记录（一条记录 + 编辑弹窗） */}
       <Card>

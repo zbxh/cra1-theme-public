@@ -15,8 +15,9 @@ final class CRA1ThemeMediaStore
         $this->root = rtrim($root, '/');
         $file = $this->root . '/runtime/cra1_theme/attachments.sqlite';
         if (!$create && !is_file($file)) throw new RuntimeException('附件服务尚未准备好，请联系管理员。');
-        $this->db = new PDO('sqlite:' . $file, null, null, [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
+        try { $this->db = new PDO('sqlite:' . $file, null, null, [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
         $this->db->exec('PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL;');
+        } catch(Throwable $error) {throw new RuntimeException('打开附件数据库 runtime/cra1_theme/attachments.sqlite 失败。原因：'.\CRA1\Theme\Diagnostics::reason($error,$this->root),0,$error);}
         if ($create) {
             $this->db->exec("CREATE TABLE IF NOT EXISTS attachments (
                 id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT NOT NULL UNIQUE, name TEXT NOT NULL,
@@ -51,9 +52,8 @@ final class CRA1ThemeMediaStore
     }
     public function lock(bool $exclusive = false)
     {
-        $h = fopen($this->root.'/runtime/cra1_theme/attachments.lock', 'c');
-        if (!$h || !flock($h, $exclusive ? LOCK_EX : LOCK_SH)) throw new RuntimeException('附件暂时忙，请稍后重试。');
-        @chmod($this->root.'/runtime/cra1_theme/attachments.lock', 0600); return $h;
+        $h=\CRA1\Theme\Files::openLock($this->root.'/runtime/cra1_theme/attachments.lock',$exclusive?LOCK_EX:LOCK_SH);
+        @chmod($this->root.'/runtime/cra1_theme/attachments.lock',0600);return $h;
     }
     private function rate(int $member, string $action, int $limit, int $duration): void
     {
@@ -133,10 +133,12 @@ final class CRA1ThemeMediaStore
         }
         if (!$size || $size[0]>4096 || $size[1]>4096 || $size[0]*$size[1]>($avatar?9000000:16000000) || min($size[0],$size[1])<($avatar?32:1)) throw new InvalidArgumentException($avatar?'图片尺寸需至少 32×32，最长边不超过 4096 像素，总像素不超过 900 万。':'图片尺寸过大或文件损坏，请换一张图片。');
         $dir=$this->root.'/public/upload/cra1-theme'.($avatar?'/avatars':'');
-        if (!is_dir($dir) && !mkdir($dir,0755,true)) throw new RuntimeException('图片目录不可写，请联系管理员。');
+        \CRA1\Theme\Files::directory($dir,0755);
         $extension=$avatar?'webp':$extensions[$mime]; $name=bin2hex(random_bytes(16)).'.'.$extension;
         $path=$dir.'/'.$name; $image=null; $output=null;
         try {
+            $warning='';set_error_handler(static function($level,$message)use(&$warning){$warning=$message;return true;});
+            try {
             if (in_array($extensions[$mime],['png','jpg','webp'],true)) {
                 $image=@imagecreatefromstring((string)file_get_contents($f['tmp_name']));
                 if (!$image) throw new InvalidArgumentException('图片文件损坏，请换一张图片。');
@@ -148,7 +150,8 @@ final class CRA1ThemeMediaStore
                 elseif ($extension==='jpg') $ok=imagejpeg($image,$path,90);
                 else $ok=imagewebp($image,$path,88);
             } else $ok=move_uploaded_file($f['tmp_name'],$path);
-            if (!$ok || !filesize($path)) throw new RuntimeException('图片上传失败，请重试。');
+            } finally {restore_error_handler();}
+            if (!$ok || !filesize($path)) throw new \CRA1\Theme\Failure('保存上传图片',$path,$warning,0644);
             chmod($path,0644); $url=substr($path,strlen($this->root.'/public'));
             return $this->transaction(function () use ($f,$kind,$owner,$mime,$size,$path,$url) {
                 $this->db->prepare('INSERT INTO attachments(url,name,kind,owner_id,source,mime,bytes,width,height,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)')->execute([$url,self::name($f['name']??'图片'),$kind,$owner,'managed',$mime,filesize($path),$size[0],$size[1],time()]);
@@ -231,10 +234,11 @@ final class CRA1ThemeMediaStore
                 if ($f['source']!=='managed' || !preg_match('~^/upload/cra1-theme/(?:avatars/)?[a-f0-9]{32}\.(?:png|jpg|webp|gif|ico)$~D',$f['url'])) throw new InvalidArgumentException('系统图片只可选择，不能删除。',403);
                 if ((!$restore && $f['deleted_at']) || ($restore && !$f['deleted_at'])) throw new InvalidArgumentException('附件状态已变化，请刷新列表。',409);
                 $refs=$this->references($f); if (!$restore && $refs) throw new InvalidArgumentException('附件正在使用，请先更换引用位置：'.implode('、',$refs),409);
-                $trash=$this->root.'/runtime/cra1_theme/media-trash'; if (!is_dir($trash)) mkdir($trash,0700,true);
+                $trash=$this->root.'/runtime/cra1_theme/media-trash'; \CRA1\Theme\Files::directory($trash,0700);
                 $public=$this->root.'/public'.$f['url']; $private=$trash.'/'.$id.'-'.basename($f['url']);
                 $from=$restore?$private:$public; $to=$restore?$public:$private;
-                if (!is_file($from)||is_link($from)||is_file($to)||!rename($from,$to)) throw new RuntimeException('文件暂时无法移动，请联系管理员。');
+                if (!is_file($from)||is_link($from)||is_file($to)) throw new RuntimeException('附件文件不存在、目标已有同名文件或归属异常，请刷新附件列表后核对。');
+                \CRA1\Theme\Failure::attempt('移动附件',$to,static function()use($from,$to){return rename($from,$to);},$restore?0644:0600);
                 $moved=true; chmod($to,$restore?0644:0600);
                 $this->db->prepare('UPDATE attachments SET deleted_at=? WHERE id=?')->execute([$restore?0:time(),$id]);
                 return $this->attachment($id);

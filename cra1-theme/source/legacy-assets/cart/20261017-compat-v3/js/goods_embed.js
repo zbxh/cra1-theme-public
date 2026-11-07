@@ -8,8 +8,8 @@
  *   3. 高度自适应：ResizeObserver + 兜底定时器；
  *   4. 模块在 iframe 内导航到结算/购物车时，由父页提升为顶层跳转（父页监听 iframe load）。
  *
- * 模块内容仍由系统 header 注入的 jQuery `.html()` 机制加载（CSS/JS 顺序执行），
- * 本文件不改模块模板与计价逻辑。
+ * 模块内容由共用加载器按声明顺序执行，保留模块内数据和模板节点；
+ * 未登记的第三方模块使用自身控件，不接管其配置与计价逻辑。
  */
 (function (window) {
   var params = new URLSearchParams(window.location.search);
@@ -110,6 +110,7 @@
   var railLastSnap = '';
   var railWatchTimer = null;
   var railAwaitSince = null;
+  var railAddPending = null;
 
   function railFindVM() {
     var els = document.querySelectorAll('.m-cloud-m, .m-dcim-m, .template');
@@ -317,7 +318,20 @@
     return false;
   }
 
-  function railDoAdd() {
+  function railDoAdd(requestId) {
+    if (railAddPending) return;
+    var started = Date.now();
+    var previousMessages = Array.from(document.querySelectorAll('.el-message--error'));
+    var operation = { id: requestId, timer: null };
+    railAddPending = operation;
+    function finish(success, reason) {
+      if (railAddPending !== operation) return;
+      clearInterval(operation.timer);
+      railAddPending = null;
+      post('rail-added', { requestId: requestId, success: success, failed: !success, reason: reason || '' });
+    }
+    // Dismiss a previous success before starting a new native operation.
+    railDoCloseDialog();
     var ok = railKind === 'order-right'
       ? railClick('.order-right .f-btn .cart')
       : railClick('.f-order .right .add-cart');
@@ -325,17 +339,14 @@
       try {
         if (railKind === 'order-right' && typeof railVM.addCart === 'function') railVM.addCart();
         else if (typeof railVM.handlerCart === 'function') railVM.handlerCart();
-      } catch (e) { }
+      } catch (e) { finish(false, 'rejected'); return; }
     }
     // 监听模块加购成功对话框（渲染在 iframe 文档内）：出现即关闭——
     // 模块对话框+全屏遮罩会罩住配置区（看起来像独立深色模块），父页确认框独占交互
-    var tries = 0;
-    var t = setInterval(function () {
-      tries++;
+    operation.timer = setInterval(function () {
       var dlg = document.querySelector('.cartDialog');
       var visible = dlg && dlg.offsetHeight > 0;
-      if (visible) {
-        clearInterval(t);
+      if (visible && railVM && railVM.cartDialog === true) {
         try {
           if (railVM && railVM.cartDialog === true) railVM.cartDialog = false;
           else {
@@ -343,10 +354,13 @@
             if (btn) btn.click();
           }
         } catch (e) { }
-        post('rail-added', {});
-      } else if (tries > 60) { // ~3.6s 无对话框视为失败，解除父页等待
-        clearInterval(t);
-        post('rail-added', { failed: true });
+        finish(true);
+      } else if (Date.now() - started > 120 && Array.from(document.querySelectorAll('.el-form-item.is-error, .el-message--error')).some(function (el) { return el.offsetHeight > 0 && previousMessages.indexOf(el) < 0; })) {
+        // Keep the module's own field and API error messages visible.
+        finish(false, 'rejected');
+      } else if (Date.now() - started > 30000) {
+        // A missing acknowledgement never proves that the cart was updated.
+        finish(false, 'timeout');
       }
     }, 60);
   }
@@ -375,7 +389,7 @@
       }
     }
     else if (data.type === 'rail-set') railExec(data);
-    else if (data.type === 'rail-add' && railCanSubmit()) railDoAdd();
+    else if (data.type === 'rail-add' && railCanSubmit()) railDoAdd(data.requestId);
     else if (data.type === 'rail-save') {
       if (!railCanSubmit()) return;
       // Editing updates the existing cart position through the module's own
@@ -413,6 +427,7 @@
     post('rail-fallback', { message: '请在下方查看价格并完成订购。' });
   }
   function railBoot(force) {
+    if (window.__CART_EMBED__.nativeModule === true) { nativeControls(); return; }
     if (new URLSearchParams(location.search).get('native_controls')==='1') { nativeControls(); return; }
     if (railVM && !force) { railStartBridge(); return; }
     var currentVM = railFindVM();

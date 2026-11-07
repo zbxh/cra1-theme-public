@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 $base=sys_get_temp_dir().'/cra1-filesystem-'.bin2hex(random_bytes(6));mkdir($base,0700);mkdir($base.'/public',0700);
-copy(dirname(__DIR__).'/backend/Files.php',$base.'/Files.php');
-$code='set_error_handler(static function($n,$s){throw new ErrorException($s,0,$n);});require $argv[1]."/Files.php";'
+foreach(['Files.php','Failure.php','Diagnostics.php']as$file)copy(dirname(__DIR__).'/backend/'.$file,$base.'/'.$file);
+$code='set_error_handler(static function($n,$s){throw new ErrorException($s,0,$n);});require $argv[1]."/Diagnostics.php";require $argv[1]."/Failure.php";require $argv[1]."/Files.php";'
  .'CRA1\\Theme\\Files::atomic($argv[1]."/public/file.json","{\"kept\":true}");'
  .'$d=CRA1\\Theme\\Files::json($argv[1]."/public/file.json");'
  .'CRA1\\Theme\\Files::noLinks($argv[1]."/public/future/missing.json");'
@@ -17,5 +17,5 @@ try{
  echo $out.PHP_EOL;
 }finally{
  foreach(glob($base.'/public/*')?:[]as$p)unlink($p);
- unlink($base.'/Files.php');rmdir($base.'/public');rmdir($base);
+ foreach(['Files.php','Failure.php','Diagnostics.php']as$file)unlink($base.'/'.$file);rmdir($base.'/public');rmdir($base);
 }

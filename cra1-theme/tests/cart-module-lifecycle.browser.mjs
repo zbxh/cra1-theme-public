@@ -1,90 +1,89 @@
-/** Real installed templates/resources with isolated third-party module responses. */
-import fs from 'node:fs'
-import path from 'node:path'
-import assert from 'node:assert/strict'
-import {createRequire} from 'node:module'
-const require=createRequire(import.meta.url),{chromium}=require(process.env.CRA1_PLAYWRIGHT_MODULE||'playwright')
-const origin=process.env.CRA1_ISOLATED_ORIGIN,out=process.env.CRA1_MODULE_COMPAT_OUT
-if(!origin||!['127.0.0.1','localhost'].includes(new URL(origin).hostname)||!out)throw Error('An isolated origin and external output are required')
-fs.mkdirSync(out,{recursive:true})
-const browser=await chromium.launch({headless:true,args:['--no-sandbox']}),checks=[],errors=[],blocked=[]
-const products=[501,502,503].map((id,i)=>({id,name:'兼容模块 '+['A','B','C'][i],description:'<p>隔离测试模块配置</p>',price:'12.00',cycle:'月',product_group_id:301,product_group_id_first:300,hidden:0,stock_control:0}))
-const json=(route,data)=>route.fulfill({json:{status:200,msg:'操作成功',data}})
-function check(ok,label){assert.ok(ok,label);checks.push(label);console.log(label)}
-let page
+/** Real installed pages; all catalogue, module and business responses are isolated. */
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+const {chromium}=createRequire(import.meta.url)(process.env.CRA1_PLAYWRIGHT_MODULE||'playwright');
+const origin=process.env.CRA1_MODULE_TEST_ORIGIN,out=process.env.CRA1_MODULE_TEST_OUT;
+if(!origin||!out)throw Error('Set CRA1_MODULE_TEST_ORIGIN and an external CRA1_MODULE_TEST_OUT.');
+fs.mkdirSync(out,{recursive:true});
+const products=[
+ {id:501,module:'vendor_custom',name:'第三方模块'},
+ {id:502,module:null,module1:'vendor_group',name:'接口分组模块'},
+ {id:503,module:'mf_cloud',mode:'only_api',res_module:'cloud_service',name:'第三方代理模块'}
+].map(p=>({...p,price:'12.00',cycle:'月',description:'<p>隔离示例</p>',product_group_id:301,product_group_id_first:300,hidden:0,stock_control:0}));
+const common={website_name:'模块兼容检查',currency_prefix:'¥',currency_suffix:'元',cart_change_product:0,cart_instruction:0,custom_fields:{before_settle:0},lang_home_open:0};
+const moduleHtml=id=>'<style>.third-party-module{font:14px/1.7 sans-serif;max-width:100%;padding:12px;box-sizing:border-box}.third-party-module button,.third-party-module select{padding:10px;max-width:100%}.third-party-module .main-card{padding:7px}.third-party-module .search-box{display:grid;gap:3px}.native-actions{display:flex;width:240px;max-width:100%}.native-actions button{width:100%;min-width:0;padding:6px}</style>'+
+ '<div class="template third-party-module" data-pid="'+id+'"><script type="application/json" id="vendor-settings">{"bandwidth":19,"traffic":768}</scr'+'ipt><div class="main-card"><div class="search-box">原生搜索</div></div><div class="native-actions"><button class="el-button el-button--primary">原生加购</button><button class="el-button el-button--primary">原生立即购买</button></div><div class="top-tab"><h2 class="com-tit">原生模块 '+id+'</h2><label>规格 <select v-model="plan"><option>标准版</option><option>专业版</option></select></label></div><p>带宽：<span id="vendor-bandwidth">{{bandwidth}}</span>Mbps</p><p>流量：<span id="vendor-traffic">{{traffic}}</span>GB/月</p><button @click="bought++">原生订购 {{bought}}</button></div><script type="text/ecmascript" src="/fixture/vendor-boot.js"></scr'+'ipt>';
+const report={status:'running',checks:[],errors:[],blocked:[]};
+const save=()=>fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(report,null,2));
+const check=(ok,label)=>{assert.ok(ok,label);report.checks.push(label);save();};
+const json=(route,data)=>route.fulfill({json:{status:200,msg:'操作成功',data}});
+const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+let page;
 try{
- for(const width of (process.env.CRA1_TEST_WIDTHS||'1920,1440,768,390,320').split(',').map(Number)){
-  const mobile=width<768
-  const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:960},...(mobile?{isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148'}:{})})
-  let failNext=false,delayNext=false
+ for(const width of (process.env.CRA1_MODULE_TEST_WIDTHS||'1920,1440,768,390,320').split(',').map(Number)){
+  const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:900},reducedMotion:'reduce'});
+  await context.addInitScript(common=>{localStorage.setItem('common_set_before',JSON.stringify(common));localStorage.setItem('lang','zh-cn');},common);
+  const reads=[];
   await context.route('**/*',async route=>{
-   const req=route.request(),u=new URL(req.url()),p=u.pathname
-   if(u.origin!==origin)return route.abort()
-   if(!['GET','HEAD'].includes(req.method())){blocked.push(p);return route.fulfill({json:{status:400,msg:'隔离测试不提交业务操作'}})}
-   if(p==='/console/v1/product/group/first')return json(route,{list:[{id:300,name:'兼容性演示'}]})
-   if(p==='/console/v1/product/group/second')return json(route,{list:[{id:301,name:'第三方模块',type:'normal',description:''}]})
-   if(p==='/console/v1/product')return json(route,{list:Number(u.searchParams.get('page')||1)>1?[]:products,count:products.length})
-   const detail=/^\/console\/v1\/product\/(50[123])$/.exec(p)
-   if(detail)return json(route,{product:products.find(x=>x.id===Number(detail[1]))})
-   const config=/^\/console\/v1\/product\/(50[123])\/config_option$/.exec(p)
-   if(config){
-    if(delayNext&&config[1]==='503'){delayNext=false;await new Promise(r=>setTimeout(r,700))}
-    return json(route,{content:'<style>.third-party-module{padding:12px;box-sizing:border-box;max-width:100%;font-size:14px}.third-party-module select{max-width:100%;height:40px}.third-party-module .f-order{position:static!important;box-sizing:border-box}</style><div class="template third-party-module" data-pid="'+config[1]+'"><main><h2>原生模块 '+config[1]+'</h2><label>规格 <select v-model="plan"><option>标准版</option><option>专业版</option></select></label></main><div class="f-order"><p>当前价格 ¥12.00 / 月</p><button type="button" @click="bought++">原生订购 {{bought}}</button></div></div><script src="/fixture/vendor-boot.js"></scr'+'ipt>'})
-   }
-   if(p==='/fixture/vendor-boot.js'){
-    if(failNext){failNext=false;return route.abort()}
-    return route.fulfill({contentType:'text/javascript',body:'const launchThirdParty=()=>{const thirdPartyVM=new Vue({el:".third-party-module",data:{plan:"标准版",bought:0}});window.vendorMounts=(window.vendorMounts||0)+1;};const fixtureId=document.querySelector(".third-party-module").dataset.pid;if(fixtureId==="502")window.onload=launchThirdParty;else if(fixtureId==="503")document.addEventListener("DOMContentLoaded",launchThirdParty,{once:true});else launchThirdParty();'})
-   }
-   return route.continue()
-  })
-  page=await context.newPage();page.on('pageerror',e=>errors.push(e.message))
-  await page.goto(origin+'/cart/goodsList.htm?product_id=501',{waitUntil:'domcontentloaded',timeout:60000})
+   const req=route.request(),u=new URL(req.url()),p=u.pathname;
+   if(u.origin!==origin)return route.abort();
+   if(p==='/cra1-shared/announcements.php')return json(route,{items:[]});
+   if(!['GET','HEAD','OPTIONS'].includes(req.method())){report.blocked.push({path:p,method:req.method()});return route.abort();}
+   if(p==='/console/v1/common')return json(route,common);
+   if(p==='/console/v1/cart')return json(route,{list:[],count:0});
+   if(p==='/console/v1/menu')return json(route,{list:[],menu:[]});
+   if(p==='/console/v1/product/group/first')return json(route,{list:[{id:300,name:'测试产品'}]});
+   if(p==='/console/v1/product/group/second')return json(route,{list:[{id:301,name:'商品配置',type:'normal'}]});
+   if(p==='/console/v1/product')return json(route,{list:Number(u.searchParams.get('page')||1)>1?[]:products,count:products.length});
+   const detail=/^\/console\/v1\/product\/(50[1-3])$/.exec(p);
+   if(detail)return json(route,{product:products.find(x=>x.id===Number(detail[1]))});
+   const config=/^\/console\/v1\/product\/(50[1-3])\/config_option$/.exec(p);
+   if(config){reads.push({path:p,flag:u.searchParams.get('flag')});return json(route,{module:Number(config[1])===503?'recloud_service':'vendor_custom',content:moduleHtml(config[1])});}
+   if(p==='/fixture/vendor-boot.js')return route.fulfill({contentType:'text/javascript',body:'window.vendorMounts=(window.vendorMounts||0)+1;const settings=JSON.parse(document.querySelector(".third-party-module #vendor-settings").textContent);window.vendorVM=new Vue({el:".third-party-module",data:{...settings,plan:"标准版",bought:0},watch:{async plan(){Object.assign(this,await(await fetch("/fixture/vendor-config")).json())}}});'});
+   if(p==='/fixture/vendor-config')return route.fulfill({json:{bandwidth:37,traffic:3072}});
+   return route.continue();
+  });
+  page=await context.newPage();page.on('pageerror',error=>report.errors.push(error.message));
   const ready=async id=>{
-   await page.waitForFunction(id=>{const v=document.querySelector('.template')?.__vue__;return v&&v.selectedProductId===id&&v.configState==='ready'},id,{timeout:45000})
-   const frame=page.frameLocator('.cl-config-frame')
-   await frame.getByRole('heading',{name:'原生模块 '+id,exact:true}).waitFor()
-   await page.waitForFunction(()=>document.querySelector('.template').__vue__.railState==='fallback')
-   check(!await page.getByRole('complementary',{name:'价格计算器',exact:true}).count(),'unknown module never leaves a duplicate loading calculator '+width)
-   return frame
+   await page.waitForURL(url=>url.pathname==='/cart/goods.htm'&&url.searchParams.get('id')===String(id));
+   await page.getByRole('heading',{name:'原生模块 '+id,exact:true}).waitFor();
+   await page.waitForFunction(()=>!!window.vendorVM);
+   check(await page.locator('.cl-config-frame,.cl-rail,.cl-rail-dock').count()===0,'third-party page has no theme iframe or calculator '+id+'/'+width);
+   check(await page.evaluate(()=>window.vendorMounts===1),'module boot executes once '+id+'/'+width);
+   check(await page.locator('.third-party-module .main-card').evaluate(e=>getComputedStyle(e).padding)==='7px','native card keeps its module spacing '+id+'/'+width);
+   check(await page.locator('.third-party-module .search-box').evaluate(e=>getComputedStyle(e).display)==='grid','native module layout is not replaced by cart theme styles '+id+'/'+width);
+   check(await page.locator('.native-actions').evaluate(e=>{const r=e.getBoundingClientRect();return [...e.querySelectorAll('button')].every(b=>!b.classList.contains('cui-button')&&getComputedStyle(b).flexShrink==='1'&&b.getBoundingClientRect().right<=r.right+1)}),'native paired purchase buttons keep shrinking and remain inside their row '+id+'/'+width);
+   check(await page.locator('cra1-cart-heading-icon,.cl-config-heading').count()===0,'borrowed module classes do not opt into theme transformations '+id+'/'+width);
+  };
+  await page.goto(origin+'/cart/goodsList.htm?product_id=501',{waitUntil:'load'});await ready(501);
+  check(await page.locator('#vendor-bandwidth').textContent()==='19','nested JSON stays inside the module before boot '+width);
+  await page.getByRole('combobox').selectOption({label:'专业版'});await page.waitForFunction(()=>document.querySelector('#vendor-bandwidth').textContent==='37');
+  check(await page.locator('#vendor-traffic').textContent()==='3072','native selection updates module values '+width);
+  await page.getByRole('button',{name:'原生订购 0',exact:true}).click();
+  check(await page.getByRole('button',{name:'原生订购 1',exact:true}).isVisible(),'native action stays active '+width);
+  await page.screenshot({path:path.join(out,'third-party-cart-'+width+'.png'),fullPage:true});
+  await page.goto(origin+'/cart/goodsList.htm?fpg_id=300&spg_id=301',{waitUntil:'load'});
+  await page.locator('.cl-goods-card').first().waitFor();await page.waitForTimeout(250);
+  check(new URL(page.url()).pathname==='/cart/goodsList.htm','category browsing stays in the list '+width);
+  for(const id of [502,503]){
+   await page.locator('.cl-goods-card').filter({hasText:products.find(p=>p.id===id).name}).click();await ready(id);
+   await page.goBack({waitUntil:'load'});await page.locator('.cl-goods-card').first().waitFor();
+   check(new URL(page.url()).pathname==='/cart/goodsList.htm','back returns to the catalogue without a redirect loop '+id+'/'+width);
   }
-  let frame=await ready(501)
-  check(await frame.getByRole('button',{name:'原生订购 0',exact:true}).isVisible(),'unknown module retains native purchase controls '+width)
-  await frame.getByRole('combobox').selectOption({label:'专业版'})
-  await frame.getByRole('button',{name:'原生订购 0',exact:true}).click()
-  check(await frame.getByRole('button',{name:'原生订购 1',exact:true}).isVisible(),'unknown module selection and action remain live '+width)
-  const choose=async id=>{
-   await page.locator('.cl-goods-card').filter({hasText:products.find(p=>p.id===id).name}).click()
-   const confirm=page.locator('.el-message-box__btns .el-button--primary')
-   if(await confirm.isVisible().catch(()=>false))await confirm.click()
-  }
-  for(const id of [502,503,501]){
-   await choose(id)
-   frame=await ready(id)
-   check(await frame.locator('body').evaluate(()=>window.vendorMounts===1),'A-B-A creates a fresh module script context '+width+' '+id)
-  }
-  check(await page.evaluate(()=>!window.vendorMounts&&!window.thirdPartyVM),'module globals do not leak into the catalog '+width)
-  check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'catalog has no horizontal overflow '+width)
-  check(await frame.locator('html').evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'module has no horizontal overflow '+width)
-  await page.evaluate(()=>scrollTo(0,0))
-  await page.screenshot({path:path.join(out,'third-party-cart-'+width+'.png'),fullPage:true})
-  if(mobile){
-   failNext=true
-   await choose(502)
-   await page.getByText('页面错误，请刷新重试',{exact:true}).waitFor();check(await page.getByRole('button',{name:'重试',exact:true}).count()===0,'configuration failure has no retry control')
-   check(await page.locator('.cl-config-error').isVisible(),'failed native script asks for browser refresh')
-   await page.reload();await ready(502)
-   check(true,'browser refresh reruns the native boot script')
-   delayNext=true
-   await choose(503)
-   await page.waitForTimeout(70)
-   await choose(501)
-   await ready(501);await page.waitForTimeout(900)
-   check(await page.evaluate(()=>document.querySelector('.template').__vue__.selectedProductId===501),'late old configuration cannot replace the current selection')
-  }
-  await context.close()
+  await page.evaluate(()=>sessionStorage.setItem('product_information',JSON.stringify({position:3,product_id:501,config_options:{plan:'标准版'}})));
+  await page.goto(origin+'/cart/goodsList.htm?product_id=501&change=true&name=A%20B&config=%7B%22a%22%3A1%7D#network',{waitUntil:'load'});await ready(501);
+  const address=new URL(page.url());
+  check(address.searchParams.get('change')==='true'&&address.searchParams.get('name')==='A B'&&address.searchParams.get('config')==='{"a":1}'&&address.hash==='#network','native route preserves cart editing and deep-link context '+width);
+  check(await page.evaluate(()=>JSON.parse(sessionStorage.product_information).position===3),'native navigation retains the existing cart position '+width);
+  await page.goto(origin+'/cart/goods_embed.htm?id=501&embed=1&embed_nonce=old',{waitUntil:'load'});await ready(501);
+  check(!new URL(page.url()).searchParams.has('embed_nonce'),'old third-party embed entry is promoted to the official host '+width);
+  check(reads.every(r=>r.flag!=='true'),'public entry never enables hidden-product mode '+width);
+  check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'native document fits the viewport '+width);
+  await context.close();
  }
- check(errors.length===0,'no unhandled errors or duplicate global declarations in actual cart pages')
- fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({status:'passed',checks,errors,blocked},null,2))
- console.log(JSON.stringify({status:'passed',checks:checks.length}))
-}catch(error){if(page&&!page.isClosed())await page.screenshot({path:path.join(out,'failure.png'),fullPage:true});fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify({error:error.stack,checks,errors},null,2));throw error}
-finally{await browser.close()}
+ check(report.blocked.length===0,'no unexpected business writes were attempted');
+ check(report.errors.length===0,'no unhandled browser errors');report.status='passed';save();
+}catch(error){report.status='failed';report.error=error.stack;save();if(page&&!page.isClosed())await page.screenshot({path:path.join(out,'failure.png'),fullPage:true});process.exitCode=1;}
+finally{await browser.close();console.log(JSON.stringify({status:report.status,checks:report.checks.length,error:report.error}));}

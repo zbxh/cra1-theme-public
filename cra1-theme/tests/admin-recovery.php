@@ -1,5 +1,7 @@
 <?php
 declare(strict_types=1);
+define('CRA1_THEME_BACKEND',dirname(__DIR__).'/backend');
+require CRA1_THEME_BACKEND.'/bootstrap.php';
 require dirname(__DIR__).'/backend/Support/cra1_theme_security.php';
 require dirname(__DIR__).'/backend/Security/AdminRecovery.php';
 use CRA1\Theme\Security\AdminRecovery;

@@ -1,5 +1,5 @@
 <?php
-/** CRA1's private backend. Including it never opens a database or writes files. */
+/** CRA1 private backend. A shared file lock protects requests from concurrent removal; configuration is never changed here. */
 declare(strict_types=1);
 if (!defined('CRA1_THEME_ROOT')) define('CRA1_THEME_ROOT', dirname(__DIR__, 2));
 if (!defined('CRA1_THEME_BACKEND')) {
@@ -24,6 +24,20 @@ if (!defined('CRA1_THEME_BACKEND')) {
         if (!is_array($doc) || json_last_error()!==JSON_ERROR_NONE) throw new \RuntimeException('主题发行清单损坏，原文件保留');
         return $doc;
     };
+    // A lock outside the theme data directory survives complete removal. Never
+    // follow symlinks, and fail promptly while files are being moved.
+    $lifecycleLock=$rootBoundary.'/runtime/cra1-theme-lifecycle.lock';
+    $noLinks($lifecycleLock);
+    if(is_dir($rootBoundary.'/runtime/cra1_theme')){
+        $oldMask=umask(0077);
+        try{$handle=@fopen($lifecycleLock,'c+b');}finally{umask($oldMask);}
+        if(!$handle)throw new \RuntimeException('主题操作锁无法打开：runtime/cra1-theme-lifecycle.lock。请在网站面板检查此文件及 runtime/ 目录是否允许 PHP 运行账号读写，并检查磁盘空间');
+        if(!flock($handle,LOCK_SH|LOCK_NB))throw new \RuntimeException('主题正在停用、启用或卸载，请稍后刷新页面');
+        $GLOBALS['CRA1_THEME_LIFECYCLE_LOCK']=$handle;
+        $noLinks($rootBoundary.'/runtime/cra1-theme-uninstall/pending.json');
+        if(is_file($rootBoundary.'/runtime/cra1-theme-uninstall/pending.json'))throw new \RuntimeException('主题卸载尚未完成，请由服务器管理员运行私有卸载备份中的 recover.php 恢复');
+    }
+    unset($lifecycleLock,$oldMask,$handle);
     // The fixed maintenance entry must be able to finish an extracted update
     // while normal requests continue to use the last committed release.
     $installer = defined('CRA1_THEME_INSTALLER_CANDIDATE') && CRA1_THEME_INSTALLER_CANDIDATE === true;

@@ -232,12 +232,13 @@ final class ConfigurationTransfer
             try{
                 foreach(self::FILES as$domain=>$name)($this->writer)($this->dir.'/'.$name,json_encode($plan['next'][$domain],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR)."\n");
                 $member=new MemberCenterStore($this->root.'/runtime');$cart=new CartThemeStore($this->root.'/runtime');
-                if(!$member->writePublicSnapshot($plan['next']['member'])||!$cart->writePublicSnapshot($plan['next']['cart']))throw new \RuntimeException('前台快照同步失败');
+                if(!$member->writePublicSnapshot($plan['next']['member']))throw $member->lastStorageFailure()??new \RuntimeException('会员快照同步失败');
+                if(!$cart->writePublicSnapshot($plan['next']['cart']))throw $cart->lastStorageFailure()??new \RuntimeException('购物车快照同步失败');
                 unlink($this->dir.'/transfer-pending.json');unlink($file);try{$this->prune();}catch(\Throwable $cleanup){error_log('CRA1 configuration history cleanup deferred');}
             }catch(\Throwable $e){
-                error_log('CRA1 configuration import failed: '.get_class($e));
-                try{$this->restore($backup);}catch(\Throwable $restore){throw new \InvalidArgumentException('配置导入中断，请检查存储空间和目录权限，再点击恢复原配置');}
-                throw new \InvalidArgumentException('配置导入未完成，原配置已恢复，请检查存储空间和目录权限后重试');
+                $reference=\CRA1\Theme\Diagnostics::record($e,'导入主题配置',$this->root);$reason=\CRA1\Theme\Diagnostics::reason($e,$this->root);
+                try{$this->restore($backup);}catch(\Throwable $restore){throw new \InvalidArgumentException('配置导入中断。原因：'.$reason.' 自动恢复未完成：'.\CRA1\Theme\Diagnostics::reason($restore,$this->root).' 请处理后恢复原配置。参考编号：'.$reference);}
+                throw new \InvalidArgumentException('配置导入未完成，原配置已恢复。原因：'.$reason.' 参考编号：'.$reference);
             }
             return ['status'=>200,'msg'=>$operation==='history.restore'?'历史配置已恢复，恢复前的配置已自动备份':'完整主题配置已导入，原配置已自动备份','data'=>['warnings'=>$plan['warnings'],'backup'=>$backup]];
         });});

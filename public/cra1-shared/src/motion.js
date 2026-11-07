@@ -75,6 +75,9 @@
   }
   function enter(page) {
     if (pages.has(page) || !page.isConnected) return;
+    // Translating an official cart module also moves its fixed purchase bar.
+    // Let that complete module own its own entry and panel transitions.
+    if (document.documentElement.hasAttribute('data-cra1-native-module') && page.matches('main.el-main')) return;
     if (page.id === 'cra1-content-slot' && !root.__CRA1_SHELL_READY__) return;
     // Do not consume the entrance while an empty React slot or a skeleton-only
     // account page is waiting for its first real content. Refreshes reuse the
@@ -130,6 +133,7 @@
     }
   }
   function update(records) {
+    if (document.documentElement.hasAttribute('data-cra1-native-module')) return;
     records.forEach(function (record) {
       if (record.type !== 'attributes') return;
       if (record.attributeName === 'aria-selected' && record.oldValue === 'false' && record.target.getAttribute('aria-selected') === 'true') {

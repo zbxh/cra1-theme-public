@@ -193,7 +193,7 @@ trait ThemeEditorStore
         $editor=$this->editor($domain,$id);if(!$patch)throw new InvalidArgumentException('没有需要保存的修改');
         $check=function($raw)use($editor,$expected){$payload=$this->editorPayload($editor,$raw);foreach($editor['sections']as$name=>$scope)if(!isset($expected[$name])||!is_string($expected[$name])||!hash_equals($payload['revisions'][$name],$expected[$name]))return $payload;return null;};
         if($domain==='website'){
-            $lock=fopen($this->configFile.'.lock','c');if(!$lock||!flock($lock,LOCK_EX))throw new RuntimeException('存储锁不可用');
+            $lock=\CRA1\Theme\Files::openLock($this->configFile.'.lock');
             try{$raw=self::readJson($this->configFile);$conflict=$check($raw);if($conflict)return ['status'=>409,'msg'=>'当前页面已有更新，你的修改已保留','data'=>$conflict];$next=$this->applyEditor($editor,$raw,$patch);if($next!==$raw)$this->writeMain($next);return ['status'=>200,'msg'=>'当前配置页已保存','data'=>$this->editorPayload($editor,$next)];}
             finally{flock($lock,LOCK_UN);fclose($lock);}
         }
@@ -205,6 +205,7 @@ trait ThemeEditorStore
         if($result['status']===409)return ['status'=>409,'msg'=>$result['msg'],'data'=>$this->editorPayload($editor,$this->editorRead($domain))];
         if($result['status']!==200)return $result;
         $payload=$this->editorPayload($editor,$result['data']['config']);$payload['snapshot_ok']=$result['data']['snapshot_ok'];
+            foreach(['snapshot_error','save_state'] as $key) if(array_key_exists($key,$result['data']))$payload[$key]=$result['data'][$key];
         return ['status'=>200,'msg'=>$result['msg'],'data'=>$payload];
     }
     public function preview(string $domain,string $id,array $patch,array $related=[]): array
@@ -214,14 +215,14 @@ trait ThemeEditorStore
         $raw=$this->applyEditor($editor,$raw,$patch);$dir=$this->root.'/runtime/cra1_theme/previews';
         if($domain==='member')$raw=$this->member->normalizedPreview($raw);
         if($domain==='cart')$raw=$this->cart->normalizedPreview($raw);
-        if(!is_dir($dir)&&!mkdir($dir,0750,true))throw new RuntimeException('预览目录不可写');
+        \CRA1\Theme\Files::directory($dir,0700);
         foreach(glob($dir.'/*.json')?:[]as$file)if(filemtime($file)<time()-900)@unlink($file);
         $files=glob($dir.'/*.json')?:[];if(count($files)>200){usort($files,static function($a,$b){return filemtime($a)<=>filemtime($b);});foreach(array_slice($files,0,count($files)-200)as$file)@unlink($file);}
         // Capture the browser address from this authenticated POST. Preview GETs
         // may carry an internal proxy Host and no Origin or Referer header.
         $origin=$GLOBALS['THEME_ORIGIN']??CRA1ThemeSecurity::currentOrigin($_SERVER);
         $token=bin2hex(random_bytes(32));$doc=['domain'=>$domain,'editorId'=>$id,'pageKey'=>$editor['pageKey']??null,'expires'=>time()+900,'config'=>$raw,'owner_id'=>(int)(theme_actor()['id']??0),'session_hash'=>CRA1ThemeSecurity::hashToken((string)($_SESSION['security_token']??'')),'message_nonce'=>bin2hex(random_bytes(24)),'origin'=>$origin];
-        if(file_put_contents($dir.'/'.$token.'.json',$this->encode($doc))===false)throw new RuntimeException('无法生成预览');@chmod($dir.'/'.$token.'.json',0640);
+        \CRA1\Theme\Files::atomic($dir.'/'.$token.'.json',$this->encode($doc),0600);
         $base=basename(dirname($_SERVER['SCRIPT_NAME']??'/cra1admin/index.php'));
         $url='/'.$base.'/index.php?r=preview&__theme_preview='.$token;
         if($domain==='member'&&$id==='server')$url.='&id=1';

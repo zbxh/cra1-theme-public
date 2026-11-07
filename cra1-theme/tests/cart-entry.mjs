@@ -3,18 +3,22 @@ import fs from 'node:fs'
 import vm from 'node:vm'
 import assert from 'node:assert/strict'
 const source=fs.readFileSync(new URL('../source/legacy-assets/cart/20261012-cart-entry-v1/js/goods.js',import.meta.url),'utf8')
+const policy=fs.readFileSync(new URL('../source/legacy-assets/cart/20261012-cart-entry-v1/js/module-policy.js',import.meta.url),'utf8')
 const checks=[]
-async function run({params={},address='',cache='{"cart_change_product":1}',config={data:{status:200,data:{content:'<div>fixture configuration</div>'}}},product={data:{status:404}},framed=false}={}){
+async function run({params={},address='',cache='{"cart_change_product":1}',config={data:{status:200,data:{module:'idcsmart_common',content:'<div>fixture configuration</div>'}}},product={data:{status:404}},framed=false}={}){
  const requests=[],errors=[],messages=[],loading={style:{}},root={style:{}},content={innerHTML:''};let instance
  const window={location:new URL(address||'https://fixture.invalid/cart/goods_embed.htm'),addEventListener(){},dispatchEvent(){},__CART_EMBED__:{fail:s=>errors.push(s),markReady:()=>messages.push('ready')}}
  window.history={state:{marker:'retained'},replaceState(state,title,value){assert.equal(state,this.state);window.location=new URL(value,window.location)}}
  window.CRA1ModuleDeps={async ensure(group){assert.equal(group,'config')},async mountScripts(host){assert.equal(host,content);messages.push(host.innerHTML)}}
  window.self=window;window.top=framed?{}:window
+ window.location.replace=url=>messages.push({redirect:url});window.top.location=window.location
+ window.CRA1CartControls={transform:html=>html}
+ vm.runInNewContext(policy,{window,URL})
  const localStorage={getItem:()=>cache,setItem(){}}
  function Vue(options){instance=this;Object.assign(this,options.data());for(const[k,method]of Object.entries(options.methods))this[k]=method.bind(this);this.$message={error:s=>errors.push(s)};this.$nextTick=fn=>fn?fn():Promise.resolve();this.$mount=()=>{options.mounted.call(this);return this};options.created.call(this)}
  Vue.prototype={}
  const jquery=()=>({html:s=>messages.push(s)});jquery.ajaxSetup=()=>{}
- const context={window,localStorage,Vue,document:{title:'',getElementsByClassName:()=>[root],getElementById:()=>loading,querySelector:selector=>selector==='.config-box .content'?content:null},getUrlParams:()=>({...Object.fromEntries(new URLSearchParams(window.location.search)),...params}),asideMenu:{},topMenu:{},pagination:{},getOrederConfig:async p=>{requests.push(p);return config},apiProductDetail:async()=>product,productGroupSecond:async()=>({data:{data:{list:[]}}}),$:jquery,URLSearchParams,Event:class{},setInterval:()=>1,clearInterval(){}}
+ const context={window,localStorage,Vue,document:{title:'',documentElement:{toggleAttribute(){}},getElementsByClassName:()=>[root],getElementById:()=>loading,querySelector:selector=>selector==='.config-box .content'?content:null},getUrlParams:()=>({...Object.fromEntries(new URLSearchParams(window.location.search)),...params}),asideMenu:{},topMenu:{},pagination:{},getOrederConfig:async p=>{requests.push(p);return config},apiProductDetail:async()=>product,productGroupSecond:async()=>({data:{data:{list:[]}}}),$:jquery,URLSearchParams,Event:class{},setInterval:()=>1,clearInterval(){}}
  vm.runInNewContext(source,context);window.onload();await new Promise(resolve=>setTimeout(resolve,0));return{requests,errors,messages,instance,location:window.location}
 }
 for(const params of [{},{id:'0'},{id:'NaN'}]){
@@ -27,6 +31,11 @@ for(const page of ['goods','goods_iframe','goods_embed']){
 }
 const explicit=await run({address:'https://fixture.invalid/cart/goods_iframe.htm?id=5&product_id=4'});assert.equal(explicit.location.searchParams.get('id'),'5');assert.equal(explicit.requests[0].id,'5');checks.push('an explicit native id is not replaced by a link alias');
 const failed=await run({params:{id:'4'},config:{data:{status:403,msg:'provider private path /internal/fixture'}}});assert.equal(failed.errors[0],'商品配置暂不可用，请重试或选择其他商品。');assert.equal(failed.messages.length,0);checks.push('unavailable product has a safe error and never reads absent detail')
+const nativeContent='<div data-vendor="untouched">original module</div>'
+const native=await run({address:'https://fixture.invalid/cart/goods.htm?id=4',config:{data:{status:200,data:{module:'recloud_service',content:nativeContent}}}})
+assert.equal(native.messages.includes(nativeContent),true);assert.equal(native.instance.content,nativeContent);checks.push('native page uses the official jQuery contract with the exact module response')
+const promoted=await run({address:'https://fixture.invalid/cart/goods_embed.htm?id=4&change=true&name=A%20B',config:{data:{status:200,data:{module:'vendor_custom',content:nativeContent}}},framed:true})
+assert.match(promoted.messages[0].redirect,/\/cart\/goods.htm\?/);assert.match(promoted.messages[0].redirect,/change=true/);assert.equal(promoted.messages.includes(nativeContent),false);checks.push('an old third-party embed link navigates before mounting module scripts')
 const missing=await run({params:{id:'4'},product:{data:{status:200,data:{}}}});assert.equal(missing.errors.length,0);assert.equal(missing.instance.content.includes('fixture'),true);checks.push('missing optional product-switcher data preserves configuration')
 for(const cache of [null,'{invalid-json']){const r=await run({params:{id:'4'},cache});assert.equal(r.errors.length,0);assert.equal(r.messages.includes('ready'),true);checks.push('absent or invalid legacy cache does not stop the cart')}
 const bridge=fs.readFileSync(new URL('../source/legacy-assets/cart/20261017-compat-v3/js/goods_embed.js',import.meta.url),'utf8')
@@ -71,6 +80,15 @@ checks.push('invalid product aliases do not become native module ids')
  productVM.loadingPrice=false;productVM.calcTotalPrice=0;poll();assert.equal(messages.at(-1).payload.availability,'ready');assert.equal(messages.at(-1).payload.price.calcText,'0.00');checks.push('a confirmed zero price remains a valid quote');
  productVM.cycleList=[];poll();assert.equal(messages.at(-1).payload.durations.length,0);assert.equal(messages.at(-1).payload.current,null);assert.equal(messages.at(-1).payload.price.calcText,'');checks.push('disappearing periods clear stale selection and price');
  productVM.cycleList=[{id:1,name:'每月'}];productVM.params.duration_id=999;poll();assert.equal(messages.at(-1).payload.availability,'loading');checks.push('an unavailable selected period cannot use a previous price');
+}
+{
+ const messages=[],classes=new Set();let inspected=0;
+ const productVM={get cycleList(){inspected++;return []},params:{},calcTotalPrice:0,handlerCart(){},submitOrder(){}};
+ const document={body:{scrollHeight:480,classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)}},documentElement:{scrollHeight:480},getElementById:()=>({style:{}}),querySelector:()=>({style:{}}),querySelectorAll:()=>[{__vue__:productVM}]};
+ const window={location:new URL('https://fixture.invalid/cart/goods_embed.htm?id=4&embed=1'),addEventListener(){},parent:{postMessage:m=>messages.push(m)}};
+ vm.runInNewContext(bridge,{window,document,location:window.location,URLSearchParams,setInterval:()=>1,clearInterval(){}});
+ window.__CART_EMBED__.nativeModule=true;window.__CART_EMBED__.markReady();
+ assert.equal(inspected,0);assert.equal(classes.has('rail-bridged'),false);assert.equal(messages.at(-1).type,'rail-fallback');checks.push('an unknown module keeps its own controls even when its VM resembles a known module');
 }
 for(const pay_type of ['free','onetime']){
  const messages=[],classes=new Set(),timers=new Map();let id=0;

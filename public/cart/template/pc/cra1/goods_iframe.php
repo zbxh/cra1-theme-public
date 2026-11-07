@@ -1,7 +1,6 @@
 {php}require_once IDCSMART_ROOT.'public/cra1-shared/cart-runtime.php';cra1_cart_runtime((string)($themes??''));{/php}
 <script src="/{$template_catalog}/template/{$themes}/js/common/jquery.mini.js"></script>
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261011-titanium-v1/css/goods_iframe.css', '/cart/template/pc/cra1/releases/20261011-titanium-v1/css/goods_iframe.css')}">
-<link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261012-icon-suite-v1/css/cart-theme.css', '/cart/template/pc/cra1/releases/20261012-icon-suite-v1/css/cart-theme.css')}">
 <script src="{:cra1_theme_asset_url('native', 'js/module-deps.js', '/clientarea/template/pc/cra1/js/module-deps.js')}"></script>
 </head>
 
@@ -31,7 +30,7 @@
   <script src="{:cra1_theme_asset_url('native', 'components/payDialog/payDialog.js', '/clientarea/template/pc/cra1/releases/20261017-compat-v3/components/payDialog/payDialog.js')}"></script>
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/product.js"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261013-security-snapshot-v1/js/cart-config.js', '/cart/template/pc/cra1/releases/20261013-security-snapshot-v1/js/cart-config.js')}"></script>
-<script src="{:cra1_theme_asset_url('cart', '20261012-icon-suite-v1/js/cart-controls.js', '/cart/template/pc/cra1/releases/20261012-icon-suite-v1/js/cart-controls.js')}"></script>
+<script src="{:cra1_theme_asset_url('cart', '20261012-cart-entry-v1/js/module-policy.js', '/cart/template/pc/cra1/releases/20261012-cart-entry-v1/js/module-policy.js')}"></script>
 <script src="{:cra1_theme_asset_url('cart', '20261012-cart-entry-v1/js/goods.js', '/cart/template/pc/cra1/releases/20261012-cart-entry-v1/js/goods.js')}"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/pagination/pagination.js"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/discountCode/discountCode.js"></script>

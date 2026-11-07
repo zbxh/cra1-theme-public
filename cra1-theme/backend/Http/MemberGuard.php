@@ -7,7 +7,7 @@ class MemberGuard extends \app\http\middleware\CheckHome
 {
     public function handle($request, \Closure $next)
     {
-        return parent::handle($request, static function ($authenticated) use ($next) {
+        $response=parent::handle($request, static function ($authenticated) use ($next) {
             if ((int)$authenticated->client_id <= 0) return json(['status'=>401,'msg'=>'登录已失效，请重新登录']);
             if(is_file(CRA1_THEME_ROOT.'/runtime/cra1_theme/distribution/pending.json'))return json(['status'=>503,'msg'=>'服务正在维护，请稍后重试']);
             $path = \CRA1\Theme\Security\OperationVerification::path($authenticated);
@@ -48,5 +48,11 @@ class MemberGuard extends \app\http\middleware\CheckHome
             }
             return \CRA1\Theme\Security\OperationVerification::filterResponse($authenticated, $response);
         });
+        if(!$request->is_api&&is_object($response)&&method_exists($response,'getData')){
+            $payload=$response->getData();
+            if(is_array($payload)&&((int)($payload['status']??0)>=400||(method_exists($response,'getCode')?$response->getCode():200)>=400))
+                $response->data(CustomerError::payload($payload,(method_exists($response,'getCode')?$response->getCode():200),['path'=>\CRA1\Theme\Security\OperationVerification::path($request),'method'=>$request->method()]))->header(['Cache-Control'=>'no-store, private']);
+        }
+        return $response;
     }
 }

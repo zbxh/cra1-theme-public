@@ -1835,20 +1835,21 @@ body {
 
 /* ==========================================================================
    订购产品 / 购物车页重塑（阿里云式，CSS-only，不改 public/cart/）
+   第三方原生商品页保留模块自身布局，排除以下购物车重塑规则。
    注意：goodsList.css / shoppingCar.css 在本文件之后加载，因此关键属性用
    !important + 更高特异性选择器压住默认样式。
    ========================================================================== */
 
 /* 搜索区：一行靠右、控件统一高度圆角 */
-.template .search-box,
-.goods > .el-container .search-box {
+html:not([data-cra1-native-module]) .template .search-box,
+html:not([data-cra1-native-module]) .goods > .el-container .search-box {
   display: flex !important;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
   margin: 0 0 18px !important;
 }
-.template .search-box .el-input__inner {
+html:not([data-cra1-native-module]) .template .search-box .el-input__inner {
   height: 36px !important;
   line-height: 36px !important;
   border-radius: calc(var(--radius) - 4px) !important;
@@ -1856,12 +1857,12 @@ body {
   background: rgba(255, 255, 255, 0.8);
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
-.template .search-box .el-input__inner:hover { border-color: var(--primary) !important; }
-.template .search-box .el-input__inner:focus {
+html:not([data-cra1-native-module]) .template .search-box .el-input__inner:hover { border-color: var(--primary) !important; }
+html:not([data-cra1-native-module]) .template .search-box .el-input__inner:focus {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent) !important;
 }
-.template .search-box .search-btn {
+html:not([data-cra1-native-module]) .template .search-box .search-btn {
   height: 36px !important;
   padding: 0 22px !important;
   border-radius: calc(var(--radius) - 4px) !important;
@@ -1869,19 +1870,19 @@ body {
   border-color: var(--primary) !important;
   font-size: 13px;
 }
-.template .search-box .search-btn:hover { background: #0f56be !important; border-color: #0f56be !important; }
+html:not([data-cra1-native-module]) .template .search-box .search-btn:hover { background: #0f56be !important; border-color: #0f56be !important; }
 
 /* 商品卡片网格：填满行宽 */
-.template .goods-list-div,
-.goods > .el-container .goods-list-div {
+html:not([data-cra1-native-module]) .template .goods-list-div,
+html:not([data-cra1-native-module]) .goods > .el-container .goods-list-div {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
   gap: 18px !important;
 }
 
 /* 玻璃卡片 + 悬停浮起 */
-.template .shopping-item,
-.goods > .el-container .shopping-item {
+html:not([data-cra1-native-module]) .template .shopping-item,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item {
   position: relative !important;
   overflow: hidden !important;
   border: 1px solid #E5E8ED !important;
@@ -1889,24 +1890,24 @@ body {
   background: #ffffff !important;
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease !important;
 }
-.template .shopping-item:hover,
-.goods > .el-container .shopping-item:hover {
+html:not([data-cra1-native-module]) .template .shopping-item:hover,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item:hover {
   transform: translateY(-3px) !important;
   border-color: color-mix(in srgb, var(--primary) 35%, transparent) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* 顶部品牌渐变条（替代灰块占位） */
-.template .shopping-item .goods-description,
-.goods > .el-container .shopping-item .goods-description {
+html:not([data-cra1-native-module]) .template .shopping-item .goods-description,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item .goods-description {
   height: 92px !important;
   background:
     radial-gradient(120% 160% at 85% -20%, rgba(255, 255, 255, 0.5) 0%, transparent 55%),
     linear-gradient(135deg, #1677e8 0%, #4f8ef7 55%, #7db4ff 100%) !important;
   position: relative;
 }
-.template .shopping-item .goods-description::before,
-.goods > .el-container .shopping-item .goods-description::before {
+html:not([data-cra1-native-module]) .template .shopping-item .goods-description::before,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item .goods-description::before {
   content: '' !important;
   position: absolute;
   right: -26px;
@@ -1916,8 +1917,8 @@ body {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.14);
 }
-.template .shopping-item .goods-description::after,
-.goods > .el-container .shopping-item .goods-description::after {
+html:not([data-cra1-native-module]) .template .shopping-item .goods-description::after,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item .goods-description::after {
   content: '' !important;
   position: absolute;
   left: 18px;
@@ -1929,38 +1930,38 @@ body {
 }
 
 /* 内容区排版 */
-.template .shopping-item .goods-content,
-.goods > .el-container .shopping-item .goods-content {
+html:not([data-cra1-native-module]) .template .shopping-item .goods-content,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item .goods-content {
   padding: 14px 18px 16px !important;
 }
-.template .shopping-item .goods-name-text,
-.goods > .el-container .shopping-item .goods-name-text {
+html:not([data-cra1-native-module]) .template .shopping-item .goods-name-text,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item .goods-name-text {
   font-size: 14.5px !important;
   font-weight: 600 !important;
   color: var(--foreground) !important;
 }
-.template .shopping-item .goods-active,
-.goods > .el-container .shopping-item .goods-active { display: none !important; }
+html:not([data-cra1-native-module]) .template .shopping-item .goods-active,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item .goods-active { display: none !important; }
 
 /* 价格 + 购买按钮 */
-.template .shopping-item .price-box,
-.goods > .el-container .shopping-item .price-box {
+html:not([data-cra1-native-module]) .template .shopping-item .price-box,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item .price-box {
   display: flex !important;
   align-items: center;
   justify-content: space-between;
   margin-top: 12px !important;
 }
-.template .shopping-item .item-price,
-.goods > .el-container .shopping-item .item-price {
+html:not([data-cra1-native-module]) .template .shopping-item .item-price,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item .item-price {
   color: var(--primary) !important;
   font-size: 20px !important;
   font-weight: 700 !important;
   font-variant-numeric: tabular-nums;
 }
-.template .shopping-item .item-price-prefix { font-size: 12px !important; font-weight: 600 !important; margin-right: 1px !important; }
-.template .shopping-item .item-price-cycle { font-size: 12px !important; font-weight: 400 !important; color: var(--muted-foreground) !important; margin-left: 2px !important; }
-.template .shopping-item .buy-btn,
-.goods > .el-container .shopping-item .buy-btn {
+html:not([data-cra1-native-module]) .template .shopping-item .item-price-prefix { font-size: 12px !important; font-weight: 600 !important; margin-right: 1px !important; }
+html:not([data-cra1-native-module]) .template .shopping-item .item-price-cycle { font-size: 12px !important; font-weight: 400 !important; color: var(--muted-foreground) !important; margin-left: 2px !important; }
+html:not([data-cra1-native-module]) .template .shopping-item .buy-btn,
+html:not([data-cra1-native-module]) .goods > .el-container .shopping-item .buy-btn {
   height: 32px !important;
   padding: 0 20px !important;
   border-radius: calc(var(--radius) - 4px) !important;
@@ -1969,20 +1970,20 @@ body {
   border-color: var(--primary) !important;
   transition: background-color 150ms ease, transform 150ms ease !important;
 }
-.template .shopping-item .buy-btn:hover { background: #0f56be !important; border-color: #0f56be !important; transform: translateY(-1px); }
+html:not([data-cra1-native-module]) .template .shopping-item .buy-btn:hover { background: #0f56be !important; border-color: #0f56be !important; transform: translateY(-1px); }
 
 /* 购物车：表头底色、边框统一 */
-.template .el-table { background: transparent; }
-.template .el-table th.el-table__cell {
+html:not([data-cra1-native-module]) .template .el-table { background: transparent; }
+html:not([data-cra1-native-module]) .template .el-table th.el-table__cell {
   background: rgba(244, 247, 251, 0.92) !important;
   color: var(--foreground) !important;
   font-weight: 600;
 }
-.template .el-table--border,
-.template .el-table--group { border-color: var(--border) !important; }
-.template .el-table td.el-table__cell,
-.template .el-table th.el-table__cell.is-leaf { border-color: var(--border) !important; }
-.template .el-link--primary { color: var(--primary) !important; }
+html:not([data-cra1-native-module]) .template .el-table--border,
+html:not([data-cra1-native-module]) .template .el-table--group { border-color: var(--border) !important; }
+html:not([data-cra1-native-module]) .template .el-table td.el-table__cell,
+html:not([data-cra1-native-module]) .template .el-table th.el-table__cell.is-leaf { border-color: var(--border) !important; }
+html:not([data-cra1-native-module]) .template .el-link--primary { color: var(--primary) !important; }
 
 /* --------------------------------------------------------------------------
    间距体系修复（用户反馈：卡片内容样式错乱——全部贴边、无内外边距）
@@ -1990,46 +1991,46 @@ body {
    CRA1 主题根字号缩小后丢失/被覆盖），标题/搜索/内容全部贴卡片边缘。
    这里统一补齐：卡片内边距 24、标题下 16、搜索与内容间距 16。
    -------------------------------------------------------------------------- */
-.template .main-card,
-.goods > .el-container .main-card {
+html:not([data-cra1-native-module]) .template .main-card,
+html:not([data-cra1-native-module]) .goods > .el-container .main-card {
   padding: 24px !important;
 }
 
-.template .main-title,
-.goods > .el-container .main-title {
+html:not([data-cra1-native-module]) .template .main-title,
+html:not([data-cra1-native-module]) .goods > .el-container .main-title {
   margin: 0 0 16px !important;
   padding: 0 !important;
   line-height: 1.3 !important;
 }
 
 /* 商品列表：标题与搜索区之间、搜索与网格之间留出间距 */
-.template .main-content-box,
-.goods > .el-container .main-content-box {
+html:not([data-cra1-native-module]) .template .main-content-box,
+html:not([data-cra1-native-module]) .goods > .el-container .main-content-box {
   padding: 0 !important;
 }
-.template .search-box,
-.goods > .el-container .search-box {
+html:not([data-cra1-native-module]) .template .search-box,
+html:not([data-cra1-native-module]) .goods > .el-container .search-box {
   margin-bottom: 18px !important;
 }
 
 /* 购物车：搜索区贴卡片顶部，与下方表格留距；表格与底栏留距 */
-.template .goods-box,
-.goods > .el-container .goods-box {
+html:not([data-cra1-native-module]) .template .goods-box,
+html:not([data-cra1-native-module]) .goods > .el-container .goods-box {
   margin: 18px 0 20px !important;
 }
-.template .footer-box,
-.goods > .el-container .footer-box {
+html:not([data-cra1-native-module]) .template .footer-box,
+html:not([data-cra1-native-module]) .goods > .el-container .footer-box {
   margin: 4px 24px 24px !important;
 }
 
 /* 结算页同样受益：标题与表格间距 */
-.template .main-content-box { padding: 0 !important; }
+html:not([data-cra1-native-module]) .template .main-content-box { padding: 0 !important; }
 
 /* 购物车底栏：el-footer 固定条本身透明化（原为白底横条，宽 1475 与内容错位），
    footer-box 升级为与内容区同宽（1440 居中）的玻璃卡，56px 高、左右 24px 内边距，
    全部子项垂直居中。注意 footer-box 无 cra1- 类，不在全局 border-box 组内，需显式声明 */
-.template .el-footer,
-.goods > .el-container .el-footer {
+html:not([data-cra1-native-module]) .template .el-footer,
+html:not([data-cra1-native-module]) .goods > .el-container .el-footer {
   position: fixed !important;
   left: 0 !important;
   right: 0 !important;
@@ -2040,8 +2041,8 @@ body {
   box-sizing: border-box;
 }
 
-.template .footer-box,
-.goods > .el-container .footer-box {
+html:not([data-cra1-native-module]) .template .footer-box,
+html:not([data-cra1-native-module]) .goods > .el-container .footer-box {
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: 1440px !important;
@@ -2058,27 +2059,27 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
 }
 
-.template .footer-box .footer-left,
-.goods > .el-container .footer-box .footer-left {
+html:not([data-cra1-native-module]) .template .footer-box .footer-left,
+html:not([data-cra1-native-module]) .goods > .el-container .footer-box .footer-left {
   display: flex !important;
   align-items: center !important;
   gap: 16px;
 }
-.template .footer-box .footer-right,
-.goods > .el-container .footer-box .footer-right {
+html:not([data-cra1-native-module]) .template .footer-box .footer-right,
+html:not([data-cra1-native-module]) .goods > .el-container .footer-box .footer-right {
   display: flex !important;
   align-items: center !important;
 }
-.template .footer-box .el-button--primary {
+html:not([data-cra1-native-module]) .template .footer-box .el-button--primary {
   height: 34px !important;
   border-radius: calc(var(--radius) - 4px) !important;
   font-size: 13px !important;
 }
-.template .el-link--primary { color: var(--primary) !important; }
+html:not([data-cra1-native-module]) .template .el-link--primary { color: var(--primary) !important; }
 
 /* 购物车空态：玻璃卡片内居中 */
-.template .goods-box > div > .el-empty { padding: 60px 0; }
-.template .el-empty__description p { color: var(--muted-foreground) !important; }
+html:not([data-cra1-native-module]) .template .goods-box > div > .el-empty { padding: 60px 0; }
+html:not([data-cra1-native-module]) .template .el-empty__description p { color: var(--muted-foreground) !important; }
 
 /* SelfChangeIp: 产品详情页"更换IP"按钮 */
 .sch-pd-change-ip {

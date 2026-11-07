@@ -29,11 +29,11 @@ test('an upload size rejection suggests local import instead of retrying the who
  }finally{globalThis.XMLHttpRequest=old}
 })
 
-test('network failures leave the user able to retry without an automatic second upload', async()=>{
+test('network failures report an unconfirmed result without an automatic second upload', async()=>{
  const old=globalThis.XMLHttpRequest;let count=0
  globalThis.XMLHttpRequest=class {upload={};open(){}setRequestHeader(){}send(){count++;this.onerror()}}
  try{
-  await assert.rejects(api('api.release.upload',new FormData(),{reauth:false,onUploadProgress:()=>{}}),/上传连接中断/)
+  await assert.rejects(api('api.release.upload',new FormData(),{reauth:false,onUploadProgress:()=>{}}),error=>/连接中断/.test(error.message)&&error.uncertain===true)
   assert.equal(count,1)
  }finally{globalThis.XMLHttpRequest=old}
 })

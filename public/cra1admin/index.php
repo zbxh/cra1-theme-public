@@ -103,8 +103,17 @@ header('Content-Security-Policy: default-src \'self\'; script-src \'self\' \'non
 
 /* ---------- 通用工具 ---------- */
 function json_out(array $data,int $code=200): void {
-    if(($data['status']??0)===200&&strpos($GLOBALS['THEME_WRITE']['target']??'','website:')===0&&in_array($GLOBALS['THEME_WRITE']['action']??'',['seo.save','workspace.editor.save','workspace.save','save','reset'],true)){try{require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_seo.php';theme_generate_seo($GLOBALS['ROOT'],($GLOBALS['THEME_SETTINGS']['canonical_url']?:$GLOBALS['THEME_ORIGIN']));}catch(Throwable $e){$data['data']['seo_ok']=false;$data['msg']='配置已保存，搜索引擎文件同步失败，请通过维护命令重建。';}}
-    $data=theme_api_complete($data);$status=(int)($data['status']??$code);
+    if(($data['status']??0)===200&&strpos($GLOBALS['THEME_WRITE']['target']??'','website:')===0&&in_array($GLOBALS['THEME_WRITE']['action']??'',['seo.save','workspace.editor.save','workspace.save','save','reset'],true)){try{require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_seo.php';theme_generate_seo($GLOBALS['ROOT'],($GLOBALS['THEME_SETTINGS']['canonical_url']?:$GLOBALS['THEME_ORIGIN']));}catch(Throwable $e){$data['data']['seo_ok']=false;$data['data']['save_state']='partial';$data['data']['seo_error']=\CRA1\Theme\Diagnostics::reason($e,$GLOBALS['ROOT']);$data['msg']='配置已保存，搜索引擎文件同步失败。原因：'.$data['data']['seo_error'].' 请修复后重新保存 SEO 设置。';}}
+    try{$data=theme_api_complete($data);}catch(Throwable $e){
+        $reference=\CRA1\Theme\Diagnostics::record($e,'记录操作结果',$GLOBALS['ROOT'],$GLOBALS['THEME_REQUEST_ID']);
+        $data['data']['audit_ok']=false;$data['data']['save_state']=($data['status']??0)===200?'partial':'unknown';
+        $data['msg']=(($data['status']??0)===200?'操作已完成，但记录结果时失败。':'未能确认操作结果。').'原因：'.\CRA1\Theme\Diagnostics::reason($e,$GLOBALS['ROOT']).' 参考编号：'.$reference;
+    }
+    $status=(int)($data['status']??$code);
+    if($status>=400){
+        if(empty($GLOBALS['THEME_ACTOR'])){unset($data['error']);$data=\CRA1\Theme\Http\CustomerError::payload($data,$status);}
+        else $data['msg']=\CRA1\Theme\Diagnostics::reason(new RuntimeException((string)($data['msg']??'')),$GLOBALS['ROOT']);
+    }elseif(isset($data['msg']))$data['msg']=\CRA1\Theme\Diagnostics::clean((string)$data['msg'],$GLOBALS['ROOT']);
     $data['code']=$data['code']??([200=>'OK',400=>'INVALID_REQUEST',401=>'SESSION_INVALID',403=>'PERMISSION_DENIED',404=>'NOT_FOUND',409=>'CONFIG_CONFLICT',429=>'RATE_LIMITED',500=>'SERVER_ERROR',503=>'SERVICE_UNAVAILABLE'][$status]??'REQUEST_FAILED');
     $data['request_id']=$GLOBALS['THEME_REQUEST_ID'];if(($data['msg']??'')==='success')$data['msg']='已读取';
     http_response_code($status);header('Content-Type: application/json; charset=utf-8');
@@ -112,9 +121,13 @@ function json_out(array $data,int $code=200): void {
 }
 set_exception_handler(function(Throwable $e): void {
     $status=$e instanceof CRA1ThemeSecurityError?$e->status:($e instanceof InvalidArgumentException?400:500);
-    $msg=$e instanceof CRA1ThemeSecurityError?$e->getMessage():($status===400&&preg_match('/[\x{4e00}-\x{9fff}]/u',$e->getMessage())?$e->getMessage():'服务端处理失败，请重试或联系超级管理员。');
-    if(!($e instanceof CRA1ThemeSecurityError))error_log('Theme admin request '.$GLOBALS['THEME_REQUEST_ID'].' exception '.get_class($e));
-    json_out(['status'=>$status,'msg'=>$msg,'code'=>$e instanceof CRA1ThemeSecurityError?$e->errorCode:'SERVER_ERROR'],$status);
+    $phase=!empty($GLOBALS['THEME_WRITE'])?'执行后台操作':'处理后台请求';
+    $data=\CRA1\Theme\Diagnostics::response($e,$phase,$GLOBALS['ROOT'],$GLOBALS['THEME_REQUEST_ID']);
+    $data['status']=$status;
+    if($e instanceof CRA1ThemeSecurityError||$e instanceof InvalidArgumentException)$data['msg']=\CRA1\Theme\Diagnostics::reason($e,$GLOBALS['ROOT']);
+    $data['code']=$e instanceof CRA1ThemeSecurityError?$e->errorCode:($status===400?'INVALID_REQUEST':'OPERATION_FAILED');
+    if(!empty($GLOBALS['THEME_WRITE']))$data['data']['save_state']='unknown';
+    json_out($data,$status);
 });
 
 function theme_admin_read_config(): array
@@ -131,12 +144,8 @@ function audit(string $action,string $result,string $detail=''): void {
 
 function atomic_write(string $file, string $content): bool
 {
-    $tmp = $file . '.tmp.' . getmypid();
-    if (file_put_contents($tmp, $content, LOCK_EX) === false) {
-        return false;
-    }
-    @chmod($tmp, 0640);
-    return rename($tmp, $file);
+    \CRA1\Theme\Files::atomic($file,$content,0640);
+    return true;
 }
 
 function read_json(string $file)
@@ -306,23 +315,13 @@ function config_patch_write(array $patch): array
     global $CONFIG_FILE;
     $defaults = \template\cra1\controller\Cra1::defaults();
     $lockFile = $CONFIG_FILE . '.lock';
-    $dir = dirname($lockFile);
-    if (!is_dir($dir) && !@mkdir($dir, 0750, true) && !is_dir($dir)) {
-        return ['status' => 400, 'msg' => '存储目录不可写'];
-    }
-    $lock = fopen($lockFile, 'c');
-    if (!$lock) {
-        return ['status' => 400, 'msg' => '存储锁不可用'];
-    }
-    flock($lock, LOCK_EX);
-
+    $lock = \CRA1\Theme\Files::openLock($lockFile);
+    try {
     $current = [];
     if (is_file($CONFIG_FILE)) {
         $decoded = json_decode((string) file_get_contents($CONFIG_FILE), true);
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
-            flock($lock, LOCK_UN);
-            fclose($lock);
-            return ['status' => 400, 'msg' => '存储文件损坏，保存已中止，原配置保留'];
+            return ['status' => 400, 'msg' => '配置未保存：runtime/cra1_theme/config.json 内容不是有效的 JSON，原文件已保留'];
         }
         $current = $decoded;
     }
@@ -340,10 +339,8 @@ function config_patch_write(array $patch): array
     $current = (new ThemeWorkspaceStore($GLOBALS['ROOT']))->applyLegacyPatch($current, $accepted);
 
     $ok = atomic_write($CONFIG_FILE, (string) json_encode($current, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-    flock($lock, LOCK_UN);
-    fclose($lock);
-    return $ok ? ['status' => 200, 'msg' => '保存成功，前台已生效']
-               : ['status' => 400, 'msg' => '保存失败：存储文件不可写'];
+    return ['status' => 200, 'msg' => '保存成功，前台已生效'];
+    } finally { flock($lock, LOCK_UN); fclose($lock); }
 }
 
 function config_save(array $input): array
@@ -1449,7 +1446,7 @@ if (strpos($r,'api.')===0) {
                 ];
             }
         } catch (Throwable $e) {
-            json_out(['status' => 500, 'msg' => '读取商品失败：' . $e->getMessage()]);
+            json_out(\CRA1\Theme\Diagnostics::response($e,'读取商品',$ROOT,$THEME_REQUEST_ID));
         }
         json_out(['status' => 200, 'msg' => 'success', 'data' => ['list' => $list]]);
     }

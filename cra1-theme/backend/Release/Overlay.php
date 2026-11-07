@@ -80,7 +80,7 @@ final class Overlay
         if($installed){$data['update_state']='current';return ['data'=>$data];}
         if(!class_exists(\ZipArchive::class))throw new \RuntimeException('PHP 未启用 ZIP 扩展，请在网站面板启用后重新检查');
         $pointer=$this->pointerDigest();$archive=$this->dir.'/overlay/'.bin2hex(random_bytes(16)).'.zip';Files::noLinks($archive);
-        if(!is_dir(dirname($archive))&&!mkdir(dirname($archive),0700,true)&&!is_dir(dirname($archive)))throw new \RuntimeException('更新暂存目录无法创建，请检查 runtime/cra1_theme/ 的写入权限');
+        Files::directory(dirname($archive),0700);
         $zip=new \ZipArchive();
         if($zip->open($archive,\ZipArchive::CREATE|\ZipArchive::EXCL)!==true)throw new \RuntimeException('更新暂存文件无法创建，请检查运行目录的写入权限');
         try{

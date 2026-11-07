@@ -125,7 +125,7 @@ export function ModuleView({ url, params, title, description, empty, onLoaded, d
         <CardContent className="space-y-4 p-5">
           <Alert tone="warning">
             <span className="inline-flex items-center gap-1.5 font-medium">
-              <AlertTriangle className="size-3.5" aria-hidden="true" />页面错误，请刷新重试
+              <AlertTriangle className="size-3.5" aria-hidden="true" />{error}
             </span>
           </Alert>
           <div className="flex flex-wrap gap-2">

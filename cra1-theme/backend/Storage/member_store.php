@@ -58,6 +58,7 @@ final class MemberCenterStore
     private string $mainFile;
     private string $publicFile;
     private string $lockFile;
+    private ?\Throwable $lastFailure = null;
 
     public function __construct(string $runtimeDir)
     {
@@ -263,7 +264,7 @@ final class MemberCenterStore
         $data = $this->readJson($this->mainFile);
         if (!is_array($data)) {
             if (is_file($this->mainFile)) {
-                throw new RuntimeException('主配置 JSON 损坏，保存已中止，原文件保留');
+                throw new RuntimeException('会员中心配置文件格式错误（JSON 无法解析）：'.\CRA1\Theme\Diagnostics::clean($this->mainFile,CRA1_THEME_ROOT).'。请从备份恢复该文件，或联系维护人员修复格式；原文件未改动。');
             }
             return self::defaults();
         }
@@ -288,7 +289,7 @@ final class MemberCenterStore
         $expected = $this->snapshotProjection($config);
         if (!is_array($snap) || $this->canonicalJson($snap) !== $this->canonicalJson($expected)) {
             if (!$this->writePublicSnapshot($config)) {
-                throw new RuntimeException('前台快照同步失败，请检查存储目录权限');
+                throw $this->lastFailure ?? new RuntimeException('前台快照同步失败，未收到可确认的原因');
             }
         }
         } finally { $this->releaseLock($lock); }
@@ -368,7 +369,7 @@ final class MemberCenterStore
                 $normalized,
                 JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT
             ))) {
-                return ['status' => 400, 'msg' => '保存失败：存储文件不可写'];
+                return ['status' => 400, 'msg' => $this->failureMessage('配置未保存')];
             }
 
             // 同步前台快照（失败不回滚主配置，但要在返回里说明）
@@ -376,10 +377,12 @@ final class MemberCenterStore
 
             return [
                 'status' => 200,
-                'msg'    => $snapshotOk ? '已保存' : '已保存，但前台快照写入失败',
+                'msg'    => $snapshotOk ? '已保存' : $this->failureMessage('配置已保存，前台快照同步失败，请修复后重新同步'),
                 'data'   => [
                     'config'  => $this->read(),
                     'snapshot_ok' => $snapshotOk,
+                    'save_state' => $snapshotOk ? 'saved' : 'partial',
+                    'snapshot_error' => $snapshotOk ? '' : $this->failureMessage('同步快照失败'),
                 ],
             ];
         } finally {
@@ -1845,42 +1848,28 @@ final class MemberCenterStore
         if (!is_file($file)) {
             return null;
         }
-        $data = json_decode((string) file_get_contents($file), true);
+        $data = json_decode(\CRA1\Theme\Files::read($file), true);
         return is_array($data) ? $data : null;
     }
 
     private function atomicWrite(string $file, string $content): bool
     {
-        if (!is_dir($this->dir) && !@mkdir($this->dir, 0750, true)) {
-            return false;
-        }
-        $tmp = $file . '.tmp.' . getmypid();
-        if (file_put_contents($tmp, $content, LOCK_EX) === false) {
-            return false;
-        }
-        @chmod($tmp, 0640);
-        if (!rename($tmp, $file)) {
-            @unlink($tmp);
-            return false;
-        }
-        return true;
+        $this->lastFailure=null;
+        try { \CRA1\Theme\Files::atomic($file,$content,0640); return true; }
+        catch (\Throwable $error) { $this->lastFailure=$error; return false; }
     }
 
-    /** @return resource|false */
+    public function lastStorageFailure(): ?\Throwable { return $this->lastFailure; }
+
+    private function failureMessage(string $prefix): string
+    {
+        return $prefix.'：'.($this->lastFailure ? \CRA1\Theme\Diagnostics::reason($this->lastFailure,CRA1_THEME_ROOT) : '未收到可确认的原因，请检查服务端记录');
+    }
+
+    /** @return resource */
     private function acquireLock()
     {
-        if (!is_dir($this->dir)) {
-            @mkdir($this->dir, 0750, true);
-        }
-        $fp = @fopen($this->lockFile, 'c');
-        if (!$fp) {
-            return false;
-        }
-        if (!flock($fp, LOCK_EX)) {
-            fclose($fp);
-            return false;
-        }
-        return $fp;
+        return \CRA1\Theme\Files::openLock($this->lockFile);
     }
 
     /** @param resource $fp */

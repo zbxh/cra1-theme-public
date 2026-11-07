@@ -95,7 +95,8 @@
               <div class="cl-shop">
                 <div class="cl-shop-main">
                   <div v-if="catalogError" class="cui-alert cui-alert--error cra1-cart-read-error" role="alert">
-                    <span>页面错误，请刷新重试</span>
+                    <span>{{ catalogError }}</span>
+                    <el-button size="small" @click="retryCatalog">重新加载</el-button>
                   </div>
                   <!-- 顶部横排导航：搜索 + 一级/二级（层级标题读 v10 first/second_navigation，v6 统一蓝条标题样式） -->
                   <div class="cl-shop-nav" v-if="isNormal && first_group_list.length" role="tablist" :aria-label="navFirstLabel || '商品分组导航'">
@@ -255,7 +256,7 @@
                         <div class="cl-skel-buttons"><span class="cl-skel-btn" v-for="n in 5" :key="'cs'+n"></span></div>
                       </div>
                       <div class="cl-config-error" v-else-if="configState === 'error'">
-                        <el-empty description="页面错误，请刷新重试">
+                        <el-empty description="商品配置暂时无法打开，请尝试在独立页打开；仍无法打开时请联系客服">
                           <el-button @click="openStandalone">在独立页打开</el-button>
                         </el-empty>
                       </div>
@@ -865,6 +866,7 @@
   <script src="/{$template_catalog}/template/{$themes}/components/eventCode/eventCode.js"></script>
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/goodsList.js?v={:filemtime(IDCSMART_ROOT . 'public/cart/template/pc/cra1/api/goodsList.js')}"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261013-security-snapshot-v1/js/cart-config.js', '/cart/template/pc/cra1/releases/20261013-security-snapshot-v1/js/cart-config.js')}"></script>
+<script src="{:cra1_theme_asset_url('cart', '20261012-cart-entry-v1/js/module-policy.js', '/cart/template/pc/cra1/releases/20261012-cart-entry-v1/js/module-policy.js')}"></script>
 <script src="{:cra1_theme_asset_url('cart', '20261012-icon-suite-v1/js/cart-controls.js', '/cart/template/pc/cra1/releases/20261012-icon-suite-v1/js/cart-controls.js')}"></script>
 <script src="{:cra1_theme_asset_url('cart', '20261017-compat-v3/js/goodsList.js', '/cart/template/pc/cra1/releases/20261017-compat-v3/js/goodsList.js')}"></script>
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/product.js?v={:filemtime(IDCSMART_ROOT . 'public/cart/template/pc/cra1/api/product.js')}"></script>

@@ -13,7 +13,7 @@ foreach([0,1,'0','1',false,true]as$flag){
  check(!isset($data['data']['set_operate_password'],$data['data']['trace'],$data['data']['password']),'no added flags, traces or credentials');
  check($data['data']['security_verification']['kind']==='operation','structured challenge preserved');
 }
-$data=Error::payload(['status'=>400,'msg'=>'private provider failure','data'=>['operate_password'=>'hash:secret','child'=>['secret_key'=>'secret','msg'=>'数据库异常'],'debug'=>['sql'=>'private']]]);
+$data=Error::payload(['status'=>400,'msg'=>'private provider failure','data'=>['operate_password'=>'hash:secret','child'=>['secret_key'=>'secret','secret'=>'secret','note'=>'runtime/private.key','msg'=>'数据库异常'],'debug'=>['sql'=>'private']]]);
 check(strpos(json_encode($data),'secret')===false,'secret hashes and nested credentials removed');
 check(strpos(json_encode($data),'private')===false,'diagnostics do not survive payload');
 $data=['status'=>200,'msg'=>'成功','data'=>['file'=>'business-attachment.png']];check(Error::payload($data)===$data,'successful business payload unchanged');

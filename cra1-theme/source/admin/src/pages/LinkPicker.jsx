@@ -45,10 +45,10 @@ export default function LinkPicker({ value, onChange, placeholder, label='跳转
       if (loaded[key]) return
       request().then((res) => {
         if (!alive) return
-        if (res.status !== 200) throw new Error('读取失败')
+        if (res.status !== 200) throw new Error(res.msg || '链接列表读取失败，服务未提供具体原因')
         apply(res.data)
-      }).catch(() => {
-        if (alive) setError((prev) => ({ ...prev, [key]: true }))
+      }).catch((error) => {
+        if (alive) setError((prev) => ({ ...prev, [key]: error.message || '链接列表读取未完成，请重试' }))
       }).finally(() => {
         if (!alive) return
         setLoaded((prev) => ({ ...prev, [key]: true }))
@@ -91,7 +91,7 @@ export default function LinkPicker({ value, onChange, placeholder, label='跳转
 
       {open && (
         <div className="mt-2 overflow-hidden rounded-lg border border-line bg-surface">
-          {error[tab] && <div role="alert" className="p-3 text-xs text-danger">页面错误，请刷新重试</div>}
+          {error[tab] && <div role="alert" className="p-3 text-xs text-danger">{error[tab]}</div>}
           <div className="flex flex-wrap items-center gap-1 border-b border-line bg-surface-alt/60 p-2">
             {TABS.map((t) => {
               const Icon = t.icon

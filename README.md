@@ -6,9 +6,9 @@
 
 钛灰银与香槟金配色 · 桌面与手机适配 · 独立可视化主题后台
 
-[![Release](https://img.shields.io/badge/Release-v17.6.4%20beta-b49b76?style=flat-square)](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.6.4) [![V10](https://img.shields.io/badge/V10-10.7.4-475569?style=flat-square)](docs/installation.md) [![PHP](https://img.shields.io/badge/PHP-7.4-777BB4?style=flat-square)](docs/installation.md) [![License](https://img.shields.io/badge/License-Source%20Available-64748b?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/badge/Release-v17.6.6%20beta-b49b76?style=flat-square)](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.6.6) [![V10](https://img.shields.io/badge/V10-10.7.4-475569?style=flat-square)](docs/installation.md) [![PHP](https://img.shields.io/badge/PHP-7.4-777BB4?style=flat-square)](docs/installation.md) [![License](https://img.shields.io/badge/License-Source%20Available-64748b?style=flat-square)](LICENSE)
 
-**[下载主题](https://github.com/zbxh/cra1-theme-public/releases/download/v17.6.4/CRA1-theme-v17.6.4-install.zip) · [在线演示](https://cra1.coorw.com/) · [主题后台](https://cra1.coorw.com/testadmin/) · [安装教程](docs/installation.md) · [使用文档](docs/usage.md)**
+**[下载主题](https://github.com/zbxh/cra1-theme-public/releases/download/v17.6.6/CRA1-theme-v17.6.6-install.zip) · [在线演示](https://cra1.coorw.com/) · [主题后台](https://cra1.coorw.com/testadmin/) · [安装教程](docs/installation.md) · [使用文档](docs/usage.md)**
 
 [功能亮点](#功能亮点) · [演示账号](#在线演示) · [界面预览](#界面预览) · [快速开始](#快速开始) · [交流与反馈](#交流与反馈)
 
@@ -67,9 +67,9 @@
 
 ### 1. 下载与环境
 
-GitHub 当前提供 **[v17.6.4 测试版](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.6.4)**，安装包已包含运行资源，无需安装 Node.js 或自行编译。
+GitHub 当前提供 **[v17.6.6 测试版](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.6.6)**，安装包已包含运行资源，无需安装 Node.js 或自行编译。
 
-**[下载主题安装包](https://github.com/zbxh/cra1-theme-public/releases/download/v17.6.4/CRA1-theme-v17.6.4-install.zip)** · [查看更新日志](https://github.com/zbxh/cra1-theme-public/releases)
+**[下载主题安装包](https://github.com/zbxh/cra1-theme-public/releases/download/v17.6.6/CRA1-theme-v17.6.6-install.zip)** · [查看更新日志](https://github.com/zbxh/cra1-theme-public/releases)
 
 | 项目 | 当前测试基准 |
 | --- | --- |
@@ -92,7 +92,7 @@ HTTP 网站使用 `http://` 打开同一安装入口。详细目录与图文步�
 
 浏览器上传受限或后台暂时不可用时，可按[安装教程](docs/installation.md#05-已有主题如何更新)使用服务器本地导入或备用解压覆盖流程。
 
-GitHub 自动生成的 **Source code** 压缩包供源码开发使用，安装请选择上面的 `CRA1-theme-v17.6.4-install.zip`。首次安装与覆盖更新使用同一份安装包。
+GitHub 自动生成的 **Source code** 压缩包供源码开发使用，安装请选择上面的 `CRA1-theme-v17.6.6-install.zip`。首次安装与覆盖更新使用同一份安装包。
 
 ## 交流与反馈
 

@@ -24,10 +24,12 @@ final class CRA1ThemeSecurity {
     public static function install(string $root,string $username,string $hash,array $settings=[]): void {
         $dir=rtrim($root,'/').'/runtime/cra1_theme';$cfg=rtrim($root,'/').'/config';
         if(is_file($dir.'/security.sqlite')||is_file($cfg.'/cra1_theme_security.key'))throw new RuntimeException('已有安全数据或密钥，禁止重新初始化');
-        foreach([$dir,$cfg]as$p)if(!is_dir($p)&&!mkdir($p,0700,true))throw new RuntimeException('无法创建安全目录');
+        foreach([$dir,$cfg]as$p)\CRA1\Theme\Files::directory($p,0700);
         self::username($username); if(!password_get_info($hash)['algo'])throw new RuntimeException('原密码哈希无效');
-        $key=random_bytes(32);$keyFile=$cfg.'/cra1_theme_security.key';$f=fopen($keyFile,'x');if(!$f)throw new RuntimeException('无法创建密钥');fwrite($f,$key);fclose($f);chmod($keyFile,0600);
-        $file=$dir.'/security.sqlite';$pdo=new PDO('sqlite:'.$file,null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);chmod($file,0600);
+        $key=random_bytes(32);$keyFile=$cfg.'/cra1_theme_security.key';
+        $f=\CRA1\Theme\Failure::attempt('创建后台安全密钥',$keyFile,static function()use($keyFile){return fopen($keyFile,'x');},0600);
+        try{\CRA1\Theme\Failure::attempt('写入后台安全密钥',$keyFile,static function()use($f,$key){return fwrite($f,$key)===strlen($key)&&fflush($f);},0600);\CRA1\Theme\Failure::attempt('设置密钥权限',$keyFile,static function()use($keyFile){return chmod($keyFile,0600);},0600);}finally{fclose($f);}
+        $file=$dir.'/security.sqlite';try{$pdo=new PDO('sqlite:'.$file,null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);}catch(Throwable $error){throw new RuntimeException('创建后台安全数据库 runtime/cra1_theme/security.sqlite 失败。原因：'.\CRA1\Theme\Diagnostics::reason($error,$root),0,$error);}chmod($file,0600);
         $pdo->exec('PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON;');
         $pdo->exec(<<<'SQL'
 CREATE TABLE meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);
@@ -188,7 +190,8 @@ SQL
         if($a==='distribution.overlay_update')return '完成解压覆盖更新';
         if($a==='distribution.overlay_recover')return '恢复解压覆盖更新';
         if($a==='transfer.history.settings.save')return '修改配置历史保留份数';
-        $releases=['release.upload'=>'上传主题安装包','release.local.import'=>'导入服务器安装包','release.apply'=>'覆盖更新主题','release.rollback'=>'回退主题更新','release.recover'=>'恢复中断更新'];
+        if($a==='release.lifecycle.apply')return '停用、启用或卸载主题';
+        $releases=['release.upload'=>'上传主题安装包','release.local.import'=>'导入服务器安装包','release.online.download'=>'下载线上主题安装包','release.online.settings.save'=>'设置 GitHub 加速前缀','release.apply'=>'覆盖更新主题','release.rollback'=>'回退主题更新','release.recover'=>'恢复中断更新'];
         if(isset($releases[$a]))return $releases[$a];
         $map=['login'=>'账号登录','login.mfa'=>'登录双重验证','logout'=>'退出登录','captcha'=>'登录验证码','rate.limit'=>'登录限流','csrf'=>'请求来源校验','permission.denied'=>'越权访问','auth.reauth'=>'重新验证身份','security.password'=>'修改自己的密码','auth.recovery.begin'=>'请求找回后台密码','auth.recovery.finish'=>'邮件重置后台密码','security.recovery.begin'=>'验证找回邮箱','security.recovery.confirm'=>'绑定找回邮箱','security.recovery.remove'=>'解除找回邮箱','security.mfa.begin'=>'开始绑定双重验证','security.mfa.confirm'=>'启用双重验证','security.mfa.cancel'=>'取消绑定双重验证','security.mfa.disable'=>'关闭双重验证','security.mfa.recovery'=>'重新生成恢复码','security.session.revoke'=>'撤销登录会话','security.accounts.create'=>'创建后台账号','security.accounts.update'=>'修改账号与权限','security.settings.save'=>'修改后台安全策略','security.audit.export'=>'导出审计记录','path'=>'修改后台入口','reset'=>'官网整体恢复默认','member.reset'=>'会员中心整体恢复默认','cart.reset'=>'购物车整体恢复默认','workspace.snapshot.rebuild'=>'重建公开快照','snapshot.repair'=>'修复公开快照','migration'=>'迁移独立管理员','recovery'=>'维护恢复账号','seo.generate'=>'生成搜索引擎文件'];
         if(isset($map[$a]))return $map[$a];if(preg_match('/(?:workspace\.)?(?:editor\.)?save|(?:member|cart).*save/',$a))return '保存主题配置';if(strpos($a,'import')!==false)return '导入主题内容';if($a==='media.upload')return '上传主题图片';if($a==='media.rename')return '修改附件名称';if($a==='media.delete')return '附件移入回收站';if($a==='media.restore')return '恢复附件';if($a==='icons.apply')return '导入所选图标';if(strpos($a,'preview')!==false)return '生成草稿预览';if(strpos($a,'page-layout')===0)return '修改页面布局';if(strpos($a,'seo.')===0)return '修改搜索引擎设置';return '其他后台操作';

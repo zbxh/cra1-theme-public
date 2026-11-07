@@ -57,9 +57,10 @@ try{
   let applications=0
   await page.route('**/index.php?*',async route=>{
    const action=new URL(route.request().url()).searchParams.get('r')
-   if(!['api.release.check','api.release.history','api.release.upload','api.release.apply'].includes(action))throw Error('Unexpected management request: '+action)
+   if(!['api.release.check','api.release.history','api.release.online.settings.get','api.release.upload','api.release.apply'].includes(action))throw Error('Unexpected management request: '+action)
    const details=page.url().includes('many=1')?{...compatibility,checks:Array.from({length:123},(_,i)=>({id:'file-'+i,status:'unverified',label:'待核验文件 '+(i+1),path:'public/cra1-fixture/file-'+i,detail:'隔离测试'}))}:compatibility
    let data=action.endsWith('check')?details:action.endsWith('history')?{current:{},history:[],interrupted:false}:{}
+   if(action==='api.release.online.settings.get')data={github_prefix:''}
    if(action.endsWith('upload')){
     check(route.request().postData().includes('filename="cra1-theme-install.zip"'),`upload uses the same install ZIP ${width}`)
     data={candidate:'fixture-install',release:'fixture-overlay-v1',version:'v17.1',release_channel:'test',sha256:'a'.repeat(64),signature:'示例安装包',blockers:[],files:[],can_apply:true}

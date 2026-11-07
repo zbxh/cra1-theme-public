@@ -13,9 +13,11 @@ try{
  $source=new PDOException('SQLSTATE[HY000]: near "ON": syntax error in '.$base.'/site/runtime/cra1_theme/security.sqlite password='.$secret.' token=fixture-token DATABASE_PASSWORD=fixture-db-password user fixture-db-user database fixture-db-name host fixture-db-host /outside/private/site.php');
  $result=InstallerFailure::response(new InstallerFailure('写入安装日志',$source),'创建主题后台',$base.'/site',[$secret]);
  $serialized=json_encode($result,JSON_UNESCAPED_UNICODE);
- check(strpos($result['msg'],'near "ON": syntax error')!==false,'the original SQL failure is visible');
+ check(strpos($result['msg'],'数据库查询语句与当前数据库不兼容')!==false&&strpos($result['msg'],'SQLSTATE')===false,'the database cause is accurate Chinese without raw SQL');
  check($result['error']['phase']==='写入安装日志','the specific failing operation survives the outer API boundary');
- check(strpos($result['msg'],'runtime/cra1_theme/security.sqlite')!==false,'the useful relative theme path remains visible');
+ check(strpos($result['msg'],$base)===false,'unrelated private paths are never returned');
+ $io=InstallerFailure::response(new \CRA1\Theme\Failure('读取文件',$base.'/site/runtime/cra1_theme/security.sqlite','Permission denied',0600),'读取安全数据库',$base.'/site');
+ check(strpos($io['msg'],'runtime/cra1_theme/security.sqlite')!==false&&strpos($io['msg'],'PHP 运行账号')!==false,'verified IO failures show the relative location and effective PHP account');
  check((bool)preg_match('/^[A-F0-9]{12}$/',$result['error']['reference']),'a failure has a log reference');
  check($result['error']['needs_check']===true,'a failed write requires confirmation before another initialization');
  $logged=(string)file_get_contents($log);

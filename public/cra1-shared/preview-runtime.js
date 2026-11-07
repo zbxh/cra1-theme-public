@@ -16,7 +16,7 @@
   var account={id:1,username:'演示用户',email:'demo@example.com',phone:'138****0000',credit:100,host_num:1,host_active_num:1,unpaid_order:0,consume:100,this_month_consume:39,expiring_count:0};
   var product={id:1,name:'演示云服务器',price:39,cycle:'月',description:'2 核 CPU · 4GB 内存 · 50GB 云盘',type:'server',module:'idcsmart_common',hidden:0,stock_control:0,qty:99,customfield:{is_domain:0}};
   function payload(url,method){
-    if(/\/product\/\d+\/config_option(?:\?|$)/.test(String(url)))return{status:200,msg:'示例配置',data:method==='GET'?{content:(boot.moduleHtml||'').replace(/<script\b[^>]*>.*?<\/script>/gs,'')}:{preview:[{name:'配置',value:'2 核 CPU · 4GB 内存'}],price:39,price_total:39,base_price:39,price_client_level_discount:0,price_promo_code_discount:0,price_event_promotion_discount:0}};
+    if(/\/product\/\d+\/config_option(?:\?|$)/.test(String(url)))return{status:200,msg:'示例配置',data:method==='GET'?{module:'idcsmart_common',content:(boot.moduleHtml||'').replace(/<script\b[^>]*>.*?<\/script>/gs,'')}:{preview:[{name:'配置',value:'2 核 CPU · 4GB 内存'}],price:39,price_total:39,base_price:39,price_client_level_discount:0,price_promo_code_discount:0,price_event_promotion_discount:0}};
     if(method&&!/^(GET|HEAD)$/i.test(method))return{status:400,msg:'预览中不执行业务操作',data:{}};
     var parsedUrl=new URL(String(url),location.href);if(parsedUrl.pathname==='/cra1-shared/compat.php')url='/theme/'+(parsedUrl.searchParams.get('target')||'');var path=String(url).split('?')[0],data={list:[],count:0,account:account,client:account,common:common,product:product,host:host,info:host,menu:[],currency:{prefix:'¥',suffix:''}};
     if(/snapshot/.test(String(url)))return{status:200,msg:'示例数据',data:snap};

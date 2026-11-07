@@ -25,6 +25,31 @@ export class ApiError extends Error {
   }
 }
 
+function changesState(route) {
+  return !/^api\.(?:get$|logs$|site-pages$|link-options$|product-options$|navigation-catalog$|icons(?:\.|$)|icon-search$)/.test(route)
+    && !/\.(?:get|list|catalog|check|history|diagnostics|resolve|preview|attachments|products|my|alerts|detail|local\.list|plan)$/.test(route)
+}
+function transportError(route, status, invalid=false) {
+  const uncertain = changesState(route)
+  const reason = status === 413 ? '请求内容超过服务器允许的上传大小，请检查 PHP 和网站服务器的上传限制'
+    : status === 504 || status === 502 ? '网站服务器未及时收到 PHP 的完整响应，请检查 PHP 服务和网站错误记录'
+    : invalid ? '服务器没有返回可识别的处理结果，请检查 PHP 服务和网站错误记录'
+    : '连接中断或服务器未响应，请检查网络和 PHP 服务'
+  const error = new ApiError((uncertain ? '尚未确认本次操作是否完成，请先刷新核对结果，避免重复提交。' : '读取未完成，请重试。') + '原因：' + reason, status, {save_state:uncertain?'unknown':undefined})
+  error.uncertain=uncertain
+  return error
+}
+async function send(route, body, options={}) {
+  try { return await fetch(base + '?r=' + route, {
+    method:'POST', signal:options.signal, credentials:'same-origin',
+    headers:{...(body instanceof FormData?{}:{'Content-Type':'application/json'}),'X-CSRF-Token':csrf},
+    body:body instanceof FormData?body:JSON.stringify(body||{})
+  }) } catch(error) {
+    if(error.name==='AbortError')throw error
+    throw transportError(route,0)
+  }
+}
+
 function multipartRequest(url, body, options) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
@@ -42,7 +67,7 @@ function multipartRequest(url, body, options) {
       if (xhr.status === 413) return reject(new ApiError('安装包超过服务器上传限制，可改用服务器本地导入', 413, null))
       resolve({status:xhr.status, json:async()=>JSON.parse(xhr.responseText)})
     }
-    xhr.onerror = () => { cleanup(); reject(new ApiError('上传连接中断，请检查网络后重试；也可使用服务器本地导入', 0, null)) }
+    xhr.onerror = () => { cleanup(); reject(transportError('api.release.upload',0)) }
     xhr.onabort = () => { cleanup(); reject(new DOMException('请求已取消', 'AbortError')) }
     if (signal?.aborted) return reject(new DOMException('请求已取消', 'AbortError'))
     signal?.addEventListener('abort', abort, {once:true})
@@ -54,21 +79,15 @@ export async function api(route, body, options = {}) {
   const multipart = typeof FormData !== 'undefined' && body instanceof FormData
   const res = multipart && typeof options.onUploadProgress === 'function'
     ? await multipartRequest(base + '?r=' + route, body, options)
-    : await fetch(base + '?r=' + route, {
-    method: 'POST',
-    signal: options.signal,
-    credentials: 'same-origin',
-    headers: { ...(multipart ? {} : { 'Content-Type': 'application/json' }), 'X-CSRF-Token': csrf },
-    body: multipart ? body : JSON.stringify(body || {}),
-  })
+    : await send(route,body,options)
   let json = null
   try {
     json = await res.json()
   } catch {
-    throw new ApiError('服务端返回了非 JSON 响应，请刷新页面重试', res.status, null)
+    throw transportError(route,res.status,true)
   }
   if (!json || typeof json.status === 'undefined') {
-    throw new ApiError('响应格式异常', res.status, json)
+    throw transportError(route,res.status,true)
   }
   if (json.status === 401) {
     // 会话过期：回登录页，避免页面上留下半残状态
@@ -77,7 +96,7 @@ export async function api(route, body, options = {}) {
   }
   if(json.code==='REAUTH_REQUIRED'&&options.reauth!==false){
     const action=route.replace(/^api\./,''),domain=body?.domain||(action.startsWith('member.')?'member':action.startsWith('cart.')?'cart':'website')
-    const target=action.startsWith('security.accounts.')?'account:'+(body?.id||'new'):action==='security.audit.export'?'audit':action==='path'||action==='security.settings.save'?'security':action==='security.session.revoke'?'account:'+(body?.account_id||boot.user_id):action.startsWith('security.mfa.')||action.startsWith('security.recovery.')||action==='security.password'?'account:'+boot.user_id:domain+':'+(body?.editorId||body?.scopeId||'all')
+    const target=action==='release.lifecycle.apply'?'theme:'+body.mode+':'+body.token:action.startsWith('security.accounts.')?'account:'+(body?.id||'new'):action==='security.audit.export'?'audit':action==='path'||action==='security.settings.save'?'security':action==='security.session.revoke'?'account:'+(body?.account_id||boot.user_id):action.startsWith('security.mfa.')||action.startsWith('security.recovery.')||action==='security.password'?'account:'+boot.user_id:domain+':'+(body?.editorId||body?.scopeId||'all')
     const credential=await new Promise(resolve=>window.dispatchEvent(new CustomEvent('theme-reauth',{detail:{action,target,resolve}})))
     if(credential){if(multipart){body.set('_reauth',credential);return api(route,body,{...options,reauth:false})}return api(route,{...body,_reauth:credential},{...options,reauth:false})}
   }
@@ -155,28 +174,25 @@ export const mediaApi = {
   restore: (body) => api('api.media.restore', body),
   upload: async (file) => {
     const body = new FormData(); body.append('file', file)
-    const response = await fetch(base + '?r=api.media.upload', {method:'POST',credentials:'same-origin',headers:{'X-CSRF-Token':csrf},body})
-    const json = await response.json()
-    if (json.status === 401) window.location.replace(base + '?r=login')
-    return json
+    return api('api.media.upload',body)
   },
 }
 
 export const securityApi={call:(action,p={})=>api('api.security.'+action,p),export:async(p={})=>{
   const credential=await new Promise(resolve=>window.dispatchEvent(new CustomEvent('theme-reauth',{detail:{action:'security.audit.export',target:'audit',resolve}})))
   if(!credential)return null
-  const r=await fetch(base+'?r=api.security.audit.export',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({...p,_reauth:credential})})
-  if(!r.ok){const j=await r.json();throw new Error(j.msg)}
+  const r=await send('api.security.audit.export',{...p,_reauth:credential})
+  if(!r.ok){const j=await r.json().catch(()=>null);throw new ApiError(j?.msg||transportError('api.security.audit.export',r.status,true).message,r.status,j)}
   const blob=await r.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='主题后台审计.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return {nextCursor:r.headers.get('X-Next-Cursor')}
 }}
 
 /** Authenticated POST downloads share the ordinary API's CSRF and session boundary. */
 export async function downloadFile(route, body, filename, options={}) {
-  const response=await fetch(base+'?r='+route,{method:'POST',credentials:'same-origin',signal:options.signal,headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(body||{})})
+  const response=await send(route,body,options)
   if(!response.ok||!response.headers.get('content-type')?.includes('application/zip')) {
     const result=await response.json().catch(()=>null)
     if(result?.status===401)window.location.replace(base+'?r=login')
-    throw new ApiError(result?.msg||'下载未完成，请重试',result?.status||response.status,result)
+    throw new ApiError(result?.msg||transportError(route,response.status,true).message,result?.status||response.status,result)
   }
   const url=URL.createObjectURL(await response.blob()),link=document.createElement('a')
   link.href=url;link.download=filename;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)

@@ -65,7 +65,7 @@ final class ConfigurationMedia
         if(!$list)return ['document'=>$document,'media'=>null,'warnings'=>array_values(array_unique($warnings))];
         $document['media']=['schema'=>1,'files'=>$list];$id=bin2hex(random_bytes(16));
         $dir=$this->root.'/runtime/cra1_theme/transfers/media';Files::noLinks($dir);
-        if(!is_dir($dir)&&!mkdir($dir,0700,true)&&!is_dir($dir))throw new \RuntimeException('图片临时目录不可写');
+        Files::directory($dir,0700);
         foreach(glob($dir.'/*.json')?:[]as$p){Files::noLinks($p);if(filemtime($p)<time()-1800){$zip=substr($p,0,-5).'.zip';Files::noLinks($zip);if(is_file($zip))unlink($zip);unlink($p);}}
         $path=$dir.'/'.$id.'.zip';$zip=new \ZipArchive();$opened=false;
         try{

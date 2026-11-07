@@ -8,16 +8,18 @@ final class Inspector
 {
     public static function context(string $root): array
     {
+        $connected=false;$phase='连接 V10 数据库';
         try{
             if(!defined('DATABASE_HOSTNAME'))require_once $root.'/config.php';
             foreach(['DATABASE_HOSTNAME','DATABASE_PORT','DATABASE_NAME','DATABASE_CHARSET','DATABASE_USERNAME','DATABASE_PASSWORD'] as $constant)if(!defined($constant))throw new \RuntimeException('数据库配置不完整');
             $db=new \PDO('mysql:host='.DATABASE_HOSTNAME.';port='.DATABASE_PORT.';dbname='.DATABASE_NAME.';charset='.DATABASE_CHARSET,DATABASE_USERNAME,DATABASE_PASSWORD,[\PDO::ATTR_ERRMODE=>\PDO::ERRMODE_EXCEPTION,\PDO::ATTR_TIMEOUT=>3]);
+            $connected=true;$phase='读取系统版本和模块信息';
             $query=\CRA1\Theme\Compatibility\Database::query($db,"SELECT setting,value FROM idcsmart_configuration WHERE setting IN ('system_version','clientarea_theme','clientarea_theme_mobile','cart_theme','cart_theme_mobile','web_theme','home_theme','home_theme_mobile')");
             $settings=array_column($query->fetchAll(\PDO::FETCH_ASSOC),'value','setting');
             $modules=\CRA1\Theme\Compatibility\Database::query($db,"SELECT name,version,status FROM idcsmart_plugin WHERE module='server'")->fetchAll(\PDO::FETCH_ASSOC);
             $sqlMode=(string)\CRA1\Theme\Compatibility\Database::query($db,'SELECT @@session.sql_mode')->fetchColumn();
             return ['system_version'=>$settings['system_version']??'','settings'=>$settings,'modules'=>$modules,'database'=>true,'database_sql_mode'=>$sqlMode];
-        }catch(\Throwable $e){return ['system_version'=>'','modules'=>[],'database'=>false,'error'=>'无法只读确认系统版本和数据库连接'];}
+        }catch(\Throwable $e){$failure=\CRA1\Theme\Diagnostics::response($e,$phase,$root);return ['system_version'=>'','modules'=>[],'database'=>$connected,'metadata_ok'=>false,'error'=>$failure['msg']];}
     }
     public static function inspect(string $root,array $options=[]): array
     {
@@ -27,7 +29,8 @@ final class Inspector
         foreach(['pdo_mysql','pdo_sqlite','sodium','fileinfo','gd','zip','mbstring','dom','curl']as$ext)$add('extension:'.$ext,extension_loaded($ext)?'pass':'blocked',$ext,extension_loaded($ext)?'已加载':'缺少必要扩展');
         $add('password',defined('PASSWORD_ARGON2ID')?'pass':'blocked','密码存储',defined('PASSWORD_ARGON2ID')?'Argon2id 可用':'缺少 Argon2id');
         $context=$options['context']??self::context($root);
-        $add('database',!empty($context['database'])?'pass':'blocked','数据库连接',!empty($context['database'])?'只读连接成功':'读取失败，未执行修改');
+        $add('database',!empty($context['database'])?'pass':'blocked','数据库连接',!empty($context['database'])?'只读连接成功':($context['error']??'连接未完成，请检查站点数据库配置，未执行修改'));
+        if(!empty($context['database'])&&isset($context['error']))$add('database-metadata','blocked','读取系统信息',$context['error']);
         if(isset($context['database_sql_mode'])) {
             $groupBy=in_array('ONLY_FULL_GROUP_BY',explode(',',strtoupper((string)$context['database_sql_mode'])),true);
             $add('database-group-by',$groupBy?'blocked':'pass','原生产品查询环境',$groupBy?'当前 MySQL 开启 ONLY_FULL_GROUP_BY，已验证的 V10 产品列表查询不能执行':'MySQL 分组规则符合已验证的原生查询环境','','请按 V10 的环境要求检查数据库配置；主题检查不会修改数据库模式或系统查询');

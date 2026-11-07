@@ -12,6 +12,7 @@ header('X-Content-Type-Options: nosniff');
 header('X-Robots-Tag: noindex');
 $requestId = bin2hex(random_bytes(10));
 $send = static function (array $data, int $http = 200): void {
+    $data=\CRA1\Theme\Http\CustomerError::payload($data,$http,['path'=>is_string($GLOBALS['target']??null)?$GLOBALS['target']:'','method'=>$GLOBALS['method']??'GET']);
     http_response_code($http);
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_SLASHES);
 };

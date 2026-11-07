@@ -1,3 +1,15 @@
+// Both link forms must reach the native module with its expected id parameter.
+// Normalize before injecting its scripts, preserving the original history state.
+(function (window) {
+  var params = new URLSearchParams(window.location.search);
+  var productId = params.get('product_id') || '';
+  if (!params.has('id') && /^[1-9]\d*$/.test(productId)) {
+    params.set('id', productId);
+    window.history.replaceState(window.history.state, '',
+      window.location.pathname + '?' + params.toString() + (window.location.hash || ''));
+  }
+})(window);
+
 var orignalSetItem = localStorage.setItem;
 localStorage.setItem = function (key, newValue) {
   var setItemEvent = new Event("setItemEvent");
@@ -61,22 +73,21 @@ localStorage.setItem = function (key, newValue) {
       },
       created() {
         const params = getUrlParams();
-        this.id = params.id;
+        this.id = params.id || params.product_id || "";
         // 只获取 commonData 配置，不触发 getGoodDetail
-        this.commonData = JSON.parse(
-          localStorage.getItem("common_set_before")
-        );
+        try { this.commonData = JSON.parse(localStorage.getItem("common_set_before")) || {}; }
+        catch (e) { this.commonData = {}; }
       },
       mounted() {
         // goods_embed（融合页嵌入壳）固定前台模式：flag 不因处于 iframe 而放宽隐藏商品
         const embedParam = new URLSearchParams(window.location.search).get("embed");
-        this.isEmbed = embedParam === "1";
+        this.isEmbed = embedParam === "1" || /\/goods_embed\.htm$/.test(window.location.pathname);
         if (window.self !== window.top && !this.isEmbed) {
           this.isIfram = true;
         }
         // 先加载 content，完成后再加载 popover 数据，避免并发请求过多
-        this.getList().then(() => {
-          if (this.commonData.cart_change_product == 1) {
+        this.getList().then((loaded) => {
+          if (loaded && this.commonData.cart_change_product == 1) {
             this.getGoodDetail(this.id);
           }
         });
@@ -144,39 +155,47 @@ localStorage.setItem = function (key, newValue) {
         },
       },
       methods: {
+        configError(message) {
+          if (window.__CART_EMBED__) {
+            window.__CART_EMBED__.fail(message);
+          } else {
+            this.$message.error(message);
+            const loading = document.getElementById("mainLoading");
+            if (loading) loading.style.display = "none";
+          }
+        },
         async getList() {
+          if (!/^[1-9]\d*$/.test(String(this.id))) {
+            this.configError("请选择需要配置的商品。");
+            return false;
+          }
           try {
             const params = { id: this.id, flag: this.isIfram };
             const res = await getOrederConfig(params);
-            if (!res.data || !res.data.data || typeof res.data.data.content !== "string") {
-              const msg = (res.data && res.data.msg) || "配置接口返回异常";
-              if (window.__CART_EMBED__ && this.isEmbed) {
-                window.__CART_EMBED__.fail(msg);
-                return;
-              }
-              this.$message.error(msg);
-              return;
+            if (!res.data || res.data.status !== 200 || !res.data.data || typeof res.data.data.content !== "string") {
+              this.configError("商品配置暂不可用，请重试或选择其他商品。");
+              return false;
             }
-            this.$nextTick(() => {
-              // 解决Jquery加载JS会在文件末尾添加时间戳的问题
-              $.ajaxSetup({
-                cache: true,
-              });
-              const content = window.CRA1CartControls ? window.CRA1CartControls.transform(res.data.data.content) : res.data.data.content;
-              $(".config-box .content").html(content);
-              // 嵌入壳：内容注入后通知父页（模块脚本由 jQuery 异步执行，高度由桥接层兜底轮询）
-              if (window.__CART_EMBED__ && this.isEmbed) {
-                window.__CART_EMBED__.markReady();
-              }
-            });
+            await this.$nextTick();
+            const host=document.querySelector('.config-box .content');
+            if (!host || !window.CRA1ModuleDeps) throw new Error('配置组件尚未加载');
+            await window.CRA1ModuleDeps.ensure('config');
+            const controls=window.CRA1CartControls;
+            const module=typeof res.data.data.module === 'string' ? res.data.data.module : '';
+            const nativeModule=!(controls && typeof controls.profile==='function' && controls.profile(module));
+            document.documentElement.toggleAttribute('data-cra1-native-module',nativeModule);
+            const root=document.querySelector('.goods.cart-page');
+            if(root)root.toggleAttribute('data-cra1-native-module',nativeModule);
+            if(window.__CART_EMBED__)window.__CART_EMBED__.nativeModule=nativeModule;
+            const content = controls ? controls.transform(res.data.data.content,module) : res.data.data.content;
+            host.innerHTML=content;
+            await window.CRA1ModuleDeps.mountScripts(host);
+            if (window.__CART_EMBED__ && this.isEmbed) window.__CART_EMBED__.markReady();
             this.content = res.data.data.content;
+            return true;
           } catch (error) {
-            // 显式上报，不再静默吞异常
-            if (window.__CART_EMBED__ && this.isEmbed) {
-              window.__CART_EMBED__.fail((error && error.message) || "网络异常");
-              return;
-            }
-            this.$message.error((error && error.message) || "配置加载失败");
+            this.configError("商品配置加载失败，请稍后重试。");
+            return false;
           }
         },
         handleCommand(id) {
@@ -184,12 +203,14 @@ localStorage.setItem = function (key, newValue) {
           location.href = `/cart/goodsList.htm?product_id=${encodeURIComponent(id)}`;
         },
         getGoodDetail(id) {
-          apiProductDetail({ id }).then((res) => {
-            this.productInfo = res.data.data.product;
+          return apiProductDetail({ id }).then((res) => {
+            const data = res && res.data;
+            if (!data || data.status !== 200 || !data.data || !data.data.product) return;
+            this.productInfo = data.data.product;
             this.getProductGroup_second(
               this.productInfo.product_group_id_first
             );
-          });
+          }).catch(() => { /* Optional product switcher must not break loaded configuration. */ });
         },
         // 获取二级分类
         getProductGroup_second(id) {
@@ -227,10 +248,9 @@ localStorage.setItem = function (key, newValue) {
 
         // 获取通用配置
         getCommonData() {
-          this.commonData = JSON.parse(
-            localStorage.getItem("common_set_before")
-          );
-          if (this.commonData.cart_change_product == 1) {
+          try { this.commonData = JSON.parse(localStorage.getItem("common_set_before")) || {}; }
+          catch (e) { this.commonData = {}; }
+          if (/^[1-9]\d*$/.test(String(this.id)) && this.commonData.cart_change_product == 1) {
             this.getGoodDetail(this.id);
           }
         },

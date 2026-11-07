@@ -135,7 +135,7 @@ function RowsField({ field, value, onChange, config }) {
   const loadNavCatalog = () => {
     setNavCatalog(s => ({ ...s, loading: true }))
     websiteApi.navigationCatalog().then(r => setNavCatalog({ loading: false, tree: r.data?.catalog || [], error: r.status === 200 ? (r.data?.error || '') : (r.msg || '读取失败') }))
-      .catch(() => setNavCatalog({ loading: false, tree: [], error: '目录读取失败，请刷新重试' }))
+      .catch(e => setNavCatalog({ loading: false, tree: [], error: e.message || '目录读取未完成，请重试' }))
   }
   useEffect(() => { if (isNavigation) loadNavCatalog() }, [field.key])
   const visibleCol = c => c.type !== 'menu-sidebar' && (!field.visual?.visibleColumns || field.visual.visibleColumns.includes(c.key))

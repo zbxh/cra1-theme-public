@@ -52,15 +52,7 @@ final class ThemeWorkspaceStore
 
     public static function readJson(string $file, bool $missingAllowed = true): array
     {
-        if (!is_file($file)) {
-            if ($missingAllowed) return [];
-            throw new RuntimeException('配置注册表缺失，请检查发布文件');
-        }
-        $data = json_decode((string) file_get_contents($file), true);
-        if (!is_array($data) || json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException('配置 JSON 损坏，操作已中止，原文件保留');
-        }
-        return $data;
+        return \CRA1\Theme\Files::json($file, $missingAllowed);
     }
 
     public function catalog(): array { return $this->catalog; }
@@ -432,14 +424,7 @@ final class ThemeWorkspaceStore
     {
         $encoded = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         if ($encoded === false) throw new RuntimeException('配置编码失败，原配置保留');
-        $tmp = $this->configFile . '.tmp.' . bin2hex(random_bytes(6));
-        if (file_put_contents($tmp, $encoded) === false) { @unlink($tmp); throw new RuntimeException('配置文件不可写'); }
-        if (is_file($this->configFile)) {
-            @chmod($tmp, fileperms($this->configFile) & 0777);
-            @chown($tmp, fileowner($this->configFile));
-            @chgrp($tmp, filegroup($this->configFile));
-        } else @chmod($tmp, 0640);
-        if (!rename($tmp, $this->configFile)) { @unlink($tmp); throw new RuntimeException('配置替换失败，原配置保留'); }
+        \CRA1\Theme\Files::atomic($this->configFile,$encoded,is_file($this->configFile)?(fileperms($this->configFile)&0777):0640);
     }
 
     /** Freeze only legacy exceptions; public defaults remain inheritable. */
@@ -585,10 +570,10 @@ final class ThemeWorkspaceStore
             if ($result['status'] !== 200) return $result;
             $payload = $this->payload($scope, $result['data']['config']);
             $payload['snapshot_ok'] = $result['data']['snapshot_ok'];
+            foreach(['snapshot_error','save_state'] as $key) if(array_key_exists($key,$result['data']))$payload[$key]=$result['data'][$key];
             return ['status' => 200, 'msg' => $result['msg'], 'data' => $payload];
         }
-        $lock = fopen($this->configFile . '.lock', 'c');
-        if (!$lock || !flock($lock, LOCK_EX)) throw new RuntimeException('存储锁不可用');
+        $lock = \CRA1\Theme\Files::openLock($this->configFile.'.lock');
         try {
             $raw = self::readJson($this->configFile);
             $payload = $this->payload($scope, $raw);
@@ -608,8 +593,7 @@ final class ThemeWorkspaceStore
 
     public function migrate(bool $apply = false): array
     {
-        $lock = fopen($this->configFile . '.lock', 'c');
-        if (!$lock || !flock($lock, LOCK_EX)) throw new RuntimeException('存储锁不可用');
+        $lock = \CRA1\Theme\Files::openLock($this->configFile.'.lock');
         try {
             $raw = self::readJson($this->configFile); $cfg = $this->resolved($raw); $doc = $this->migratedVisibility($raw);
             $next = $raw; $next['page_module_visibility_json'] = $this->encode($doc); $differences = [];

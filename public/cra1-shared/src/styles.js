@@ -10,8 +10,20 @@
   var motion=root.CRA1Shared.Motion;
   var selector=entries.map(function(entry){return entry[1];}).join(',')+(business?','+business.selector:'');
   var owned=new WeakMap();
+  function nativeModule(element){
+    return document.documentElement.hasAttribute('data-cra1-native-module') &&
+      !!element.closest('.goods[data-cra1-native-module] .config-box .content,.el-dialog__wrapper,.el-message-box__wrapper,.el-select-dropdown,.el-cascader__dropdown,.el-picker-panel,.el-popper,.el-message,.el-notification');
+  }
   function apply(element){
     if(!element||element.nodeType!==1)return;
+    // Official cart modules own their controls and body-level popups. Adding
+    // cui classes here can change flex sizing, clip purchase buttons or replace
+    // a module's icons even though its HTML loader left the response untouched.
+    if(nativeModule(element)){
+      var previousNative=owned.get(element);
+      if(previousNative){previousNative.tokens.forEach(function(name){element.classList.remove(name);});owned.delete(element);}
+      return;
+    }
     if(business)business.apply(element);
     var previous=owned.get(element);
     // Existing React/Alpine components already declare their semantic variants.

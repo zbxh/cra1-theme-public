@@ -234,7 +234,7 @@ final class OperationVerification
         $path = self::path($request);
         $payload = $response->getData();
         if (is_array($payload) && (int)($payload['status'] ?? 0) >= 400) {
-            $response->data(\CRA1\Theme\Http\CustomerError::payload($payload))->header(['Cache-Control'=>'no-store, private']);
+            $response->data(\CRA1\Theme\Http\CustomerError::payload($payload,(method_exists($response,'getCode')?$response->getCode():200),['path'=>$path,'method'=>$request->method()]))->header(['Cache-Control'=>'no-store, private']);
         }
         if ($request->client_operation_summary) return $response->data(self::redact($response->getData()))->header(['Cache-Control'=>'no-store, private']);
         if (strtoupper($request->method()) !== 'GET') return $response;

@@ -31,6 +31,7 @@
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/product.js?v={:filemtime(IDCSMART_ROOT . 'public/cart/template/pc/cra1/api/product.js')}"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261017-compat-v3/js/goods_embed.js', '/cart/template/pc/cra1/releases/20261017-compat-v3/js/goods_embed.js')}"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261013-security-snapshot-v1/js/cart-config.js', '/cart/template/pc/cra1/releases/20261013-security-snapshot-v1/js/cart-config.js')}"></script>
+  <script src="{:cra1_theme_asset_url('cart', '20261012-cart-entry-v1/js/module-policy.js', '/cart/template/pc/cra1/releases/20261012-cart-entry-v1/js/module-policy.js')}"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261012-icon-suite-v1/js/cart-controls.js', '/cart/template/pc/cra1/releases/20261012-icon-suite-v1/js/cart-controls.js')}"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261012-cart-entry-v1/js/goods.js', '/cart/template/pc/cra1/releases/20261012-cart-entry-v1/js/goods.js')}"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/pagination/pagination.js"></script>

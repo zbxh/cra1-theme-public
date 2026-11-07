@@ -323,7 +323,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
             <Skeleton className="h-14 w-full" />
           ) : !cat || cat.error ? (
             <Alert tone="warning">
-              页面错误，请刷新重试
+              {cat?.error || '未读取到系统导航，请重新加载'}
             </Alert>
           ) : (
             <>

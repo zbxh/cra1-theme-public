@@ -61,7 +61,7 @@ final class Package
         $checked=self::inspect($archive);
         if(!hash_equals($expected['sha256'],$checked['sha256']))throw new \RuntimeException('候选包在预检后发生变化');
         if(file_exists($dir))throw new \RuntimeException('暂存目录已存在');
-        if(!mkdir($dir,0700,true))throw new \RuntimeException('暂存目录不可写');
+        Files::directory($dir,0700);
         $zip=new \ZipArchive();$zip->open($archive);
         try{foreach($checked['manifest']['files']as$path=>$row){
             $bytes=$zip->getFromName(($checked['archive_format']==='install'?'':'payload/').$path);

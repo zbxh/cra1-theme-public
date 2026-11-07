@@ -71,7 +71,7 @@ export function WorkspaceProvider({ children }) {
       }
       const data = assertResponse(response)
       update(id, (old) => ({ ...old, data, revision: data.revision, revisions:data.revisions, values: clone(data.values), original: clone(data.values),
-        remote: null, migrated:false, saving: false, saveError: '', savedMessage: data.snapshot_ok === false ? '配置已保存，前台同步失败，请重试同步。' : response.msg }))
+        remote: null, migrated:false, saving: false, saveError: '', savedMessage: response.msg }))
       setRecords((old) => {
         const next = { ...old }
         for (const [key, entry] of Object.entries(next)) {

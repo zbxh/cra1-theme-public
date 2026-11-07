@@ -19,7 +19,7 @@ final class Files
                     $allowed=true;
                 }
             }
-            if(!$allowed||realpath($boundary)!==$boundary)throw new \RuntimeException('文件路径不在已确认的允许目录内');
+            if(!$allowed||realpath($boundary)!==$boundary)throw new Failure('检查文件访问范围',$path,'open_basedir restriction in effect');
         }
         for($p=$path;;$p=dirname($p)){
             if(is_link($p))throw new \RuntimeException('拒绝通过软链接访问文件');
@@ -31,27 +31,46 @@ final class Files
         self::noLinks($path);
         if (!is_file($path)) {
             if ($missing) return [];
-            throw new \RuntimeException('文件不存在：'.basename($path));
+            throw new Failure('读取文件',$path,'No such file or directory');
         }
-        $data=json_decode((string)file_get_contents($path),true);
-        if (!is_array($data) || json_last_error()!==JSON_ERROR_NONE) throw new \RuntimeException('JSON 损坏，原文件已保留：'.basename($path));
+        $data=json_decode((string)self::read($path),true);
+        if (!is_array($data) || json_last_error()!==JSON_ERROR_NONE) throw new \RuntimeException('配置内容不是有效的 JSON，读取已中止，原文件已保留：'.Diagnostics::clean($path,defined('CRA1_THEME_ROOT')?CRA1_THEME_ROOT:''));
         return $data;
+    }
+    public static function read(string $path): string
+    {
+        self::noLinks($path);
+        return Failure::attempt('读取文件',$path,static function()use($path){return file_get_contents($path);});
+    }
+    public static function directory(string $path,int $mode=0700): void
+    {
+        self::noLinks($path);
+        if(is_dir($path))return;
+        Failure::attempt('创建目录',$path,static function()use($path,$mode){return mkdir($path,$mode,true)||is_dir($path);},$mode);
+    }
+    /** @return resource */
+    public static function openLock(string $path,int $kind=LOCK_EX)
+    {
+        self::noLinks($path);self::directory(dirname($path));
+        $f=Failure::attempt('打开配置锁',$path,static function()use($path){return fopen($path,'c+b');},0600);
+        try{Failure::attempt('获取配置锁',$path,static function()use($f,$kind){return flock($f,$kind);},0600);}
+        catch(\Throwable $e){fclose($f);throw $e;}
+        return $f;
     }
     public static function atomic(string $path, string $bytes, int $mode = 0640): void
     {
         self::noLinks($path);
         $dir=dirname($path);
-        if (!is_dir($dir) && !mkdir($dir,0700,true) && !is_dir($dir)) throw new \RuntimeException('目录无法创建');
+        self::directory($dir);
         $temp=$path.'.cra1-'.bin2hex(random_bytes(8));
         try {
-            $f=fopen($temp,'x+b');
-            if (!$f) throw new \RuntimeException('文件不可写');
+            $f=Failure::attempt('创建临时文件',$path,static function()use($temp){return fopen($temp,'x+b');},$mode);
             try {
-                if (fwrite($f,$bytes)!==strlen($bytes) || !fflush($f)) throw new \RuntimeException('写入未完成');
-                chmod($temp,$mode);
+                Failure::attempt('写入文件',$path,static function()use($f,$bytes){return fwrite($f,$bytes)===strlen($bytes)&&fflush($f);},$mode);
+                Failure::attempt('设置文件权限',$path,static function()use($temp,$mode){return chmod($temp,$mode);},$mode);
             } finally { fclose($f); }
-            if (!rename($temp,$path)) throw new \RuntimeException('文件替换失败');
-        } finally { if (is_file($temp)) unlink($temp); }
+            Failure::attempt('替换文件',$path,static function()use($temp,$path){return rename($temp,$path);},$mode);
+        } finally { if (is_file($temp)) @unlink($temp); }
     }
     public static function putJson(string $path, array $data, int $mode = 0640): void
     {
@@ -59,11 +78,8 @@ final class Files
     }
     public static function locked(string $path, callable $work)
     {
-        self::noLinks($path);
-        if (!is_dir(dirname($path)) && !mkdir(dirname($path),0700,true) && !is_dir(dirname($path))) throw new \RuntimeException('锁目录不可写');
-        $f=fopen($path,'c+b');
-        if (!$f) throw new \RuntimeException('锁不可用');
-        try { if (!flock($f,LOCK_EX)) throw new \RuntimeException('无法取得锁'); return $work(); }
+        $f=self::openLock($path);
+        try { return $work(); }
         finally { flock($f,LOCK_UN); fclose($f); }
     }
 }

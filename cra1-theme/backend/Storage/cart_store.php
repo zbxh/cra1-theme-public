@@ -55,6 +55,7 @@ final class CartThemeStore
     private string $mainFile;
     private string $publicFile;
     private string $lockFile;
+    private ?\Throwable $lastFailure = null;
 
     public function __construct(string $runtimeDir)
     {
@@ -194,13 +195,13 @@ final class CartThemeStore
         return is_file($this->mainFile);
     }
 
-    /** 读取规范配置（缺失/损坏时返回默认值，不写盘） */
+    /** 读取规范配置（缺失时返回默认值；损坏时拒绝读取，不写盘） */
     public function read(): array
     {
         $data = $this->readJson($this->mainFile);
         if (!is_array($data)) {
             if (is_file($this->mainFile)) {
-                throw new RuntimeException('主配置 JSON 损坏，保存已中止，原文件保留');
+                throw new RuntimeException('购物车配置文件格式错误（JSON 无法解析）：'.\CRA1\Theme\Diagnostics::clean($this->mainFile,CRA1_THEME_ROOT).'。请从备份恢复该文件，或联系维护人员修复格式；原文件未改动。');
             }
             return self::defaults();
         }
@@ -224,7 +225,7 @@ final class CartThemeStore
             || json_encode($snap['custom_code'] ?? null, JSON_UNESCAPED_UNICODE)
                !== json_encode(CRA1ThemePublicProjection::code($config['custom_code']), JSON_UNESCAPED_UNICODE);
         if ($stale && !$this->writePublicSnapshot($config)) {
-            throw new RuntimeException('前台快照同步失败，请检查存储目录权限');
+            throw $this->lastFailure ?? new RuntimeException('前台快照同步失败，未收到可确认的原因');
         }
         } finally { $this->releaseLock($lock); }
     }
@@ -281,17 +282,19 @@ final class CartThemeStore
                 $normalized,
                 JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT
             ))) {
-                return ['status' => 400, 'msg' => '保存失败：存储文件不可写'];
+                return ['status' => 400, 'msg' => $this->failureMessage('配置未保存')];
             }
 
             $snapshotOk = $this->writePublicSnapshot($normalized);
 
             return [
                 'status' => 200,
-                'msg'    => $snapshotOk ? '已保存' : '已保存，但前台快照写入失败',
+                'msg'    => $snapshotOk ? '已保存' : $this->failureMessage('配置已保存，前台快照同步失败，请修复后重新同步'),
                 'data'   => [
                     'config'      => $this->read(),
                     'snapshot_ok' => $snapshotOk,
+                    'save_state' => $snapshotOk ? 'saved' : 'partial',
+                    'snapshot_error' => $snapshotOk ? '' : $this->failureMessage('同步快照失败'),
                 ],
             ];
         } finally {
@@ -321,11 +324,11 @@ final class CartThemeStore
                 $fresh,
                 JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT
             ))) {
-                return ['status' => 400, 'msg' => '重置失败：存储文件不可写'];
+                return ['status' => 400, 'msg' => $this->failureMessage('配置未恢复默认')];
             }
             $snapshotOk = $this->writePublicSnapshot($fresh);
-            return ['status' => 200, 'msg' => $snapshotOk ? '已恢复默认' : '配置已恢复默认，前台同步失败，请重试同步',
-                'data' => ['config' => $this->read(), 'snapshot_ok' => $snapshotOk]];
+            return ['status' => 200, 'msg' => $snapshotOk ? '已恢复默认' : $this->failureMessage('配置已恢复默认，前台快照同步失败，请修复后重新同步'),
+                'data' => ['config' => $this->read(), 'snapshot_ok' => $snapshotOk, 'save_state' => $snapshotOk ? 'saved' : 'partial', 'snapshot_error' => $snapshotOk ? '' : $this->failureMessage('同步快照失败')]];
         } finally {
             $this->releaseLock($lock);
         }
@@ -720,48 +723,29 @@ final class CartThemeStore
         if (!is_file($file)) {
             return null;
         }
-        $raw = (string) file_get_contents($file);
+        $raw = \CRA1\Theme\Files::read($file);
         $data = json_decode($raw, true);
         return is_array($data) ? $data : null;
     }
 
     private function atomicWrite(string $file, string $content): bool
     {
-        $tmp = $file . '.' . getmypid() . '.tmp';
-        if (@file_put_contents($tmp, $content) === false) {
-            return false;
-        }
-        if (!@rename($tmp, $file)) {
-            @unlink($tmp);
-            return false;
-        }
-        @chmod($file, 0644);
-        return true;
+        $this->lastFailure=null;
+        try { \CRA1\Theme\Files::atomic($file,$content,0640); return true; }
+        catch (\Throwable $error) { $this->lastFailure=$error; return false; }
     }
 
-    /**
-     * 获取排他锁。
-     * @return resource|false|string 成功返回句柄；fopen 失败（权限/属主问题）返回错误文案字符串；flock 竞争失败返回 false
-     */
+    public function lastStorageFailure(): ?\Throwable { return $this->lastFailure; }
+
+    private function failureMessage(string $prefix): string
+    {
+        return $prefix.'：'.($this->lastFailure ? \CRA1\Theme\Diagnostics::reason($this->lastFailure,CRA1_THEME_ROOT) : '未收到可确认的原因，请检查服务端记录');
+    }
+
+    /** @return resource */
     private function acquireLock()
     {
-        if (!is_dir($this->dir)) {
-            @mkdir($this->dir, 0755, true);
-        }
-        $fp = @fopen($this->lockFile, 'c');
-        if ($fp === false) {
-            $owner = @fileowner($this->lockFile);
-            $whoami = function_exists('getmyuid') ? getmyuid() : -1;
-            if ($owner !== false && $whoami !== false && $owner !== $whoami) {
-                return '配置存储文件属主与 Web 进程不一致，保存不可用（历史上曾以其他用户运行过命令行工具；请将 runtime/cra1_theme/cart_theme* 文件属主改为 Web 用户）';
-            }
-            return '配置存储不可写：无法打开锁文件（请检查 ' . $this->lockFile . ' 的权限）';
-        }
-        if (!@flock($fp, LOCK_EX)) {
-            fclose($fp);
-            return false;
-        }
-        return $fp;
+        return \CRA1\Theme\Files::openLock($this->lockFile);
     }
 
     /** @param resource|false $fp */

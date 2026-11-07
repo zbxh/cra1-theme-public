@@ -102,7 +102,7 @@ test('native missing ticket asks for a browser refresh without a retry button or
  const f=ticketFixture(),response={status:200,config:{method:'get',url:'/ticket/42'},data:{status:400,msg:'SQLSTATE[HY000] /private/secret'}}
  assert.equal(await f.ok(response),response)
  assert.equal(f.card.children.length,1)
- assert.equal(f.created.find(n=>n.tag==='h2').textContent,'页面错误，请刷新重试')
+ assert.equal(f.created.find(n=>n.tag==='h2').textContent,'工单内容暂时无法加载，请刷新重试')
  assert.equal(f.created.some(n=>n.tag==='button'),false)
  assert.equal(f.created.some(n=>n.textContent?.includes('SQLSTATE')),false)
  assert.equal(f.created.find(n=>n.tag==='a').href,'ticket.htm')
@@ -172,14 +172,41 @@ test('detail outages do not claim deletion; retry recovers and404 remains missin
  action=()=>Promise.reject({status:404});page.retry();await settle();assert.equal(page.notFound,true);assert.equal(page.loadFailed,false)
 })
 
-test('native read failures ask for refresh while writes retain useful business reasons',async()=>{
+test('native read failures keep actionable Chinese reasons while writes retain business validation',async()=>{
  const f=axiosFixture()
  for(const error of [{code:'ERR_NETWORK',message:'Network Error'},{code:'ECONNABORTED',message:'timeout'}, {response:{status:503,data:{msg:'SQLSTATE[HY000]'}}}]){
-  await assert.rejects(f.fail({...error,config:{method:'get',url:'/host/20/specific_info'}}),e=>e.data.msg==='页面错误，请刷新重试')
+  await assert.rejects(f.fail({...error,config:{method:'get',url:'/host/20/specific_info'}}),e=>e.data.msg===(error.code==='ERR_NETWORK'?'网络连接暂时中断，请检查网络后重试':error.code==='ECONNABORTED'?'等待响应超时，请稍后重试':'内容暂时无法加载，请刷新重试或联系客服'))
  }
- await assert.rejects(f.ok({status:200,config:{method:'get',url:'/host/20'},data:{status:400,msg:'读取失败'}}),e=>e.data.msg==='页面错误，请刷新重试')
+ await assert.rejects(f.ok({status:200,config:{method:'get',url:'/host/20'},data:{status:400,msg:'读取失败'}}),e=>e.data.msg==='读取失败')
  await assert.rejects(f.ok({status:200,config:{method:'post',url:'/product/settle'},data:{status:400,msg:'商品库存不足'}}),e=>e.data.msg==='商品库存不足')
  for(const [status,message] of [[401,'登录已失效，请重新登录'],[403,'当前账号无权执行此操作'],[429,'操作过于频繁，请稍后重试']]){
   await assert.rejects(f.ok({status:200,config:{method:'get',url:'/account'},data:{status,msg:message}}),e=>e.data.msg===message)
  }
+})
+
+
+test('renewal, order and payment write timeouts never encourage duplicate submission',async()=>{
+ for(const [path,needle]of[['/host/42/renew','续费'],['/product/settle','订单'],['/pay','付款']]){
+  assert.match(msg({code:'TIMEOUT'},{method:'POST',path}),new RegExp(needle))
+  assert.match(msg({code:'ERR_NETWORK'},{method:'POST',path}),/避免重复/)
+  assert.match(msg({status:503},{method:'POST',path}),/尚未确认/)
+ }
+ assert.match(msg({status:503},{method:'GET',path:'/configoption/price'}),/重新报价/)
+ assert.match(msg({status:503},{method:'GET',path:'/product/2/configoption'}),/商品配置/)
+ for(const status of[403,404])assert.equal(msg({status},{path:'/order/42'}),'订单不存在或你无权查看，请到订单列表确认')
+})
+test('shared failed envelopes recursively remove diagnostics while retaining verification booleans',async()=>{
+ const env=requestFixture({status:400,msg:'余额不足',data:{operate_password:1,verify_code:1,security_verification:{kind:'native_code',methods:[{value:'email_code',label:'邮箱验证码'}]},trace:'private',password:'fixture-secret',secret:'fixture-secret',private_key:'fixture-secret',note:'runtime/private.key',child:{debug:'private',note:'/runtime/private.key',error_detail:'private',msg:'SQLSTATE[HY000]'}}})
+ await assert.rejects(env.CRA1Shared.Request.request('/host/42/renew',{method:'POST'}),e=>{
+  const raw=JSON.stringify(e.data);assert.equal(e.data.msg,'余额不足');assert.equal(e.data.data.operate_password,1)
+  assert.equal(e.data.data.security_verification.methods[0].value,'email_code');assert.doesNotMatch(raw,/private|fixture-secret|SQLSTATE/);return true
+ })
+})
+test('native Axios errors scrub nested diagnostics and keep successful plugin HTML untouched',async()=>{
+ const f=axiosFixture(),config={method:'post',url:'/host/42/renew'}
+ await assert.rejects(f.ok({status:200,config,data:{status:503,msg:'SQLSTATE[HY000]',data:{trace:'private',password:'fixture-secret',description:'/runtime/security.sqlite'}}}),e=>{
+  assert.match(e.data.msg,/尚未确认续费/);assert.doesNotMatch(JSON.stringify(e.data),/SQLSTATE|private|fixture-secret|security.sqlite/);return true
+ })
+ const response={status:200,config:{method:'post',url:'/pay'},data:{status:200,data:{html:'<script>window.paymentCallback()</script><form action="/pay"></form>'}}}
+ assert.equal(await f.ok(response),response);assert.match(response.data.data.html,/<script>/)
 })

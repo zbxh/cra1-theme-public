@@ -110,7 +110,7 @@ export function ProductImporter({ open, onOpenChange, importedIds = [], onImport
               <Loader2 className="size-4 animate-spin" />正在读取商品…
             </p>
           )}
-          {!loading && error && <div className="py-10 text-center text-sm text-danger"><p>页面错误，请刷新重试</p></div>}
+          {!loading && error && <div className="py-10 text-center text-sm text-danger"><p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{error}</p></div>}
           {!loading && !error && total === 0 && (
             <p className="py-10 text-center text-sm text-muted-foreground">
               {list.length ? '没有匹配的商品' : '商品库为空'}

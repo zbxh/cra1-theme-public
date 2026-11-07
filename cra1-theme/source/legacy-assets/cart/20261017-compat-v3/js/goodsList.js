@@ -129,6 +129,7 @@
           entryProductId: 0, // URL 配置及购物车编辑数据只属于进入时的商品
           entryCartEdit: false,
           configState: "idle", // idle | loading | ready | error
+          moduleSelectionRequestId: 0,
           configErrorText: "",
           embedNonce: "",
           embedSeq: 0,         // 每次创建 iframe 自增，校验迟到消息
@@ -139,6 +140,7 @@
         dockDetailOpen: false,
         couponOpen: false,   // idle | bridged | fallback
           railLoading: false,
+          railAddRequestId: '',
           railAvailability: "loading",
           railDurationRequired: true,
           railDurations: [],
@@ -325,6 +327,7 @@
         embedSrc() {
           if (!this.selectedProductId || this.configState === "error") return "";
           if(window.__THEME_PREVIEW__){const u=new URL(window.location.href);u.searchParams.set('part','goods');u.searchParams.set('id','1');u.searchParams.set('embed','1');u.searchParams.set('embed_nonce',this.embedNonce);return u.pathname+u.search;}
+          if (!this.isThemedProduct(this.selectedProduct)) return "";
           const url = this.productConfigUrl("/cart/goods_embed.htm", this.selectedProductId);
           url.searchParams.set("embed", "1");
           url.searchParams.set("embed_nonce", this.embedNonce);
@@ -702,6 +705,7 @@
             url.searchParams.append(key, value);
           });
           url.searchParams.set("id", productId);
+          url.hash = window.location.hash;
           return url;
         },
         goLogin() {
@@ -1240,11 +1244,14 @@
           this.scrollDisabled = false;
         },
         resetProductSelection() {
+          this.moduleSelectionRequestId++;
           this.selectedProductId = 0;
           this.selectedProduct = null;
           this.configState = "idle";
           this.embedDirty = false;
           this.railState = "idle";
+          clearTimeout(this.railAddTimer);
+          this.railAddRequestId = '';
         },
         // 重置二级分组状态并作废旧请求
         resetSecondGroupState() {
@@ -1506,7 +1513,9 @@
             return;
           }
           // 新窗口打开
-          window.open(`/cart/goodsList.htm?product_id=${encodeURIComponent(item.id)}`);
+          window.open(this.isThemedProduct(item)
+            ? `/cart/goodsList.htm?product_id=${encodeURIComponent(item.id)}`
+            : `/cart/goods.htm?id=${encodeURIComponent(item.id)}`);
         },
         /* ================= 融合页：商品选择与配置嵌入 ================= */
         // 商品描述安全净化：白名单标签 + 去事件属性 + 本地与 HTTP/HTTPS 链接
@@ -1602,8 +1611,22 @@
           }
           this.doSelectProduct(item);
         },
-        doSelectProduct(item, historyMode = "push") {
+        doSelectProduct(item, historyMode = "push", resolved = false) {
+          const requestId = ++this.moduleSelectionRequestId;
+          const modules = window.CRA1CartModules;
+          if (!resolved && modules && !modules.catalogModule(item) && !window.__THEME_PREVIEW__) {
+            // Some catalogue hooks omit module metadata. Resolve it through
+            // V10's actual config response rather than guessing from markup or
+            // bouncing between the list and native page.
+            return this.resolveProductModule(item, historyMode, requestId);
+          }
           if (Number(item.id) !== this.entryProductId) this.clearProductEntry();
+          this.catalogError = "";
+          if (!this.isThemedProduct(item) && !window.__THEME_PREVIEW__) {
+            const url = window.CRA1CartModules.url('/cart/goods.htm', item.id);
+            window.location[historyMode === 'replace' ? 'replace' : 'assign'](url);
+            return;
+          }
           this.configOpen = this.configPanel?.default_open !== false;
           this.selectedProductId = item.id;
           this.selectedProduct = item;
@@ -1614,6 +1637,8 @@
           this.configErrorText = "";
           // v6：重置价格计算器桥接状态（等壳侧 rail-data）
           this.railState = "idle";
+          clearTimeout(this.railAddTimer);
+          this.railAddRequestId = '';
           this.railLoading = true;
           this.railAvailability = "loading";
           this.railDurationRequired = true;
@@ -1633,11 +1658,29 @@
         },
         reloadConfig() {
           if (!this.selectedProduct) return;
+          clearTimeout(this.railAddTimer);
+          this.railAddRequestId = '';
           this.configState = "loading";
           this.embedSeq++;
           this.embedNonce = `n${Date.now().toString(36)}${this.embedSeq}`;
           this.configErrorText = "";
           this.$nextTick(() => { this.configState = "loading"; });
+        },
+        isThemedProduct(item) {
+          const modules = window.CRA1CartModules;
+          return !!(modules && modules.profile(modules.catalogModule(item)));
+        },
+        async resolveProductModule(item, historyMode, requestId) {
+          try {
+            const res = await getOrederConfig({id:item.id,flag:false});
+            if (requestId !== this.moduleSelectionRequestId) return;
+            if (res.data?.status !== 200 || typeof res.data?.data?.content !== 'string') throw new Error('unavailable configuration');
+            const module = typeof res.data.data.module === 'string' ? res.data.data.module : '';
+            this.doSelectProduct({...item,module,module1:'',res_module:'',mode:''},historyMode,true);
+          } catch (_) {
+            if (requestId !== this.moduleSelectionRequestId) return;
+            this.catalogError = '商品配置暂时无法加载，请重试或选择其他商品。';
+          }
         },
         openStandalone() {
           if (!this.selectedProductId) return;
@@ -1708,6 +1751,7 @@
           }
           const requestId = this.goodsListRequestId;
           const preferred = this.urlProductId || this.defaultProductId;
+          const explicitProduct = this.urlProductId;
           let target = preferred ? list.find(x => Number(x.id) === Number(preferred) && this.isSellable(x)) : null;
           // The chosen product may be beyond the first list page. Read it through
           // the same group-filtered list API, so another group never leaks in.
@@ -1726,7 +1770,9 @@
           if (requestId !== this.goodsListRequestId || this.selectedProductId) return;
           this.urlProductId = 0;
           if (!target) target = list.find(x => this.isSellable(x));
-          if (target) this.doSelectProduct(target, "replace");
+          // Browsing a category must not navigate away just because its first
+          // card is a third-party product. Explicit deep links still open it.
+          if (target && (explicitProduct || this.isThemedProduct(target))) this.doSelectProduct(target, "replace");
           else {
             this.selectedProductId = 0;
             this.selectedProduct = null;
@@ -1778,7 +1824,7 @@
             case "rail-updated":
               // 价格计算器数据（v6）：桥接成功
               this.railState = "bridged";
-              this.railLoading = false;
+              this.railLoading = !!this.railAddRequestId;
               this.applyRailData(data.payload || {});
               break;            case "rail-fallback":
               // 壳侧 VM 不可达：降级提示（iframe 内保留 v5 侧栏卡片）
@@ -1787,9 +1833,16 @@
               this.railFallbackText = window.CRA1Shared.Errors.message(data.message, { fallback:'请在下方查看价格并完成订购' });
               break;
             case "rail-added":
-              // 模块加购成功（cartDialog 已弹出）：父页确认框
+              if (!this.railAddRequestId || data.requestId !== this.railAddRequestId) break;
+              clearTimeout(this.railAddTimer);
+              this.railAddRequestId = '';
               this.railLoading = false;
-              this.railConfirmAfterAdd();
+              if (data.success === true && data.failed !== true) {
+                this.refreshTopCart();
+                this.railConfirmAfterAdd();
+              } else if (data.reason === 'timeout') {
+                this.$message.warning('暂未收到加购结果，请先查看购物车，再决定是否重试。');
+              }
               break;
             default:
               break;
@@ -1798,7 +1851,7 @@
         /* ---- 价格计算器（v6）：父侧状态与方法 ---- */
         applyRailData(p) {
           this.railAvailability = p.availability || "ready";
-          this.railLoading = this.railAvailability !== "ready";
+          this.railLoading = !!this.railAddRequestId || this.railAvailability !== "ready";
           this.railDurationRequired = p.durationRequired !== false;
           if (Array.isArray(p.durations)) this.railDurations = p.durations;
           if (p.current !== undefined && p.current !== null) {
@@ -1855,9 +1908,16 @@
         railAddCart() {
           if (this.railLoading || this.railAvailability !== "ready") return;
           this.railLoading = true;
-          this.railPost("rail-add");
+          const requestId = this.embedNonce + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+          this.railAddRequestId = requestId;
+          this.railPost("rail-add", { requestId });
           clearTimeout(this.railAddTimer);
-          this.railAddTimer = setTimeout(() => { this.railLoading = false; }, 6000);
+          this.railAddTimer = setTimeout(() => {
+            if (this.railAddRequestId !== requestId) return;
+            this.railAddRequestId = '';
+            this.railLoading = false;
+            this.$message.warning('暂未收到加购结果，请先查看购物车，再决定是否重试。');
+          }, 32000);
         },
         railBuyNow() {
           if (this.railLoading || this.railAvailability !== "ready") return;
@@ -1987,6 +2047,7 @@
         },
       },
       beforeDestroy() {
+        this.moduleSelectionRequestId++;
         this.__dockObserver?.disconnect();
         clearTimeout(this.railAddTimer);
         clearTimeout(this.railBuyTimer);

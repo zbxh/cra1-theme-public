@@ -393,12 +393,18 @@
     root.querySelectorAll('template').forEach(node=>{result=result.concat(all(node.content,selector));});
     return result;
   }
-  function transform(content) {
-    if (typeof content !== 'string') return content;
+  function profile(module) {
+    return window.CRA1CartModules ? window.CRA1CartModules.profile(module) : '';
+  }
+  function transform(content, module) {
+    // Unknown modules own their complete markup and bindings. Shared class
+    // names or a borrowed stylesheet do not opt them into a native adapter.
+    const kind=profile(module);
+    if (typeof content !== 'string' || !kind) return content;
     try {
       const template=document.createElement('template'); template.innerHTML=content;
       const fragment=template.content;
-      const cloud=!!fragment.querySelector('link[href*="/mf_cloud/"]');
+      const cloud=kind==='cloud' && !!fragment.querySelector('link[href*="/mf_cloud/"]');
       if (cloud) {
         // The CRA1 phone fork names its duration collection cycleList; its
         // template still referenced an absent calcCycleList alias.
@@ -464,5 +470,5 @@
       return content;
     }
   }
-  window.CRA1CartControls={transform,version:'20261012-cart-heading-v1'};
+  window.CRA1CartControls={transform,profile,version:'20261012-cart-heading-v1'};
 })(window);

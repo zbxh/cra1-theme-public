@@ -52,7 +52,7 @@ try{
  check(nav.external==='https://example.invalid/a'&&nav.invalid===''&&nav.root==='/plugin/92/source.htm','external/root URLs remain usable and unsafe schemes are rejected')
  await page.evaluate(async()=>{
   const host=document.getElementById('host')
-  const html='<h2>第三方模块配置</h2><p>保留模块自己的配置与订购控件</p><script>window.boots=(window.boots||0)+1;window.shellIntact=asideMenu.theme&&topMenu.theme;window.futureAvailable=futureBadge.name;</scr'+'ipt><script src="/clientarea/template/pc/default/components/asideMenu/asideMenu.js"></scr'+'ipt><script src="/clientarea/template/pc/cra1/components/futureBadge/futureBadge.js"></scr'+'ipt>'
+  const html='<h2>第三方模块配置</h2><p>保留模块自己的配置与订购控件</p><script src="/clientarea/template/pc/default/components/asideMenu/asideMenu.js"></scr'+'ipt><script src="/clientarea/template/pc/cra1/components/futureBadge/futureBadge.js"></scr'+'ipt><script>window.boots=(window.boots||0)+1;window.shellIntact=asideMenu.theme&&topMenu.theme;window.futureAvailable=futureBadge.name;</scr'+'ipt>'
   host.innerHTML=html;await CRA1ModuleDeps.mountScripts(host)
   host.innerHTML=html;await CRA1ModuleDeps.mountScripts(host)
  })

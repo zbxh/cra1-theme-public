@@ -37,7 +37,7 @@ export function Alert({ tone = 'info', className, children, ...props }) {
   return (
     <div
       role={role}
-      className={cn('rounded-lg border px-3.5 py-2.5 text-[13px]', alertTones[tone], className)}
+      className={cn('rounded-lg border px-3.5 py-2.5 text-[13px] min-w-0 whitespace-pre-wrap [overflow-wrap:anywhere]', alertTones[tone], className)}
       {...props}
     >
       {children}

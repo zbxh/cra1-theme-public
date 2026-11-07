@@ -295,40 +295,46 @@
     return task
   }
 
+  function executableScript(node) {
+    // JSON configuration and text/x-template blocks are module data. Leave
+    // them in their original DOM position, available before any boot script.
+    var type=(node.getAttribute('type')||'').trim().toLowerCase()
+    return !type || type==='module' || /^(?:text|application)\/(?:x-)?(?:java|ecma)script(?:[\d.]*$|\s*;)/.test(type)
+  }
+
   /** Execute native declarations once; page boot scripts still execute per mount. */
   async function mountFragment(host, options) {
     options = options || {}
     var signal=options.signal, enabled=options.enabled || function(){return true}
-    var scripts=Array.from(host.querySelectorAll('script')),lifecycle=lateLifecycle(signal)
+    var scripts=Array.from(host.querySelectorAll('script')).filter(executableScript),lifecycle=lateLifecycle(signal)
     try {
-    // Vue must not compile inert script nodes. Keep their order outside its root.
+    // Executable nodes must not be compiled by Vue. Data/template nodes stay.
     scripts.forEach(function(node){node.remove()})
-    var declared=scripts.filter(function(node){return component(node.getAttribute('src'))})
-    for(var dependency of declared){
+    for(var node of scripts){
       if(signal && signal.aborted)throw aborted()
-      var src=dependency.getAttribute('src'),name=component(src)
-      if(!enabled(src))continue
-      if(COMPONENT_PATHS[name])await observe(loadOne(name),signal)
-      else if(!loaded[name]) {
-        var target=new URL(src,document.baseURI);
+      if(!host.isConnected)return
+      var source=node.getAttribute('src')||'',name=component(source)
+      if(!enabled(source))continue
+      // Resolve declarations where the module put them. A custom component
+      // may depend on an earlier inline configuration or vendor library.
+      if(name) {
+        if(COMPONENT_PATHS[name])await observe(loadOne(name),signal)
+        else if(!loaded[name]) {
+        var target=new URL(source,document.baseURI);
         var present=Array.from(document.scripts).some(function(script){return script.src && new URL(script.src,document.baseURI).pathname===target.pathname});
         if(!present){
-          try { await execute(dependency,true) }
+          try { await execute(node,true) }
           catch(error){
             if(error.code!=='MODULE_RESOURCE_LOAD' || !/\/template\/(?:pc|mobile)\/cra1\//.test(target.pathname))throw error;
-            var fallback=dependency.cloneNode(true);
+            var fallback=node.cloneNode(true);
             fallback.src=new URL(baseUrl()+'components/'+name+'/'+name+'.js',location.origin).href;
             await execute(fallback,true);
           }
         }
         loaded[name]=true;
+        }
+        continue
       }
-    }
-    for(var node of scripts){
-      if(signal && signal.aborted)throw aborted()
-      if(!host.isConnected)return
-      var source=node.getAttribute('src')||''
-      if(!enabled(source)||component(source))continue
       var deps=(node.getAttribute('data-cra1-deps')||'').split(/[\s,]+/).filter(Boolean)
       if(deps.length)await observe(ensure(deps),signal)
       await execute(node,!!source && !!options.once && options.once(source))
@@ -336,10 +342,8 @@
     lifecycle.replay()
     } finally { lifecycle.restore() }
     async function execute(old, once) {
-      var src=old.getAttribute('src')||'',type=(old.type||'').toLowerCase()
-      if(type&&!['text/javascript','application/javascript','module'].includes(type)){
-        host.appendChild(old);return
-      }
+      var src=old.getAttribute('src')||'',type=(old.type||'').trim().toLowerCase()
+      if(!executableScript(old))return
       var url=src?new URL(src,document.baseURI):null
       if(url&&!['http:','https:'].includes(url.protocol))throw new Error('模块资源地址无效')
       var key=url && (component(src)?url.origin+url.pathname:url.href)
@@ -358,6 +362,9 @@
         await new Promise(function(resolve,reject){
           var next=document.createElement('script'),timer,executionError
           Array.from(old.attributes).forEach(function(a){if(a.name!=='src')next.setAttribute(a.name,a.value)})
+          // The official jQuery loader evaluates classic script bodies even
+          // when a legacy JavaScript MIME label is no longer browser-native.
+          next.type=type==='module'?'module':'text/javascript'
           next.async=false
           if(url&&!options.fetchScripts)next.src=url.href
           else next.text=text
