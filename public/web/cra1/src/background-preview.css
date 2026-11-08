@@ -24,7 +24,7 @@
 .ap-header { height: 80px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 max(32px, calc((100vw - 1280px)/2)); border-bottom: 1px solid var(--ap-line); }
 .ap-brand { display: flex; align-items: center; gap: 10px; min-height: 44px; }
 .ap-brand strong { font: 600 19px/1 Arial,sans-serif; letter-spacing: -.7px; }
-.ap-brand-mark { display: grid; place-items: center; width: 32px; height: 32px; color: #e5d2b0; border-radius: 9px; background: linear-gradient(140deg, #61656b, #35383c); box-shadow: inset 0 1px 0 rgb(255 255 255 / 15%); }
+.ap-brand-mark { display: grid; place-items: center; width: 32px; height: 32px; color: inherit; border-radius: 9px; background: transparent; box-shadow: none; }
 .ap-brand-mark svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; }
 .ap-brand-label { padding-left: 15px; margin-left: 5px; border-left: 1px solid var(--ap-line); color: var(--ap-body); font-size: 13px; }
 .ap-preview-label { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ap-muted); }

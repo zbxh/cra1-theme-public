@@ -1953,6 +1953,8 @@ add_hook('clientarea_view_append', function ($param) {
  * 钩子参数 view_html 即当前模板名；未登记的模板保持系统标题不动。
  */
 add_hook('cart_view_append', function ($param) {
+    // Standalone third-party configuration uses the complete installed native document.
+    if (($param['view_html'] ?? '') === 'goods') return [];
     $theme = isset($param['cart_theme']) ? (string) $param['cart_theme'] : '';
     // 仅接管 CRA1 购物车主题（本钩子对其它购物车主题同样会被调用）
     if (!\CRA1\Theme\Context::isCRA1($theme)) {

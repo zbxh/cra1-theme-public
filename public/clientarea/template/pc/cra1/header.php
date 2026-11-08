@@ -1,4 +1,10 @@
 {php}
+require_once IDCSMART_ROOT.'public/cra1-shared/official-cart.php';
+if (\CRA1\Theme\Presentation\OfficialCart::ownsDocument(get_defined_vars())) {
+    echo \CRA1\Theme\Presentation\OfficialCart::render('header', get_defined_vars());
+} else {
+{/php}
+{php}
 require_once IDCSMART_ROOT . 'public/cra1-shared/runtime.php';
 $__cra1Page = basename((string)parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '.htm');
 $__cra1Runtime = CRA1ThemeRuntime::load($__cra1Page);
@@ -119,3 +125,5 @@ foreach ($__cra1NativeComponents as $__cra1Name=>$__cra1Relative) {
     echo '<script src="'.htmlspecialchars($__cra1Source,ENT_QUOTES,'UTF-8').'"></script>';
 }
 {/php}
+
+{php}}{/php}

@@ -180,15 +180,10 @@ localStorage.setItem = function (key, newValue) {
             const modules=window.CRA1CartModules;
             if (!modules) throw new Error('商品页面尚未加载');
             const managed=!!modules.profile(module);
-            if (this.isEmbed && !managed) {
+            if (!managed) {
               // Old embed links and incomplete catalogue metadata must also
               // reach the same full-document official module host.
               window.top.location.replace(modules.url('/cart/goods.htm', this.id));
-              return false;
-            }
-            if (!this.isEmbed && /\/goods\.htm$/.test(window.location.pathname) && managed &&
-                new URLSearchParams(window.location.search).get('standalone') !== '1') {
-              window.location.replace(modules.url('/cart/goodsList.htm', this.id));
               return false;
             }
             await this.$nextTick();

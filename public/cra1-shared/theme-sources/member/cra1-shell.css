@@ -483,9 +483,7 @@ body > div > .el-container > .el-container > .el-main,
 /* 侧边栏切换图标：桌面与移动端都显示（主导航默认关闭，靠它唤出） */
 .cra1-header__menu-btn { display: inline-flex; }
 
-/* 顶栏品牌：只展示一个 LOGO 图片的超链接。
-   系统 Logo 多为白色横向字标，浅色顶栏上不可见，因此用深色底座承载；
-   图片加载失败时回退为首字方块，避免出现空白占位。 */
+/* 顶栏品牌透明展示商家 Logo；图片失败时使用文字标识。 */
 .cra1-header__brand {
   display: inline-flex;
   align-items: center;
@@ -494,7 +492,7 @@ body > div > .el-container > .el-container > .el-main,
   height: 30px;
   padding: 0 10px;
   border-radius: calc(var(--radius) - 4px);
-  background: var(--sidebar-primary);
+  background: transparent;
   overflow: hidden;
   text-decoration: none;
   transition: opacity 150ms ease;
@@ -511,7 +509,7 @@ body > div > .el-container > .el-container > .el-main,
 .cra1-header__brand--text {
   width: 30px;
   padding: 0;
-  color: var(--sidebar-primary-foreground);
+  color: var(--sidebar-foreground);
   font-size: 13px;
   font-weight: 600;
 }

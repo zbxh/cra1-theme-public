@@ -3598,6 +3598,46 @@
       "observed_sha256": "3d99910311ba5bcbb9a7917d44fc06c0677d99bc8c4d7a898eaa50364f68a0e1",
       "verification": "official-10.7.2-to-10.7.4-files",
       "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
+    },
+    {
+      "path": "public/clientarea/template/pc/default/header.php",
+      "purpose": "第三方商品页原生页头",
+      "observed_sha256": "dc7a3c44e05460f0302b874c7ab1acda88841b9a3fdf4d8b535bb692f14cd06d",
+      "required": true,
+      "ownership": "v10-native",
+      "verified_sha256": [],
+      "verification": "pending",
+      "impact": "复用本站安装的原生文件，V10 升级后随原生实现变化，不作为敏感操作校验条件"
+    },
+    {
+      "path": "public/clientarea/template/pc/default/footer.php",
+      "purpose": "第三方商品页原生公共依赖与页尾",
+      "observed_sha256": "69068235c39798f208bc168130592a6cb3a6cf519fa31e14d6e5ef83c55b8429",
+      "required": true,
+      "ownership": "v10-native",
+      "verified_sha256": [],
+      "verification": "pending",
+      "impact": "复用本站安装的原生文件，V10 升级后随原生实现变化，不作为敏感操作校验条件"
+    },
+    {
+      "path": "public/cart/template/pc/default/goods.php",
+      "purpose": "第三方商品页原生模板",
+      "observed_sha256": "cbcb3ed5d1a5264c2c27163e1fd643390acc1b5c3de080bdd1a391a84d788816",
+      "required": true,
+      "ownership": "v10-native",
+      "verified_sha256": [],
+      "verification": "pending",
+      "impact": "复用本站安装的原生文件，V10 升级后随原生实现变化，不作为敏感操作校验条件"
+    },
+    {
+      "path": "public/cart/template/pc/default/js/goods.js",
+      "purpose": "第三方商品页原生加载与切换逻辑",
+      "observed_sha256": "4d92d76b47f26c3aa2fbcd95dc94202672a512d4cf91218b228bebd44a09abdf",
+      "required": true,
+      "ownership": "v10-native",
+      "verified_sha256": [],
+      "verification": "pending",
+      "impact": "复用本站安装的原生文件，V10 升级后随原生实现变化，不作为敏感操作校验条件"
     }
   ]
 }

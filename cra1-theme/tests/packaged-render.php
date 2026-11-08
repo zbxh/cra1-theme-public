@@ -34,8 +34,13 @@ function packagedAssets(string $html,string $page):void {
     foreach(array_unique($matches[1]) as $url){
         $path=parse_url(html_entity_decode($url),PHP_URL_PATH);
         if(!preg_match('~\.(?:js|css)$~',$path)||strpos($path,'/upload/')===0)continue;
-        $nativeModule=strpos($path,'/plugins/server/')===0 && strpos($path,'..')===false;
-        packagedCheck(is_file(IDCSMART_ROOT.'public'.$path)||($nativeModule&&is_file($GLOBALS['native'].'/public'.$path)),'missing resource '.$path.' in '.$page);
+        // Standalone carts render the installed default document, whose complete
+        // component dependencies remain in V10 rather than in the theme package.
+        $nativeAsset=strpos($path,'..')===false && (
+            strpos($path,'/plugins/server/')===0
+            ||preg_match('~^/(?:clientarea|cart)/template/(?:pc|mobile)/default/~D',$path)
+        );
+        packagedCheck(is_file(IDCSMART_ROOT.'public'.$path)||($nativeAsset&&is_file($GLOBALS['native'].'/public'.$path)),'missing resource '.$path.' in '.$page);
         $GLOBALS['assets'][$path]=true;
     }
 }
@@ -112,6 +117,12 @@ foreach(['pc','mobile'] as $device){
         $cart=IDCSMART_ROOT.'public/cart/template/'.$themes;$_SERVER['REQUEST_URI']='/cart/'.$name.'.htm'.($name==='goods'?'?standalone=1':'');
         $html=packagedRender($member.'/header.php',$vars,$member,'php').packagedRender($cart.'/'.$name.'.php',$vars,$cart,'php').packagedRender($member.'/footer.php',$vars,$member,'php');
         packagedCheck(strpos($html,'<html')!==false&&strpos($html,'</html>')!==false,'cart document '.$themes.'/'.$name);packagedAssets($html,'cart:'.$themes.'/'.$name);$pages[]='cart:'.$themes.'/'.$name;
+        if ($name==='goods') {
+            packagedCheck(strpos($html,'/cart/template/pc/default/js/goods.js')!==false,'standalone cart uses the actual installed native loader '.$themes);
+            packagedCheck(strpos($html,'/clientarea/template/pc/default/utils/request.js')!==false,'standalone cart uses the same native request client '.$themes);
+            packagedCheck(strpos($html,'/cra1-shared/')===false&&strpos($html,'__CRA1_RUNTIME__')===false,'standalone cart does not load theme controls, layout or runtime '.$themes);
+            packagedCheck(substr_count($html,'<aside-menu>')===1&&substr_count($html,'<top-menu ')===1,'native standalone cart has one original navigation shell '.$themes);
+        }
     }
 }
 echo json_encode(['status'=>'passed','checks'=>$checks,'pages'=>$pages,'unique_assets'=>count($assets),'production_writes'=>0,'native_fixture'=>'installed native libraries; not official compatibility proof'],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE).PHP_EOL;

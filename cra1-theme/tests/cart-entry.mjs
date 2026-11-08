@@ -32,10 +32,11 @@ for(const page of ['goods','goods_iframe','goods_embed']){
 const explicit=await run({address:'https://fixture.invalid/cart/goods_iframe.htm?id=5&product_id=4'});assert.equal(explicit.location.searchParams.get('id'),'5');assert.equal(explicit.requests[0].id,'5');checks.push('an explicit native id is not replaced by a link alias');
 const failed=await run({params:{id:'4'},config:{data:{status:403,msg:'provider private path /internal/fixture'}}});assert.equal(failed.errors[0],'商品配置暂不可用，请重试或选择其他商品。');assert.equal(failed.messages.length,0);checks.push('unavailable product has a safe error and never reads absent detail')
 const nativeContent='<div data-vendor="untouched">original module</div>'
-const native=await run({address:'https://fixture.invalid/cart/goods.htm?id=4',config:{data:{status:200,data:{module:'recloud_service',content:nativeContent}}}})
-assert.equal(native.messages.includes(nativeContent),true);assert.equal(native.instance.content,nativeContent);checks.push('native page uses the official jQuery contract with the exact module response')
-const promoted=await run({address:'https://fixture.invalid/cart/goods_embed.htm?id=4&change=true&name=A%20B',config:{data:{status:200,data:{module:'vendor_custom',content:nativeContent}}},framed:true})
-assert.match(promoted.messages[0].redirect,/\/cart\/goods.htm\?/);assert.match(promoted.messages[0].redirect,/change=true/);assert.equal(promoted.messages.includes(nativeContent),false);checks.push('an old third-party embed link navigates before mounting module scripts')
+for(const page of ['goods_iframe','goods_embed'])for(const framed of [false,true]){
+ const promoted=await run({address:'https://fixture.invalid/cart/'+page+'.htm?id=4&change=true&name=A%20B',config:{data:{status:200,data:{module:'recloud_service',content:nativeContent}}},framed})
+ assert.match(promoted.messages[0].redirect,/\/cart\/goods.htm\?/);assert.match(promoted.messages[0].redirect,/id=4/);assert.match(promoted.messages[0].redirect,/change=true/);assert.match(promoted.messages[0].redirect,/name=A%20B/);assert.equal(promoted.messages.includes(nativeContent),false);
+ checks.push('legacy '+page+' '+(framed?'framed':'standalone')+' promotes third-party modules without executing them twice')
+}
 const missing=await run({params:{id:'4'},product:{data:{status:200,data:{}}}});assert.equal(missing.errors.length,0);assert.equal(missing.instance.content.includes('fixture'),true);checks.push('missing optional product-switcher data preserves configuration')
 for(const cache of [null,'{invalid-json']){const r=await run({params:{id:'4'},cache});assert.equal(r.errors.length,0);assert.equal(r.messages.includes('ready'),true);checks.push('absent or invalid legacy cache does not stop the cart')}
 const bridge=fs.readFileSync(new URL('../source/legacy-assets/cart/20261017-compat-v3/js/goods_embed.js',import.meta.url),'utf8')

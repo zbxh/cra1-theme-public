@@ -34,6 +34,10 @@ try{
    if(p==='/console/v1/common')return json(route,common);
    if(p==='/console/v1/cart')return json(route,{list:[],count:0});
    if(p==='/console/v1/menu')return json(route,{list:[],menu:[]});
+   // The complete installed default header owns these native reads.
+   if(p==='/console/v1/account')return json(route,{account:{id:999,username:'隔离测试'},custom_fields:[]});
+   if(p==='/console/v1/presale_consult/config')return json(route,{presale_consult:0,config:{}});
+   if(p.includes('/event_promotion/'))return json(route,{list:[],event_promotion:[],count:0});
    if(p==='/console/v1/product/group/first')return json(route,{list:[{id:300,name:'测试产品'}]});
    if(p==='/console/v1/product/group/second')return json(route,{list:[{id:301,name:'商品配置',type:'normal'}]});
    if(p==='/console/v1/product')return json(route,{list:Number(u.searchParams.get('page')||1)>1?[]:products,count:products.length});

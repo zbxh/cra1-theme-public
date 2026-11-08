@@ -1,3 +1,9 @@
+{php}
+require_once IDCSMART_ROOT.'public/cra1-shared/official-cart.php';
+if (\CRA1\Theme\Presentation\OfficialCart::ownsDocument(get_defined_vars())) {
+    echo \CRA1\Theme\Presentation\OfficialCart::render('footer', get_defined_vars());
+} else {
+{/php}
 <!-- =======公共======= -->
 {php}
 // 共享资产不参与主题降级，缺失时回退 pc/default（同 header.php）。
@@ -31,3 +37,5 @@ if (is_file(IDCSMART_ROOT . 'public/clientarea/template/' . $themes . '/componen
 </body>
 
 </html>
+
+{php}}{/php}

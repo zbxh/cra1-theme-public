@@ -1,12 +1,10 @@
 import { ArrowUpRight, ArrowLeft, Check, Layers3 } from 'lucide-react'
-import { useState } from 'react'
 import { commonData, stripHtml } from '../lib'
 import { AnnouncementSlot } from '../ui/announcement-slot'
 import defaults from '../../../../backend/Storage/auth-pages.defaults.json'
 
 /** Shared presentation for native account flows; authentication stays in CredentialForm. */
 export function RegisterAuthLayout({ title, subtitle, children, kind }) {
-  const [lightLogo, setLightLogo] = useState('')
   const runtime = window.__CRA1_RUNTIME__ || {}, common = commonData()
   const page = kind || (runtime.page === 'regist' ? 'regist' : 'login')
   const d = defaults[page], configured = runtime.auth_appearance || {}
@@ -14,23 +12,11 @@ export function RegisterAuthLayout({ title, subtitle, children, kind }) {
   const name = common.website_name || window.__CRA1_PAGE__?.website_name || '会员中心'
   const logo = cfg.logo || common.system_logo, brand = Number(cfg.brand.enabled) === 1
   const pageLabel = { login: '登录', regist: '注册', forget: '找回密码', oauth: '关联账户' }[runtime.page] || (page === 'regist' ? '注册' : '登录')
-  function measureLogo(event) {
-    // A same-site white logo needs a dark backing on this light layout. Sample a
-    // tiny bitmap once; external images remain untouched if canvas is restricted.
-    const img = event.currentTarget
-    try {
-      const canvas = document.createElement('canvas'); canvas.width = 96; canvas.height = 32
-      const ctx = canvas.getContext('2d', {willReadFrequently: true}); ctx.drawImage(img, 0, 0, 96, 32)
-      const data = ctx.getImageData(0, 0, 96, 32).data; let visible = 0, light = 0
-      for (let i = 0; i < data.length; i += 4) if (data[i + 3] > 100) {visible++; if (Math.min(data[i], data[i + 1], data[i + 2]) > 210) light++}
-      setLightLogo(visible > 0 && light / visible > .8 ? logo : '')
-    } catch { setLightLogo('') }
-  }
   return <div className={'cra1-auth-page' + (brand ? '' : ' cra1-auth-page--centered')}>
     <header className="cra1-auth-header">
       <div className="cra1-auth-header-brand">
       <a className="cra1-auth-logo" href="/" aria-label={`${name}，返回首页`}>
-        {logo ? <span className={'cra1-auth-logo-image' + (lightLogo === logo ? ' cra1-auth-logo-image--light' : '')}><img src={logo} alt={name} onLoad={measureLogo} /></span> : <span className="cra1-auth-monogram">{Array.from(name)[0]}</span>}
+        {logo ? <span className="cra1-auth-logo-image"><img src={logo} alt={name} /></span> : <span className="cra1-auth-monogram">{Array.from(name)[0]}</span>}
         {!logo && <span>{name}</span>}
       </a>
       <span className="cra1-auth-page-label">{pageLabel}</span>
