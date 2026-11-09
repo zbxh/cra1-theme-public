@@ -58,6 +58,7 @@ const member=path.join(root,'cra1-theme/source/member'),admin=path.join(root,'cr
 for(const dir of [member,admin,path.join(root,'public/cra1-shared'),path.join(root,'public/web/cra1/src')])if(!fs.existsSync(path.join(dir,'node_modules')))throw new Error('Run npm ci in '+path.relative(root,dir)+' first. Do not use an external build tree.')
 run(['node_modules/vite/bin/vite.js','build'],member,{CRA1_MEMBER_OUT_DIR:path.join(output,'public/clientarea/template/pc/cra1/releases',release,'assets'),VITE_CRA1_SHARED_BASE:`/cra1-shared/releases/${release}`})
 run(['node_modules/vite/bin/vite.js','build'],admin,{CRA1ADMIN_OUT_DIR:path.join(output,'public/cra1admin/assets/releases',release)})
+fs.copyFileSync(path.join(admin,'src/security-login.css'),path.join(output,'public/cra1admin/assets/releases',release,'security-login.css'))
 const shared=path.join(output,'public/cra1-shared')
 fs.cpSync(path.join(root,'public/cra1-shared/src'),path.join(shared,'src'),{recursive:true})
 run([path.join(root,'public/cra1-shared/build.mjs')],root,{CRA1_SHARED_ROOT:shared,CRA1_SHARED_RELEASE:release})

@@ -66,7 +66,7 @@ export default function AccountPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-lg font-semibold tracking-tight text-ink">账户信息</h1>
+        <h1 className="text-lg font-semibold tracking-tight text-title">账户信息</h1>
         <p className="mt-0.5 text-[13px] text-muted-foreground">查看与维护账户资料、安全设置与余额记录</p>
       </div>
 
@@ -488,7 +488,7 @@ function CreditPanel() {
     { key: 'type', title: '类型', render: (r) => creditTypeText(r.type) },
     { key: 'amount', title: '金额', width: 120,
       render: (r) => (
-        <span className={Number(r.amount) >= 0 ? 'font-medium text-[#00B42A]' : 'font-medium text-danger'}>
+        <span className={Number(r.amount) >= 0 ? 'font-medium text-success' : 'font-medium text-danger'}>
           {Number(r.amount) >= 0 ? '+' : ''}{formatMoney(r.amount)}
         </span>
       ) },

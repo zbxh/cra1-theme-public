@@ -1,5 +1,5 @@
 .main-title {
-  color: #171725;
+  color: var(--cui-title);
   font-size: 0.28rem;
   margin-bottom: 0.4rem;
 }
@@ -8,7 +8,7 @@
   align-items: center;
 }
 .goods-name {
-  color: #171725;
+  color: var(--cui-title);
   font-weight: bold;
   font-size: 0.16rem;
 }
@@ -21,10 +21,10 @@
   font-size: 0.14rem;
 }
 .goodsInfo-price {
-  color: #1E2736;
+  color: var(--cui-title);
 }
 .goodsInfo-name {
-  color: #757575;
+  color: var(--cui-muted);
 }
 .radio-box {
   /* width: 80%; */
@@ -36,7 +36,7 @@
   margin-top: 0.16rem;
   width: 100%;
   text-align: left;
-  border: 1px solid #E6E7EB;
+  border: 1px solid var(--cui-edge);
   border-radius: 0.03rem;
   border-collapse: collapse;
 }
@@ -45,9 +45,9 @@
 }
 .goods-table thead {
   line-height: 0.46rem;
-  background: #EEF4FF;
+  background: var(--cui-accent);
   height: 0.46rem;
-  color: #757575;
+  color: var(--cui-muted);
 }
 .goods-table tbody tr td {
   padding-top: 0.29rem;
@@ -69,11 +69,11 @@
   color: #F0142F;
 }
 .item-price {
-  color: #171725;
+  color: var(--cui-title);
 }
 .item-total {
   font-weight: bold;
-  color: #171725;
+  color: var(--cui-title);
 }
 .shopping-goods {
   margin-bottom: 0.4rem;
@@ -89,7 +89,7 @@
   display: flex;
   align-items: center;
   font-size: 0.18rem;
-  box-shadow: 0rem 0rem 0.2rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0rem 0rem 0.2rem color-mix(in srgb,var(--cui-night) 15%,transparent);
   position: fixed;
   bottom: 0;
   background-color: #fff;
@@ -108,10 +108,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   /* white-space: nowrap; */
-  color: #1E2736;
+  color: var(--cui-ink);
 }
 .footer-left {
-  color: #333333;
+  color: var(--cui-ink);
   font-size: 0.18rem;
   display: flex;
   justify-content: start;
@@ -131,11 +131,11 @@
 }
 .footer-left .radio-box .el-radio .el-radio__label {
   font-size: 0.16rem;
-  color: #1E2736;
+  color: var(--cui-ink);
 }
 .footer-right {
   font-size: 0.14rem;
-  color: #1E2736;
+  color: var(--cui-ink);
   display: flex;
 }
 .total-price {
@@ -153,7 +153,7 @@
 .pay-text {
   white-space: nowrap;
   margin-right: 0.31rem;
-  color: #333333;
+  color: var(--cui-ink);
   font-size: 0.18rem;
   font-weight: 300;
 }
@@ -170,11 +170,11 @@
   margin: 0 0.4rem;
 }
 .all-check .el-checkbox__label {
-  color: #333333;
+  color: var(--cui-ink);
   font-size: 0.18rem;
 }
 .qty-num {
-  color: #4E5259;
+  color: var(--cui-title);
   height: 0.13rem;
   margin-top: 0.1rem;
 }
@@ -198,7 +198,7 @@
 }
 .original-price {
   text-decoration: line-through;
-  color: #999999;
+  color: var(--cui-muted);
 }
 .discount-codeNumber {
   margin-top: 0.08rem;
@@ -260,7 +260,7 @@
   .footer-left {
     display: none;
     flex-direction: column;
-    color: #333333;
+    color: var(--cui-ink);
     font-size: 0.18rem;
   }
   .btn-box {
@@ -274,7 +274,7 @@
   }
   .footer-right {
     font-size: 0.14rem;
-    color: #1E2736;
+    color: var(--cui-ink);
     display: block;
     text-align: right;
   }

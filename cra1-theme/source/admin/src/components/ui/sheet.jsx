@@ -39,7 +39,7 @@ export function SheetContent({ className, children, side = 'left', onOpenAutoFoc
       >
         {children}
         <SheetPrimitive.Close
-          className="absolute right-3 top-3 rounded-md p-1 text-muted transition-colors duration-150 hover:bg-surface-alt hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          className="absolute right-3 top-3 rounded-md p-1 text-muted transition-colors duration-150 hover:bg-surface-alt hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           aria-label="关闭"
         >
           <X className="size-4" />

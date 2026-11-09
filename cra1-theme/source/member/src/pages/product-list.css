@@ -5,7 +5,7 @@
 .cra1-products :is(button,input,select) { font-family: var(--cui-font); }
 .cra1-products button { cursor: pointer; }
 .cra1-products button:disabled { cursor: not-allowed; opacity: .45; }
-.cra1-products button:focus-visible, .cra1-products a:focus-visible { outline: 2px solid var(--cui-gold); outline-offset: 3px; }
+.cra1-products button:focus-visible, .cra1-products a:focus-visible { outline: 2px solid var(--cui-focus); outline-offset: 3px; }
 .cra1-products svg { width: 16px; height: 16px; flex: none; }
 .cra1-products__head-count { color: var(--cui-muted); font: 400 12px/20px var(--cui-font); }
 .cra1-products__head-count strong { color: var(--cui-ink); font-weight: 500; }
@@ -22,7 +22,7 @@
 .cra1-products__status[data-status="expiring"] small { color: var(--cui-gold); }
 .cra1-products__status[data-status="overdue"] small { color: var(--cui-danger); }
 .cra1-products__search { display: flex; align-items: center; gap: 8px; flex: 1 1 200px; max-width: 285px; min-width: 170px; min-height: 36px; margin: 0 0 0 auto; padding: 0 11px; border: 1px solid var(--cui-control-edge); border-radius: 8px; color: var(--cui-muted); background: var(--cui-surface); }
-.cra1-products__search:focus-within { border-color: var(--cui-gold); box-shadow: 0 0 0 3px color-mix(in srgb,var(--cui-champagne) 15%,transparent); }
+.cra1-products__search:focus-within { border-color: var(--cui-focus); box-shadow: 0 0 0 3px color-mix(in srgb,var(--cui-focus) 15%,transparent); }
 .cra1-products__search input { width: 100%; min-width: 0; height: 34px; padding: 2px 0; margin: 0; border: 0; border-radius: 0; color: var(--cui-ink); background: transparent; font: 400 13px/20px var(--cui-font); }
 .cra1-products__search input:focus { outline: none; box-shadow: none; }
 .cra1-products__search input::placeholder { color: var(--cui-muted); opacity: .9; }
@@ -34,12 +34,12 @@
 .cra1-products__sync-note button { min-height: 32px; padding: 4px 8px; border: 0; border-radius: 6px; background: transparent; color: var(--cui-ink); font: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .cra1-products__grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; min-width: 0; }
 .cra1-product-card { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 12px; border-radius: 14px; cursor: pointer; }
-.cra1-product-card:has(.cra1-product-card__panel-link:focus-visible) { outline: 2px solid var(--cui-gold); outline-offset: 3px; }
+.cra1-product-card:has(.cra1-product-card__panel-link:focus-visible) { outline: 2px solid var(--cui-focus); outline-offset: 3px; }
 .cra1-product-card__identity { min-width: 0; }
 .cra1-product-card__heading { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
 .cra1-product-card__names { flex: 1; min-width: 0; }
 .cra1-product-card__state { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex: none; max-width: 110px; }
-.cra1-product-card__title { display: block; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--cui-ink); font: 500 14px/22px var(--cui-font); }
+.cra1-product-card__title { display: block; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--cui-title); font: 500 14px/22px var(--cui-font); }
 .cra1-product-card__status { display: inline-flex; align-items: center; gap: 4px; flex: none; padding: 2px 5px; border-radius: 5px; color: var(--cui-muted); background: var(--cui-accent); font: 500 11px/17px var(--cui-font); white-space: nowrap; }
 .cra1-product-card__status::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
 .cra1-product-card__status[data-tone="success"] { color: var(--cui-success); background: color-mix(in srgb,var(--cui-success) 8%,var(--cui-surface)); }

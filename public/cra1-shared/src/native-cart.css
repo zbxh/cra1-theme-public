@@ -1,0 +1,118 @@
+/* Only presentation changes. Native rem scaling, controls and calculator
+   bindings stay intact; unrecognized module structures retain their layout. */
+html[data-cra1-native-cart] body {
+  margin: 0;
+  background: var(--cui-page);
+  /* Native theme/index.js sets its own HTML variables; keep the navigation
+     and configuration palette local without changing that native script. */
+  --color-primary: var(--cui-brand);
+}
+html[data-cra1-native-cart] :is(.cra1-header,.cra1-aside,.cra1-aside__overlay,.cra1-notices-host,.cra1-notice-reader),
+html[data-cra1-native-cart] :is(.cra1-header,.cra1-aside,.cra1-notices-host,.cra1-notice-reader) * {
+  box-sizing: border-box;
+  font-family: var(--cui-font);
+}
+html[data-cra1-native-cart] .goods > .el-container > .el-container {
+  min-width: 0;
+  min-height: 100vh;
+  background: transparent;
+}
+html[data-cra1-native-cart] .goods > .el-container > .el-container > .el-main {
+  min-width: 0;
+  width: auto;
+  box-sizing: border-box;
+  overflow: visible;
+  margin-top: 0;
+  padding-top: 24px;
+  background: transparent;
+  font-family: var(--cui-font);
+}
+html[data-cra1-native-cart] .cra1-header { font-size: 13px; line-height: 1.5; }
+html[data-cra1-native-cart] .cra1-aside { font-size: 13px; line-height: 1.5; }
+html[data-cra1-native-cart] .cra1-notices-host { flex: 0 0 auto; }
+/* The common native desktop fallback has a fixed sidebar at top:0. Put those
+   same nodes in two columns so it cannot cover the header or page notices. */
+html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(260px,300px);
+  align-items: start;
+  gap: 24px;
+}
+html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) > .l-config {
+  min-width: 0;
+  width: auto;
+  margin-right: 0;
+}
+html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) > .order-right {
+  position: sticky;
+  top: calc(var(--header-h) + 16px);
+  right: auto;
+  width: auto;
+  height: auto;
+  max-height: calc(100vh - var(--header-h) - 32px);
+  max-height: calc(100dvh - var(--header-h) - 32px);
+  overflow: auto;
+  padding: 20px;
+  border: 1px solid var(--cui-line);
+  border-radius: 16px;
+  box-shadow: var(--cui-shadow-card);
+}
+html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) > .l-config > .main-card {
+  border: 1px solid var(--cui-line);
+  border-radius: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+  background: var(--cui-surface);
+}
+html[data-cra1-native-cart] .common-box:has(> .l-config + .order-right) .f-btn {
+  display: flex;
+  gap: 8px;
+}
+html[data-cra1-native-cart] .common-box:has(> .l-config + .order-right) .f-btn > .el-button {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 40px;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: normal;
+}
+/* Color and shape only: no sizing, positioning, extra controls or DOM rewriting. */
+html[data-cra1-native-cart] .config-box .el-input__inner,
+html[data-cra1-native-cart] .config-box .el-textarea__inner {
+  background-color: var(--cui-field);
+  border-color: var(--cui-control-edge);
+  border-radius: 8px;
+  color: var(--cui-body);
+}
+html[data-cra1-native-cart] .config-box .el-button { border-radius: 8px; }
+html[data-cra1-native-cart] .config-box .el-button--primary:not(.is-plain):not(.is-disabled) {
+  background: var(--cui-button-highlight),var(--cui-button-gradient);
+  border-color: var(--cui-brand);
+  color: var(--cui-white);
+}
+html[data-cra1-native-cart] .config-box .el-input__inner:focus,
+html[data-cra1-native-cart] .config-box .el-textarea__inner:focus {
+  border-color: var(--cui-focus);
+}
+html[data-cra1-native-cart] .config-box :is(button,a,input,textarea):focus-visible {
+  outline: 2px solid var(--cui-focus);
+  outline-offset: 2px;
+}
+@media (max-width:1024px) {
+  html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) { grid-template-columns: minmax(0,1fr); gap: 16px; }
+  html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) > .order-right {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    font-size: 14px;
+  }
+  html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) > .l-config > .main-card { padding: 16px; }
+  html[data-cra1-native-cart] .common-box:has(> .l-config + .order-right) .l-config :is(.el-input,.el-select,.el-textarea) { max-width: 100%; }
+}
+@media (max-width:750px) {
+  html[data-cra1-native-cart] .goods > .el-container > .el-container > .el-main { padding-top: 16px; }
+}

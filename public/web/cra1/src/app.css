@@ -10,7 +10,7 @@
     --brand-hover: var(--cui-brand-hover);
     --ink: var(--cui-ink);
     --body: var(--cui-body);
-    --muted: var(--cui-muted);
+    --muted: var(--cui-accent);
     --surface: var(--cui-surface);
     --surface-alt: var(--cui-accent);
     --line: var(--cui-line);
@@ -55,7 +55,7 @@
     --shadow-card: var(--cui-shadow-card);
     --shadow-card-hover: var(--cui-shadow-pop);
     /* 内发光：给玻璃卡片一点"顶面受光"的厚度感，是低成本高收益的一层 */
-    --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    --shadow-inset: inset 0 1px 0 color-mix(in srgb,var(--cui-white) 70%,transparent);
 
     /* 激活态文字渐变（选项卡/关键标题）。角度与色标按品牌色生成，
        参考阿里云 246deg 与腾讯云 90deg 的"偏轴渐变"——纯正 90deg 会显得呆板。 */
@@ -75,7 +75,7 @@
   body {
     padding-top: 4rem;
     min-height: 100vh;
-    background: var(--cui-accent);
+    background: var(--cui-page);
     color: var(--body);
     font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
     letter-spacing: 0;
@@ -245,7 +245,7 @@
 
   .page-hero {
     @apply relative overflow-hidden border-b border-line;
-    background: linear-gradient(180deg, #f3f7ff 0%, #fbfcfe 70%, #ffffff 100%);
+    background: linear-gradient(180deg, var(--cui-page) 0%, var(--cui-page) 70%, #ffffff 100%);
   }
 
   .page-hero > .container-page {
@@ -315,14 +315,14 @@
   }
 
   .hairline-card {
-    background: rgba(255, 255, 255, 0.85);
+    background: color-mix(in srgb,var(--cui-white) 85%,transparent);
     border-color: color-mix(in srgb,var(--cui-night) 8.0%,transparent);
   }
 
   .hairline-card {
     background-image:
       linear-gradient(#fff, #fff),
-      linear-gradient(135deg, rgba(220, 227, 236, 0.9), rgba(220, 227, 236, 0.5));
+      linear-gradient(135deg, color-mix(in srgb,var(--cui-white) 90%,transparent), color-mix(in srgb,var(--cui-white) 50%,transparent));
   }
 
   .lift-card {
@@ -463,7 +463,7 @@
   .mega-card:hover,
   .drawer-link:hover,
   .drawer-sub:hover {
-    background: var(--cui-accent);
+    background: var(--cui-page);
   }
 
   .drawer-link {
@@ -727,7 +727,7 @@
     transition: opacity 250ms ease;
     background: radial-gradient(
       180px circle at var(--mx) var(--my),
-      rgba(255, 255, 255, 0.3),
+      color-mix(in srgb,var(--cui-white) 30%,transparent),
       transparent 65%
     );
   }
@@ -1150,7 +1150,7 @@
     /* 收窄：原先 4rem 宽 + 0.7rem 内边距偏宽，与设计稿的紧凑感不符 */
     width: 3.25rem;
     padding: 0.55rem 0.2rem;
-    color: #44536a;
+    color: var(--cui-body);
     border-radius: 9999px;
     transition: color 150ms ease;
   }
@@ -1203,7 +1203,7 @@
     /* 三围与胶囊一致，视觉成列 */
     width: 3.25rem;
     height: 3.25rem;
-    color: #44536a;
+    color: var(--cui-body);
     background: #fff;
     border: 1px solid var(--line);
     border-radius: 9999px;
@@ -1614,7 +1614,7 @@
 }
 
 .cta-band :is(p, dl, ul, ol, time) {
-  color: rgba(255, 255, 255, 0.88);
+  color: color-mix(in srgb,var(--cui-white) 88%,transparent);
 }
 
 /* 下拉菜单：更强的 ease-out 曲线（daisyUI 已提供 200ms + scale(0.95) + origin-top）。
@@ -1855,11 +1855,11 @@
 /* 轮播文案：Mac 软件窗口样式 */
 .mac-window {
   border-radius: 0.875rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(15, 23, 40, 0.58);
+  border: 1px solid color-mix(in srgb,var(--cui-white) 16%,transparent);
+  background: color-mix(in srgb,var(--cui-night) 58%,transparent);
   backdrop-filter: blur(20px) saturate(1.35);
   -webkit-backdrop-filter: blur(20px) saturate(1.35);
-  box-shadow: 0 30px 70px -18px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 30px 70px -18px color-mix(in srgb,var(--cui-night) 55%,transparent), inset 0 1px 0 color-mix(in srgb,var(--cui-white) 8%,transparent);
   overflow: hidden;
 }
 
@@ -1888,7 +1888,7 @@
   border: 1px solid transparent;
   border-radius: 1.1rem;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.72)),
+    linear-gradient(color-mix(in srgb,var(--cui-white) 82%,transparent), color-mix(in srgb,var(--cui-white) 72%,transparent)),
     linear-gradient(120deg, rgba(43, 140, 255, 0.28) 0%, rgba(14, 159, 110, 0.16) 45%, rgba(122, 90, 248, 0.14) 100%);
   background-origin: border-box;
   background-clip: padding-box, border-box;
@@ -1989,7 +1989,7 @@
 }
 
 .promo-panel-hover:hover {
-  background: rgba(255, 255, 255, 0.55);
+  background: color-mix(in srgb,var(--cui-white) 55%,transparent);
 }
 
 .promo-entry {
@@ -2067,7 +2067,7 @@
   min-height: 2.75rem;
   padding: 0.55rem 0.2rem;
   font-size: 0.875rem;
-  color: #44536a;
+  color: var(--cui-body);
 }
 
 /* 指针设备（桌面）：行高压缩到 32px，仍高于 WCAG 2.5.8 的 24px 下限。
@@ -2156,7 +2156,7 @@
    属 §8.1「禁止硬编码色值」的既有违规（同一页面出现两种"品牌蓝"）。 */
 .bento-cta {
   background: var(--brand);
-  border-color: rgba(0, 0, 0, 0.04);
+  border-color: color-mix(in srgb,var(--cui-night) 4%,transparent);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -2239,7 +2239,7 @@
 
 /* 焦点环：深色底上用浅色描边，保证可见（键盘可达性，7.5.5） */
 .node-dot:focus-visible {
-  outline: 2px solid #7fb2ff;
+  outline: 2px solid var(--cui-night-focus);
   outline-offset: 4px;
   border-radius: 9999px;
 }
@@ -2436,7 +2436,7 @@
   height: 10px;
   border-radius: 9999px;
   background: #4f94ff;
-  border: 2px solid rgba(11, 18, 32, 0.9);
+  border: 2px solid color-mix(in srgb,var(--cui-night) 90%,transparent);
   box-shadow: 0 0 10px rgba(79, 148, 255, 0.65), 0 0 22px rgba(79, 148, 255, 0.3);
 }
 
@@ -2537,7 +2537,7 @@
 
 /* 轮播标题切换条：透明渐变悬浮在轮播图上（无边界线、无投影） */
 .carousel-tabs {
-  background: linear-gradient(to top, rgba(9, 15, 27, 0.34), rgba(9, 15, 27, 0.1) 55%, transparent);
+  background: linear-gradient(to top, color-mix(in srgb,var(--cui-night) 34%,transparent), color-mix(in srgb,var(--cui-night) 10%,transparent) 55%, transparent);
 }
 
 /* 打字机光标 */
@@ -2574,7 +2574,7 @@
   /* 令牌重映射（只影响 footer 内部）：手写 CSS 类读这批变量 */
   --ink: var(--night-ink);
   --body: var(--night-body);
-  --muted: var(--night-muted);
+  --muted: var(--cui-accent);
   --line: var(--night-line);
   --brand: var(--night-brand);
   --brand-hover: var(--cui-brand-hover);
@@ -2647,7 +2647,7 @@ html.js body {
    hover 边框着色由模板既有 hover:border-brand/35 承担 */
 .price-row {
   border-radius: 0.75rem;
-  border-color: rgba(0, 0, 0, 0.04);
+  border-color: color-mix(in srgb,var(--cui-night) 4%,transparent);
   box-shadow: var(--shadow-card);
   transition: box-shadow 200ms var(--ease-out-strong), border-color 150ms ease;
 }

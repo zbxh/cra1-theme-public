@@ -3,14 +3,14 @@
 .cui-ambient-host { position: relative; isolation: isolate; }
 .cui-ambient-content { position: relative; z-index: 1; }
 .cui-ambient {
-  --ambient-base: #f9fafb;
-  --ambient-grid: rgb(97 101 107 / 10%);
-  --ambient-silver: rgb(148 163 179 / 28%);
-  --ambient-silver-core: rgb(196 207 218 / 44%);
+  --ambient-base: var(--cui-mist-50);
+  --ambient-grid: color-mix(in srgb,var(--cui-night) 10%,transparent);
+  --ambient-silver: color-mix(in srgb,var(--cui-night) 28%,transparent);
+  --ambient-silver-core: color-mix(in srgb,var(--cui-night) 44%,transparent);
   --ambient-gold: rgb(197 167 119 / 25%);
   --ambient-gold-core: rgb(229 210 176 / 43%);
-  --ambient-focus: rgb(255 255 255 / 75%);
-  --ambient-wire: #85929f;
+  --ambient-focus: color-mix(in srgb,var(--cui-white) 75%,transparent);
+  --ambient-wire: var(--cui-mist-400);
   --ambient-wire-gold: #b28e58;
   --ambient-wire-alpha: .34;
   position: absolute; inset: 0; z-index: 0;
@@ -20,14 +20,14 @@
   contain: layout paint style;
 }
 .cui-ambient[data-palette="dark"] {
-  --ambient-base: #212327;
-  --ambient-grid: rgb(196 207 218 / 9%);
-  --ambient-silver: rgb(148 163 179 / 17%);
-  --ambient-silver-core: rgb(196 207 218 / 23%);
+  --ambient-base: var(--cui-mist-800);
+  --ambient-grid: color-mix(in srgb,var(--cui-night) 9%,transparent);
+  --ambient-silver: color-mix(in srgb,var(--cui-night) 17%,transparent);
+  --ambient-silver-core: color-mix(in srgb,var(--cui-night) 23%,transparent);
   --ambient-gold: rgb(197 167 119 / 14%);
   --ambient-gold-core: rgb(229 210 176 / 22%);
   --ambient-focus: rgb(229 210 176 / 12%);
-  --ambient-wire: #b8c4d0;
+  --ambient-wire: var(--cui-mist-300);
   --ambient-wire-gold: #e5d2b0;
   --ambient-wire-alpha: .36;
 }

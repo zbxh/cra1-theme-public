@@ -57,7 +57,7 @@
 .cra1-site-drawer .cra1-drawer-group-row { display:flex; align-items:stretch; position:relative; min-height:44px; border-radius:7px; }
 .cra1-site-drawer .cra1-drawer-group-row.is-open { background:linear-gradient(90deg,color-mix(in srgb,var(--cui-champagne) 10%,var(--cui-surface)),var(--cui-surface) 58%); }
 .cra1-site-drawer .cra1-drawer-group-row.is-open::before { content:''; position:absolute; left:0; top:13px; bottom:13px; width:2px; border-radius:2px; background:var(--cui-champagne); pointer-events:none; }
-.cra1-site-drawer .cra1-drawer-group-title { display:flex; align-items:center; gap:8px; flex:1; min-width:0; min-height:44px; padding:10px 12px; border:0; border-radius:7px; background:transparent; color:var(--cui-ink); text-align:left; font-weight:500; overflow-wrap:anywhere; }
+.cra1-site-drawer .cra1-drawer-group-title { display:flex; align-items:center; gap:8px; flex:1; min-width:0; min-height:44px; padding:10px 12px; border:0; border-radius:7px; background:transparent; color:var(--cui-title); text-align:left; font-weight:500; overflow-wrap:anywhere; }
 .cra1-site-drawer .cra1-drawer-group-button { justify-content:space-between; width:100%; }
 .cra1-site-drawer .cra1-drawer-group-title > svg { flex-shrink:0; width:14px; height:14px; color:var(--cui-muted); }
 .cra1-site-drawer .cra1-drawer-group-toggle { display:grid; place-items:center; flex-shrink:0; width:44px; min-height:44px; padding:0; border:0; border-radius:7px; color:var(--cui-muted); background:transparent; }
@@ -82,7 +82,7 @@
 }
 .cra1-site-drawer .cra1-drawer-branch-card.is-open .cra1-drawer-card-toggle { background:linear-gradient(120deg,var(--cui-accent),color-mix(in srgb,var(--cui-highlight) 25%,var(--cui-accent))); }
 .cra1-site-drawer .cra1-drawer-card-toggle > svg { flex-shrink:0; width:14px; height:14px; }
-.cra1-site-drawer .cra1-drawer-card-title { grid-area:1 / 1; align-self:center; justify-self:start; position:relative; z-index:1; max-width:calc(100% - 24px); margin:10px 12px; padding:0; color:var(--cui-ink); font-weight:500; line-height:24px; overflow-wrap:anywhere; }
+.cra1-site-drawer .cra1-drawer-card-title { grid-area:1 / 1; align-self:center; justify-self:start; position:relative; z-index:1; max-width:calc(100% - 24px); margin:10px 12px; padding:0; color:var(--cui-title); font-weight:500; line-height:24px; overflow-wrap:anywhere; }
 .cra1-site-drawer .cra1-drawer-count { font-size:12px; font-variant-numeric:tabular-nums; }
 .cra1-site-drawer .cra1-drawer-chevron { transition:transform var(--cui-duration-fast) ease; }
 .cra1-site-drawer .cra1-drawer-chevron.is-open { transform:rotate(180deg); }
@@ -94,9 +94,9 @@
 .cra1-site-drawer .cra1-drawer-overview svg { flex-shrink:0; width:14px; height:14px; }
 .cra1-site-drawer .cra1-drawer-aside-link { font-size:12px; }
 .cra1-site-drawer .cra1-drawer-footer { flex-shrink:0; min-height:52px; padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px)); border-top:1px solid var(--cui-line); color:var(--cui-muted); background:var(--cui-surface); font-size:14px; line-height:23px; overflow-wrap:anywhere; }
-.cra1-site-drawer :is(a,button):focus-visible { outline:2px solid var(--cui-gold); outline-offset:-2px; }
+.cra1-site-drawer :is(a,button):focus-visible { outline:2px solid var(--cui-focus); outline-offset:-2px; }
 @media (hover:hover) and (pointer:fine) {
-  .cra1-site-drawer :is(.cra1-drawer-close,.cra1-drawer-back,.cra1-drawer-top,.cra1-drawer-link,.cra1-drawer-group-toggle,a.cra1-drawer-group-title):hover { background:var(--cui-accent); color:var(--cui-ink); }
+  .cra1-site-drawer :is(.cra1-drawer-close,.cra1-drawer-back,.cra1-drawer-top,.cra1-drawer-link,.cra1-drawer-group-toggle,a.cra1-drawer-group-title):hover { background:var(--cui-accent); color:var(--cui-title); }
   .cra1-site-drawer .cra1-drawer-logout:hover { color:var(--cui-danger); background:color-mix(in srgb,var(--cui-danger) 5%,transparent); }
   .cra1-site-drawer .cra1-drawer-branch-card:hover { border-color:var(--cui-steel); box-shadow:0 3px 12px color-mix(in srgb,var(--cui-night) 8%,transparent); }
   .cra1-site-drawer .cra1-drawer-card-head:hover .cra1-drawer-card-toggle { background:linear-gradient(120deg,var(--cui-accent),color-mix(in srgb,var(--cui-highlight) 35%,var(--cui-accent))); }

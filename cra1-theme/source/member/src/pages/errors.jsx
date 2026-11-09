@@ -32,7 +32,7 @@ function ErrorPage({ icon: Icon, code, title, description, primary, secondary })
         <span className="mb-5 inline-flex size-14 items-center justify-center rounded-2xl border border-line bg-surface text-brand shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
           <Icon className="size-7" aria-hidden="true" />
         </span>
-        <h1 className="text-xl font-semibold text-ink">{title}</h1>
+        <h1 className="text-xl font-semibold text-title">{title}</h1>
         {description && <p className="mx-auto mt-2 max-w-md text-[13px] leading-6 text-muted">{description}</p>}
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
           {primary}

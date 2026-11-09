@@ -12,11 +12,11 @@
    ========================================================================== */
 :root {
   --up-brand: var(--cui-brand, var(--cui-titanium));
-  --up-ink: var(--cui-ink, #1d2129);
-  --up-muted-txt: var(--cui-muted, #86909c);
-  --up-line: var(--cui-line, #e5e8ed);
-  --up-tag-bg: var(--cui-accent, #f2f3f5);
-  --up-accent-bg: var(--cui-accent, #f2f3f5);
+  --up-ink: var(--cui-ink, var(--cui-title));
+  --up-muted-txt: var(--cui-muted, var(--cui-muted));
+  --up-line: var(--cui-line, var(--cui-mist-200));
+  --up-tag-bg: var(--cui-accent, var(--cui-mist-100));
+  --up-accent-bg: var(--cui-accent, var(--cui-mist-100));
 }
 
 /* --------------------------------------------------------------------------
@@ -60,10 +60,10 @@
   font-weight: 600;
   color: #fff;
   background-color: var(--up-brand);
-  border: 1px solid rgba(220, 227, 236, 0.9);
+  border: 1px solid color-mix(in srgb,var(--cui-white) 90%,transparent);
   border-color: color-mix(in srgb, var(--up-line) 90%, transparent);
   border-radius: 50%;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 2px color-mix(in srgb,var(--cui-night) 4%,transparent);
   overflow: hidden;
 }
 
@@ -107,7 +107,7 @@
   background: #fff;
   border: 1px solid var(--up-line);
   border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 12px 28px rgba(29, 33, 41, 0.12);
+  box-shadow: 0 4px 6px -1px color-mix(in srgb,var(--cui-night) 5%,transparent), 0 12px 28px color-mix(in srgb,var(--cui-night) 12%,transparent);
   transform-origin: top right;
   animation: cra1-upanel-pop 150ms cubic-bezier(0.23, 1, 0.32, 1);
 }

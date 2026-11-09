@@ -14,7 +14,7 @@ const ICON_TONES = {
 const CLICKABLE = cn(
   'transition-all duration-150 cursor-pointer',
   'hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:border-brand/40',
-  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand'
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus'
 )
 
 /**

@@ -89,6 +89,11 @@
 
 /* 内容区基线：与外壳 1440 限宽体系对齐（cra1-shell 同款） */
 
+/* 原生脚手架的外层底色使用页面令牌，第三方完整页面保持原样。 */
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-container {
+  background: var(--cui-page);
+}
+
 /* 价格数字：表格数字对齐 */
 .cart-page .price-num,
 .cart-page .item-price,
@@ -247,7 +252,7 @@
 }
 
 .cart-page .cl-nav-item.is-active {
-  color: var(--primary);
+  color: var(--cui-ink);
   background: var(--primary-soft);
   font-weight: 600;
 }
@@ -316,7 +321,7 @@
   display: flex;
   align-items: baseline;
   gap: 2px;
-  color: var(--danger);
+  color: var(--cui-title);
   margin-top: 4px;
 }
 
@@ -631,18 +636,18 @@
   opacity: 0.62;
 }
 
-/* ---- 可选中商品卡（参考用户选型截图：浅蓝标题带 + 选中主色描边） ---- */
+/* Selectable product cards share the Mist selection marker. */
 .cart-page .cl-goods-card {
   cursor: pointer;
   text-align: left;
 }
 
 .cart-page .cl-goods-card.is-selected {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 1px var(--primary), var(--shadow-card);
+  border-color: var(--cui-selection-mark);
+  box-shadow: 0 0 0 1px var(--cui-selection-mark), var(--shadow-card);
 }
 
-/* 标题带：浅蓝底 + 名称 + 选中对勾（v4 紧凑化） */
+/* Compact title band, product name and selection check. */
 .cart-page .cl-card-head {
   display: flex;
   align-items: center;
@@ -656,7 +661,7 @@
 }
 
 .cart-page .cl-goods-card.is-selected .cl-card-head {
-  background: color-mix(in srgb,var(--cui-titanium) 10.0%,transparent);
+  background:var(--cui-selected);
 }
 
 .cart-page .cl-card-head-name {
@@ -675,7 +680,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--cui-selection-mark);
   color: #ffffff;
   font-size: 12px;
   flex-shrink: 0;
@@ -772,7 +777,7 @@
 
 .cart-page .cl-sec-tit-price {
   font-size: 13px;
-  color: var(--danger);
+  color: var(--cui-title);
   font-variant-numeric: tabular-nums;
 }
 
@@ -926,7 +931,7 @@
 }
 
 .cart-page .cl-price {
-  color: var(--danger);
+  color: var(--cui-title);
   white-space: nowrap;
 }
 
@@ -1007,7 +1012,7 @@
 /* 模块模板令牌重映射（v10 配色变量 → CRA1 令牌，作用域限购物车页） */
 .cart-page {
   --color-primary: var(--primary);
-  --color-price-text: var(--danger);
+  --color-price-text: var(--cui-title);
 }
 
 /* 页标题 */
@@ -1126,7 +1131,7 @@
 
 .cart-page .goods-table .item-price .price,
 .cart-page .goods-table .item-total span {
-  color: var(--danger);
+  color: var(--cui-title);
   font-weight: 600;
 }
 
@@ -1151,7 +1156,7 @@
 .cart-page .footer-box .total-price {
   font-size: 20px;
   font-weight: 700;
-  color: var(--danger);
+  color: var(--cui-title);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1327,7 +1332,7 @@
 }
 
 .cart-page .cl-meta-price {
-  color: var(--danger);
+  color: var(--cui-title);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1531,7 +1536,7 @@
 }
 
 .cart-page .cl-m-cart-price .price {
-  color: var(--danger);
+  color: var(--cui-title);
   font-weight: 600;
 }
 
@@ -1576,7 +1581,7 @@
 .cart-page .cl-m-cart-total-num {
   font-size: 17px;
   font-weight: 700;
-  color: var(--danger);
+  color: var(--cui-title);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1662,7 +1667,7 @@
 }
 
 .cart-page .cl-m-settle-sub {
-  color: var(--danger);
+  color: var(--cui-title);
   font-weight: 600;
 }
 
@@ -2198,8 +2203,8 @@
 }
 
 .cart-page .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item.is-active {
-  color: var(--primary);
-  border-color: var(--primary);
+  color: var(--cui-ink);
+  border-color: var(--cui-selection-mark);
   background: var(--primary-soft, color-mix(in srgb,var(--cui-titanium) 6.0%,transparent));
   font-weight: 600;
 }
@@ -2451,7 +2456,7 @@
     line-height: 18px;
     cursor: pointer;
   }
-  .cart-page .cl-rail-dock-now { display: flex; align-items: baseline; flex-wrap: wrap; color: var(--danger); min-width: 0; }
+  .cart-page .cl-rail-dock-now { display: flex; align-items: baseline; flex-wrap: wrap; color: var(--cui-title); min-width: 0; }
   .cart-page .cl-rail-dock-num { font-size: 20px; font-weight: 700; line-height: 26px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
   .cart-page .cl-rail-dock .cl-rail-price-origin { margin: 0; font-size: 11px; overflow-wrap: anywhere; }
   .cart-page .cl-rail-dock-actions { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -2469,7 +2474,7 @@
 }
 
 .cl-config-toggle { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:44px; padding:10px 14px; border:1px solid #e4e4e7; border-radius:8px; background:#fff; color:#27272a; cursor:pointer; margin-bottom:12px; }
-.cl-config-toggle:focus-visible { outline:2px solid var(--cui-gold); outline-offset:2px; }
+.cl-config-toggle:focus-visible { outline:2px solid var(--cui-focus); outline-offset:2px; }
 
 /* ========================================================================== 
    商品选择与选配分区同级。外层与分区标题保持同级；镜像、存储的专用适配规则见本文件末尾。
@@ -2740,7 +2745,7 @@ html[data-cra1-theme="cart"] .cl-cart-fixed-grid { display:grid; grid-template-c
 html[data-cra1-theme="cart"] .cl-cart-fixed-grid button { min-width:0; min-height:52px; padding:7px; border:1px solid #dce1e5; border-radius:8px; background:#fff; color:#61656b; line-height:1.4; }
 html[data-cra1-theme="cart"] .cl-cart-fixed-grid strong { font-size:16px; font-weight:550; overflow-wrap:anywhere; }
 html[data-cra1-theme="cart"] .cl-cart-fixed-grid small { display:block; font-size:10px; }
-html[data-cra1-theme="cart"] .cl-cart-fixed-grid button[aria-pressed="true"] { border-color:#b39c78; background:linear-gradient(135deg,#f2ede3,#fcfcfa); color:#655032; box-shadow:inset 0 0 0 1px #c5a7771f; }
+html[data-cra1-theme="cart"] .cl-cart-fixed-grid button[aria-pressed="true"] { border-color:var(--cui-selection-mark); background:var(--cui-selected); color:var(--cui-ink); box-shadow:inset 0 0 0 1px var(--cui-selection-mark); }
 html[data-cra1-theme="cart"] .cl-cart-performance { padding-top:12px; margin-top:12px; border-top:1px solid #e5e8eb; }
 html[data-cra1-theme="cart"] .cl-cart-add-disk { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; min-height:44px; margin-top:14px; padding:10px 16px; border:1px dashed #cfd5d9; border-radius:10px; background:#f8f9fa; color:#4b525a; font-size:12px; }
 html[data-cra1-theme="cart"] .cl-cart-add-disk small { color:#727980; font-size:11px; }
@@ -2762,8 +2767,8 @@ html[data-cra1-theme="cart"] .cl-cart-dialog-actions { display:flex; flex:none; 
   html[data-cra1-theme="cart"] .cl-cart-select-wrap select::picker-icon { display:none; }
   html[data-cra1-theme="cart"] .cl-cart-select-wrap select::picker(select) { margin-top:6px; max-height:min(300px,45dvh); max-width:calc(100vw - 32px); padding:6px; border:1px solid #d5cfc3; border-radius:12px; background:linear-gradient(145deg,#fff,#f8f9fa); box-shadow:inset 0 1px 0 #fff,0 10px 24px -14px #2e33394d,0 0 18px #c5a77714; overflow:auto; scrollbar-width:thin; }
   html[data-cra1-theme="cart"] .cl-cart-select-wrap option { display:flex; align-items:center; gap:10px; min-height:40px; padding:9px 11px; margin:2px 0; border-radius:7px; background:transparent; color:#424a53; font:400 12px/1.6 var(--cui-font,system-ui,sans-serif); white-space:normal; overflow-wrap:anywhere; }
-  html[data-cra1-theme="cart"] .cl-cart-select-wrap option:checked { background:linear-gradient(115deg,#eee7da,#f5f2eb); color:#655032; font-weight:550; }
-  html[data-cra1-theme="cart"] .cl-cart-select-wrap option::checkmark { color:#8b7048; order:1; margin-left:auto; }
+  html[data-cra1-theme="cart"] .cl-cart-select-wrap option:checked { background:linear-gradient(115deg,#eee7da,#f5f2eb); color:var(--cui-ink); font-weight:550; }
+  html[data-cra1-theme="cart"] .cl-cart-select-wrap option::checkmark { color:var(--cui-selection-mark); order:1; margin-left:auto; }
 }
 @media (hover:hover) and (pointer:fine) {
   html[data-cra1-theme="cart"] :is(.cl-cart-os-card,.cl-cart-disk-card):hover { border-color:#b9ae9b; }
@@ -2818,7 +2823,7 @@ html[data-cra1-theme="cart"] .cl-cart-disk-compact > button { display:inline-fle
   background:var(--cui-surface, #fff); color:var(--cui-text, #30363d);
   font:inherit; font-size:14px; cursor:pointer;
 }
-.cart-page .cl-native-purchase-jump:focus-visible { outline:2px solid #89744e; outline-offset:3px; }
+.cart-page .cl-native-purchase-jump:focus-visible { outline:2px solid var(--cui-focus); outline-offset:3px; }
 .cart-page .cra1-cart-read-error {
   display: flex;
   flex-wrap: wrap;

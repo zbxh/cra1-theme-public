@@ -41,6 +41,9 @@
     link: function (name) { return (this.context().links || {})[name] || ''; },
     error: function (error, options) { return shared.Errors.message(error, options); }
   };
+  // The native cart owns /common and its cache, including third-party fields.
+  // Navigation can use the theme projection without changing that contract.
+  if (!root.document.documentElement.hasAttribute('data-cra1-native-cart')) {
   try {
     var old = JSON.parse(root.localStorage.getItem('common_set_before') || '{}');
     root.localStorage.setItem('common_set_before', JSON.stringify(context.common ? filterCommon(context.common) : filterCommon(old)));
@@ -54,6 +57,7 @@
       return originalSet.call(this, key, value);
     };
     root.Storage.prototype.__cra1Filtered = true;
+  }
   }
   if (context.features) {
     root.__CRA1_FEAT__ = Object.assign({ready: !context.error}, context.features);

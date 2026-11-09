@@ -12,7 +12,7 @@ html {
 
 body {
   margin: 0;
-  background: transparent;
+  background: var(--cui-page);
 }
 
 /* 模块配置内容直接铺满，不套页面卡片（父页已有卡片容器） */
@@ -512,14 +512,14 @@ body.rail-fallback .common-config .common-box {
 
   /* ---- 表单项整行卡片：浅底圆角卡 + label 置顶（v7 已置顶，这里加卡片观感） ---- */
   .cart-embed .el-form-item {
-    background: var(--muted, #f5f5f5) !important;
+    background: var(--muted, var(--cui-page)) !important;
     border-radius: 10px;
     padding: 10px 12px 14px !important;
   }
 
   .cart-embed .el-form-item__label {
     font-size: 13px !important;
-    color: var(--muted-foreground, #737373) !important;
+    color: var(--muted-foreground, var(--cui-muted)) !important;
     padding-bottom: 8px !important;
   }
 

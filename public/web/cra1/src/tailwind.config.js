@@ -1,6 +1,14 @@
 const path = require('path');
 const daisyui = require('daisyui');
 const flowbite = require('flowbite/plugin');
+const paletteSource = require('fs').readFileSync(path.resolve(__dirname, '../../../cra1-shared/src/tokens.css'), 'utf8');
+// DaisyUI converts literal colours to OKLCH during compilation. Read the shared
+// primitives here so its generated palette cannot drift from the runtime tokens.
+const palette = (name) => {
+  const value = paletteSource.match(new RegExp('--cui-' + name + ':\\s*(#[0-9a-fA-F]{3,8})\\s*;'))?.[1];
+  if (!value) throw new Error('Missing shared colour: ' + name);
+  return value;
+};
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -23,6 +31,8 @@ module.exports = {
       },
       colors: {
         ink: 'rgb(from var(--cui-ink) r g b / <alpha-value>)',
+        title: 'rgb(from var(--cui-title) r g b / <alpha-value>)',
+        focus: 'rgb(from var(--cui-focus) r g b / <alpha-value>)',
         body: 'rgb(from var(--cui-body) r g b / <alpha-value>)',
         muted: 'rgb(from var(--cui-muted) r g b / <alpha-value>)',
         brand: 'rgb(from var(--cui-brand) r g b / <alpha-value>)',
@@ -65,19 +75,19 @@ module.exports = {
     themes: [
       {
         cra1: {
-          primary: '#35383c',
+          primary: palette('titanium'),
           'primary-content': '#FFFFFF',
-          secondary: '#61656b',
+          secondary: palette('silver'),
           'secondary-content': '#FFFFFF',
           accent: '#0E9F6E',
           'accent-content': '#FFFFFF',
-          neutral: '#2b2f34',
-          'neutral-content': '#eef0f1',
+          neutral: palette('mist-800'),
+          'neutral-content': palette('mist-50'),
           'base-100': '#FFFFFF',
-          'base-200': '#eef0f1',
-          'base-300': '#d8dde1',
-          'base-content': '#2b2f34',
-          info: '#35383c',
+          'base-200': palette('mist-100'),
+          'base-300': palette('mist-300'),
+          'base-content': palette('mist-700'),
+          info: palette('titanium'),
           success: '#07835E',
           warning: '#B45309',
           error: '#B42318',

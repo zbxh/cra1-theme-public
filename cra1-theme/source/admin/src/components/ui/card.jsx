@@ -43,7 +43,7 @@ export function CardHeader({ className, ...props }) {
 
 /** 卡片头排式（阿里云）：14px/600 标题；如需「查看全部 >」右侧链接，用 CardHeader + flex 行自行组合 */
 export function CardTitle({ className, ...props }) {
-  return <h3 className={cn('relative text-[14px] font-semibold text-ink', className)} {...props} />
+  return <h3 className={cn('relative text-[14px] font-semibold text-title', className)} {...props} />
 }
 
 export function CardDescription({ className, ...props }) {
@@ -63,7 +63,7 @@ export function PageHeader({ title, description, actions, className }) {
   return (
     <div data-page-header className={cn('flex flex-wrap items-start justify-between gap-3', className)}>
       <div className="min-w-0">
-        <h1 className="text-lg font-semibold tracking-tight text-ink">{title}</h1>
+        <h1 className="text-lg font-semibold tracking-tight text-title">{title}</h1>
         {description && <p className="mt-0.5 text-[13px] text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}

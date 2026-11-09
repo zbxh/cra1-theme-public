@@ -19,7 +19,7 @@
 .announcements-page .announcement-target-pages { max-height:300px; overflow:auto; padding-right:4px; scrollbar-gutter:stable; }
 .announcements-page .announcement-target-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:6px 12px; padding-left:20px; }
 .announcements-page .announcement-target-grid>label { align-items:flex-start; min-width:0; padding:3px 0; }
-.announcements-page .announcement-target-theme input[type=checkbox] { flex:none; width:15px; height:15px; margin-top:2px; accent-color:#58667b; }
+.announcements-page .announcement-target-theme input[type=checkbox] { flex:none; width:15px; height:15px; margin-top:2px; accent-color:var(--cui-mist-500); }
 .announcement-preview-dialog.preview-dialog { display:flex; flex-direction:column; width: min(1200px,94vw); max-height:92vh; max-height:92dvh; height:min(820px,92dvh); overflow:hidden; }
 .announcement-preview-dialog .announcement-preview-tools { display:grid; grid-template-columns:180px minmax(0,1fr) auto; gap:12px; align-items:end; margin-bottom:14px; }
 .announcement-preview-dialog .announcement-preview-tools>.announcement-field { min-width:0; }

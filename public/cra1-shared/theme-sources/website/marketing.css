@@ -37,7 +37,7 @@
 }
 /* Independent, bounded clouds make the colour flow visible.
    Softness is prepainted into gradients; only transforms are animated. */
-.marketing-hero { --hero-body: color-mix(in srgb, var(--body) 45%, var(--ink)); background: #f8faf9; }
+.marketing-hero { --hero-body: color-mix(in srgb, var(--body) 45%, var(--ink)); background: var(--cui-page); }
 .marketing-hero-ambient {
   position: absolute; z-index: -1; inset: 0; overflow: hidden; pointer-events: none; contain: paint;
 }

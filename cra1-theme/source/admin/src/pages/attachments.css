@@ -1,6 +1,6 @@
 .attachments-page {display:grid;gap:20px;min-width:0;}
-.attachments-page,.attachment-dialog {--color-brand:#35383c;--color-brand-hover:#2b2f34;}
-.attachments-page .bg-brand,.attachment-dialog .bg-brand {background-image:linear-gradient(128deg,#565b62,#35383c 55%,#4b525a);box-shadow:inset 0 1px 0 #ffffff22,0 2px 4px #21232716;}
+.attachments-page,.attachment-dialog {--color-brand:var(--cui-brand);--color-brand-hover:var(--cui-brand-hover);}
+.attachments-page .bg-brand,.attachment-dialog .bg-brand {background-image:linear-gradient(128deg,var(--cui-night-raised),var(--cui-night) 55%,var(--cui-night));box-shadow:inset 0 1px 0 color-mix(in srgb,var(--cui-white) 13.333%,transparent),0 2px 4px color-mix(in srgb,var(--cui-night) 8.627%,transparent);}
 .attachments-heading {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
 .attachments-heading h1 {font-size:24px;font-weight:600;margin:0 0 6px;}
 .attachments-heading p {font-size:13px;color:var(--muted-foreground);line-height:1.7;margin:0;}
@@ -9,7 +9,7 @@
 .attachments-search {display:flex;align-items:center;gap:8px;min-width:200px;max-width:320px;flex:1;}
 .attachments-search>svg {color:var(--muted-foreground);flex-shrink:0;}
 .attachments-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;scroll-margin-top:88px;outline:none;}
-.attachment-card {min-width:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--background);box-shadow:0 2px 6px #272a3005;}
+.attachment-card {min-width:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--background);box-shadow:0 2px 6px color-mix(in srgb,var(--cui-night) 1.961%,transparent);}
 .attachment-image {display:block;width:100%;height:154px;border:0;border-bottom:1px solid var(--border);background:linear-gradient(145deg,var(--secondary),var(--background));padding:16px;cursor:pointer;}
 .attachment-image img {display:block;width:100%;height:100%;object-fit:contain;}
 .attachment-trash-image {height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--muted-foreground);font-size:12px;}

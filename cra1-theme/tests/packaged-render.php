@@ -120,7 +120,10 @@ foreach(['pc','mobile'] as $device){
         if ($name==='goods') {
             packagedCheck(strpos($html,'/cart/template/pc/default/js/goods.js')!==false,'standalone cart uses the actual installed native loader '.$themes);
             packagedCheck(strpos($html,'/clientarea/template/pc/default/utils/request.js')!==false,'standalone cart uses the same native request client '.$themes);
-            packagedCheck(strpos($html,'/cra1-shared/')===false&&strpos($html,'__CRA1_RUNTIME__')===false,'standalone cart does not load theme controls, layout or runtime '.$themes);
+            packagedCheck(substr_count($html,'/native-cart-navigation.js')===1&&substr_count($html,'/native-cart-navigation.css')===1,'standalone cart loads the navigation-only bundle once '.$themes);
+            packagedCheck(strpos($html,'/cra1-shared.js')===false&&strpos($html,'/cra1-shared.css')===false&&strpos($html,'cl-config-frame')===false,'standalone cart excludes theme business transformations and calculator '.$themes);
+            packagedCheck(strpos($html,'data-cra1-native-cart')!==false&&strpos($html,'__CRA1_RUNTIME__')!==false,'standalone cart supplies navigation context without changing native common data '.$themes);
+            packagedCheck(strpos($html,$manifest['asset_bases']['native'].'/components/asideMenu/asideMenu.js')!==false&&strpos($html,$manifest['asset_bases']['native'].'/components/topMenu/topMenu.js')!==false,'standalone cart substitutes only the CRA1 navigation components '.$themes);
             packagedCheck(substr_count($html,'<aside-menu>')===1&&substr_count($html,'<top-menu ')===1,'native standalone cart has one original navigation shell '.$themes);
         }
     }

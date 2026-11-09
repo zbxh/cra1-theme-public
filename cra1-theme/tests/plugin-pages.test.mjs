@@ -75,7 +75,7 @@ test('message read failures are handled and expose only the shared safe error',a
   await f.instance.getMsgDetail();assert.deepEqual(f.calls,['/client_care/mail/123']);assert.deepEqual(f.errors,['暂时无法读取，请稍后重试'])
 })
 test('guest access has no network probe and no invented authorization',async()=>{
-  const context={document:{addEventListener(){}},localStorage:{getItem(){return null}},location:{origin:'https://fixture.invalid'},CRA1Shared:{Request:{getToken:()=>'',request:()=>{throw Error('must not request')}}}}
+  const context={document:{documentElement:{hasAttribute:()=>false},addEventListener(){}},localStorage:{getItem(){return null}},location:{origin:'https://fixture.invalid'},CRA1Shared:{Request:{getToken:()=>'',request:()=>{throw Error('must not request')}}}}
   vm.runInNewContext(fs.readFileSync(new URL('../../public/cra1-shared/src/runtime.js',import.meta.url),'utf8'),{window:context,URL,Promise})
   await assert.rejects(context.CRA1Shared.Access.read(),/当前未登录/)
   assert.equal(context.__CRA1_ACCESS__,undefined)

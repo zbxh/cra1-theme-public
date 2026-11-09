@@ -3,8 +3,8 @@ import { cn } from './utils'
 /** Badge：状态标签（胶囊形，浅底主色字，对齐主题 7.4） */
 const tones = {
   default: 'bg-brand/8 text-brand border-brand/15',
-  success: 'bg-[#00B42A]/8 text-[#00B42A] border-[#00B42A]/15',
-  warning: 'bg-[#B45309]/8 text-[#B45309] border-[#B45309]/15',
+  success: 'bg-success/8 text-success border-success/15',
+  warning: 'bg-warning/8 text-warning border-warning/15',
   danger: 'bg-danger/8 text-danger border-danger/15',
   muted: 'bg-surface-alt text-muted border-line',
 }
@@ -27,8 +27,8 @@ export function Badge({ tone = 'default', className, ...props }) {
 /** Alert：页面级提示（错误/成功/警告/信息），带 role 便于读屏播报 */
 const alertTones = {
   error: 'border-danger/20 bg-danger/6 text-danger',
-  success: 'border-[#00B42A]/20 bg-[#00B42A]/6 text-[#00B42A]',
-  warning: 'border-[#B45309]/20 bg-[#B45309]/6 text-[#B45309]',
+  success: 'border-success/20 bg-success/6 text-success',
+  warning: 'border-warning/20 bg-warning/6 text-warning',
   info: 'border-brand/20 bg-brand/6 text-brand',
 }
 

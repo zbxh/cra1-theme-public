@@ -28,8 +28,8 @@ export function TabsTrigger({ className, ...props }) {
         'inline-flex h-8 items-center rounded-md px-3 text-[13px] font-medium text-body',
         'transition-[background-color,color] duration-150',
         'hover:bg-surface-alt hover:text-ink',
-        'data-[state=active]:bg-brand data-[state=active]:text-white',
-        'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand',
+        'data-[state=active]:bg-surface-alt data-[state=active]:text-ink data-[state=active]:shadow-[inset_0_-2px_0_var(--cui-selection-mark)]',
+        'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus',
         className
       )}
       {...props}

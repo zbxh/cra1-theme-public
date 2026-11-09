@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import vm from 'node:vm'
 import assert from 'node:assert/strict'
 import test from 'node:test'
-const source=fs.readFileSync(new URL('../../public/cra1-shared/theme-sources/member/topMenu.js',import.meta.url),'utf8')
+const source=fs.readFileSync(new URL('../../public/clientarea/template/pc/cra1/components/topMenu/topMenu.js',import.meta.url),'utf8')
 const context={};vm.runInNewContext(source+';globalThis.header=topMenu',context)
 function fixture(state={}){
  const focused=[],messages={},languages={}

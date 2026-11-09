@@ -119,7 +119,7 @@ function PublicSettings({domain,query,navigate}){
  return <div className="space-y-5"><div><p className="text-sm text-muted-foreground">{{website:'官网主题',member:'会员中心',cart:'购物车'}[domain]}</p><h1 className="text-2xl font-semibold">公共设置</h1></div>
   <div className="visual-workspace public-settings-workspace">
    <aside className="block-picker public-settings-picker" aria-label="公共设置选择"><p className="block-picker-heading">选择要修改的部分</p>
-    <select className="mobile-block-picker w-full rounded border border-line p-2" aria-label="选择公共设置" value={selected==='header'?'header|'+section:selected} onChange={e=>{const [id,part]=e.target.value.split('|');pick(id,part)}}>
+    <select className="mobile-block-picker w-full rounded border border-input bg-white p-2" aria-label="选择公共设置" value={selected==='header'?'header|'+section:selected} onChange={e=>{const [id,part]=e.target.value.split('|');pick(id,part)}}>
      {items.map(item=>item.id==='header'?<optgroup label="头部" key="header">{HEADER_SECTIONS.map(([key,label])=><option key={key} value={'header|'+key}>{label}</option>)}</optgroup>:item.children?<optgroup key={item.id} label={item.label}>{item.children.map(child=><option key={child.id} value={child.id}>{child.label}</option>)}</optgroup>:<option key={item.id} value={item.id}>{item.label}</option>)}
     </select>
     <div className="desktop-block-picker">{items.map(item=>item.children?<div key={item.id}>
@@ -141,7 +141,7 @@ function BusinessContent({domain,id,query,navigate,workspace}){
  const blocks=BUSINESS_BLOCKS[domain+':'+id],key=new URLSearchParams(query).get('module'),selected=blocks?.find(b=>b[0]===key)?.[0]||blocks?.[0][0]
  const content=<div className="embedded-editor">{domain==='cart'?<CartContent workspace={workspace} scope={id} block={selected}/>:['login','regist'].includes(id)?<MemberAuth key={id} workspace={workspace} kind={id}/>:<MemberContent workspace={workspace} scope={id} block={selected}/>}</div>
  if(!blocks||blocks.length===1)return content
- return <div className="visual-workspace"><aside className="block-picker"><p className="block-picker-heading">选择要修改的部分</p><select aria-label="选择页面区块" className="mobile-block-picker w-full rounded border border-line p-2" value={selected} onChange={e=>navigate(routeFor(domain,id)+'?module='+e.target.value)}>{blocks.map(([k,label])=><option key={k} value={k}>{label}</option>)}</select><div className="desktop-block-picker">{blocks.map(([k,label])=><button className={'block-choice '+(k===selected?'active':'')} type="button" key={k} onClick={()=>navigate(routeFor(domain,id)+'?module='+k)}>{label}</button>)}</div></aside><div className="min-w-0">{content}</div></div>
+ return <div className="visual-workspace"><aside className="block-picker"><p className="block-picker-heading">选择要修改的部分</p><select aria-label="选择页面区块" className="mobile-block-picker w-full rounded border border-input bg-white p-2" value={selected} onChange={e=>navigate(routeFor(domain,id)+'?module='+e.target.value)}>{blocks.map(([k,label])=><option key={k} value={k}>{label}</option>)}</select><div className="desktop-block-picker">{blocks.map(([k,label])=><button className={'block-choice '+(k===selected?'active':'')} type="button" key={k} onClick={()=>navigate(routeFor(domain,id)+'?module='+k)}>{label}</button>)}</div></aside><div className="min-w-0">{content}</div></div>
 }
 function Overview({navigate}){
  const ctx=useWorkspaces(),dirty=Object.entries(ctx.records).filter(([,r])=>r.values&&!equal(r.values,r.original)),[state,setState]=useState({}),[loading,setLoading]=useState(false)

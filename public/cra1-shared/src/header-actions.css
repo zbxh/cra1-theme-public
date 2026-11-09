@@ -11,7 +11,7 @@ html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-
 html[data-cra1-theme] .cra1-header-support__trigger svg {width:18px;height:18px;flex-shrink:0;}
 html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-header__icon-btn:hover,
 html[data-cra1-theme] .cra1-header-support__trigger:hover {color:var(--cui-titanium);background:var(--cui-accent);box-shadow:none;transform:none;}
-html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-header__icon-btn:focus-visible {outline:2px solid var(--cui-gold);outline-offset:2px;}
+html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-header__icon-btn:focus-visible {outline:2px solid var(--cui-focus);outline-offset:2px;}
 .cra1-header-glyph {display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;}
 .cra1-header-glyph svg {width:15px;height:15px;}
 .cra1-upanel__mini-btn .cra1-header-glyph svg {width:12px;height:12px;}
@@ -73,7 +73,7 @@ html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-
   .cra1-account-mobile__identity-copy {display:grid;min-width:0;gap:2px;}
   .cra1-account-mobile__name,.cra1-account-mobile__sub {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:20px;}
   .cra1-account-mobile__name {font-size:13px;font-weight:500;}
-  .cra1-account-mobile__sub {font-size:11px;color:#61656b;}
+  .cra1-account-mobile__sub {font-size:11px;color:var(--cui-muted);}
   .cra1-account-mobile__group {display:grid;gap:2px;}
   .cra1-account-mobile__group+.cra1-account-mobile__group {border-top:1px solid var(--up-line);margin-top:7px;padding-top:7px;}
   .cra1-account-mobile__item,.cra1-account-mobile__back {
@@ -81,18 +81,18 @@ html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-
     padding:8px 10px;border:0;border-radius:7px;background:transparent;color:var(--up-ink);
     font:inherit;font-size:13px;line-height:20px;text-decoration:none;text-align:left;cursor:pointer;
   }
-  .cra1-account-mobile__item:hover,.cra1-account-mobile__back:hover {background:#f4f3ef;color:#35383c;}
-  .cra1-account-mobile__item:focus-visible,.cra1-account-mobile__back:focus-visible {outline:2px solid #987537;outline-offset:-2px;}
-  .cra1-account-mobile__item .cra1-header-glyph svg,.cra1-account-mobile__back .cra1-header-glyph svg {width:17px;height:17px;color:#61656b;}
+  .cra1-account-mobile__item:hover,.cra1-account-mobile__back:hover {background:var(--cui-accent);color:var(--cui-ink);}
+  .cra1-account-mobile__item:focus-visible,.cra1-account-mobile__back:focus-visible {outline:2px solid var(--cui-focus);outline-offset:-2px;}
+  .cra1-account-mobile__item .cra1-header-glyph svg,.cra1-account-mobile__back .cra1-header-glyph svg {width:17px;height:17px;color:var(--cui-body);}
   .cra1-account-mobile__label {flex:1 1 0;min-width:0;overflow-wrap:anywhere;}
-  .cra1-account-mobile__count {flex:0 0 auto;min-width:23px;padding:1px 6px;border-radius:5px;background:#f0f1f2;color:#61656b;font-size:11px;font-variant-numeric:tabular-nums;text-align:center;}
-  .cra1-account-mobile__count--unread {background:#f2eee5;color:#80632f;}
+  .cra1-account-mobile__count {flex:0 0 auto;min-width:23px;padding:1px 6px;border-radius:5px;background:var(--cui-accent);color:var(--cui-body);font-size:11px;font-variant-numeric:tabular-nums;text-align:center;}
+  .cra1-account-mobile__count--unread {background:var(--cui-accent);color:#80632f;}
   .cra1-account-mobile__back {color:#80632f;}
   .cra1-account-mobile__heading {margin:0;padding:8px 10px 4px;font-size:13px;font-weight:500;}
   .cra1-account-mobile__content .cra1-header-support__section {padding:6px 2px;}
-  .cra1-account-mobile__content .cra1-header-support__title {color:#61656b;}
-  .cra1-account-mobile__content .cra1-header-support__item {color:#35383c;}
+  .cra1-account-mobile__content .cra1-header-support__title {color:var(--cui-title);}
+  .cra1-account-mobile__content .cra1-header-support__item {color:var(--cui-ink);}
   .cra1-account-mobile__content .cra1-header-support__status {padding:10px;overflow-wrap:anywhere;}
-  .cra1-account-mobile__content [aria-pressed="true"] {background:#f4f3ef;color:#80632f;}
+  .cra1-account-mobile__content [aria-pressed="true"] {background:var(--cui-accent);color:#80632f;}
   .cra1-header .cra1-account__avatar svg {width:17px;height:17px;}
 }

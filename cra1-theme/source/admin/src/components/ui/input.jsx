@@ -2,9 +2,9 @@ import { forwardRef, useId, useRef, useLayoutEffect } from 'react'
 import { cn } from './utils'
 
 const base =
-  'flex h-10 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink ' +
+  'flex h-10 w-full rounded-lg border border-input bg-surface px-3 py-2 text-sm text-ink ' +
   'placeholder:text-muted transition-[border-color,box-shadow] duration-150 ' +
-  'focus-visible:outline-none focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-brand/15 ' +
+  'focus-visible:outline-none focus-visible:border-focus focus-visible:ring-[3px] focus-visible:ring-focus/15 ' +
   'disabled:cursor-not-allowed disabled:bg-surface-alt disabled:text-muted ' +
   'aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/15'
 
@@ -74,8 +74,8 @@ export function Checkbox({ className, ...props }) {
     <input
       type="checkbox"
       className={cn(
-        'size-4 shrink-0 cursor-pointer rounded border-line text-brand accent-[#1769E0] ' +
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+        'size-4 shrink-0 cursor-pointer rounded border-input text-brand accent-brand ' +
+          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus',
         className
       )}
       {...props}

@@ -13,11 +13,11 @@ html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-them
   height: 32px;
   min-height: 32px;
   padding: 0 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid color-mix(in srgb,var(--cui-white) 10%,transparent);
   border-radius: 8px;
   color: #fff;
-  background: linear-gradient(180deg, #2b3444 0%, #161e2e 55%, #0d1420 100%);
-  box-shadow: 0 6px 16px -8px rgba(9, 15, 27, 0.8);
+  background: var(--cui-button-gradient);
+  box-shadow: 0 6px 16px -8px color-mix(in srgb,var(--cui-night) 80%,transparent);
   font: 600 14px/20px "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
   text-decoration: none;
   white-space: nowrap;
@@ -34,7 +34,7 @@ html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-them
   z-index: -1;
   border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(180deg, #2b3444 0%, #161e2e 55%, #0d1420 100%);
+  background: var(--cui-button-gradient);
 }
 
 html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-theme="cart"]) :is(.btn-aurora, .cra1-header__login)::after {
@@ -46,13 +46,13 @@ html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-them
   pointer-events: none;
   opacity: 0;
   filter: blur(10px);
-  background: linear-gradient(97deg, #ffc0ad 0%, #f8c7ff 37.79%, #d2ccff 75.81%, #c2d1ff 100%);
+  background: linear-gradient(110deg,var(--cui-steel),var(--cui-champagne),var(--cui-mist-400));
   transition: opacity 300ms ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
   html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-theme="cart"]) :is(.btn-aurora, .cra1-header__login):hover {
-    border-color: rgba(255, 255, 255, 0.28);
+    border-color: color-mix(in srgb,var(--cui-white) 28%,transparent);
   }
   html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-theme="cart"]) :is(.btn-aurora, .cra1-header__login):hover::after {
     opacity: 1;
@@ -64,7 +64,7 @@ html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-them
 }
 
 html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-theme="cart"]) :is(.btn-aurora, .cra1-header__login):focus-visible {
-  outline: 2px solid #263246;
+  outline: 2px solid var(--cui-focus);
   outline-offset: 2px;
 }
 

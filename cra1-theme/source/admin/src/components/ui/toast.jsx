@@ -50,7 +50,7 @@ export function ToastProvider({ children }) {
 }
 
 const tones = {
-  success: { icon: CheckCircle2, cls: 'text-[#00B42A]' },
+  success: { icon: CheckCircle2, cls: 'text-success' },
   error: { icon: AlertCircle, cls: 'text-danger' },
   info: { icon: Info, cls: 'text-brand' },
 }

@@ -1,17 +1,17 @@
 /* Low-chroma business ink + feathered surfaces. Glyphs stay outside the mask. */
 :root {
- --cui-icon-compute:#3562a4; --cui-icon-compute-fill:#e5eefb;
- --cui-icon-security:#19786b; --cui-icon-security-fill:#e2f3ed;
- --cui-icon-finance:#986221; --cui-icon-finance-fill:#faf0d9;
- --cui-icon-gold:#896437; --cui-icon-gold-fill:#f4ebdb;
+ --cui-icon-compute:#3562a4; --cui-icon-compute-fill:var(--cui-mist-100);
+ --cui-icon-security:#19786b; --cui-icon-security-fill:var(--cui-mist-100);
+ --cui-icon-finance:#986221; --cui-icon-finance-fill:var(--cui-mist-100);
+ --cui-icon-gold:#896437; --cui-icon-gold-fill:var(--cui-mist-200);
  --cui-icon-surface:#fff;
 }
 :where(.cui-dark,.cui-card--featured,.product-card-featured,.bento-featured,.bg-night,.footer-night) {
  --cui-icon-compute:#a5caff; --cui-icon-compute-fill:#2b3b52;
- --cui-icon-security:#8cdbc7; --cui-icon-security-fill:#253f3b;
- --cui-icon-finance:#efd093; --cui-icon-finance-fill:#42382a;
- --cui-icon-gold:#e2c392; --cui-icon-gold-fill:#40382e;
- --cui-icon-surface:#2a2e32;
+ --cui-icon-security:#8cdbc7; --cui-icon-security-fill:var(--cui-mist-700);
+ --cui-icon-finance:#efd093; --cui-icon-finance-fill:var(--cui-mist-700);
+ --cui-icon-gold:#e2c392; --cui-icon-gold-fill:var(--cui-mist-700);
+ --cui-icon-surface:var(--cui-mist-800);
 }
 html[data-cra1-theme] .cui-business-icon {
  --cui-icon-ink:var(--cui-icon-compute); --cui-icon-fill:var(--cui-icon-compute-fill);
@@ -78,8 +78,8 @@ html[data-cra1-theme] .cui-icon-art > svg,html[data-cra1-theme] .cui-icon-art > 
 html[data-cra1-theme] .cui-configured-icon {display:inline-flex;vertical-align:middle;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;margin-right:9px;flex:none}
 html[data-cra1-theme] .cui-configured-icon > .cui-icon-art {width:18px;height:18px}
 
-:root{--cui-icon-titanium:#555d67;--cui-icon-titanium-fill:#c9ced4;--cui-icon-graphite:#625c55;--cui-icon-graphite-fill:#d1c9bf;--cui-icon-champagne:#896d46;--cui-icon-champagne-fill:#dacfbb}
-:where(.cui-dark,.cui-card--featured,.product-card-featured,.bento-featured,.bg-night,.footer-night,.ip-sample-dark){--cui-icon-titanium:#d1d7df;--cui-icon-titanium-fill:#3c444e;--cui-icon-graphite:#d7cfc5;--cui-icon-graphite-fill:#413c37;--cui-icon-champagne:#dec9a4;--cui-icon-champagne-fill:#453d31}
+:root{--cui-icon-titanium:var(--cui-mist-600);--cui-icon-titanium-fill:var(--cui-mist-300);--cui-icon-graphite:var(--cui-mist-600);--cui-icon-graphite-fill:var(--cui-mist-300);--cui-icon-champagne:#896d46;--cui-icon-champagne-fill:var(--cui-mist-300)}
+:where(.cui-dark,.cui-card--featured,.product-card-featured,.bento-featured,.bg-night,.footer-night,.ip-sample-dark){--cui-icon-titanium:var(--cui-mist-300);--cui-icon-titanium-fill:var(--cui-mist-700);--cui-icon-graphite:var(--cui-mist-300);--cui-icon-graphite-fill:var(--cui-mist-700);--cui-icon-champagne:#dec9a4;--cui-icon-champagne-fill:var(--cui-mist-700)}
 
 html[data-cra1-theme] .cl-heading-icon > .cui-icon-mask{width:18px;height:18px}html[data-cra1-theme] .cra1-primary-item__icon > .cui-icon-mask{width:20px;height:20px}
 

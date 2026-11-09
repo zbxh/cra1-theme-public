@@ -52,7 +52,7 @@ export function DialogContent({ className, children, onOpenAutoFocus, onCloseAut
           className={cn(
             'absolute right-3.5 top-3.5 rounded-md p-1 text-muted',
             'transition-colors duration-150 hover:bg-surface-alt hover:text-ink',
-            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand'
+            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus'
           )}
           aria-label="关闭"
         >
@@ -99,7 +99,7 @@ export function ConfirmDialog({ open, title, description, confirmText = '确认'
           <button
             type="button"
             onClick={onCancel}
-            className="h-10 rounded-lg border border-line bg-surface px-4 text-sm text-ink transition-colors duration-150 hover:bg-surface-alt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            className="h-10 rounded-lg border border-line bg-surface px-4 text-sm text-ink transition-colors duration-150 hover:bg-surface-alt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             取消
           </button>
@@ -108,7 +108,7 @@ export function ConfirmDialog({ open, title, description, confirmText = '确认'
             onClick={onConfirm}
             disabled={busy}
             className={cn(
-              'h-10 rounded-lg px-4 text-sm font-medium text-white transition-[background-color,transform] duration-150 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:pointer-events-none disabled:opacity-50',
+              'h-10 rounded-lg px-4 text-sm font-medium text-white transition-[background-color,transform] duration-150 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:pointer-events-none disabled:opacity-50',
               tone === 'danger' ? 'bg-danger hover:brightness-95' : 'bg-brand hover:bg-brand-hover'
             )}
           >

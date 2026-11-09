@@ -55,7 +55,7 @@ export default function AccountPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-ink">账户信息</h1>
+      <h1 className="text-xl font-semibold text-title">账户信息</h1>
       <p className="mt-1 text-sm text-muted">查看与维护你的账户资料</p>
 
       <div className="mt-5 rounded-xl border border-line bg-surface">

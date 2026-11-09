@@ -91,7 +91,7 @@ export default function FinancePage() {
     <div className="space-y-4">
       {/* 页标题（紧凑式，与概览条一体） */}
       <div>
-        <h1 className="text-lg font-semibold tracking-tight text-ink">财务中心</h1>
+        <h1 className="text-lg font-semibold tracking-tight text-title">财务中心</h1>
         <p className="mt-0.5 text-[13px] text-muted-foreground">管理订单、余额与消费记录</p>
       </div>
 
@@ -373,7 +373,7 @@ function CreditPanel({ refreshKey }) {
     { key: 'type', title: '类型', width: 110, render: (r) => creditTypeText(r.type) },
     { key: 'amount', title: '金额', width: 120, align: 'right',
       render: (r) => (
-        <span className={Number(r.amount) >= 0 ? 'font-medium text-[#00B42A]' : 'font-medium text-danger'}>
+        <span className={Number(r.amount) >= 0 ? 'font-medium text-success' : 'font-medium text-danger'}>
           {Number(r.amount) >= 0 ? '+' : ''}{formatMoney(r.amount)}
         </span>
       ) },

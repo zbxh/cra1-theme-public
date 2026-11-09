@@ -10,8 +10,10 @@
 @import "./pages/serverPanel/auto-renew.css";
 @import "./pages/product-list.css";
 
-/* 设计令牌：阿里云控制台观感基准（浅灰底 + 白卡描边 + 主蓝） */
+/* Shared Mist surfaces, readable text and titanium actions. */
 @theme {
+  --color-title: var(--cui-title);
+  --color-focus: var(--cui-focus);
   --color-ink: var(--cui-ink);        /* 主文字/标题 */
   --color-body: var(--cui-body);       /* 正文 */
   --color-muted: var(--cui-muted);      /* 辅助灰 */
@@ -25,7 +27,7 @@
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
 
   /* shadcn 语义色（与 css/cra1-shell.css 的 :root 保持一致） */
-  --color-background: var(--cui-accent);
+  --color-background: var(--cui-page);
   --color-foreground: var(--cui-ink);
   --color-card: var(--cui-surface);
   --color-card-foreground: var(--cui-ink);
@@ -35,7 +37,7 @@
   --color-accent-foreground: var(--cui-ink);
   --color-border: var(--cui-line);
   --color-input: var(--cui-control-edge);
-  --color-ring: var(--cui-gold);
+  --color-ring: var(--cui-focus);
   --color-primary: var(--cui-brand);
   --color-primary-foreground: var(--cui-white);
   --color-secondary: var(--cui-accent);

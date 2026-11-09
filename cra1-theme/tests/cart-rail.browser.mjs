@@ -9,7 +9,7 @@ if(!origin||!out)throw Error('Set a guest theme origin and external evidence dir
 fs.mkdirSync(out,{recursive:true});
 const release=stage?JSON.parse(fs.readFileSync(path.join(stage,'release.json'))).release:'';
 const products=[501,502,503,504,505,506,507].map((id,i)=>({id,module:id===503?'vendor_custom':id===507?'mf_dcim':[502,504,505].includes(id)?'idcsmart_common':'mf_cloud',name:['云产品','通用周期产品','第三方产品','免费产品','一次性产品','延迟购买栏模块','DCIM 产品'][i],price:'12.00',cycle:'月',description:'<p>隔离示例配置</p>',product_group_id:301,product_group_id_first:300,hidden:0,stock_control:0}));
-const report={status:'running',checks:[],errors:[],blocked:[]},browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+const report={status:'running',checks:[],errors:[],blocked:[],console:[]},browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const check=(ok,label)=>{assert.ok(ok,label);report.checks.push(label);fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(report,null,2))};
 let page;
 const json=(route,data)=>route.fulfill({json:{status:200,msg:'操作成功',data}});
@@ -33,7 +33,17 @@ try{
    const req=route.request(),u=new URL(req.url()),p=u.pathname;
    if(['data:','blob:'].includes(u.protocol))return route.continue();
    if(u.origin!==origin)return route.abort();
+   // These fixtures replace products, not unrelated installed add-on business data.
+
+   if(p==='/cra1-shared/snapshot.php')return json(route,{content:{goodslist:{config_panel:{default_open:true},default_selection:{product_id:0}}}});
+   if(p==='/cra1-shared/announcements.php')return json(route,{items:[]});
    if(!['GET','HEAD','OPTIONS'].includes(req.method())){report.blocked.push({path:p,method:req.method()});return route.fulfill({json:{status:400,msg:'隔离测试不提交业务操作'}})}
+   // The official fallback header owns these reads as well as the product template.
+   if(p==='/console/v1/common')return json(route,{website_name:'隔离演示',currency_prefix:'¥',currency_suffix:'',cart_change_product:0,custom_fields:{before_settle:0},lang_home_open:0});
+   if(p==='/console/v1/account')return json(route,{account:{id:999,username:'隔离测试'},custom_fields:[]});
+   if(p==='/console/v1/menu')return json(route,{list:[],menu:[]});
+   if(p==='/console/v1/presale_consult/config')return json(route,{presale_consult:0,config:{}});
+   if(p.includes('/event_promotion/'))return route.fulfill({json:{status:200,msg:'操作成功',list:[],data:{list:[],event_promotion:[],count:0}}});
    if(p==='/console/v1/product/group/first')return json(route,{list:[{id:300,name:'测试产品'}]});
    if(p==='/console/v1/product/group/second')return json(route,{list:[{id:301,name:'商品配置',type:'normal',description:''}]});
    if(p==='/console/v1/product')return json(route,{list:Number(u.searchParams.get('page')||1)>1?[]:products,count:products.length});
@@ -49,7 +59,7 @@ try{
    }
    return route.continue();
   });
-  page=await context.newPage();page.setDefaultTimeout(20000);page.on('pageerror',e=>report.errors.push(e.message));
+  page=await context.newPage();page.setDefaultTimeout(20000);page.on('console',m=>{if(['error','warning'].includes(m.type()))report.console.push(m.text())});page.on('pageerror',e=>report.errors.push({message:e.message,stack:e.stack,url:page.url()}));
   await page.goto(origin+'/cart/goodsList.htm?fpg_id=300&spg_id=301&product_id=501',{waitUntil:'domcontentloaded',timeout:60000});
   const wait=async(id,availability)=>{
    await page.waitForFunction(({id,availability})=>{const v=document.querySelector('.template')?.__vue__;return v&&v.selectedProductId===id&&v.configState==='ready'&&v.railState==='bridged'&&v.railAvailability===availability},{id,availability});
@@ -73,6 +83,7 @@ try{
    check(links.unsafe===0,'description URL compatibility still removes executable links and handlers');
   }
   const rail=width>1024?page.locator('.cl-rail'):page.locator('.cl-rail-dock');
+  await rail.waitFor({state:'visible'});
   check(await rail.isVisible(),'one calculator remains visible before periods '+width);
   check(await rail.locator('.cl-rail-buy').isDisabled(),'pending periods disable purchase '+width);
   check((await rail.innerText()).includes('待计算')&&!(await rail.innerText()).includes('0.00'),'unconfirmed initial zero is not displayed '+width);
@@ -147,5 +158,5 @@ try{
   await context.close();
  }
  check(report.errors.length===0,'no unhandled JavaScript errors');report.status='passed';
-}catch(error){report.status='failed';report.error=error.stack;if(page&&!page.isClosed())await page.screenshot({path:path.join(out,'failure.png'),fullPage:true});process.exitCode=1;}
+}catch(error){report.status='failed';report.error=error.stack;if(page&&!page.isClosed())report.diagnostics=await page.evaluate(()=>({viewport:innerWidth,events:window.__railEvents,classes:document.documentElement.className,htmlTheme:document.documentElement.dataset.cra1Theme,state:Object.fromEntries(['selectedProductId','configState','railState','railAvailability','first_group_list','select_second_obj','isNormal','viewportW','isMobileCart','cartConfigReady','goodSLoading','catalogError','configErrorText'].map(k=>[k,document.querySelector('.template')?.__vue__?.[k]])),elements:[...document.querySelectorAll('.cl-rail,.cl-rail-dock,.cl-shop,.cl-config-frame,.cl-layout')].map(e=>({tag:e.tagName,cls:e.className,style:e.getAttribute('style'),computed:{display:getComputedStyle(e).display,visibility:getComputedStyle(e).visibility,width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height},parents:[e.parentElement,e.parentElement?.parentElement].filter(Boolean).map(a=>({cls:a.className,display:getComputedStyle(a).display}))})),styles:[...document.styleSheets].map(s=>s.href),resources:performance.getEntriesByType('resource').filter(r=>/\.(?:css|js)$/.test(r.name)).map(r=>({url:r.name,bytes:r.decodedBodySize}))})).catch(()=>({}));if(page&&!page.isClosed())await page.screenshot({path:path.join(out,'failure.png'),fullPage:true});process.exitCode=1;}
 finally{fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(report,null,2));await browser.close();console.log(JSON.stringify({status:report.status,checks:report.checks.length,error:report.error}));}

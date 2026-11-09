@@ -12,7 +12,7 @@ const shared=path.join(root,'public/cra1-shared/src'),checks=[],errors=[]
 const assets={
  '/vue.js':path.join(root,'public/clientarea/template/pc/default/js/common/vue.js'),
  '/shell.css':path.join(root,'public/cra1-shared/theme-sources/member/cra1-shell.css'),
- '/header.js':path.join(root,'public/cra1-shared/theme-sources/member/topMenu.js'),
+ '/header.js':path.join(root,'public/clientarea/template/pc/cra1/components/topMenu/topMenu.js'),
 }
 const scripts=['ui.js','header-search.js','announcements.js','header-actions.js']
 const styles=['tokens.css','header-search.css','announcements.css','user-panel.css','header-support.css','header-actions.css']
@@ -22,7 +22,7 @@ window.__CRA1_MEMBER_SNAPSHOT__={appearance:{show_cart:1,show_message:1,show_lan
 window.reads=0;window.messageDelay=0;window.messageCount=3;window.navigations=[];
 window.fixtureSupport={enabled:true,groups:[{title:'联系我们',items:[{action:'copy',label:'复制客服账号',copy:'fixture-support',showText:true,showIcon:true},{action:'link',label:'在线客服',href:'/support.html',showText:true},{action:'link',label:'不安全链接',href:'javascript:alert(1)',showText:true}]}]};
 window.CRA1Shared={
- Runtime:{context:()=>__CRA1_RUNTIME__,link:n=>__CRA1_RUNTIME__.links[n]||'',money:v=>'¥'+v},
+ Runtime:{context:()=>__CRA1_RUNTIME__,common:()=>({}),link:n=>__CRA1_RUNTIME__.links[n]||'',money:v=>'¥'+v},
  Avatar:{register(){},style:()=>({}),letter:u=>String(u.username||'会员').slice(0,1)},
  Request:{request:async()=>({data:{list:[]}})},
 };

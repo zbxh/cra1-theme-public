@@ -29,15 +29,18 @@ try{
   await context.route('**/*',async route=>{
    const req=route.request(),u=new URL(req.url()),p=u.pathname;
    if(u.origin!==origin)return route.abort();
+   // These fixtures replace products, not unrelated installed add-on business data.
+   if(req.resourceType()==='document'){const response=await route.fetch();let html=await response.text();html=html.replace(/<script\b[^>]*\bsrc=[\"']\/plugins\/addon\/[^\"']+[\"'][^>]*>[\s\S]*?<\/script>/gi,'');return route.fulfill({response,body:html});}
+   if(p==='/cra1-shared/snapshot.php')return json(route,{content:{goodslist:{config_panel:{default_open:true},default_selection:{product_id:0}}}});
    if(p==='/cra1-shared/announcements.php')return json(route,{items:[]});
    if(!['GET','HEAD','OPTIONS'].includes(req.method())){report.blocked.push({path:p,method:req.method()});return route.abort();}
    if(p==='/console/v1/common')return json(route,common);
    if(p==='/console/v1/cart')return json(route,{list:[],count:0});
    if(p==='/console/v1/menu')return json(route,{list:[],menu:[]});
-   // The complete installed default header owns these native reads.
+   // Native APIs stay in place; CRA1 replaces only the two navigation components.
    if(p==='/console/v1/account')return json(route,{account:{id:999,username:'隔离测试'},custom_fields:[]});
    if(p==='/console/v1/presale_consult/config')return json(route,{presale_consult:0,config:{}});
-   if(p.includes('/event_promotion/'))return json(route,{list:[],event_promotion:[],count:0});
+   if(p.includes('/event_promotion/'))return route.fulfill({json:{status:200,msg:'操作成功',list:[],data:{list:[],event_promotion:[],count:0}}});
    if(p==='/console/v1/product/group/first')return json(route,{list:[{id:300,name:'测试产品'}]});
    if(p==='/console/v1/product/group/second')return json(route,{list:[{id:301,name:'商品配置',type:'normal'}]});
    if(p==='/console/v1/product')return json(route,{list:Number(u.searchParams.get('page')||1)>1?[]:products,count:products.length});
@@ -54,6 +57,8 @@ try{
    await page.waitForURL(url=>url.pathname==='/cart/goods.htm'&&url.searchParams.get('id')===String(id));
    await page.getByRole('heading',{name:'原生模块 '+id,exact:true}).waitFor();
    await page.waitForFunction(()=>!!window.vendorVM);
+   check(await page.locator('.cra1-header').count()===1&&await page.locator('.cra1-aside').count()===1,'CRA1 navigation mounts once around native business content '+id+'/'+width);
+   check(await page.evaluate(()=>document.documentElement.hasAttribute('data-cra1-native-cart')&&!Storage.prototype.__cra1Filtered),'native common cache keeps its third-party contract '+id+'/'+width);
    check(await page.locator('.cl-config-frame,.cl-rail,.cl-rail-dock').count()===0,'third-party page has no theme iframe or calculator '+id+'/'+width);
    check(await page.evaluate(()=>window.vendorMounts===1),'module boot executes once '+id+'/'+width);
    check(await page.locator('.third-party-module .main-card').evaluate(e=>getComputedStyle(e).padding)==='7px','native card keeps its module spacing '+id+'/'+width);

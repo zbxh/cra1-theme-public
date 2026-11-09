@@ -12,6 +12,10 @@ html {
 
 body {
   margin: 0;
+}
+
+/* 配置卡透明时，嵌入文档也须透明，才能延续父页的白色卡片背景。 */
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) body.cra1-cart-embed {
   background: transparent;
 }
 
@@ -86,8 +90,8 @@ body {
 }
 .cart-embed:not([data-cra1-native-module]) .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item:hover { color: var(--primary); border-color: color-mix(in srgb,var(--cui-titanium) 45.0%,transparent); }
 .cart-embed:not([data-cra1-native-module]) .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item.is-active {
-  color: var(--primary);
-  border-color: var(--primary);
+  color: var(--cui-ink);
+  border-color: var(--cui-selection-mark);
   background: var(--primary-soft, color-mix(in srgb,var(--cui-titanium) 6.0%,transparent));
   font-weight: 600;
 }
@@ -480,14 +484,14 @@ html:not([data-cra1-native-module]) body.rail-fallback .f-order { display: block
 
   /* ---- 表单项整行卡片：浅底圆角卡 + label 置顶（v7 已置顶，这里加卡片观感） ---- */
   .cart-embed:not([data-cra1-native-module]) .el-form-item {
-    background: var(--muted, #f5f5f5) !important;
+    background: var(--muted, var(--cui-page)) !important;
     border-radius: 10px;
     padding: 10px 12px 14px !important;
   }
 
   .cart-embed:not([data-cra1-native-module]) .el-form-item__label {
     font-size: 13px !important;
-    color: var(--muted-foreground, #737373) !important;
+    color: var(--muted-foreground, var(--cui-muted)) !important;
     padding-bottom: 8px !important;
   }
 

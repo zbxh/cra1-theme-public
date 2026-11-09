@@ -18,6 +18,8 @@
  */
 const topMenu = {
   name: 'cra1TopMenu',
+  // The installed native goods page passes its cart event count through :num.
+  props: { num: { type: Number, default: 0 } },
   template: /* html */ `
 <!--
   外壳容器用 display:contents：.cra1-shell__body 的 flex 子项仍然是 header 与公告条本身，
@@ -234,6 +236,7 @@ const topMenu = {
     },
   },
   watch: {
+    num(value) { this.shoppingCarNum = Math.max(0, Number(value) || 0) },
     unLogin() {
       if (this._headerSearch) this._headerSearch.refresh()
       this.ensureMessageCount()
@@ -460,8 +463,11 @@ const topMenu = {
     async getCommonSetting() {
       try {
         const res = await getCommon()
-        this.commonData = res.data.data || {}
-        localStorage.setItem('common_set_before', JSON.stringify(this.commonData))
+        const nativeCommon = res.data.data || {}
+        // Keep the native cache complete. Theme-only header settings stay local
+        // to this component and never replace the module's /common response.
+        localStorage.setItem('common_set_before', JSON.stringify(nativeCommon))
+        this.commonData = Object.assign({}, nativeCommon, CRA1Shared.Runtime.common())
         this.seletcLang = localStorage.getItem('lang') || this.commonData.lang_home || 'zh-cn'
         this.logo = this.commonData.system_logo || ''
         this.logoFailed = false

@@ -51,7 +51,7 @@ html[data-cra1-theme="member"] .server-auto-renew .ar-loader {
   width: 16px; height: 16px; color: var(--cui-graphite); animation: auto-renew-spin 900ms linear infinite;
 }
 html[data-cra1-theme="member"] .server-auto-renew .ar-switch:focus-visible {
-  outline: 2px solid var(--cui-gold); outline-offset: 3px;
+  outline: 2px solid var(--cui-focus); outline-offset: 3px;
 }
 html[data-cra1-theme="member"] .server-auto-renew .ar-switch:disabled { cursor: not-allowed; }
 html[data-cra1-theme="member"] .server-auto-renew .ar-switch[aria-busy="true"] { cursor: wait; }

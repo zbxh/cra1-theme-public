@@ -133,8 +133,12 @@ try{
   const b=await page.locator('.cra1-auth-panel').boundingBox();assert.ok(Math.abs(b.x+b.width/2-1440/2)<2);assert.ok(b.width<=500)
   await page.screenshot({path:path.join(out,'centered-login-1440.png'),fullPage:true})
  })
- await run('white-logo-remains-readable-on-light-page',fixture({auth_appearance:{logo:'/mock-light-logo.svg'}}),async({page})=>{
-  await page.locator('.cra1-auth-logo-image--light').waitFor();await page.screenshot({path:path.join(out,'white-logo-1440.png'),fullPage:true})
+ await run('configured-logo-retains-its-colours-and-transparent-container',fixture({auth_appearance:{logo:'/mock-light-logo.svg'}}),async({page})=>{
+  const logo=page.locator('.cra1-auth-logo-image');await logo.waitFor();
+  assert.equal(await logo.evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)');
+  assert.equal(await logo.locator('img').evaluate(el=>getComputedStyle(el).filter),'none');
+  assert.equal(await logo.locator('img').getAttribute('src'),'/mock-light-logo.svg');
+  await page.screenshot({path:path.join(out,'transparent-logo-1440.png'),fullPage:true})
  })
  await run('mobile-long-copy-and-many-providers',fixture({auth_appearance:{title:'用于检查长标题换行的自定义账户登录页面',description:'帮助用户在不同尺寸设备上访问云产品与账户管理。'.repeat(3),brand:{enabled:1},support:{enabled:1,label:'客户服务与帮助',url:'/help.htm'}},auth:{providers:Array.from({length:7},(_,i)=>({...provider,name:i===0?provider.name:'Provider'+i,title:'第三方社交登录平台 '+(i+1)}))}}),async({page})=>{
   assert.equal(await page.locator('.auth-provider-grid button').count(),7);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false)

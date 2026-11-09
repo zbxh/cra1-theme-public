@@ -15,8 +15,8 @@
   /* ---- 色彩令牌（同 cra1-shell.css :root） ---- */
   --primary: var(--cui-brand);
   --primary-hover: var(--cui-brand-hover);
-  --ring: var(--cui-gold);
-  --background: var(--cui-accent);
+  --ring: var(--cui-focus);
+  --background: var(--cui-page);
   --foreground: var(--cui-ink);
   --ink: var(--cui-ink);
   --muted: var(--cui-accent);
@@ -67,11 +67,11 @@
   --el-border-radius-small: 6px;
   --el-border-color: var(--border);
   --el-border-color-light: var(--border);
-  --el-border-color-lighter: #eef0f3;
+  --el-border-color-lighter: var(--cui-edge);
   --el-text-color-primary: var(--ink);
   --el-text-color-regular: var(--cui-body);
   --el-text-color-secondary: var(--muted-foreground);
-  --el-text-color-placeholder: #a3adba;
+  --el-text-color-placeholder: var(--cui-muted);
   --el-font-family: var(--cui-font);
 }
 
@@ -88,6 +88,11 @@
 }
 
 /* 内容区基线：与外壳 1440 限宽体系对齐（cra1-shell 同款） */
+
+/* 原生脚手架的外层底色使用页面令牌，第三方完整页面保持原样。 */
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-container {
+  background: var(--cui-page);
+}
 
 /* 价格数字：表格数字对齐 */
 .cart-page .price-num,
@@ -113,10 +118,10 @@
 .cart-page .el-dropdown-menu,
 .cart-page .el-select-dropdown,
 .cart-page .el-message-box {
-  background: rgba(255, 255, 255, 0.82);
+  background: color-mix(in srgb,var(--cui-white) 82%,transparent);
   -webkit-backdrop-filter: blur(18px) saturate(1.4);
   backdrop-filter: blur(18px) saturate(1.4);
-  border-color: rgba(255, 255, 255, 0.7);
+  border-color: color-mix(in srgb,var(--cui-white) 70%,transparent);
   box-shadow: var(--shadow-pop);
 }
 
@@ -316,7 +321,7 @@
   display: flex;
   align-items: baseline;
   gap: 2px;
-  color: var(--danger);
+  color: var(--cui-title);
   margin-top: 4px;
 }
 
@@ -503,7 +508,7 @@
     align-items: center;
     gap: 12px;
     padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
-    background: rgba(255, 255, 255, 0.92);
+    background: color-mix(in srgb,var(--cui-white) 92%,transparent);
     -webkit-backdrop-filter: blur(16px) saturate(1.3);
     backdrop-filter: blur(16px) saturate(1.3);
     border-top: 1px solid var(--border);
@@ -539,7 +544,7 @@
     display: flex;
     align-items: baseline;
     gap: 1px;
-    color: var(--danger);
+    color: var(--cui-title);
   }
 
   .cart-page .cl-rail-dock-num {
@@ -842,7 +847,7 @@
 
 .cart-page .cl-sec-tit-price {
   font-size: 13px;
-  color: var(--danger);
+  color: var(--cui-title);
   font-variant-numeric: tabular-nums;
 }
 
@@ -996,7 +1001,7 @@
 }
 
 .cart-page .cl-price {
-  color: var(--danger);
+  color: var(--cui-title);
   white-space: nowrap;
 }
 
@@ -1077,7 +1082,7 @@
 /* 模块模板令牌重映射（v10 配色变量 → CRA1 令牌，作用域限购物车页） */
 .cart-page {
   --color-primary: var(--primary);
-  --color-price-text: var(--danger);
+  --color-price-text: var(--cui-title);
 }
 
 /* 页标题 */
@@ -1104,7 +1109,7 @@
   margin: 0 auto;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  background: rgba(255, 255, 255, 0.94);
+  background: color-mix(in srgb,var(--cui-white) 94%,transparent);
   -webkit-backdrop-filter: blur(14px) saturate(1.35);
   backdrop-filter: blur(14px) saturate(1.35);
   box-shadow: var(--shadow-pop);
@@ -1196,7 +1201,7 @@
 
 .cart-page .goods-table .item-price .price,
 .cart-page .goods-table .item-total span {
-  color: var(--danger);
+  color: var(--cui-title);
   font-weight: 600;
 }
 
@@ -1221,7 +1226,7 @@
 .cart-page .footer-box .total-price {
   font-size: 20px;
   font-weight: 700;
-  color: var(--danger);
+  color: var(--cui-title);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1397,7 +1402,7 @@
 }
 
 .cart-page .cl-meta-price {
-  color: var(--danger);
+  color: var(--cui-title);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1601,7 +1606,7 @@
 }
 
 .cart-page .cl-m-cart-price .price {
-  color: var(--danger);
+  color: var(--cui-title);
   font-weight: 600;
 }
 
@@ -1646,7 +1651,7 @@
 .cart-page .cl-m-cart-total-num {
   font-size: 17px;
   font-weight: 700;
-  color: var(--danger);
+  color: var(--cui-title);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1732,7 +1737,7 @@
 }
 
 .cart-page .cl-m-settle-sub {
-  color: var(--danger);
+  color: var(--cui-title);
   font-weight: 600;
 }
 
@@ -2006,7 +2011,7 @@
   .cart-page .f-order .el-main {
     padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)) !important;
     box-sizing: border-box;
-    background: rgba(255, 255, 255, 0.94);
+    background: color-mix(in srgb,var(--cui-white) 94%,transparent);
     -webkit-backdrop-filter: blur(14px) saturate(1.35);
     backdrop-filter: blur(14px) saturate(1.35);
     border-top: 1px solid var(--border);
@@ -2393,7 +2398,7 @@
   .el-select-dropdown .el-select-dropdown__empty {
     padding: 24px 0;
     font-size: 13px;
-    color: var(--muted-foreground, #737373);
+    color: var(--muted-foreground, var(--cui-muted));
   }
 
   @keyframes cl-sel-up {
@@ -2613,8 +2618,8 @@
   }
 }
 
-.cl-config-toggle { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:44px; padding:10px 14px; border:1px solid #e4e4e7; border-radius:8px; background:#fff; color:#27272a; cursor:pointer; margin-bottom:12px; }
-.cl-config-toggle:focus-visible { outline:2px solid var(--cui-gold); outline-offset:2px; }
+.cl-config-toggle { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:44px; padding:10px 14px; border:1px solid var(--cui-edge); border-radius:8px; background:#fff; color:var(--cui-ink); cursor:pointer; margin-bottom:12px; }
+.cl-config-toggle:focus-visible { outline:2px solid var(--cui-focus); outline-offset:2px; }
 
 /* Read failures remain legible under V10's responsive root font size. */
 .cart-page .cra1-cart-read-error {

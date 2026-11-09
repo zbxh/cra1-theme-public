@@ -131,7 +131,7 @@ export default function AgreementPage() {
 
           {attachments.length > 0 && (
             <div className="mt-8 border-t border-line pt-5">
-              <h2 className="mb-3 text-[13px] font-medium text-ink">相关附件</h2>
+              <h2 className="mb-3 text-[13px] font-medium text-title">相关附件</h2>
               <ul className="space-y-2">
                 {attachments.map((url, i) => (
                   <li key={`${url}-${i}`}>

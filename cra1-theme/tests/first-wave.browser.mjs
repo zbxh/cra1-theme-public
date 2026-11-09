@@ -66,7 +66,8 @@ const server=http.createServer(async(req,res)=>{
   if(route==='/order/7/gateway'){state='Unpaid';return json(res,{})}
   if(route==='/upload')return json(res,{save_name:'fixture.pdf',image_url:'/fixture/proof.pdf'})
   if(route==='/recharge')return json(res,{id:7})
-  if(route==='/credit_limit')return json(res,{credit_limit:{status:'Active',remaining_amount:'500.00'}})
+  // Gateway/combination scenarios start without an active credit-limit account.
+  if(route==='/credit_limit')return json(res,{credit_limit:{status:'Inactive',remaining_amount:'0.00'}})
   if(route==='/menu')return json(res,{menu:[{id:1,name:'会员中心',url:'home.htm'},{id:3,name:'财务中心',url:'finance.htm'},{id:4,name:'工单支持',url:'plugin/99/ticket.htm'}]})
   if(route==='/ticket')return json(res,{list:Array.from({length:5},(_,i)=>({id:i+1,ticket_num:'20261023'+i,title:['应用服务部署咨询与产品使用问题','付款成功后服务尚未开通','关于自定义产品参数的使用方法'][i%3],name:'售后服务部',last_reply_time:1792736400-i*500,status:['等待客服回复','处理中','已回复'][i%3],status_id:i+1,color:['#a68859','#737c87','#40856e'][i%3]})),count:42})
   if(route==='/ticket/type')return json(res,{list:[{id:1,name:'技术支持'},{id:2,name:'财务咨询'}]})
@@ -164,7 +165,7 @@ try{
   check(errors.length===0,'performance run no browser errors');check(assetErrors.length===0,'performance run no resource errors')
   fs.writeFileSync(path.join(out,'performance.json'),JSON.stringify({baseline,release,conditions:{latencyMs:100,bandwidthMbps:10,cpuSlowdown:4,samplesPerCacheAndPage:count,backend:'isolated fixed API fixtures; no production timing claim'},rows,samples,errors,assetErrors},null,2))
  }else{
- if(!process.env.CRA1_FIRST_WAVE_FOCUS){
+ if(!process.env.CRA1_FIRST_WAVE_FOCUS||process.env.CRA1_FIRST_WAVE_FOCUS==='payments'){
  await page.goto(origin+'/cashier.htm?id=7');await page.locator('.cra1-cashier-surface .pay-method-item').first().waitFor();await page.waitForFunction(()=>window.__fixtureQr)
  check(await page.locator('.cra1-cashier-amount strong').innerText()==='¥80.00','partial balance amount')
  for(const width of [1920,1440,768,390,320]){await shot('cashier',width);if(width<769)check(!await page.locator('details').getAttribute('open'),'mobile details collapsed')}
@@ -181,6 +182,7 @@ try{
  await page.goto(origin+'/orderDetail.htm?id=7');await page.getByText('商品明细',{exact:true}).waitFor();for(const width of [1440,390,320])await shot('order-detail',width)
  await page.getByRole('button',{name:'前往收银台',exact:true}).focus();await page.evaluate(()=>{window.__legacyPaid=0;window.__legacyCancelled=0;window.CRA1Shared.Payments.open({orderId:7,onPaid:()=>window.__legacyPaid++,onCancel:()=>window.__legacyCancelled++})});await page.locator('.new-pay-dialog .pay-method-item').first().waitFor();check(!page.url().includes('cashier.htm'),'legacy call keeps modal and origin');await page.locator('.new-pay-dialog .close-btn').click();check(await page.evaluate(()=>window.__legacyCancelled===1&&window.__legacyPaid===0),'legacy cancel callback fires once');check(await page.getByRole('button',{name:'前往收银台',exact:true}).evaluate(el=>el===document.activeElement),'legacy modal restores the original keyboard focus')
  }
+ if(process.env.CRA1_FIRST_WAVE_FOCUS!=='payments'){
  await page.setViewportSize({width:1440,height:1000})
  if(process.env.CRA1_FIRST_WAVE_FOCUS!=='module'){
  for(const name of ['ticket','ticketDetails','addTicket']){await page.goto(origin+'/plugin/99/'+name+'.htm?id=7');await page.waitForTimeout(900);for(const width of [1920,1440,768,390,320])await shot(name,width);if(name==='ticket'){check(await page.locator('.cra1-ticket-mobile-card').count()===5,'mobile cards use all native ticket rows');await page.getByRole('button',{name:'查看完整表格'}).click();check(await page.locator('.tabledata>.el-table').isVisible(),'native table and plugin controls remain accessible');await page.evaluate(()=>{const th=document.createElement('th');th.textContent='插件新增操作';document.querySelector('.tabledata .el-table__header-wrapper tr').append(th)});await page.waitForFunction(()=>!document.querySelector('.cra1-ticket-mobile-enabled'));check(await page.locator('.tabledata>.el-table').isVisible()&&await page.locator('.cra1-ticket-mobile').count()===0,'late plugin columns restore full native table')}}
@@ -195,6 +197,7 @@ try{
  }else{
  await page.goto(origin+'/productdetail.htm?id=31');await page.getByRole('button',{name:'模块自定义操作'}).waitFor();await page.waitForFunction(()=>window.__fixtureModuleOrder?.length>=3);check(await page.evaluate(()=>JSON.stringify(window.__fixtureModuleOrder))==='[1,2,3]','module scripts preserve dependency and external SDK order');await page.getByRole('button',{name:'模块自定义操作'}).click();await page.getByText('操作已触发',{exact:true}).waitFor();for(const width of [1920,1440,768,390,320])await shot('product',width)
  moduleFail=true;await page.reload();await page.getByText('页面错误，请刷新重试',{exact:true}).waitFor();check(!await page.getByText('暂无可显示的内容。',{exact:true}).isVisible(),'module failure is distinct from a successful empty result');check(await page.getByRole('button',{name:'重新加载',exact:true}).count()===0,'module error offers no retry');moduleFail=false;await page.reload();await page.getByRole('button',{name:'模块自定义操作'}).waitFor()
+ }
  }
  check(errors.length===0,'no browser runtime errors');check(assetErrors.length===0,'no missing scripts or styles')
  fs.writeFileSync(path.join(out,'results.json'),JSON.stringify({status:'passed',checks,errors,assetErrors,requests,maxStatusInflight,productionWrites:0,fixture:'real templates and native cashier; isolated mocked business and gateways'},null,2))

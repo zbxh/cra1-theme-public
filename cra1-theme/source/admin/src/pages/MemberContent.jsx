@@ -58,7 +58,7 @@ function ProductForm({ title, value, onSubmit, onCancel }) {
         }}
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-[15px] font-semibold text-ink">{title}</h3>
+          <h3 className="text-[15px] font-semibold text-title">{title}</h3>
           <button type="button" aria-label="取消" className="inline-flex size-6 items-center justify-center rounded text-muted-foreground transition-colors duration-150 hover:bg-accent" onClick={onCancel}><X className="size-3.5" aria-hidden="true" /></button>
         </div>
 

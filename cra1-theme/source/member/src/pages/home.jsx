@@ -282,7 +282,7 @@ function RecentVisits({ recent, onClear }) {
             onCloseAutoFocus={(event) => { if (clearing.current) event.preventDefault() }}
           >
             <div className="mb-2 flex shrink-0 items-center gap-2">
-              <h2 id={titleId} className="min-w-0 flex-1 truncate text-[14px] font-semibold text-ink">{title}</h2>
+              <h2 id={titleId} className="min-w-0 flex-1 truncate text-[14px] font-semibold text-title">{title}</h2>
               <Button variant="ghost" size="sm" className="h-11 px-2" aria-label="清空最近访问" onClick={clear}>
                 <Trash2 className="size-3.5" aria-hidden="true" />清空
               </Button>
@@ -308,7 +308,7 @@ function RecentVisits({ recent, onClear }) {
   return (
     <section className="min-w-0 flex-1 basis-full lg:basis-0" aria-labelledby="home-recent-title" data-home-recent>
       <div className="mb-1.5 flex items-center gap-3">
-        <h2 id="home-recent-title" className="flex min-w-0 items-center gap-2 text-[14px] font-semibold text-ink">
+        <h2 id="home-recent-title" className="flex min-w-0 items-center gap-2 text-[14px] font-semibold text-title">
           <History className="size-4 shrink-0 text-brand" aria-hidden="true" />
           <span className="truncate">{title}</span>
         </h2>
@@ -824,9 +824,9 @@ function TicketSection() {
     return t.status || '—'
   }
   const statusCls = (t) => {
-    if (t.status_id === 2 || t.status_id === 5) return { color: '#FF7D00' }
+    if (t.status_id === 2 || t.status_id === 5) return { color: 'var(--cui-warning)' }
     if (t.status_id === 3) return { color: 'var(--cui-titanium)' }
-    return t.color ? { color: t.color, background: `${t.color}14` } : undefined
+    return t.color ? { color: `color-mix(in srgb, ${t.color} 35%, var(--cui-title))`, background: `${t.color}14` } : undefined
   }
 
   return (
@@ -1054,7 +1054,7 @@ function SecurityOverview({ cfg, account }) {
             <circle cx="66" cy="66" r={R} fill="none" stroke="#E5E8ED" strokeWidth="10" />
             <circle
               cx="66" cy="66" r={R} fill="none"
-              stroke={percent >= 75 ? '#00B42A' : percent >= 40 ? '#FF7D00' : '#E5484D'}
+              stroke={percent >= 75 ? 'var(--cui-success)' : percent >= 40 ? 'var(--cui-warning)' : 'var(--cui-danger)'}
               strokeWidth="10" strokeLinecap="round"
               strokeDasharray={`${unknown ? 0 : (CIRC * percent) / 100} ${CIRC}`}
               transform="rotate(-90 66 66)"

@@ -8,12 +8,14 @@ import { spawn, execFileSync } from 'node:child_process'
 import assert from 'node:assert/strict'
 const { chromium } = await import(process.env.CRA1_PLAYWRIGHT_MODULE || 'playwright')
 const install=process.env.CRA1_INSTALL_PACKAGE, out=process.env.CRA1_BROWSER_OUT
+const extracted=process.env.CRA1_INSTALL_ROOT
 const native=process.env.CRA1_NATIVE_REFERENCE_ROOT, php=process.env.CRA1_PHP || '/www/server/php/74/bin/php'
 const baseline=process.env.CRA1_BASELINE==='1'
-if(!install||!out||!native)throw Error('Set CRA1_INSTALL_PACKAGE, CRA1_BROWSER_OUT and CRA1_NATIVE_REFERENCE_ROOT')
+if((!install&&!extracted)||!out||!native)throw Error('Set CRA1_INSTALL_PACKAGE or CRA1_INSTALL_ROOT, CRA1_BROWSER_OUT and CRA1_NATIVE_REFERENCE_ROOT')
 fs.mkdirSync(out,{recursive:true})
 const root=fs.mkdtempSync(path.join(os.tmpdir(),'cra1-sidebar-browser-'))
-execFileSync('python3',['-c','import sys,zipfile;zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])',install,root])
+if(extracted)fs.cpSync(extracted,root,{recursive:true,dereference:true})
+else execFileSync('python3',['-c','import sys,zipfile;zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])',install,root])
 fs.writeFileSync(path.join(root,'config.php'),'<?php // Isolated fixture; no system database.\n')
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'cra1-theme/release.json')))
 const backend=path.join(root,manifest.backend_root), shared=`/cra1-shared/releases/${manifest.release}`

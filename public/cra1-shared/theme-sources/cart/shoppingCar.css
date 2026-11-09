@@ -1,5 +1,5 @@
 .main-title {
-  color: #171725;
+  color: var(--cui-title);
   font-size: 0.28rem;
   margin-bottom: 0.4rem;
 }
@@ -16,7 +16,7 @@
   align-items: center;
 }
 .goods-name {
-  color: #171725;
+  color: var(--cui-title);
   font-weight: bold;
   font-size: 0.16rem;
 }
@@ -32,15 +32,15 @@
   margin-top: 0.16rem;
   width: 100%;
   text-align: left;
-  border: 1px solid #e6e7eb;
+  border: 1px solid var(--cui-edge);
   border-radius: 0.03rem;
   border-collapse: collapse;
 }
 .goods-table thead {
   line-height: 0.46rem;
-  background: #eef4ff;
+  background: var(--cui-accent);
   height: 0.46rem;
-  color: #757575;
+  color: var(--cui-muted);
 }
 .goods-table tbody tr td {
   padding-top: 0.29rem;
@@ -67,16 +67,16 @@
   color: var(--color-danger);
 }
 .item-price {
-  color: #171725;
+  color: var(--cui-title);
 }
 .item-total {
   font-size: 0.14rem;
   font-weight: bold;
-  color: #171725;
+  color: var(--cui-title);
 }
 .original-price {
   text-decoration: line-through;
-  color: #999999;
+  color: var(--cui-muted);
 }
 .discount-codeNumber {
   font-size: 0.12rem;
@@ -103,7 +103,7 @@
   padding-right: 1.2rem;
   box-sizing: border-box;
   font-size: 0.18rem;
-  box-shadow: 0rem 0rem 0.2rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0rem 0rem 0.2rem color-mix(in srgb,var(--cui-night) 15%,transparent);
   height: 1.6rem !important;
   position: fixed;
   bottom: 0;
@@ -131,7 +131,7 @@
 }
 .buy-again-btn {
   margin-left: 0.1rem;
-  background: #e1f0ff;
+  background: var(--cui-accent);
   height: 0.32rem;
   min-width: 0.6rem;
   border-radius: 0.03rem;
@@ -140,12 +140,12 @@
   color: var(--color-primary);
 }
 .footer-left {
-  color: #333333;
+  color: var(--cui-ink);
   font-size: 0.18rem;
 }
 .footer-right {
   font-size: 0.14rem;
-  color: #1e2736;
+  color: var(--cui-ink);
   display: flex;
   align-items: center;
 }
@@ -164,17 +164,17 @@
   font-size: 0.14rem;
 }
 .goodsInfo-price {
-  color: #1e2736;
+  color: var(--cui-title);
 }
 .goodsInfo-type {
   overflow: hidden;
   text-overflow: ellipsis;
   /* white-space: nowrap; */
   width: 80%;
-  color: #1e2736;
+  color: var(--cui-ink);
 }
 .goodsInfo-name {
-  color: #757575;
+  color: var(--cui-muted);
 }
 .buy-btn {
   margin-left: 0.4rem;
@@ -196,11 +196,11 @@
   width: 90%;
 }
 .all-check .el-checkbox__label {
-  color: #333333;
+  color: var(--cui-ink);
   font-size: 0.18rem;
 }
 .qty-num {
-  color: #4e5259;
+  color: var(--cui-title);
   height: 0.13rem;
   margin-top: 0.1rem;
 }
@@ -251,7 +251,7 @@
   .footer-left {
     display: flex;
     flex-direction: column;
-    color: #333333;
+    color: var(--cui-ink);
     font-size: 0.18rem;
   }
   .delect-btn {
@@ -259,7 +259,7 @@
   }
   .footer-right {
     font-size: 0.14rem;
-    color: #1e2736;
+    color: var(--cui-ink);
     display: flex;
     flex-direction: column;
     align-items: center;
