@@ -47,7 +47,7 @@
     var shell = doc.createElement('div');
     shell.id = 'cra1-native-page';
     shell.className = 'cra1-shell';
-    shell.innerHTML = '<div class="cra1-native-page__navigation"><aside-menu :menu-active-id="5" @getruleslist="getRule"></aside-menu></div><div class="cra1-shell__body"><div class="cra1-native-page__navigation"><top-menu ref="topMenuRef"></top-menu></div><main class="cra1-shell__content cra1-native-page__content"></main></div>';
+    shell.innerHTML = '<div class="cra1-native-page__navigation"><aside-menu :menu-active-id="5" @getruleslist="getRule"></aside-menu></div><div class="cra1-shell__body"><div class="cra1-native-page__navigation"><top-menu ref="topMenuRef"></top-menu></div><main class="cra1-shell__content cra1-native-page__content cra1-module-view"></main></div>';
     var content = shell.querySelector('main');
     Array.from(doc.body.childNodes).forEach(function (node) {
       if (node.nodeType === 1 && (/^(SCRIPT|STYLE|LINK)$/.test(node.tagName) || node.matches('.el-dialog__wrapper,.v-modal,.el-popper,[role="tooltip"]'))) return;
@@ -65,6 +65,14 @@
     }).$mount(shell.firstElementChild);
     new root.Vue({components: {topMenu: topMenu}}).$mount(shell.querySelector('.cra1-shell__body').firstElementChild);
     groupPluginAction(content);
+    var stopCharts;
+    function observeCharts() {
+      if (stopCharts) stopCharts();
+      stopCharts = root.CRA1ModuleDeps && root.CRA1ModuleDeps.observeCharts && root.CRA1ModuleDeps.observeCharts(content);
+    }
+    observeCharts();
+    root.addEventListener('pagehide', function () { if (stopCharts) stopCharts(); stopCharts = null; });
+    root.addEventListener('pageshow', function (event) { if (event.persisted) observeCharts(); });
   }
   if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', mount, {once: true});
   else mount();

@@ -6,6 +6,70 @@
   'use strict';
 
   document.addEventListener('alpine:init', function () {
+    // Use the native domain service's category URL and supported suffixes.
+    Alpine.data('domainRegistration', function () {
+      return {
+        keyword: '', error: '', busy: false, hasAction: false,
+        init: function () { this.hasAction = !!this.$el.querySelector('#cra1-domain-search [data-domain-submit]'); },
+        clearError: function () {
+          this.error = '';
+          this.$refs.domainInput.setCustomValidity('');
+        },
+        submit: async function () {
+          if (!this.hasAction || this.busy) return;
+          this.clearError();
+          var configured = this.$refs.domainForm.getAttribute('action') || '';
+          // Merchant anchors, telephone and email actions keep their own meaning.
+          if (configured.charAt(0) === '#' || /^(?:tel|mailto):/i.test(configured)) {
+            window.location.assign(configured); return;
+          }
+          var input = this.$refs.domainInput, keyword = this.keyword.trim();
+          if (!keyword) {
+            input.setCustomValidity('请输入域名关键字');
+            input.reportValidity(); input.focus(); return;
+          }
+          this.busy = true;
+          try {
+            var target = new URL(configured, window.location.href);
+            if (!/^https?:$/.test(target.protocol)) throw new Error('invalid-target');
+            var nativeCart = target.origin === window.location.origin && target.pathname === '/cart/goodsList.htm';
+            if (nativeCart) {
+              var available = window.__CRA1_RUNTIME__ && window.__CRA1_RUNTIME__.features && window.__CRA1_RUNTIME__.features.domain_search;
+              if (available === false) { this.error = '域名查询暂未开放，请联系客服。'; return; }
+              if (available !== true) throw new Error('capability-unavailable');
+              var results = await Promise.all([API.get('/idcsmart_domain/config'), API.get('/idcsmart_domain/domain_suffix')]);
+              if (this._disposed) return;
+              var config = results[0] || {}, suffixes = Array.isArray(results[1]) ? results[1] : [];
+              var supported = suffixes.map(function (item) { return item && item.suffix; }).filter(function (suffix) { return typeof suffix === 'string' && /^\.[^\s/?#]+$/.test(suffix); });
+              if (!supported.length) { this.error = '暂未配置可查询的域名后缀，请联系网站客服。'; return; }
+              // Only the untouched default link follows the native discovered URL.
+              // Explicit merchant category links retain their parameters and hash.
+              if (!target.search && !target.hash) {
+                if (typeof config.domain_url !== 'string' || !config.domain_url.trim()) { this.error = '域名服务暂未配置，请联系客服。'; return; }
+                target = new URL(config.domain_url, window.location.href);
+                if (!/^https?:$/.test(target.protocol)) throw new Error('invalid-target');
+              }
+              var explicitSuffix = target.searchParams.get('suffix');
+              var suffix = explicitSuffix || config.default_search_domain;
+              var dot = keyword.indexOf('.'), typedSuffix = dot > 0 ? keyword.slice(dot).toLowerCase() : '';
+              if (typedSuffix) {
+                suffix = supported.find(function (item) { return item.toLowerCase() === typedSuffix; });
+                if (!suffix) { this.error = '暂不支持此域名后缀，请更换后重试。'; return; }
+              }
+              if (explicitSuffix && !typedSuffix && supported.indexOf(explicitSuffix) === -1) { this.error = '暂不支持此域名后缀，请更换后重试。'; return; }
+              if (supported.indexOf(suffix) === -1) suffix = supported[0];
+              target.searchParams.set('suffix', suffix);
+            }
+            target.searchParams.set('domain', keyword);
+            if (!this._disposed) window.location.assign(target.href);
+          } catch (error) {
+            this.error = '暂时无法读取域名服务，请稍后重试。';
+          } finally { this.busy = false; }
+        },
+        destroy: function () { this._disposed = true; }
+      };
+    });
+
     // The product section directory follows its visible, configured anchors.
     Alpine.data('pageSections', function () {
       return {

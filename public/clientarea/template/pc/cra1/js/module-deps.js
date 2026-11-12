@@ -94,6 +94,12 @@
     config: ['payDialog', 'discountCode', 'eventCode', 'customGoods'],
   }
 
+  var MODULE_EXTRA_DEPS = {
+    mf_dcim_cabinet: { product_detail: ['ipDefase'] },
+    mf_cloud_mysql: { product_detail: ['ipDefase'] },
+    chinac_cloud_phone: { product_detail: ['batchRenewpage'] },
+  }
+
   var NATIVE_BINDINGS = Object.assign({}, COMPONENT_PATHS)
   var declaredLoads = {}
   var loaded = {}      // name -> true
@@ -182,10 +188,41 @@
    * @param {string|string[]} group MODULE_DEPS 的键，或组件名数组
    * @returns {Promise<void>}
    */
-  function ensure(group) {
+  function ensure(group, moduleName, view) {
     var names = Array.isArray(group) ? group : (MODULE_DEPS[group] || [])
+    if (moduleName && Object.prototype.hasOwnProperty.call(MODULE_EXTRA_DEPS, moduleName)) {
+      names = names.concat(MODULE_EXTRA_DEPS[moduleName][view || 'product_detail'] || [])
+    }
     // 逐个启动：loadOne 内部已处理依赖顺序，这里并发触发互不冲突的链
     return Promise.all(['asideMenu','topMenu'].concat(names).map(loadOne)).then(function () {})
+  }
+
+  // Native charts can initialize while their Vue tab is still hidden. A fluid
+  // container then measures differently after mounting or opening the sidebar.
+  // Resize the existing chart instance; never rebuild its data or business VM.
+  function observeCharts(host) {
+    var frame=0,disposed=false,observed=new Set()
+    var observer=window.ResizeObserver?new window.ResizeObserver(schedule):null
+    function schedule() {
+      if(disposed||frame)return
+      frame=window.requestAnimationFrame(function(){
+        frame=0
+        if(disposed||!host.isConnected)return
+        var charts=Array.from(host.querySelectorAll('.my-echart'))
+        observed.forEach(function(node){if(!host.contains(node)){if(observer)observer.unobserve(node);observed.delete(node)}})
+        charts.forEach(function(node){
+          if(observer&&!observed.has(node)){observed.add(node);observer.observe(node)}
+          var chart=window.echarts&&window.echarts.getInstanceByDom&&window.echarts.getInstanceByDom(node)
+          if(chart&&node.clientWidth>0&&node.clientHeight>0&&(Math.abs(chart.getWidth()-node.clientWidth)>1||Math.abs(chart.getHeight()-node.clientHeight)>1))chart.resize()
+        })
+      })
+    }
+    var mutations=new MutationObserver(schedule)
+    mutations.observe(host,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']})
+    if(observer)observer.observe(host)
+    window.addEventListener('resize',schedule)
+    schedule()
+    return function(){disposed=true;if(frame)window.cancelAnimationFrame(frame);mutations.disconnect();if(observer)observer.disconnect();window.removeEventListener('resize',schedule);observed.clear()}
   }
 
 
@@ -399,6 +436,8 @@
     register: register,
     mountScripts: mountScripts,
     deps: MODULE_DEPS,
+    moduleDeps: MODULE_EXTRA_DEPS,
+    observeCharts: observeCharts,
     graph: DEPS,
   }
 })(window)

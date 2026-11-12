@@ -373,8 +373,8 @@ function QuickLinksCard({ content, setContentSection }) {
               >
                 <DragHandle {...drag.handleProps(i, '拖拽排序：' + it.label)} />
                 <div className="cra1-row-content flex min-w-0 flex-1 items-center gap-2">
-                  <span className="min-w-0 truncate text-[13px] text-ink">{it.label || '（未命名）'}</span>
-                  <span className="cra1-row-secondary truncate font-mono text-[11px] text-muted-foreground">{it.url}</span>
+                  <span title={it.label} className="cra1-row-title truncate text-[13px] text-ink">{it.label || '（未命名）'}</span>
+                  <span title={it.url} className="cra1-row-secondary truncate font-mono text-[11px] text-muted-foreground">{it.url}</span>
                   {Number(it.enabled) !== 1 && <Badge tone="muted">停用</Badge>}
                 </div>
                 {drag.isOver(i) && <DropBadge pos={drag.dropPos} />}
@@ -615,8 +615,8 @@ function HomeBannerCard({ content, setContentSection }) {
             {items.map((it, i) => (
               <li key={it.id || i} className="cra1-flat-row flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2.5">
                 <div className="cra1-row-content flex min-w-0 flex-1 items-center gap-2">
-                  <span className="min-w-0 truncate text-[13px] text-ink">{it.title || '（未命名）'}</span>
-                  <span className="cra1-row-secondary truncate font-mono text-[11px] text-muted-foreground">{it.link}</span>
+                  <span title={it.title} className="cra1-row-title truncate text-[13px] text-ink">{it.title || '（未命名）'}</span>
+                  <span title={it.link} className="cra1-row-secondary truncate font-mono text-[11px] text-muted-foreground">{it.link}</span>
                   {Number(it.enabled) !== 1 && <Badge tone="muted">停用</Badge>}
                 </div>
                 <div className="cra1-row-actions flex shrink-0 items-center gap-0.5">

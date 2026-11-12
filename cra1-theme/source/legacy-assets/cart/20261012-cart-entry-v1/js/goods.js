@@ -181,8 +181,7 @@ localStorage.setItem = function (key, newValue) {
             if (!modules) throw new Error('商品页面尚未加载');
             const managed=!!modules.profile(module);
             if (!managed) {
-              // Old embed links and incomplete catalogue metadata must also
-              // reach the same full-document official module host.
+              // Legacy embed links retain the complete native document.
               window.top.location.replace(modules.url('/cart/goods.htm', this.id));
               return false;
             }
@@ -195,10 +194,8 @@ localStorage.setItem = function (key, newValue) {
             const root=document.querySelector('.goods.cart-page');
             if(root)root.toggleAttribute('data-cra1-native-module',nativeModule);
             if(window.__CART_EMBED__)window.__CART_EMBED__.nativeModule=nativeModule;
+            if (this.isEmbed && window.__CART_EMBED__?.prepare) window.__CART_EMBED__.prepare(module);
             if (nativeModule) {
-              // V10 default goods.js owns this contract: mount the untouched
-              // response with the installed jQuery and let the module run its
-              // own scripts, Vue tree, quotes, dialogs and purchasing controls.
               $.ajaxSetup({cache:true});
               $(host).html(res.data.data.content);
             } else {

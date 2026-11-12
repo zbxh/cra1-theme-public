@@ -6,5 +6,5 @@ const registry=JSON.parse(fs.readFileSync(new URL('../backend/Compatibility/nati
 const context={window:{},console,URL,Set,Promise};
 vm.runInNewContext(source.replace('window.CRA1ModuleDeps = {','window.CRA1ModuleDeps = { paths: COMPONENT_PATHS,'),context);
 const loader=context.window.CRA1ModuleDeps;
-for(const [key,value]of Object.entries({paths:loader.paths,dependencies:loader.graph,groups:loader.deps}))assert.deepEqual(JSON.parse(JSON.stringify(value)),registry[key],key+' stays consistent for native pages and injected modules');
-console.log(JSON.stringify({status:'passed',checks:3}));
+for(const [key,value]of Object.entries({paths:loader.paths,dependencies:loader.graph,groups:loader.deps,module_dependencies:loader.moduleDeps}))assert.deepEqual(JSON.parse(JSON.stringify(value)),registry[key],key+' stays consistent for native pages and injected modules');
+console.log(JSON.stringify({status:'passed',checks:4}));

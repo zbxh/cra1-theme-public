@@ -2,7 +2,7 @@
 // The surrounding shell and other Vue applications retain their own handlers.
 const documents = new WeakMap()
 
-export function watchModuleFailure(host, onFailure) {
+export function watchModuleFailure(host, onFailure, onRecoverable) {
   const root = host.ownerDocument.defaultView, Vue = root.Vue
   let state = documents.get(root)
   if (!state) {
@@ -14,7 +14,7 @@ export function watchModuleFailure(host, onFailure) {
     }
     state.failed = function (error, vm, info) {
       const boundary = [...state.boundaries].find(b => b.instances.has(vm?.$root || vm) || (vm?.$el && b.host.contains(vm.$el)))
-      if (boundary) { boundary.fail(); return }
+      if (boundary) { boundary.report('script'); return }
       if (state.error) return state.error.call(this, error, vm, info)
       throw error
     }
@@ -25,8 +25,13 @@ export function watchModuleFailure(host, onFailure) {
         const config = reason?.config, method = (config?.method || 'get').toLowerCase()
         let requestPath = ''
         try { requestPath = new URL(config?.url || '', root.location.href).pathname } catch {}
-        const rejectedRead = ['get', 'head'].includes(method) && boundary.prefixes.some(prefix => requestPath.startsWith(prefix))
-        if (scriptError || rejectedRead) { event.preventDefault(); boundary.fail(); return }
+        requestPath = requestPath.replace(/^\/console\/v1(?=\/)/, '')
+        const moduleRequest = !!config && boundary.prefixes.some(prefix => requestPath.startsWith(prefix))
+        if (scriptError || moduleRequest) {
+          event.preventDefault()
+          boundary.report(moduleRequest ? (['get', 'head'].includes(method) ? 'read' : 'operation') : 'script')
+          return
+        }
       }
     }
     if (state.mount) Vue.prototype.$mount = state.mounted
@@ -38,10 +43,20 @@ export function watchModuleFailure(host, onFailure) {
   const sources = Array.from(host.querySelectorAll('script[src]')).map(node => new URL(node.src, root.location.href))
     .filter(url => url.origin === root.location.origin && /\/plugins\/(?:server|reserver)\//.test(url.pathname))
   const prefixes = sources.map(url => /\/plugins\/(?:server|reserver)\/([^/]+)\//.exec(url.pathname)?.[1]).filter(Boolean).map(name => '/'+name+'/')
-  const boundary = {host, sources: sources.map(url => url.href), prefixes, instances: new Set(), fail: onFailure}
+  const boundary = {
+    host, sources: sources.map(url => url.href), prefixes, instances: new Set(), ready: false,
+    report(kind) {
+      // A page script/render failure before boot completes is fatal. Once the
+      // native page has mounted, a failed tab query or event handler must not
+      // destroy the rest of its controls or lose an operation's current state.
+      if (!this.ready) onFailure()
+      else onRecoverable?.(kind)
+    },
+  }
   state.boundaries.add(boundary)
   return {
     instances: boundary.instances,
+    ready() { boundary.ready = true },
     dispose() {
       state.boundaries.delete(boundary)
       if (state.boundaries.size) return

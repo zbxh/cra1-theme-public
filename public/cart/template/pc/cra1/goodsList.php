@@ -51,8 +51,8 @@
         </div>
         <div class="cl-dock-m-row cl-dock-m-coupon" v-show="couponOpen && railPrice.hasDiscount">
           <el-input v-model="railCoupon" size="small" :placeholder="lang.coupon_input || '请输入优惠码'"
-            @keyup.enter.native="railApplyCoupon"></el-input>
-          <el-button size="small" class="cl-dock-m-exchange" @click="railApplyCoupon">{{lang.exchange || '兑换'}}</el-button>
+            :disabled="railCouponBusy || !!railCouponApplied" @keyup.enter.native="railApplyCoupon"></el-input>
+          <el-button size="small" class="cl-dock-m-exchange" :loading="railCouponBusy" @click="railCouponApplied ? railRemoveCoupon() : railApplyCoupon()">{{railCouponApplied ? '移除' : (lang.exchange || '兑换')}}</el-button>
         </div>
       </div>
       <div class="cl-rail-dock-price">
@@ -77,7 +77,7 @@
         <el-button type="primary" class="cl-rail-buy" :disabled="railLoading || railAvailability !== 'ready'"
           @click="railPrimaryAction">{{isEditingCartItem ? '保存修改' : (lang.product_buy_now || '立即购买')}}</el-button>
       </div>
-      <p v-if="railAvailability !== 'ready'" class="cl-rail-status" role="status">{{railStatusText}}</p>
+      <p v-if="railAvailability !== 'ready'" class="cl-rail-status" role="status">{{railStatusText}} <el-button v-if="railAvailability === 'error'" type="text" @click="railRetryBridge">重试</el-button></p>
     </div>
     <el-container>
       <aside-menu @getruleslist="getRule"></aside-menu>
@@ -313,14 +313,14 @@
                         </span>
                       </div>
                     </div>
-                    <p v-if="railAvailability !== 'ready'" class="cl-rail-status" role="status">{{railStatusText}}</p>
+                    <p v-if="railAvailability !== 'ready'" class="cl-rail-status" role="status">{{railStatusText}} <el-button v-if="railAvailability === 'error'" type="text" @click="railRetryBridge">重试</el-button></p>
                     <!-- 优惠码（模块提供时显示） -->
                     <div class="cl-rail-field" v-if="railPrice.hasDiscount">
                       <div class="cl-rail-label">{{lang.coupon_code || '优惠码'}}</div>
                       <div class="cl-rail-coupon">
                         <el-input v-model="railCoupon" size="small" :placeholder="lang.coupon_input || '请输入优惠码'"
-                          @keyup.enter.native="railApplyCoupon"></el-input>
-                        <el-button size="small" @click="railApplyCoupon">{{lang.exchange || '兑换'}}</el-button>
+                          :disabled="railCouponBusy || !!railCouponApplied" @keyup.enter.native="railApplyCoupon"></el-input>
+                        <el-button size="small" :loading="railCouponBusy" @click="railCouponApplied ? railRemoveCoupon() : railApplyCoupon()">{{railCouponApplied ? '移除' : (lang.exchange || '兑换')}}</el-button>
                       </div>
                     </div>
                     <!-- 操作按钮 -->
@@ -416,7 +416,7 @@
                                   <div class="premium-type" v-if="item.type && item.type === 'premium'">
                                     {{lang.template_text98}}
                                   </div>
-                                  <el-popover placement="bottom" trigger="hover" v-if="item.avail === 1">
+                                  <el-popover placement="bottom" trigger="hover" popper-class="cra1-domain-price-popover" v-if="item.avail === 1">
                                     <div class="pirce-box" slot="reference" v-loading="item.priceLoading">
                                       <span class="now-price">{{commonData.currency_prefix}}<span
                                           style="font-size: 0.18rem;  color: var(--color-price-text);">{{item.showPrice}}{{commonData.currency_suffix}}
@@ -480,7 +480,7 @@
                                       <div class="premium-type" v-if="item.type && item.type === 'premium'">
                                         {{lang.template_text115}}
                                       </div>
-                                      <el-popover placement="bottom" trigger="hover" v-if="item.avail === 1">
+                                      <el-popover placement="bottom" trigger="hover" popper-class="cra1-domain-price-popover" v-if="item.avail === 1">
                                         <div class="pirce-box" slot="reference" v-loading="item.priceLoading">
                                           <span class="now-price">{{commonData.currency_prefix}}<span
                                               style="font-size: 0.18rem;  color: var(--color-price-text);">{{item.showPrice}}{{commonData.currency_suffix}}
@@ -603,7 +603,7 @@
                                     </div>
                                   </div>
                                   <div class="car-year">
-                                    <el-select v-model="item.selectYear" @change="(val)=>changeCart(val,item)">
+                                    <el-select v-model="item.selectYear" popper-class="cra1-domain-year-options" @change="(val)=>changeCart(val,item)">
                                       <el-option v-for="items in item.priceArr" :key="items.buyyear"
                                         :label="items.buyyear + lang.template_text101" :value="items.buyyear">
                                       </el-option>
@@ -775,7 +775,7 @@
                           <div class="config-item price-area">
                             <span class="config-label" style="width: auto;min-width: auto;">{{lang.ssl_total}}</span>
                             <div class="price-display">
-                              <div class="price-main">
+                              <div class="price-main" v-if="sslQuoteReady">
                                 <template v-if="sslDiscount > 0 || sslLevelNum > 0 || sslEventDiscount > 0">
                                   <span class="currency">{{commonData.currency_prefix}}</span>
                                   <span class="amount">{{sslCalcTotalPrice.toFixed(2)}}{{commonData.currency_suffix}}</span>
@@ -801,9 +801,10 @@
                                 </template>
                                 <template v-else>
                                   <span class="currency">{{commonData.currency_prefix}}</span>
-                                  <span class="amount">{{sslTotalPrice.toFixed(2)}}{{commonData.currency_suffix}}</span>
+                                  <span class="amount">{{sslCalcTotalPrice.toFixed(2)}}{{commonData.currency_suffix}}</span>
                                 </template>
                               </div>
+                              <p v-else role="status" class="cra1-cart-read-error-text">{{sslQuoteError || '正在计算配置费用…'}} <el-button v-if="sslQuoteError" type="text" @click="calcSslPrice">重试</el-button></p>
                               <div class="promo-actions">
                                 <span v-if="sslDiscount > 0 || sslLevelNum > 0 || sslEventDiscount > 0"
                                   class="original-price">
@@ -823,7 +824,7 @@
                           </div>
                           <!-- 购买按钮 -->
                           <div class="config-item buy-area">
-                            <el-button type="primary" class="buy-btn" :disabled="disabledJump"
+                            <el-button type="primary" class="buy-btn" :disabled="disabledJump || !sslQuoteReady || sslLoadingPrice"
                               @click="goBuySsl">{{lang.buy_now}}</el-button>
                           </div>
                         </div>
@@ -832,8 +833,8 @@
                   </div>
                 </template>
               </div>
-        <div class="up-dialog">
-          <el-dialog width="6.8rem" :visible.sync="isShowUpload" :show-close=false>
+        <div class="up-dialog cra1-domain-upload">
+          <el-dialog width="6.8rem" custom-class="cra1-domain-upload-dialog" :visible.sync="isShowUpload" :show-close=false>
             <div class="dia-title">{{lang.template_text131}}</div>
             <div class="dia-concent">
               <p class="up-tips">{{lang.template_text132}}</p>

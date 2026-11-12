@@ -49,6 +49,11 @@
       "countDownButton"
     ]
   },
+  "module_dependencies": {
+    "mf_dcim_cabinet": {"product_detail": ["ipDefase"]},
+    "mf_cloud_mysql": {"product_detail": ["ipDefase"]},
+    "chinac_cloud_phone": {"product_detail": ["batchRenewpage"]}
+  },
   "groups": {
     "list": [
       "pagination",

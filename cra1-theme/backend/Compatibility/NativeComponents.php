@@ -26,7 +26,11 @@ final class NativeComponents
             if (!is_string($relative)||!preg_match('~^components/([A-Za-z][A-Za-z0-9_]*)/\1\.js$~D',$relative)) throw new \RuntimeException('Invalid native component path');
             $scripts[$name]=$relative;unset($visiting[$name]);
         };
-        foreach ($registry['groups'][$group] as $name) $visit($name);
+        $names=$registry['groups'][$group];
+        // Some resource modules share a page layout but declare additional
+        // native components. Load those bindings before their business script.
+        $names=array_merge($names,$registry['module_dependencies'][$match[1]][$match[2]]??[]);
+        foreach ($names as $name) $visit($name);
         return $scripts;
     }
 }

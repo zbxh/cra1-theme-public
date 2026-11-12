@@ -2814,6 +2814,94 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cl-cart-disk-compac
   html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cl-cart-controls *::after { transition:none; }
 }
 
+/* Domain and certificate ordering keep native handlers; contain the selection
+   and quote columns instead of allowing a sticky desktop column to cover them. */
+.cart-page .domain-box .domain-search .search-button{color:var(--cui-white)!important;font-size:14px!important}
+.cart-page .domain-box .domain-item{gap:16px;min-width:0;height:auto!important;padding:16px!important}
+.cart-page .domain-box .domain-item :is(.item-left,.item-right){display:flex;min-width:0;flex-wrap:wrap;gap:8px;align-items:center}
+.cart-page .domain-box .domain-item .domain-name{font-size:14px!important;overflow-wrap:anywhere}
+.cart-page .domain-box .domain-item :is(.domain-status,.now-price){font-size:12px!important}
+.cart-page .domain-box .domain-item .domain-status{margin-left:0!important}
+.cart-page .domain-box .domain-item .add-btn{height:auto!important;min-height:36px;margin:0!important;font-size:13px!important;padding:8px 12px!important}
+/* Native rem amounts shrink with V10's mobile root size. Keep the domain
+   result, bulk result and cart prices readable, including inline amounts. */
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.pirce-box .now-price,.car-price,.car-money .now-price,.car-money .money-text,.car-bottom){font-size:14px!important;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.pirce-box .now-price>span:first-child,.car-price>span,.car-money .money-text>span){font-size:18px!important;font-variant-numeric:tabular-nums}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.domain-item,.batch-item) .item-right{min-width:0;flex-wrap:wrap;gap:8px}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.domain-item,.batch-item) .item-right>span,
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.pirce-box,.car-price,.car-money .mon-right){min-width:0;max-width:100%}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.domain-item,.batch-item) .add-btn{flex:0 0 auto;min-height:36px;height:auto!important;margin:0!important;padding:8px 12px!important;font-size:13px!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .batch-item{min-width:0;height:auto!important;gap:16px;padding:16px!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .batch-item .item-left{min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .batch-item .domain-name{font-size:14px!important;white-space:normal;overflow-wrap:anywhere}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .batch-item .domain-status{font-size:12px!important;margin-left:0!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.car-bottom,.car-money){flex-wrap:wrap;gap:8px}
+/* Domain controls share the same readable scale; body-mounted overlays carry
+   explicit domain classes so other native module popovers stay unchanged. */
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.reg-ridio,.suffix-box,.suffix-item,.fillter-item,.upload-btn,.search-title,.search-fillter,.car-top,.clear-car,.car-del,.shop-name,.unavail-title,.unavail-name,.unavail-reason,.open-text,.el-checkbox__label,.el-input__inner,.el-textarea__inner,.start-search p,.batch-search p,.car-no,.el-button){font-size:14px!important;line-height:1.5}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.domain-status,.premium-type,.whois-box,.original-price,.oir-price){font-size:13px!important;line-height:1.5}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.el-icon-arrow-down,.el-select__caret){font-size:14px!important;color:var(--cui-muted)!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .el-button{min-height:44px!important;height:auto!important;padding:10px 14px!important;white-space:normal}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .el-input__inner{min-height:44px!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.reg-ridio,.suffix-box,.suffix-item,.fillter-item,.upload-btn,.clear-car,.whois-box){min-height:44px;display:inline-flex;align-items:center}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .suffix-list{top:44px!important;width:100%!important;box-sizing:border-box;gap:8px;padding:12px!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.suffix-item,.fillter-item){min-width:64px;width:auto!important;height:auto!important;padding:8px 12px!important;margin:0!important;box-sizing:border-box}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .all-check{min-height:64px;height:auto!important;padding:8px 12px!important;gap:12px;flex-wrap:wrap}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .car-item{padding:16px!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .domain-right{height:auto!important;min-width:0}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .car-no{min-height:180px;box-sizing:border-box;padding:16px;text-align:center}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .caritem-top{flex-wrap:wrap;gap:12px}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .car-name{min-width:0;max-width:100%;flex-wrap:wrap;gap:8px}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.car-name,.batch-item) .el-checkbox{min-width:0;max-width:100%;display:inline-flex;align-items:center;white-space:normal}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box :is(.car-name,.batch-item) .el-checkbox__label{min-width:0;overflow-wrap:anywhere}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .car-year .el-select{width:88px!important;height:auto!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .unavail-item{min-width:0;height:auto!important;min-height:44px;padding:12px!important;overflow-wrap:anywhere}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .unavail-reason{display:block;margin-left:0!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-price-popover{box-sizing:border-box;max-width:calc(100vw - 24px)!important;overflow-x:auto;font-size:14px!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-price-popover .price-list{width:max-content;font-size:14px!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-price-popover .price-item>div{box-sizing:border-box;width:120px;height:auto;min-height:40px;padding:8px;display:block;text-align:center;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-price-popover .price-item:not(:first-child) :is(.price-new,.price-renew){font-size:18px!important;font-variant-numeric:tabular-nums}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-year-options .el-select-dropdown__item{font-size:14px!important;min-height:44px;height:auto;line-height:44px}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog{width:520px!important;max-width:calc(100vw - 24px);box-sizing:border-box}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog .el-dialog__body{padding:24px!important}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog .dia-title{font-size:18px!important;line-height:1.5}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog :is(.up-tips,.file-name,.file-btn,.el-button){font-size:14px!important;line-height:1.5}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog .file-box{gap:8px;flex-wrap:wrap}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog .file-name{box-sizing:border-box;min-width:0;min-height:44px;flex:1 1 150px;padding:8px 12px}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog :is(.file-btn,.el-button){min-height:44px;height:auto!important;padding:10px 14px!important;margin:0!important;white-space:normal}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog .dia-foter{gap:12px;flex-wrap:wrap;margin-top:24px}
+@media(max-width:560px){
+ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .batch-item{flex-direction:column;align-items:stretch}
+ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .batch-item .item-right{justify-content:space-between}
+ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .car-del{display:inline-flex!important;align-items:center;min-height:44px}
+ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .car-box{height:auto!important;min-height:180px;max-height:480px}
+ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .domain-box .unavail-item{width:100%!important}
+}
+.cart-page .ssl-box .ssl-content{display:grid!important;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
+.cart-page .ssl-box .ssl-content .ssl-left{width:auto;min-width:0}
+.cart-page .ssl-box .ssl-content .ssl-right{box-sizing:border-box;min-width:0;width:100%!important;max-width:100%;height:auto!important;min-height:0;position:static!important}
+.cart-page .ssl-box .ssl-filter .filter-item{display:flex;flex-wrap:wrap;gap:10px 16px;min-width:0}
+.cart-page .ssl-box .ssl-filter .filter-label{width:auto;flex:0 0 auto;font-size:13px;line-height:36px}
+.cart-page .ssl-box .ssl-filter .el-radio-group{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.cart-page .ssl-box .ssl-filter .el-radio-button__inner{font-size:13px;line-height:1.5;padding:8px 12px;border-radius:6px!important}
+.cart-page .ssl-box .ssl-content .ssl-right :is(.right-title,.config-label,.config-info-link){font-size:13px!important;line-height:1.6}
+.cart-page .ssl-box .ssl-content .ssl-right :is(.right-title,.right-content,.right-footer){padding:16px!important}
+.cart-page .ssl-box .ssl-right .config-item{min-width:0;gap:10px;flex-wrap:wrap}
+@media(max-width:1024px){
+ .cart-page .ssl-box .ssl-content{grid-template-columns:minmax(0,1fr)}
+ .cart-page .ssl-box .ssl-content .ssl-right{margin:0!important}
+ .cart-page .ssl-box .ssl-content .ssl-right .right-content{overflow:visible}
+}
+@media(max-width:560px){
+ .cart-page .domain-box .domain-search{display:flex;flex-wrap:wrap;gap:10px}
+ .cart-page .domain-box .domain-search>.el-input{flex:1 1 100%;width:100%!important}
+ .cart-page .domain-box .domain-search .search-button{width:100%!important;margin:0!important}
+ .cart-page .domain-box .domain-list .domain-item{flex-direction:column;align-items:stretch}
+ .cart-page .domain-box .domain-item .item-right{justify-content:space-between}
+ .cart-page .domain-box .domain-content .domain-one,
+ .cart-page .domain-box .domain-content .domain-one-list{height:auto!important}
+}
+
 /* Read failures remain legible under V10's responsive root font size. */
 .cart-page:not([data-cra1-native-module]) .cl-price-pending { color:var(--cui-muted, var(--cui-title)); font-size:13px; line-height:1.5; }
 .cart-page:not([data-cra1-native-module]) .cl-native-purchase-jump {
@@ -2843,4 +2931,17 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cl-cart-disk-compac
 @media (max-width: 767px) {
   .cart-page:not([data-cra1-native-module]) .cl-m-cart-invalid:has(.cra1-cart-read-error-text) { flex-wrap: wrap; }
   .cart-page:not([data-cra1-native-module]) .cl-m-cart-invalid .cra1-cart-read-error-text { flex-basis: 100%; }
+  html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .el-message {
+    box-sizing: border-box;
+    min-width: 0;
+    width: calc(100vw - 24px);
+    max-width: 480px;
+    align-items: flex-start;
+  }
+  html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .el-message .el-message__content {
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
 }

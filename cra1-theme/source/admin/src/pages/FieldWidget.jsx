@@ -592,11 +592,11 @@ function RowsField({ field, value, onChange, config }) {
             >
               <DragHandle {...drag.handleProps(i, '拖拽排序：' + titleOf(it))} />
               <div className="cra1-row-content flex min-w-0 flex-1 items-center gap-1.5">{(it.row.image||it.row.img)&&<img src={it.row.image||it.row.img} alt="" className="h-10 w-14 shrink-0 rounded object-cover"/>}
-                <span className={cn('truncate text-[13px]', it.hidden ? 'text-muted-foreground line-through opacity-60' : 'text-ink')}>
+                <span title={titleOf(it)} className={cn('cra1-row-title truncate text-[13px]', it.hidden ? 'text-muted-foreground line-through opacity-60' : 'text-ink')}>
                   {it.child ? '└ ' : ''}{titleOf(it)}
                 </span>
                 {subtitleOf(it) && (
-                  <span className="cra1-row-secondary hidden shrink-0 truncate text-[11px] text-muted-foreground sm:block">
+                  <span title={subtitleOf(it)} className="cra1-row-secondary hidden truncate text-[11px] text-muted-foreground sm:block">
                     {subtitleOf(it)}
                   </span>
                 )}

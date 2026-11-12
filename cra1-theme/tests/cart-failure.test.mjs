@@ -131,3 +131,25 @@ test('scrolling after a failed catalog read cannot start uncontrolled retries',(
  f.page.scrollBottom();f.page.needScroll()
  assert.equal(reads,0);assert.equal(f.page.goodsParmas.page,1)
 })
+
+test('SSL quote failures preserve selection but block checkout until an explicit successful retry',async()=>{
+ const f=catalogFixture(),p=f.page;
+ p.sslSelectedProduct={id:5,max_domain:0};p.product_id=8;
+ f.env.calcPrice=()=>Promise.reject({data:{msg:'private provider exception'}});
+ await p.calcSslPrice();assert.equal(p.sslQuoteReady,false);assert.equal(p.sslLoadingPrice,false);
+ assert.match(p.sslQuoteError,/重试/);p.goBuySsl();
+ f.env.calcPrice=()=>Promise.resolve({data:{status:200,data:{price:10,price_total:20,preview:[]}}});
+ p.sslQty=2;await p.calcSslPrice();assert.equal(p.sslQuoteReady,true);assert.equal(p.sslCalcTotalPrice,20);
+ assert.equal(p.sslQuoteError,'');p.sslQty=3;p.goBuySsl();
+ assert.notEqual(p.sslQuoteSelection,p.sslSelectionKey());
+});
+test('SSL older responses cannot replace a more recent selection or free quote',async()=>{
+ const f=catalogFixture(),p=f.page,pending=[];
+ p.sslSelectedProduct={id:5,max_domain:0};p.product_id=8;
+ f.env.calcPrice=()=>new Promise((resolve,reject)=>pending.push({resolve,reject}));
+ p.sslQty=2;const older=p.calcSslPrice();p.sslQty=3;const newer=p.calcSslPrice();
+ pending[1].resolve({data:{status:200,data:{price:0,price_total:0,preview:[]}}});await newer;
+ pending[0].resolve({data:{status:200,data:{price:10,price_total:20,preview:[]}}});await older;
+ assert.equal(p.sslQuoteReady,true);assert.equal(p.sslCalcTotalPrice,0);assert.equal(p.sslQty,3);
+ assert.equal(p.sslQuoteSelection,p.sslSelectionKey());
+});

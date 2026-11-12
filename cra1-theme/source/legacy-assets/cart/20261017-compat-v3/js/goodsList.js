@@ -65,7 +65,7 @@
         this.urlProductId = this.getQuery("product_id") * 1 || 0;
         this.initializeProductEntry();
         this.host_id = this.getQuery("host_id") * 1;
-        this.domainInput = this.getQuery("domain");
+        this.domainInput = this.getQuery("domain") || "";
       },
       mounted() {
         // 融合页：消息桥 / 历史状态 / 视口监听
@@ -149,6 +149,8 @@
           railPrice: { currency: "", suffix: "", calcText: "", originText: "", hasDiscount: false },
           railPreview: [], // 当前配置明细（桥接 preview）
           railCoupon: "",
+          railCouponApplied: "",
+          railCouponBusy: false,
           railFallbackText: "",
           gridConf: null,      // 快照 v2：{desktop_columns, tablet_columns, mobile_columns, rows_per_load, desc_max_lines}
           cardSections: null, // 快照 v2：卡片展示区块（顺序+显隐）
@@ -210,6 +212,11 @@
           faillList: [],
           activeNames: [],
           domainConfig: {},
+          domainConfigState: "idle",
+          domainSettingsRequestId: 0,
+          domainSearchRequestId: 0,
+          domainBatchRequestId: 0,
+          domainEntryPending: true,
           isShowUpload: false,
           fileName: "",
           fileContent: "",
@@ -241,6 +248,10 @@
           sslLevelNum: 0,                // 等级折扣
           sslEventDiscount: 0,           // 活动折扣
           sslLoadingPrice: false,        // 价格计算加载状态
+          sslQuoteRequest: 0,
+          sslQuoteReady: false,
+          sslQuoteError: "",
+          sslQuoteSelection: "",
           sslPromo: {                    // 优惠参数
             scene: "new",
             promo_code: "",
@@ -282,6 +293,7 @@
       },
       computed: {
         railStatusText() {
+          if (this.railAvailability === "error") return "配置费用计算失败，请重试。";
           if (this.railAvailability === "unavailable") return "暂未获取到可用订购周期，请刷新页面或选择其他商品。";
           return this.railDurationRequired && !this.railDurations.length ? "正在加载订购周期…" : "正在计算配置费用…";
         },
@@ -574,6 +586,10 @@
         // 计算 SSL 价格
         async calcSslPrice() {
           if (!this.sslSelectedProduct) return;
+          const request = ++this.sslQuoteRequest;
+          const selection = this.sslSelectionKey();
+          this.sslQuoteReady = false;
+          this.sslQuoteError = "";
           this.sslLoadingPrice = true;
           try {
             let params = {
@@ -594,6 +610,9 @@
               params.config_options.san_count = 0;
             }
             const res = await calcPrice(params);
+            if (request !== this.sslQuoteRequest || selection !== this.sslSelectionKey()) return;
+            const valid = value => value !== null && value !== undefined && value !== "" && Number.isFinite(Number(value)) && Number(value) >= 0;
+            if (Number(res.data?.status) !== 200 || !valid(res.data?.data?.price) || !valid(res.data?.data?.price_total)) throw new Error("invalid quote");
             const newPrice = res.data.data.price * 1;
             // 只有当价格真正变化时才更新，避免触发不必要的 watcher
             if (Math.abs(this.sslTotalPrice - newPrice) > 0.01) {
@@ -606,11 +625,19 @@
             this.sslEventDiscount = res.data.data.price_event_promotion_discount * 1 || 0;
             // 配置费用明细
             this.sslPreview = res.data.data.preview || [];
+            this.sslQuoteSelection = selection;
+            this.sslQuoteReady = true;
           } catch (error) {
-            this.$message.error(error.data.msg);
+            if (request !== this.sslQuoteRequest || selection !== this.sslSelectionKey()) return;
+            this.sslQuoteError = "配置费用计算失败，请重试。";
+            this.sslPreview = [];
           } finally {
-            this.sslLoadingPrice = false;
+            if (request === this.sslQuoteRequest) this.sslLoadingPrice = false;
           }
+        },
+        sslSelectionKey() {
+          return JSON.stringify([this.product_id, this.sslSelectedProduct?.id, this.sslWildcardCount,
+            this.sslSanCount, this.sslYears, this.sslQty, this.sslPromo.promo_code, this.sslPromo.event_promotion]);
         },
         // SSL 活动变更
         sslEventChange(eventObj) {
@@ -633,7 +660,8 @@
         },
         // SSL 立即购买
         goBuySsl() {
-          if (!this.sslSelectedProduct) return;
+          if (!this.sslSelectedProduct || !this.sslQuoteReady || this.sslLoadingPrice
+              || this.sslQuoteSelection !== this.sslSelectionKey()) return;
           let params = {
             id: this.product_id,
             config_options: {
@@ -774,28 +802,60 @@
           this.fileContent = "";
           this.isShowUpload = false;
         },
-        // 获取域名设置
-        getDomainSet() {
-          domainSetting().then((res) => {
-            // 域名插件未配置时 data 可能为 undefined（示例站无该插件）：守卫后走默认值，不让分支崩
-            const cfg = res.data.data || {};
-            this.domainConfig = cfg;
-            this.selectSuffix = cfg.default_search_domain || "";
-            const suffixArr = this.suffixList.reduce((all, cur) => {
-              all.push(cur.suffix);
-              return all;
-            }, []);
-            if (
-              suffixArr.length > 0 &&
-              !suffixArr.includes(this.selectSuffix)
-            ) {
-              this.selectSuffix = this.suffixList[0].suffix;
-            }
-            // 官网跳转查询
-            if (location.href.indexOf("suffix") !== -1) {
-              this.selectSuffix = this.getQuery("suffix");
-              this.handelDomainSearch();
-            }
+        domainScopeKey() {
+          return [this.select_first_obj.id, this.select_second_obj.id, this.host_id].join(":");
+        },
+        resetDomainState(cancelEntry = false) {
+          this.domainSettingsRequestId++;
+          this.domainSearchRequestId++;
+          this.domainBatchRequestId++;
+          this.domainConfigState = "idle";
+          this.domainConfig = {};
+          this.suffixList = [];
+          this.selectSuffix = "";
+          this.domainList = [];
+          this.availList = [];
+          this.unavailList = [];
+          this.faillList = [];
+          this.isSearching = false;
+          this.batchLoading = false;
+          if (cancelEntry) this.domainEntryPending = false;
+        },
+        // 后缀与设置必须属于当前域名分类，切换分类后的迟到响应不再生效。
+        domainSettingsCurrent(requestId, scope) {
+          return requestId === this.domainSettingsRequestId && this.isDomain && scope === this.domainScopeKey();
+        },
+        async getDomainSet(requestId, scope) {
+          const res = await domainSetting();
+          if (!this.domainSettingsCurrent(requestId, scope)) return false;
+          const cfg = res?.data?.data;
+          if (Number(res?.data?.status) !== 200 || !cfg || typeof cfg !== "object" || Array.isArray(cfg)) {
+            throw new Error("domain settings unavailable");
+          }
+          this.domainConfig = cfg;
+          const defaultSuffix = String(cfg.default_search_domain || "").trim().toLowerCase();
+          this.selectSuffix = this.suffixList.find(item => item.suffix === defaultSuffix)?.suffix || this.suffixList[0].suffix;
+          return true;
+        },
+        loadDomainResultPrices(list, current) {
+          let warned = false;
+          list.filter(item => item.avail === 1).forEach(item => {
+            domainPrice({ name: item.name, host_id: this.host_id }).then(res => {
+              if (!current()) return;
+              const prices = res?.data?.data;
+              if (Number(res?.data?.status) !== 200 || !Array.isArray(prices) || !prices.length || prices[0].buyprice == null) {
+                throw new Error("domain price unavailable");
+              }
+              item.priceArr = prices;
+              item.showPrice = prices[0].buyprice;
+            }).catch(() => {
+              if (!current()) return;
+              item.showPrice = "—";
+              if (!warned) this.$message.warning("部分域名价格暂时无法读取，请重新查询。");
+              warned = true;
+            }).finally(() => {
+              if (current()) item.priceLoading = false;
+            });
           });
         },
         // 是否已经加入购物车
@@ -842,11 +902,16 @@
           }
         },
         // 批量查询域名
-        batchSearchDomain() {
+        async batchSearchDomain() {
+          if (this.batchLoading || !this.isDomain) return;
           if (!this.textarea2) {
             this.$message.warning(lang.template_text140);
             return;
           }
+          if (this.domainConfigState !== "ready") {
+            if (this.domainConfigState === "loading" || !await this.getSuffix(false)) return;
+          }
+          if (Number(this.domainConfig.batch_search_domain) !== 1) return;
           // 解析输入框中的换行 把换行替换成\n 传字符串
           const params = this.textarea2
             .replace(/[\r\n]/g, ",")
@@ -863,31 +928,26 @@
             return;
           }
           this.batchLoading = true;
-          domainBatch({ domains: params })
+          const requestId = ++this.domainBatchRequestId;
+          const scope = this.domainScopeKey();
+          const current = () => requestId === this.domainBatchRequestId && this.isDomain && scope === this.domainScopeKey();
+          return domainBatch({ domains: params })
             .then((res) => {
-              this.availList = res.data.data.avail.map((item) => {
-                item.priceArr = [];
-                item.showPrice = 0;
-                item.priceLoading = true;
-                return item;
-              });
-              // 查询可注册的域名价格
-              this.availList.forEach((item) => {
-                domainPrice({ name: item.name, host_id: this.host_id })
-                  .then((res) => {
-                    item.priceArr = res.data.data || [];
-                    item.showPrice = res.data.data[0]?.buyprice || 0;
-                  })
-                  .finally(() => {
-                    item.priceLoading = false;
-                  });
-              });
-              this.unavailList = res.data.data.unavail;
-              this.faillList = res.data.data.fail;
+              if (!current()) return;
+              const result = res?.data?.data;
+              if (Number(res?.data?.status) !== 200 || !Array.isArray(result?.avail) || !Array.isArray(result?.unavail) || !Array.isArray(result?.fail)) {
+                throw new Error("domain batch unavailable");
+              }
+              this.availList = result.avail.map(item => ({ ...item, avail: 1, priceArr: [], showPrice: "—", priceLoading: true }));
+              this.loadDomainResultPrices(this.availList, current);
+              this.unavailList = result.unavail;
+              this.faillList = result.fail;
             })
-            .catch((err) => { })
+            .catch(() => {
+              if (current()) this.$message.warning("域名查询暂时未完成，请重试。");
+            })
             .finally(() => {
-              this.batchLoading = false;
+              if (current()) this.batchLoading = false;
             });
         },
         handleBatchChange(val) {
@@ -1085,101 +1145,127 @@
           }
         },
         // 获取后缀
-        async getSuffix() {
+        async getSuffix(autoSearch = true) {
           // DA购买域名需要传入产品ID筛选对于的后缀
+          const requestId = ++this.domainSettingsRequestId;
+          const scope = this.domainScopeKey();
+          this.domainSearchRequestId++;
+          this.domainBatchRequestId++;
+          this.domainConfigState = "loading";
+          this.domainConfig = {};
+          this.suffixList = [];
+          this.selectSuffix = "";
+          this.domainList = [];
+          this.isSearching = true;
+          this.batchLoading = false;
+          let ready = false;
           try {
             const res = await domainSuffix(this.host_id);
-            this.suffixList = res.data.data || [];
-            this.getDomainSet();
-          } catch (error) {
-            this.getDomainSet();
+            if (!this.domainSettingsCurrent(requestId, scope)) return false;
+            if (Number(res?.data?.status) !== 200 || !Array.isArray(res?.data?.data)) {
+              throw new Error("domain suffixes unavailable");
+            }
+            this.suffixList = res.data.data.filter(item => item && typeof item.suffix === "string" && /^\.[^.\s/?:#\\]+(?:\.[^.\s/?:#\\]+)*$/.test(item.suffix.trim()))
+              .map(item => ({ ...item, suffix: item.suffix.trim().toLowerCase() }));
+            if (!this.suffixList.length) {
+              this.domainConfigState = "empty";
+              this.$message.warning("暂未提供可查询的域名后缀，请稍后重试或联系客服。");
+              return false;
+            }
+            ready = await this.getDomainSet(requestId, scope);
+            if (ready) this.domainConfigState = "ready";
+          } catch (_) {
+            if (this.domainSettingsCurrent(requestId, scope)) {
+              this.domainConfigState = "error";
+              this.suffixList = [];
+              this.selectSuffix = "";
+              this.$message.warning("暂时无法读取域名查询设置，请点击查询重试。");
+            }
+          } finally {
+            if (this.domainSettingsCurrent(requestId, scope)) this.isSearching = false;
           }
+          if (ready && this.domainEntryPending) {
+            this.domainEntryPending = false;
+            const suffix = this.getQuery("suffix");
+            if (suffix !== null) {
+              const entrySuffix = suffix.trim().toLowerCase();
+              this.selectSuffix = this.suffixList.find(item => item.suffix === entrySuffix)?.suffix || "";
+              if (!this.selectSuffix) {
+                this.$message.warning("请选择当前可用的域名后缀后查询。");
+                return false;
+              }
+            }
+            const domain = this.getQuery("domain");
+            if (autoSearch && domain !== null && domain.trim()) await this.handelDomainSearch();
+          }
+          return ready;
         },
         // 选择后缀
         handelSelectSuffix(item) {
           this.selectSuffix = item;
         },
-        // 域名截断 return domain suffix baidu.com => baidu .com
+        // 完整域名按当前可用后缀解析，兼容 .co.uk 等多级后缀。
         getDomainSuffix(str) {
-          const domainStr = str.trim();
-          const domainRegex = /^[^.]+(\.[^.]+)+$/;
-          const domainData = {
-            domain: domainStr,
-            suffix: "",
-          };
-          if (domainRegex.test(domainStr)) {
-            const parts = domainStr.split(".");
-            domainData.domain = parts[0];
-            domainData.suffix =
-              parts.length >= 2 ? "." + parts.slice(1).join(".") : "";
-          }
-          return domainData;
+          const value = String(str || "").trim();
+          const match = this.suffixList.slice().sort((a, b) => b.suffix.length - a.suffix.length)
+            .find(item => value.toLowerCase().endsWith(item.suffix));
+          if (match) return { domain: value.slice(0, -match.suffix.length), suffix: match.suffix };
+          const dot = value.indexOf(".");
+          return { domain: dot < 0 ? value : value.slice(0, dot), suffix: dot < 0 ? "" : value.slice(dot).toLowerCase() };
         },
-        handelDomainSearch() {
+        async handelDomainSearch() {
+          if (this.isSearching || !this.isDomain) return;
           // 去除前后空格
-          this.domainInput = this.domainInput.trim();
+          this.domainInput = String(this.domainInput || "").trim();
           if (!this.domainInput) {
             this.$message.warning(lang.template_text140);
             return;
           }
-          const suffix = this.getDomainSuffix(this.domainInput).suffix;
-          if (
-            suffix &&
-            this.suffixList.find((item) => item.suffix === suffix)
-          ) {
-            this.selectSuffix = suffix;
+          if (this.domainConfigState !== "ready" && !await this.getSuffix(false)) return;
+          const parsed = this.getDomainSuffix(this.domainInput);
+          const selected = this.suffixList.find(item => item.suffix === (parsed.suffix || this.selectSuffix));
+          if (!selected) {
+            this.$message.warning("请选择当前可用的域名后缀后查询。");
+            return;
           }
+          if (!parsed.domain) {
+            this.$message.warning(lang.template_text140);
+            return;
+          }
+          this.domainEntryPending = false;
+          this.selectSuffix = selected.suffix;
+          this.domainInput = parsed.domain;
           this.isShowSuffixBox = false;
           this.isSearching = true;
           this.domainList = [];
-          this.domainInput = this.getDomainSuffix(this.domainInput).domain;
-          domainSearch({
-            domain: this.domainInput,
-            suffix: this.selectSuffix,
+          const requestId = ++this.domainSearchRequestId;
+          const scope = this.domainScopeKey();
+          const current = () => requestId === this.domainSearchRequestId && this.isDomain && scope === this.domainScopeKey();
+          return domainSearch({
+            domain: parsed.domain,
+            suffix: selected.suffix,
             host_id: this.host_id,
           })
             .then((res) => {
-              if (res.data.status === 200) {
-                const list = res.data.data;
-                this.domainList = list.map((item) => {
-                  item.priceArr = [];
-                  item.showPrice = 0;
-                  item.priceLoading = true;
-
-                  return item;
+              if (!current()) return;
+              if (Number(res?.data?.status) !== 200 || !Array.isArray(res?.data?.data)) {
+                throw new Error("domain search unavailable");
+              }
+              this.domainList = res.data.data.map(item => ({ ...item, priceArr: [], showPrice: "—", priceLoading: item.avail === 1 }));
+              this.loadDomainResultPrices(this.domainList, current);
+              if (Number(selected.allow_zh) === 0 && /[\u4e00-\u9fa5]/.test(parsed.domain)) {
+                this.domainList.unshift({
+                  name: parsed.domain + selected.suffix,
+                  avail: -2,
+                  description: lang.template_text143,
                 });
-                this.isSearching = false;
-                this.domainList.forEach((item) => {
-                  if (item.avail === 1) {
-                    domainPrice({ name: item.name, host_id: this.host_id })
-                      .then((res) => {
-                        item.priceArr = res.data.data || [];
-                        item.showPrice = res.data.data[0]?.buyprice || 0;
-                      })
-                      .finally(() => {
-                        item.priceLoading = false;
-                      });
-                  }
-                });
-                // 判断当前选中的域名后缀是否支持中文
-                const isChinese =
-                  this.suffixList.find((item) => {
-                    return item.suffix === this.selectSuffix;
-                  }).allow_zh === 0;
-                // 判断输入的是否是中文
-                const chineseReg = /[\u4e00-\u9fa5]/g;
-                if (isChinese && chineseReg.test(this.domainInput)) {
-                  this.domainList.unshift({
-                    // 添加一条不支持中文的提示
-                    name: this.domainInput + this.selectSuffix,
-                    avail: -2,
-                    description: lang.template_text143,
-                  });
-                }
               }
             })
-            .catch((err) => {
-              this.isSearching = false;
+            .catch(() => {
+              if (current()) this.$message.warning("域名查询暂时未完成，请重试。");
+            })
+            .finally(() => {
+              if (current()) this.isSearching = false;
             });
         },
         // 获取域名价格
@@ -1255,6 +1341,7 @@
         },
         // 重置二级分组状态并作废旧请求
         resetSecondGroupState() {
+          this.resetDomainState(true);
           this.secondGroupRequestId++;
           this.second_group_list = [];
           this.select_second_obj = {
@@ -1374,6 +1461,7 @@
         },
         // 初始化
         async initData() {
+          this.resetDomainState();
           this.catalogError = "";
           this.goodSLoading = true;
           this.resetProductSelection();
@@ -1464,6 +1552,7 @@
         },
         // 点击二级分类
         selectSecondType(val) {
+          this.resetDomainState(true);
           if (val !== this.select_second_obj.id) this.clearProductEntry();
           this.resetProductSelection();
           this.updateUrlParam("product_id", null, "replace");
@@ -1644,6 +1733,8 @@
           this.railDurationRequired = true;
           this.railPrice = { currency: "", suffix: "", calcText: "", originText: "", hasDiscount: false };
           this.railCoupon = "";
+          this.railCouponApplied = "";
+          this.railCouponBusy = false;
           this.railDurations = [];
           this.railDurationId = 0;
           this.railPreview = [];
@@ -1844,6 +1935,13 @@
                 this.$message.warning('暂未收到加购结果，请先查看购物车，再决定是否重试。');
               }
               break;
+            case "rail-coupon-result":
+              this.railCouponBusy = false;
+              this.railCouponApplied = String(data.applied || "");
+              if (data.success) this.railCoupon = this.railCouponApplied;
+              if (data.message) this.$message[data.success ? "success" : "error"](
+                window.CRA1Shared.Errors.message(data.message, { fallback: "优惠码暂时无法使用，请重试" }));
+              break;
             default:
               break;
           }
@@ -1852,6 +1950,7 @@
         applyRailData(p) {
           this.railAvailability = p.availability || "ready";
           this.railLoading = !!this.railAddRequestId || this.railAvailability !== "ready";
+          if (p.couponApplied !== undefined) this.railCouponApplied = String(p.couponApplied || "");
           this.railDurationRequired = p.durationRequired !== false;
           if (Array.isArray(p.durations)) this.railDurations = p.durations;
           if (p.current !== undefined && p.current !== null) {
@@ -1901,9 +2000,16 @@
         },
         railApplyCoupon() {
           const code = String(this.railCoupon || "").trim();
-          if (!code) return;
+          if (!code || this.railCouponBusy) return;
+          this.railCouponBusy = true;
           this.railLoading = true;
           this.railPost("rail-set", { field: "coupon", value: code });
+        },
+        railRemoveCoupon() {
+          if (this.railCouponBusy) return;
+          this.railCouponBusy = true;
+          this.railLoading = true;
+          this.railPost("rail-set", { field: "coupon-remove" });
         },
         railAddCart() {
           if (this.railLoading || this.railAvailability !== "ready") return;
@@ -1955,7 +2061,7 @@
         },
         railRetryBridge() {
           this.railLoading = true;
-          this.railPost("rail-init");
+          this.railPost(this.railAvailability === 'error' ? "rail-requote" : "rail-init");
         },
         railConfirmAfterAdd() {
           this.$confirm(
@@ -2047,6 +2153,7 @@
         },
       },
       beforeDestroy() {
+        this.resetDomainState(true);
         this.moduleSelectionRequestId++;
         this.__dockObserver?.disconnect();
         clearTimeout(this.railAddTimer);

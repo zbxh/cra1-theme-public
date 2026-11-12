@@ -25,10 +25,11 @@ import { watchModuleFailure } from './module-boundary'
  * （html font-size = clientWidth/19.2）下会比 default 主题偏大。样式收敛由
  * cra1-shell.css 的 .cra1-module-view 作用域规则负责。
  */
-export function ModuleView({ url, params, title, description, empty, onLoaded, deps = 'list' }) {
+export function ModuleView({ url, params, title, description, empty, onLoaded, deps = 'list', moduleName }) {
   const hostRef = useRef(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [warning, setWarning] = useState('')
   const [html, setHtml] = useState('')
 
   // params 是对象，直接进依赖会每次渲染都触发请求；用序列化值做依赖
@@ -38,11 +39,12 @@ export function ModuleView({ url, params, title, description, empty, onLoaded, d
     let alive = true
     setLoading(true)
     setError('')
+    setWarning('')
     setHtml('')
     // 模块模板的 JS 会以裸标识符引用主题组件（pagination / payDialog…），
     // 必须先确保这些全局绑定就绪，否则 Vue 挂载会抛 "xxx is not defined"，
     // 页面上会残留未编译的 {{lang.xxx}}。
-    const ready = window.CRA1ModuleDeps ? window.CRA1ModuleDeps.ensure(deps) : Promise.resolve()
+    const ready = window.CRA1ModuleDeps ? window.CRA1ModuleDeps.ensure(deps, moduleName) : Promise.resolve()
     // 只请求模块渲染接口本身：即使模块的状态/实例接口不可用（产品状态会显示
     // 为故障），只要 /host/:id/view 能返回 HTML，实例管理界面就必须正常渲染。
     Promise.all([ready, get(url, JSON.parse(paramsKey))])
@@ -62,7 +64,7 @@ export function ModuleView({ url, params, title, description, empty, onLoaded, d
         if (alive) setLoading(false)
       })
     return () => { alive = false }
-  }, [url, paramsKey, deps])
+  }, [url, paramsKey, deps, moduleName])
 
   useEffect(() => {
     const host = hostRef.current
@@ -101,24 +103,26 @@ export function ModuleView({ url, params, title, description, empty, onLoaded, d
     host.addEventListener('click', readCredentials)
 
     const scriptController=new AbortController()
-    let reapTimer, disposed=false, boundary
+    let disposed=false, boundary, stopCharts
     function dispose() {
       if(disposed)return
-      disposed=true;clearTimeout(reapTimer);scriptController.abort();credentialController.abort();host.removeEventListener('click',readCredentials)
+      disposed=true;scriptController.abort();credentialController.abort();host.removeEventListener('click',readCredentials)
+      stopCharts?.()
       const instances=new Set([...(boundary?.instances || []),...[host,...host.querySelectorAll('*')].map(el=>el.__vue__).filter(Boolean)])
+      boundary?.dispose()
       instances.forEach(vm=>{if(!vm._isDestroyed)vm.$destroy()})
     }
-    boundary = watchModuleFailure(host, () => { if (!disposed) { dispose(); setError('页面错误，请刷新重试') } })
+    boundary = watchModuleFailure(host,
+      () => { if (!disposed) { dispose(); setError('页面暂时无法加载，请刷新重试') } },
+      kind => { if (!disposed) setWarning(kind === 'read'
+        ? '部分内容暂时无法读取，请重试当前查询，或刷新页面。'
+        : '当前页面发生错误，请刷新页面后确认操作结果。') },
+    )
     mountModuleScripts(host,{signal:scriptController.signal,enabled:src=>!(src.split('?')[0]==='/plugins/addon/flow_packet/template/clientarea/flowPacketUsage.js' && window.__CRA1_RUNTIME__?.features?.flow_packet!==true)})
-      .then(()=>{if(!scriptController.signal.aborted)onLoaded?.(host)})
+      .then(()=>{if(!scriptController.signal.aborted){boundary.ready();stopCharts=window.CRA1ModuleDeps?.observeCharts(host);onLoaded?.(host)}})
       .catch(()=>{if(!scriptController.signal.aborted){dispose();setError('模块所需资源未能加载。请重试，或联系管理员检查模块及网络。')}})
 
-    // 原生模块接口失败时可能一直保留 loading；结束初始化并提示刷新。
-    reapTimer = setTimeout(() => {
-      if(!disposed && [...host.querySelectorAll('.pro-des-loading,.el-loading-mask')].some(el=>el.getBoundingClientRect().height>0)){dispose();setError('页面错误，请刷新重试')}
-    }, 12000)
-
-    return () => { dispose(); boundary.dispose() }
+    return dispose
 
     // onLoaded 由调用方每次渲染新建，纳入依赖会导致重复注入
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,10 +146,13 @@ export function ModuleView({ url, params, title, description, empty, onLoaded, d
         <CardContent className="space-y-4 p-5">
           <Alert tone="warning">
             <span className="inline-flex items-center gap-1.5 font-medium">
-              <AlertTriangle className="size-3.5" aria-hidden="true" />页面错误，请刷新重试
+              <AlertTriangle className="size-3.5" aria-hidden="true" />{error}
             </span>
           </Alert>
           <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={() => { window.location.reload() }}>
+              <RefreshCw className="size-3.5" />刷新重试
+            </Button>
             <Button variant="outline" size="sm" onClick={() => { window.location.href = '/productList.htm' }}>
               <ArrowLeft className="size-3.5" />返回产品列表
             </Button>
@@ -162,6 +169,12 @@ export function ModuleView({ url, params, title, description, empty, onLoaded, d
   return (
     <div className="cra1-module-view" data-module-title={title || ''}>
       {description && <p className="mb-3 text-[13px] text-muted-foreground">{description}</p>}
+      {warning && <Alert tone="warning" className="mb-3 flex flex-wrap items-center justify-between gap-3" role="alert">
+        <span>{warning}</span>
+        <Button variant="outline" size="sm" onClick={() => { window.location.reload() }}>
+          <RefreshCw className="size-3.5" />刷新页面
+        </Button>
+      </Alert>}
       <div ref={hostRef} />
     </div>
   )

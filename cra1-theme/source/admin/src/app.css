@@ -120,11 +120,17 @@ button:disabled { cursor:not-allowed; }
 @container(max-width:600px){.tree-editor-row{height:auto;min-height:44px;flex-wrap:wrap;row-gap:4px;padding-top:4px;padding-bottom:4px;padding-left:8px!important}.tree-editor-row~ul{margin-left:12px!important}.tree-editor-controls{flex-basis:100%;justify-content:flex-end}.tree-editor-heading,.tree-editor-meta,.tree-editor-leaf-space{display:none}}
 /* Keep titles readable without shrinking touch targets in narrow editor columns. */
 .cra1-sort-list,.cra1-product-entries{container-type:inline-size}
+/* A summary starts with no intrinsic claim on the row. Long descriptions and
+   URLs must truncate inside the content area, keeping the title and actions visible. */
+.cra1-row-content>.cra1-row-title{flex:0 1 auto;min-width:0}
+.cra1-row-content:has(>.cra1-row-secondary)>.cra1-row-title{max-width:60%}
+.cra1-row-content>.cra1-row-secondary{flex:1 1 0;min-width:0}
 @container(max-width:600px){
   .cra1-flat-row:has(>.cra1-row-actions){height:auto;min-height:44px;flex-wrap:wrap;row-gap:4px;padding-block:6px}
   .cra1-flat-row>.cra1-row-content{flex:1 1 calc(100% - 60px);min-width:0}
   .cra1-flat-row>.cra1-row-actions{flex:1 0 100%;flex-wrap:wrap;justify-content:flex-end}
   .cra1-flat-row .cra1-row-secondary{display:none}
+  .cra1-row-content:has(>.cra1-row-secondary)>.cra1-row-title{max-width:100%}
   .cra1-product-entry{display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 8px;padding:6px 8px}
   .cra1-product-entry-label{grid-column:2;overflow-wrap:anywhere}
   .cra1-product-entry-actions{grid-column:2;flex-wrap:wrap;justify-content:flex-end}

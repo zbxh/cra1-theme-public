@@ -9,11 +9,11 @@
   "shared_global": "CRA1Shared",
   "member_api_prefix": "/console/v1/cra1-theme/",
   "session_cookie": "CRA1THEMEID",
-  "release": "20261109-cra1-v17-6-8",
+  "release": "20261111-cra1-domain-list-fixes-v4",
   "release_channel": "test",
   "security_epoch": 1,
   "version": "v17.6.8",
-  "backend_root": "cra1-theme/backend/releases/20261109-cra1-v17-6-8",
+  "backend_root": "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4",
   "installation_combinations": [
     {
       "system": "10.7.4",
@@ -76,12 +76,12 @@
   ],
   "release_blockers": [],
   "asset_bases": {
-    "member": "/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8",
-    "native": "/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8",
-    "cart": "/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8",
-    "shared": "/cra1-shared/releases/20261109-cra1-v17-6-8",
-    "website": "/web/cra1/releases/20261109-cra1-v17-6-8",
-    "admin": "assets/releases/20261109-cra1-v17-6-8"
+    "member": "/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4",
+    "native": "/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4",
+    "cart": "/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4",
+    "shared": "/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4",
+    "website": "/web/cra1/releases/20261111-cra1-domain-list-fixes-v4",
+    "admin": "assets/releases/20261111-cra1-domain-list-fixes-v4"
   },
   "references": {
     "public/cart/template/mobile/cra1/api": "public/cart/template/pc/cra1/api",
@@ -169,24 +169,24 @@
     "public/clientarea/template/pc/cra1/lang/zh-cn/index.js": "public/clientarea/template/pc/default/lang/zh-cn/index.js",
     "public/clientarea/template/pc/cra1/lang/zh-hk/element-lang.js": "public/clientarea/template/pc/default/lang/zh-hk/element-lang.js",
     "public/clientarea/template/pc/cra1/lang/zh-hk/index.js": "public/clientarea/template/pc/default/lang/zh-hk/index.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/account.js": "public/clientarea/template/pc/default/api/account.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/certification.js": "public/clientarea/template/pc/default/api/certification.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/goods.js": "public/clientarea/template/pc/default/api/goods.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/goodsList.js": "public/clientarea/template/pc/default/api/goodsList.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/home.js": "public/clientarea/template/pc/default/api/home.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/orderDetail.js": "public/clientarea/template/pc/default/api/orderDetail.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/product.js": "public/clientarea/template/pc/default/api/product.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/security.js": "public/clientarea/template/pc/default/api/security.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/security_group.js": "public/clientarea/template/pc/default/api/security_group.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/shopping.js": "public/clientarea/template/pc/default/api/shopping.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/template.js": "public/clientarea/template/pc/default/api/template.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/withdraw.js": "public/clientarea/template/pc/default/api/withdraw.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/components/resetAuth/resetAuth.css": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.css",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/components/resetAuth/resetAuth.js": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/components/resetAuth/resetAuth.less": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.less",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/components/unsubscribe/unsubscribe.css": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.css",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/components/unsubscribe/unsubscribe.js": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.js",
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/components/unsubscribe/unsubscribe.less": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.less",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/account.js": "public/clientarea/template/pc/default/api/account.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/certification.js": "public/clientarea/template/pc/default/api/certification.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/goods.js": "public/clientarea/template/pc/default/api/goods.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/goodsList.js": "public/clientarea/template/pc/default/api/goodsList.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/home.js": "public/clientarea/template/pc/default/api/home.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/orderDetail.js": "public/clientarea/template/pc/default/api/orderDetail.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/product.js": "public/clientarea/template/pc/default/api/product.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/security.js": "public/clientarea/template/pc/default/api/security.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/security_group.js": "public/clientarea/template/pc/default/api/security_group.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/shopping.js": "public/clientarea/template/pc/default/api/shopping.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/template.js": "public/clientarea/template/pc/default/api/template.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/withdraw.js": "public/clientarea/template/pc/default/api/withdraw.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/components/resetAuth/resetAuth.css": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.css",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/components/resetAuth/resetAuth.js": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/components/resetAuth/resetAuth.less": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.less",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/components/unsubscribe/unsubscribe.css": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.css",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/components/unsubscribe/unsubscribe.js": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.js",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/components/unsubscribe/unsubscribe.less": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.less",
     "public/clientarea/template/pc/cra1/theme": "public/clientarea/template/pc/default/theme",
     "public/clientarea/template/pc/cra1/utils/directive.js": "public/clientarea/template/pc/default/utils/directive.js",
     "public/clientarea/template/pc/cra1/utils/util.js": "public/clientarea/template/pc/default/utils/util.js",
@@ -3731,331 +3731,331 @@
       "sha256": "9f2c35f13a523171fd27b19c822e6eb437830855543decea39fed7629b05216f",
       "bytes": 4517
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Announcements/Endpoint.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Announcements/Endpoint.php": {
       "sha256": "055a9e49f29eb39c8a09c52302e43c82bd70d841c9c025ec73ce3bb55cb712a6",
       "bytes": 2893
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Announcements/LegacyMigration.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Announcements/LegacyMigration.php": {
       "sha256": "84e5e47f742955e9a816afc8cdc50582bc0d6aafa7c1e04d5e34831134dc3657",
       "bytes": 7377
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Announcements/NativeMember.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Announcements/NativeMember.php": {
       "sha256": "69f32a1bc5c083fcbf616a27b622ad98a3664236d1ea02a869123abb63195466",
       "bytes": 2200
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Announcements/PageCatalog.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Announcements/PageCatalog.php": {
       "sha256": "80ecf70c3c5fe30e6c2400212ee1194c869ba882dc1f817b2931b1fd34ecaaa7",
       "bytes": 8257
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/Capabilities.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/Capabilities.php": {
       "sha256": "b98d7cc539e14bbebf56d35646c5144563bfdf0eae4cb212bdf56bdbf9a17392",
       "bytes": 2209
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/Database.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/Database.php": {
       "sha256": "1f48da973d366c8ad732b7c192a070e4ee6c33822925f72a3201a41db3be5ca6",
       "bytes": 761
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/HomeProducts.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/HomeProducts.php": {
       "sha256": "7763e887e2d6be985868a8dc3170ad6e99ff25908ca00e8c6dd17c1cbf936311",
       "bytes": 3447
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/KnownContracts.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/KnownContracts.php": {
       "sha256": "96653324856dc02fc65dcf3c94ed8142ea8974bf2c487b6b189cc3799cc80002",
       "bytes": 2828
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/MenuAccess.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/MenuAccess.php": {
       "sha256": "7f2c416bac86c8c45bf5c37c8e24fd459186c5c943b726cd5a305f1a7b340e2a",
       "bytes": 1074
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/MfCloudAdapter.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/MfCloudAdapter.php": {
       "sha256": "999abc52b74ecec762771f0b1a7ba8d94827ac43f4e372de3cf96dc6bf878680",
       "bytes": 4381
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/ModuleAdapter.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/ModuleAdapter.php": {
       "sha256": "c16cb902e1142917fd6775e0262906070ccb072b2ca8e7f65e19a35d84eaf2b8",
       "bytes": 4897
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/NativeComponents.php": {
-      "sha256": "1368f44eb550c390fd65a36a5cb49044128ba898e82d87030cb006417f168b4c",
-      "bytes": 1619
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/NativeComponents.php": {
+      "sha256": "6828f78851179e98222f9d29cf0b77ae5649560f7f595a9f647a57ee4f5688b9",
+      "bytes": 1893
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/PanelDiskState.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/PanelDiskState.php": {
       "sha256": "480c48b7b4ffb6a7e5c4d0e1cd6bf01d63cc313a4f4ba75b96ea625de9d701a8",
       "bytes": 3153
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/PanelFlowTime.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/PanelFlowTime.php": {
       "sha256": "2cc9d83345a53670eab1bb6e28f101495bf31c4b258f4ecbfb7ad31da5a45b54",
       "bytes": 1105
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/PluginPages.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/PluginPages.php": {
       "sha256": "ce05ecf4333a8848846a9debc4216e9bcd9236f4ae65c4e5ac28fb6b8fab43b8",
       "bytes": 1322
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/admin-pages.js": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/admin-pages.js": {
       "sha256": "8f4c05a9cae727927a79e79ab89dc0d03b6f97cfadc2df3e398897387d8f3ca2",
       "bytes": 1890
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/native-components.json": {
-      "sha256": "244c9561eabcb414164cc961d34d06081ba9e759978434bf72a985966ef8e1f6",
-      "bytes": 2542
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/native-components.json": {
+      "sha256": "af5ad459c1299750479af481bb9a816ce4ec99caadc91fe13c1d2ae85521410f",
+      "bytes": 2752
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/native-contracts.json": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/native-contracts.json": {
       "sha256": "911e79d037804486a5aa5d7827c28923d186323b14a72e558ab45e265f4ff831",
       "bytes": 6781
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Compatibility/runtime.php": {
-      "sha256": "86a288094bb3d8324e287e58872cbacee4aa24081442cdcb723ea7fbf4b072d6",
-      "bytes": 22108
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Compatibility/runtime.php": {
+      "sha256": "89ba446c4bf12923ed29bd2b3d43025b43b1d2f2659fb1c54a81fb838d7ce0f3",
+      "bytes": 22218
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Context.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Context.php": {
       "sha256": "e0bb284114b22d822f59592103f80efc7f833b9f1134a2b9f96e419b673f4052",
       "bytes": 1330
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Diagnostics.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Diagnostics.php": {
       "sha256": "efdc3cad11d36645fc40b476d98cba2036cedde535756e1b24d90826047d1138",
       "bytes": 5633
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Failure.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Failure.php": {
       "sha256": "5800df5e1e55566b1788ce4eeba09fe0aff594eed0c95acde59f519d3308d14a",
       "bytes": 5031
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Files.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Files.php": {
       "sha256": "427a09feeaa77a086dffb52c91dd4442655c76f66e063f014ad91fce3e6695e8",
       "bytes": 4201
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Http/CustomerError.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Http/CustomerError.php": {
       "sha256": "eafb0dbd10a2f53fe04cb0cede29b4c39caa1fbcbe14e450fe18e209a33f9a04",
       "bytes": 6289
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Http/HookBootstrap.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Http/HookBootstrap.php": {
       "sha256": "9c7998226f446982cbd3308a77feaecda3fdd75b1fca8554379a406aa160c06b",
       "bytes": 2245
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Http/MemberController.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Http/MemberController.php": {
       "sha256": "f32eb14bf217296eaf4b7da4835b5a9c23b7a23b4da59eb3b6ee9b1aec3ff998",
       "bytes": 5660
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Http/MemberGuard.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Http/MemberGuard.php": {
       "sha256": "3d3304365a6f311852e8e460e99cb4404ed7e89fd6479af01fac0b11f516f2eb",
       "bytes": 4652
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Http/NativeAdmin.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Http/NativeAdmin.php": {
       "sha256": "4e598b2d86830d43b0eb12a711b2341702488eb8747aa2e330bec1314c2c2526",
       "bytes": 1896
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Http/OperationGuard.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Http/OperationGuard.php": {
       "sha256": "42be8391f37a9c568bc797ec47452c4ef8cead585a9b887efe6ce0bd446135be",
       "bytes": 569
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Http/Routes.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Http/Routes.php": {
       "sha256": "317afb4b6806c590eff21aa59d304d18bd456274b545ed9d32f3879b3c131339",
       "bytes": 1272
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Http/admin/ViewController.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Http/admin/ViewController.php": {
       "sha256": "75bfb549f533cd0862b3831f6b47dd2672687a2f7dff574cb3a9808e196d7cd5",
       "bytes": 561
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Http/home/MemberController.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Http/home/MemberController.php": {
       "sha256": "bfd0f577e474bfe3ecb06532d8b00449b3385d5c8b78e5fac02d1fd237a94c06",
       "bytes": 1330
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Http/home/ViewClientController.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Http/home/ViewClientController.php": {
       "sha256": "fac5f6204de6ce3317ef42391d4c2d22f3c3073a8199e5380573b121214078e7",
       "bytes": 8251
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Presentation/ClientareaTemplates.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Presentation/ClientareaTemplates.php": {
       "sha256": "31f144e9f6b47dc2c78c8fc02286369b968057e3338a3a93b6917ba9db46227c",
       "bytes": 2258
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Presentation/Footer.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Presentation/Footer.php": {
       "sha256": "50d2183c74c28aeaa060fc1f310a258445f934bfd33802585faf1bbf6c3a28c7",
       "bytes": 461
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Presentation/OfficialCart.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Presentation/OfficialCart.php": {
       "sha256": "ad1579bcdb75de6711a7115486d0540aac2ce84c7f843697e73ff2bcf7e189b6",
       "bytes": 5348
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Presentation/TemplateCache.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Presentation/TemplateCache.php": {
       "sha256": "148c6d1615e2e49515344b299eba17d4cdb7ea2f58d5cd803f132f56d3487443",
       "bytes": 2001
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Assets.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Assets.php": {
       "sha256": "74802ef3183781631c1016afe54078c387e06c8e153598328810ef7bc191baf6",
       "bytes": 3059
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/CustomerData.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/CustomerData.php": {
       "sha256": "f32998300c6be13074ec77d13faa2a7f1778bf11b65d61d92c6fb13b2c13262b",
       "bytes": 1718
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Diagnostics.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Diagnostics.php": {
       "sha256": "cac83f038cae6429b1f80004cc00f820cd477b4291880cc36486fe1276ae4a28",
       "bytes": 5455
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Identity.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Identity.php": {
       "sha256": "d2359472fa99241c4ac5f85fa8ba84409c297f2e115081167382d8575743327c",
       "bytes": 893
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Inspector.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Inspector.php": {
       "sha256": "9ce02b5179d04eefc7a7d0aec97fe99aa3e2240d6b8b01ee462d92a71870ecbc",
       "bytes": 11680
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/InstallationEnvironment.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/InstallationEnvironment.php": {
       "sha256": "72cc9a158dc02b31f28adfe0101461f97198c867a7d17cc741cc16606930f3a3",
       "bytes": 4186
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Installer.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Installer.php": {
       "sha256": "9535ebba707585b0e3bf370bf846bb2d242b388d31b7777c4e8d6d195646d6a7",
       "bytes": 11714
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/InstallerFailure.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/InstallerFailure.php": {
       "sha256": "cab572f350940ae1b3acf58312d077c045e79eaa7d02fb2837ec229ea8a98d5a",
       "bytes": 1976
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Lifecycle.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Lifecycle.php": {
       "sha256": "1f7458344eec361aacda40a366edbbe4e70a964ef867d7c157b9674e762496b2",
       "bytes": 17533
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/LocalPackages.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/LocalPackages.php": {
       "sha256": "2ca992231ec0efee1f2155115375bb067cedc712508d11d5e15fd738a274a0ee",
       "bytes": 4121
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Management.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Management.php": {
       "sha256": "f53e05ac5c34796df8b1b21db571f5b6961e8c74b7f007e084990401509ef09f",
       "bytes": 9225
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Manifest.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Manifest.php": {
       "sha256": "3be95b8c0c14265a49f41855b112c76a5348602d26a5aaf79e6557ac1f07d022",
       "bytes": 13001
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/OnlineUpdateSettings.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/OnlineUpdateSettings.php": {
       "sha256": "e6ed60e70aef431ee7caf20929e6d22b1abe300800dc71139afcd07c224da091",
       "bytes": 1693
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/OnlineUpdates.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/OnlineUpdates.php": {
       "sha256": "7f505938a69361205f7da6b1372f8046593fd8f40d0dcb58ef588caff6d95545",
       "bytes": 13588
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Overlay.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Overlay.php": {
       "sha256": "bc8693edb7737707bbd768ceaa450aa07b113800003ecd7b7c21cdadb5ab2812",
       "bytes": 9582
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Package.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Package.php": {
       "sha256": "7a4c2ea8d8ba5fee403f80f3564693e7ba430c2e5d9d181fe273c410179c89fe",
       "bytes": 5071
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/References.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/References.php": {
       "sha256": "e26b17d912d4ed87d6e6979ad2e89ab1e5896428cccaba2abf198f1004e19746",
       "bytes": 14136
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/ServerRules.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/ServerRules.php": {
       "sha256": "ecc5de06ec2d0e3c9b6e09485ac51cb145451d0c9e55dc8306bb869000919194",
       "bytes": 519
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/ThemeCache.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/ThemeCache.php": {
       "sha256": "a59b31e99c5df678009401c1ce5406cc687798df88edba687db30515085df762",
       "bytes": 4103
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/ThemeSelection.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/ThemeSelection.php": {
       "sha256": "7fec3feddc48d3c7330e1a07b44b2316d0caf23a0403f46de7be1efa44f54ff4",
       "bytes": 5384
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/Updater.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/Updater.php": {
       "sha256": "4089ffff4ce72f52f58a2860c3da13ebe8d91a02f3cfb9ff3a7c45585cf8ba8c",
       "bytes": 26543
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Release/lifecycle-recover.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Release/lifecycle-recover.php": {
       "sha256": "c88faf75bcbf0068df987421040b3437aa9bd7ad58cf64decd895f1b0b9b1203",
       "bytes": 5032
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Security/AdminRecovery.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Security/AdminRecovery.php": {
       "sha256": "8fa75147862adb66fbd7bea24d9bf14283b2a69c4fcb746a817edeb921a9215b",
       "bytes": 8675
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Security/NativeAuthorization.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Security/NativeAuthorization.php": {
       "sha256": "229f7ba6d0bbeecdd05b903a89ff6bbf0cd2112565f03c5609355ecd8aa9afa7",
       "bytes": 3033
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Security/OperationVerification.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Security/OperationVerification.php": {
       "sha256": "608eaa08b72f14b469bafea1582a67ac1f66289f2c9d4948392b5321f7f40a10",
       "bytes": 18837
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Security/RecoveryMailer.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Security/RecoveryMailer.php": {
       "sha256": "1cf10895435d12fb35f02d387797466e715996d4dd62a266789ca5f3bded2e49",
       "bytes": 1685
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/AnnouncementStore.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/AnnouncementStore.php": {
       "sha256": "e4517cca178d0455c58a4e3af2b6cab40b64e60b80f2317ad6ad969585830c93",
       "bytes": 16642
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/AuthAppearance.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/AuthAppearance.php": {
       "sha256": "2a1ad7fd3d38ec0e63d96e0c478110e6de3781d8a03403204dc9d73e30b2924b",
       "bytes": 3594
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/ConfigurationDiff.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/ConfigurationDiff.php": {
       "sha256": "8de20295f20fd0481cb39fc9e0e908d2885e3984a0dfa0b177de8d55a5ca3c42",
       "bytes": 4759
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/ConfigurationMedia.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/ConfigurationMedia.php": {
       "sha256": "5dc73a3d3aadbc98348a48a6df55cb2348d4f318cacf400f68d206364208e927",
       "bytes": 9911
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/ConfigurationTransfer.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/ConfigurationTransfer.php": {
       "sha256": "9e48239f373de272ebe58db8e27ac2b94f6bff5f172fc5c242270c1e3361c450",
       "bytes": 22982
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/MenuTransfer.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/MenuTransfer.php": {
       "sha256": "f09e43451d0d4e7b8a3509d3d40682d9739532c5dc31a9d2623cd56f24491e71",
       "bytes": 19101
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/auth-pages.defaults.json": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/auth-pages.defaults.json": {
       "sha256": "2bf1127dec1ec78326762f4b1928457a455fd7e7d7f83636320b266e82e9217d",
       "bytes": 1838
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/cart_store.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/cart_store.php": {
       "sha256": "7a9369bf8e5c9f961155847d90468e36b3a338a87d085514536f2aed32367184",
       "bytes": 35821
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/editor_store.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/editor_store.php": {
       "sha256": "fa9bfe9bf36ed21446f51ed72b5ea82f374ef4c0fa3f4ad4cc1c9327ad0d7b7a",
       "bytes": 16898
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/member-menu.defaults.json": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/member-menu.defaults.json": {
       "sha256": "0abe0d22c1dc3fd5fb2c67ffddc45427ff214f0d7d01634f33da6d04e6d05459",
       "bytes": 37901
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/member_store.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/member_store.php": {
       "sha256": "e3abeb322a0ee1e8a97df10071f56dd1f48bd03c64bf073d574239f49d4c5e9d",
       "bytes": 91642
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/workspace_schema.json": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/workspace_schema.json": {
       "sha256": "d7afa81f62ffbffe60215faf32d8bfb33c852fb01d143cca9fe0915a6e8ef6fe",
       "bytes": 2505833
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Storage/workspace_store.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Storage/workspace_store.php": {
       "sha256": "3c0e7ce7596447614784943871c7052ff4658ccab5443a3a0f2ece540b4e7c21",
       "bytes": 38416
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Support/cra1_theme_admin.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Support/cra1_theme_admin.php": {
       "sha256": "4b2b27c9308e011d05622c55a12c754793cc1748523826007ecb1653a0cb6662",
       "bytes": 30834
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Support/cra1_theme_client_actions.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Support/cra1_theme_client_actions.php": {
       "sha256": "de787a0221025cba9f62c6af7721cfbf59edd178d52139a874f7d8684031e431",
       "bytes": 9705
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Support/cra1_theme_media.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Support/cra1_theme_media.php": {
       "sha256": "60fe026d3b6b3dbdf9732d4be702a54d2232c821b2bded05d79298be6f037b74",
       "bytes": 19747
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Support/cra1_theme_security.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Support/cra1_theme_security.php": {
       "sha256": "cb49d6f44b3e0d26d65fb24e0a54b1bc3e37096fe976a496dbacf75a72f41fc7",
       "bytes": 38560
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Support/cra1_theme_seo.php": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Support/cra1_theme_seo.php": {
       "sha256": "ec4a74bd2f396f3323fc8bcef52d26c3a3693853ec70a61ae5216a5e8e913a1f",
       "bytes": 4251
     },
-    "cra1-theme/backend/releases/20261109-cra1-v17-6-8/Views/announcement.html": {
+    "cra1-theme/backend/releases/20261111-cra1-domain-list-fixes-v4/Views/announcement.html": {
       "sha256": "77ad7547514390fd3c5d83ed323bde07e314d4b289954245e7453bcb90126bcb",
       "bytes": 563
     },
@@ -5332,8 +5332,8 @@
       "bytes": 567
     },
     "public/cart/template/pc/cra1/goodsList.php": {
-      "sha256": "29fb770982826b77fdf60157bf3e8a1cc9a902172b3d49ac0d8bff815bbfe5c8",
-      "bytes": 67522
+      "sha256": "fa052d12fe76fc087ced1956d145b4407c611c2fbc4284cc7f9957123b4cd72a",
+      "bytes": 68504
     },
     "public/cart/template/pc/cra1/goods_embed.php": {
       "sha256": "98dd9dd60fa976c04f61fd18cca8c62b85346ae73fc573ff39d333d3ac979ae4",
@@ -5356,16 +5356,16 @@
       "bytes": 32154
     },
     "public/cart/template/pc/cra1/js/goods.js": {
-      "sha256": "832d8cc987995bb0368b07cb19ff23f741a72c065019f7b1aa11e8a3480de7e7",
-      "bytes": 10262
+      "sha256": "ef4ff7e43fff1d693179d94d2dc1aee157bf624ab8c01815c0976ba60457018d",
+      "bytes": 10754
     },
     "public/cart/template/pc/cra1/js/goodsList.js": {
-      "sha256": "77cb8fc968594df672777e2014c05f0ad1fdceccdaeef061014233cd364923c1",
-      "bytes": 86995
+      "sha256": "f6d12eaa929048ebacda84974e859eddfb6cd80eaf9ff28fd482a5df3b51ea17",
+      "bytes": 94276
     },
     "public/cart/template/pc/cra1/js/goods_embed.js": {
-      "sha256": "060231e55ef6a02c3dbd41e8a2f191c7e8cfe152eb7c27078be8a02afa472e07",
-      "bytes": 20530
+      "sha256": "cd25967a2024265ee9e0e1a155c998f2afbdb98ff41ea68a0d1a2a4e58d1ae3a",
+      "bytes": 27422
     },
     "public/cart/template/pc/cra1/js/orderResult.js": {
       "sha256": "ff0438e927f9769628078a1c1849a81f71e93972b69ef15b8038ecdaee854a4c",
@@ -5383,99 +5383,99 @@
       "sha256": "5be9e8f4bacebb36561573fc706be6881d018c2d829656cd5706fcd521347024",
       "bytes": 2775
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261011-titanium-v1/css/cart-theme.css": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261011-titanium-v1/css/cart-theme.css": {
       "sha256": "b6ca446fafe91106308a3b39d7cefd1bcf542b74c8a58621faada46ce676457d",
       "bytes": 67330
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261011-titanium-v1/css/goods.css": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261011-titanium-v1/css/goods.css": {
       "sha256": "1acc7094a81fba6ddd8ea35328f0abfd174e1b509a5bd6af7e697564c4c3cf83",
       "bytes": 1154
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261011-titanium-v1/css/goodsList.css": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261011-titanium-v1/css/goodsList.css": {
       "sha256": "7a415f27c788ed13685fb8e03ffa204846459537f5fd09f9bd40deb6622531a1",
       "bytes": 31906
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261011-titanium-v1/css/goods_embed.css": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261011-titanium-v1/css/goods_embed.css": {
       "sha256": "96e22e282402989c537ae2848ae0bda407bce687666642ebc8099c03cfd1d225",
       "bytes": 24101
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261011-titanium-v1/css/goods_iframe.css": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261011-titanium-v1/css/goods_iframe.css": {
       "sha256": "84a7997be014a0e3e21bade8faaa6e3e36dd7a38892eabaaf816adf9b7e76056",
       "bytes": 471
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261011-titanium-v1/css/settlement.css": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261011-titanium-v1/css/settlement.css": {
       "sha256": "3ce009f012489cd0b503785a24a8f1f345ba81abc8988b5ba7175dd699c1ce1a",
       "bytes": 5310
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261011-titanium-v1/css/shoppingCar.css": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261011-titanium-v1/css/shoppingCar.css": {
       "sha256": "28a6a0907bb418b6735f015cadb920a957892a671684894789086b01ef3a134d",
       "bytes": 5004
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-cart-entry-v1/js/goods.js": {
-      "sha256": "56c4fa705c46d6f2636928415d899940f14812d90a1c26b446b364a8172c1a08",
-      "bytes": 10961
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-cart-entry-v1/js/goods.js": {
+      "sha256": "ef4ff7e43fff1d693179d94d2dc1aee157bf624ab8c01815c0976ba60457018d",
+      "bytes": 10754
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-cart-entry-v1/js/goodsList.js": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-cart-entry-v1/js/goodsList.js": {
       "sha256": "00ead8386e5d49fbdf6209348bf33a96eb2e97fa1ee72f4f268175b469baf439",
       "bytes": 84652
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-cart-entry-v1/js/goods_embed.js": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-cart-entry-v1/js/goods_embed.js": {
       "sha256": "63a2a47de1a3b1c5727425313b0a692464bb0330ce623d678c264673e331d291",
       "bytes": 15352
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-cart-entry-v1/js/module-policy.js": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-cart-entry-v1/js/module-policy.js": {
       "sha256": "b344fd0a4e1fb236c1007d71368e6b19fb6866ed72c371c2c5860ec152bba4cb",
       "bytes": 1471
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-cart-entry-v1/js/shoppingCar.js": {
-      "sha256": "bed5306a924abb795c296e6a51e01ab8f46a6b0df0a601fec071a246fa232744",
-      "bytes": 23112
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-cart-entry-v1/js/shoppingCar.js": {
+      "sha256": "ea598cc6dc566c32b5e921735e774b4e33c07a7c09d98e442ffd6defc0cd075b",
+      "bytes": 23954
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-icon-suite-v1/css/cart-theme.css": {
-      "sha256": "d589ba4733b5eeee967e6210b4c8ab93a6345a9402548442f3f13ba55fa8413b",
-      "bytes": 109029
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-icon-suite-v1/css/cart-theme.css": {
+      "sha256": "057376094c03a45d46cd901e7f7120b740eb6ab40da90118fb58992b48639832",
+      "bytes": 120735
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-icon-suite-v1/js/cart-config.js": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-icon-suite-v1/js/cart-config.js": {
       "sha256": "4ba4de6bfffc3c81a6d6a5244526869d0f492a20f8af7996c25f3bdee7b065e7",
       "bytes": 1730
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-icon-suite-v1/js/cart-controls.js": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-icon-suite-v1/js/cart-controls.js": {
       "sha256": "61e9ed99aa9fdef6f507c5f33f2d0adb0139ca6f8098d02e17c04a55413df0ce",
       "bytes": 32496
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-icon-suite-v1/js/goods.js": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-icon-suite-v1/js/goods.js": {
       "sha256": "096a9931e4078fa1f5e9388d5e01cce9d87b9664957328ea32e0d23c2729072d",
       "bytes": 8593
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-icon-suite-v1/js/goodsList.js": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-icon-suite-v1/js/goodsList.js": {
       "sha256": "b8a7cc2b7545082c8df670a891862bcb2f65ebf0dc2b82e6f15c64f11dca8c81",
       "bytes": 81296
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261013-security-snapshot-v1/js/cart-config.js": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261013-security-snapshot-v1/js/cart-config.js": {
       "sha256": "4ba4de6bfffc3c81a6d6a5244526869d0f492a20f8af7996c25f3bdee7b065e7",
       "bytes": 1730
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261017-compat-v3/css/purchase-pages.css": {
-      "sha256": "331d8aad0f3c7d837f4efdb4a7ab7e225eb9608b95d6f07933c216e6ecf908bf",
-      "bytes": 9852
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261017-compat-v3/css/purchase-pages.css": {
+      "sha256": "f6fb047197869f2057fbc2ee62849c93e18c019cc2e6c265e30f0c7bc955d0b5",
+      "bytes": 11301
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261017-compat-v3/css/purchase-theme.css": {
-      "sha256": "1dbccf39876152aaddbc0bbf3a79195604b331bf4ea4170117da9db3761a38ee",
-      "bytes": 77183
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261017-compat-v3/css/purchase-theme.css": {
+      "sha256": "24f3d673c89db3ca8f7f7fe5a1c63db1cc4c73f9768c55ea40eae07307f6101f",
+      "bytes": 78632
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261017-compat-v3/js/goodsList.js": {
-      "sha256": "77cb8fc968594df672777e2014c05f0ad1fdceccdaeef061014233cd364923c1",
-      "bytes": 86995
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261017-compat-v3/js/goodsList.js": {
+      "sha256": "f6d12eaa929048ebacda84974e859eddfb6cd80eaf9ff28fd482a5df3b51ea17",
+      "bytes": 94276
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261017-compat-v3/js/goods_embed.js": {
-      "sha256": "060231e55ef6a02c3dbd41e8a2f191c7e8cfe152eb7c27078be8a02afa472e07",
-      "bytes": 20530
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261017-compat-v3/js/goods_embed.js": {
+      "sha256": "cd25967a2024265ee9e0e1a155c998f2afbdb98ff41ea68a0d1a2a4e58d1ae3a",
+      "bytes": 27422
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261017-compat-v3/js/orderResult.js": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261017-compat-v3/js/orderResult.js": {
       "sha256": "ab018d96209cc2d1170e18262be8c2efa6179d198c96a43932089581973eb318",
       "bytes": 6075
     },
-    "public/cart/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261017-compat-v3/js/settlement.js": {
+    "public/cart/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261017-compat-v3/js/settlement.js": {
       "sha256": "2665ce943dc9299cdb51135f1c1a07970171c42e79c115cfad56d30f30735c8d",
       "bytes": 19127
     },
@@ -6284,16 +6284,16 @@
       "bytes": 1965
     },
     "public/clientarea/template/pc/cra1/js/module-deps.js": {
-      "sha256": "d8e2c01ccaab432528cbf0b6ac698bb7f44ffc3c0e4c41dc0422180c63a25d0d",
-      "bytes": 20711
+      "sha256": "265ba4d53aa131679c074d63fae7f6a0ed2085dd236a5439138bc0eb83bc5007",
+      "bytes": 22858
     },
     "public/clientarea/template/pc/cra1/js/native-capabilities.js": {
       "sha256": "925e25900ade3d05c74e80a6eab7b4759d4ee2ad0a075068ee6377ca46c9954d",
       "bytes": 2133
     },
     "public/clientarea/template/pc/cra1/js/native-page.js": {
-      "sha256": "36b928ab3fc0a0ad38ceea60dad25c971124ae93b2bcfd112746a0a7577b2fd9",
-      "bytes": 4077
+      "sha256": "637ddbe702fa76dcaca36690accc806ec49736391bc03a803219413d78f3c414",
+      "bytes": 4535
     },
     "public/clientarea/template/pc/cra1/js/plugin-pages.js": {
       "sha256": "4ffc5dff65ff47eb45b07af14143607d0af274bc03db34fbaf3bdc8ba6f5c433",
@@ -6355,439 +6355,439 @@
       "sha256": "2c7681af5af25fe8a3a43af18bafa13d49b066070f9ad2a5711e9b307d48cc75",
       "bytes": 674
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/20261012-nav-auth-v1/css/cra1-shell.css": {
-      "sha256": "c50a80d448e35c973a3ee7296c659759b62e0d88c3a4d5ba041f892c9b13bb0c",
-      "bytes": 113083
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261012-nav-auth-v1/css/cra1-shell.css": {
+      "sha256": "ee5dce45b61b20fcbf87875810a249cc762162eba244b5ae0218710f3fb4a5e2",
+      "bytes": 127449
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/common.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/common.js": {
       "sha256": "6bdc73c5c3e0a32c5901b4ad9cace43940190078528044a6355b399d0d12aac7",
       "bytes": 12662
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/api/finance.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/api/finance.js": {
       "sha256": "f1b61810d5d35ca2700bccd4437afd09c698013e5fd9d46e26b3f0444cd41f79",
       "bytes": 4400
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/css/AvatarEditor.css": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/css/AvatarEditor.css": {
       "sha256": "8ead25c258078b99b26f22f8d6b9e66b912cf3da7f017f1765eb8d162b747c92",
       "bytes": 3247
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/css/app.css": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/css/app.css": {
       "sha256": "341410edc3f287adbd6ee388c80350c3b9d3a77d4b882cfa59f7dcef4cbd09c0",
       "bytes": 101938
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/css/cashier.css": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/css/cashier.css": {
       "sha256": "ca0a37206dc212a22be2d8c509425b45202a3c32da650b4ba5c74b02a1248bb2",
       "bytes": 14054
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/404.js": {
-      "sha256": "fa3d1f733ce6ba3cbf148b556f798f49177886e716f30aabf777d33b650f97ea",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/404.js": {
+      "sha256": "d9a965e4a5a1e94f7cf2c3f6c2826970fd1c39f19731e3f22dff6e0cf9e7e540",
       "bytes": 265
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/account.js": {
-      "sha256": "66ed11d20769ba88e9f55da96679a82aaa981ffe95902e9d84d7f6e801419fc6",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/account.js": {
+      "sha256": "666ea6c11b5172fa56f6c9134296583b5b6b02a88cf3ec816cdaeb524f3cd3cf",
       "bytes": 30536
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/agreement.js": {
-      "sha256": "da1df20dc998dbe91ee7e0cba6cf57fbd45942628bb5d460be3d0df2b1df7ccd",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/agreement.js": {
+      "sha256": "edd190878cef4c32867462733a053927395db35708f98483d2883ad1e30b926b",
       "bytes": 6256
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/cashier.js": {
-      "sha256": "7d674acb38e7e80390c9d8feab2ffcd4a4672094cfd2dfdd927b0ef68a4e3c3e",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/cashier.js": {
+      "sha256": "83bc3e3de9e97958ed72ac203af10e15dc66f2c4ff6191bea52aabb5486709ee",
       "bytes": 8002
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/AvatarEditor-hHiHNuty.js": {
-      "sha256": "db4c226fdb6cb1167b883894aa8a70c06811758cbc756a969c6e603e8c7e6560",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/AvatarEditor-BJiqz1So.js": {
+      "sha256": "6a239635238d45d5acd74a9a368507883b6b4433e79a30beb9d2bab93444e565",
       "bytes": 6328
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/app-ChQWZZ3o.js": {
-      "sha256": "de397f9fb9518b65e180d580e94c7dd40d83355dbdf53f51e6b38e2b14fa50c2",
-      "bytes": 305118
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/app-BjuCTy9p.js": {
+      "sha256": "5c4d34a21b11bd062e2958409eebafe02fbc440a4a6f7588b87398dc2b7b20a9",
+      "bytes": 305131
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/arrow-left-DCCnUlx0.js": {
-      "sha256": "f1b3b121e3f49b08959b8d95ed26bc71a6feda434dd66fcf56abd792b7891131",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/arrow-left-Ctgd2ZtZ.js": {
+      "sha256": "e1b96f0ba68b34dc32b0c8cbe5de8a99b9a7279a68b0cc1e8bf48c00585ef8e8",
       "bytes": 164
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/arrow-right-C7kkFBu-.js": {
-      "sha256": "90a35bb1d9efaed29cc13e1e5f7dc06980d018d0fcf4f17127bbc9c44ff3bae6",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/arrow-right-DwzcP5Fl.js": {
+      "sha256": "95dd6667434dc5b9ce78217556c0680ed3fe5c274c05a11f4f169aaa0870e632",
       "bytes": 164
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/arrow-up-right-CKMUHLy8.js": {
-      "sha256": "3d4122f84ad0ccf7afad5ca810f755397b7b38ea23731e2c1b84f8f1500530c7",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/arrow-up-right-UBeCCQhN.js": {
+      "sha256": "94b3ec78d5fcabf65ff54f0a620e2d0bba17a1a0f59f59a0a838f3da4810bcba",
       "bytes": 166
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/authLayout-G1cZfeGq.js": {
-      "sha256": "a8aed6309017ea31788c26108ece845c42456605a306284a057e2fdfbf7348ea",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/authLayout-DzkQjCXK.js": {
+      "sha256": "6c41f339a25c369794e168577840dd4c7cfa0a7d179b1e94ef8c57f5529be21b",
       "bytes": 25873
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/button-DaT4xAJj.js": {
-      "sha256": "91c9c5328cd0ee78a93131681b35032d9c3ce47404c0c3be9f4fe17ac582b968",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/button-Bopfh5L6.js": {
+      "sha256": "adaf21e775952fc38f3baa1e6a16de810c55e5f569940381a77fd448dfe90813",
       "bytes": 1326
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/calendar-CuVplgKp.js": {
-      "sha256": "25bd4c6ea410a3242784d683e7ddd547bf4941fa7edb765a9770e7317bf8ba50",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/calendar-DvW_Nu5T.js": {
+      "sha256": "da8c13d8bc6ecd53de0e14afa3a6c9e5190a4708056b8032a1a905a628250e41",
       "bytes": 256
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/captcha-Ddcze4Te.js": {
-      "sha256": "2f92ccf38e73d5324d98208e4a710d93f44dad724c527390ddc0271188ec5d45",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/captcha-CYS_syY3.js": {
+      "sha256": "05f77e228a20c60f417e60710c4804278661f4da76a7abbdc9e346add9e72c4d",
       "bytes": 3151
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/card-CaA214Rb.js": {
-      "sha256": "524d5df55f4cd4c278bcda5baa029d1ba8dcd1b68bb1782dd2a6011317ad60d3",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/card-BVW1Do3R.js": {
+      "sha256": "61337c78d0e0dd68088500cd41294885367c95313bbbf4b72f705c4d243267df",
       "bytes": 1498
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/check-Dqc7ys4L.js": {
-      "sha256": "3bf5d67fd287577f44e3ffd05f1d521345a84ed2e3b0caca6504d9a01f5b81d4",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/check-BciflhHc.js": {
+      "sha256": "60040228723f030b7b4dd523e22ca290dfc334a4cd25ba8ccc6908ceec49643b",
       "bytes": 118
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/circle-check-zSoDiI0b.js": {
-      "sha256": "6ef69433b9f5141999ade93c65ef988ac1cd344deebcff0ee36934ead14d6128",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/circle-check-CwKvmSf0.js": {
+      "sha256": "eb04110dff4d8f6296b657647eb56f3ef3e76e9652a79bbe2191536eed40984e",
       "bytes": 172
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/clock-BDkywRmi.js": {
-      "sha256": "e79cacfd0d86ca1852fd5cc4c33bda509e194ae8665784c504ebb4687b8b1e82",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/clock-mNygmOWn.js": {
+      "sha256": "5b6f0f9c69bfbc4d719ac452f4250904fb48f772bdc500110c5105d8e4af9f99",
       "bytes": 163
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/compat-u5qYtgxC.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/compat-u5qYtgxC.js": {
       "sha256": "55b270ab86745e0146a7e21db1eea3a479c33ffbbd0bcccade1f15d2c6be6f20",
       "bytes": 2175
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/credit-card-1nKo5BXG.js": {
-      "sha256": "72d83b9dcbc15545a447242e415cd331326a19b5978c99735d8a92c7cf8b1089",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/credit-card-Dzuzhvpr.js": {
+      "sha256": "641a73f4620c0dce5975d985308d0bf3349cc820a1bc6b1f85fc80b4085cb074",
       "bytes": 206
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/data-table-Ba29GtMj.js": {
-      "sha256": "0c9355ae17d993d316e44063c767757d17dc61e70f584573b6c6002eafffe94d",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/data-table-CahM8Lde.js": {
+      "sha256": "39381339cf6237d15a6a276a070b1c0050b90a6a1d71fff86e215af7cc8efdd0",
       "bytes": 4516
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/dialog-D62RSzCb.js": {
-      "sha256": "3803b676774b7d449234db71c9859fc45c0f95e9a478a7a26fd9d71880554834",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/dialog-DsiO7qxs.js": {
+      "sha256": "c1efc62f895af2d1c2bd5500efa06632ff9fe8e9feb6952a1b7e468f143ff041",
       "bytes": 7609
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/dialogs-BeX6c4fJ.js": {
-      "sha256": "f3418e7bd87a041659e86c51b615f239ec934a682521987434f45d1de76a8173",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/dialogs-BIMt9Ngw.js": {
+      "sha256": "c2aca4da583d55b3c570ff1b7efd16f2db02128b22a7eb3a29629663e8d41649",
       "bytes": 138791
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/errors-D8pcVCCa.js": {
-      "sha256": "d32d4860c3154670d06636b4e4b144f83f70f99df535a3cbb4b2b221eb0b823a",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/errors-_Y8o0zO0.js": {
+      "sha256": "c5f6f938aee5aa99e2def79b448aa7155e5adbf87bf4e889afdba444a58febdf",
       "bytes": 3672
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/external-link-BaCDcClJ.js": {
-      "sha256": "0d8c9da52c5002fb7ac2db3b3aba3012947069d06408ae16aec5f9a09235c000",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/external-link-PuYBqdce.js": {
+      "sha256": "b89d5bfd855791e1af748e3926179f7150d564827a413e2ca7fcea5aa3269899",
       "bytes": 250
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/eye-CBOYwfZP.js": {
-      "sha256": "19c89e8a8c19224508249bb83fec1f29e1eb1c4325cad6d0e1dc9a31b3d44704",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/eye-CHdv4KPZ.js": {
+      "sha256": "316d32050a33e86ea059e18011a1ae85ae319b5f3057f669a7cdb9616ea0ff6c",
       "bytes": 250
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/feedback-677RrAYL.js": {
-      "sha256": "6928eb3b0fbd18f6c7f9cf2c10fc1ad203db073002784b5c7d353c103ceb82c6",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/feedback-Bwhd1htC.js": {
+      "sha256": "7b00fbd4deaa29c7590c66afc832079a45ee61c5b9c4e6e453d35c413990a35a",
       "bytes": 1367
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/file-text-CZoVmRyT.js": {
-      "sha256": "f40be0f7c2161ca4e5620723a660239ec5886b5679aff72cd4b7977e3a763b2a",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/file-text-DiIgL_PL.js": {
+      "sha256": "d96d06e2581db79483656823d7a1e91932b32afe3546b254954715b1c146aa4c",
       "bytes": 332
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/index-C4MsnhO8.js": {
-      "sha256": "caa09e98871457956c5dffc4df3305e31349d09e56041c829335beb3543e3068",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/index-BScoca6K.js": {
+      "sha256": "62a26706d16ea871968c841d10ac73ff364ca57c20e72650a00f93cba9d2eee1",
       "bytes": 27070
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/index-CMBclsTt.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/index-CMBclsTt.js": {
       "sha256": "90cbaa1deaf6cecb5fbb6b35accb0cbf31ded55870e7cffd024a255623ab7b55",
       "bytes": 34053
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/index-DT6vQThv.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/index-DT6vQThv.js": {
       "sha256": "91bfa9cfc9449ccd30c96b78f19f5a4b7ebc388dc76f656b9efce0fc2dfe0692",
       "bytes": 4267
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/index-DxfGiVoV.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/index-DrLgtN4L.js": {
+      "sha256": "a7df023fc4612f6c3fba5e66a9f3ca6133ad6b00c203e9eab8cfe81f247f4998",
+      "bytes": 4907
+    },
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/index-DxfGiVoV.js": {
       "sha256": "e55e226040a8a9f544b31cb50c3eb45ab17a8a5e98d018e0e55047b3249acc33",
       "bytes": 7857
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/index-aMx7hVAp.js": {
-      "sha256": "f337c5cb25ee8508a08d72ce042319071ba8b396e929d20ac83f37f38c37cb23",
-      "bytes": 4907
-    },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/info-DdeFx01H.js": {
-      "sha256": "2ec81fab0ed9d3df816213337899be5f0c8c5991d5e7200cc6245ac1975c1f4a",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/info-C_rDGsVC.js": {
+      "sha256": "0f8bdb83d0fcb1ef86a764ca0fc918b5c91e9e8f11bb3949f4b5c0545ab59041",
       "bytes": 198
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/input-BBmyREA1.js": {
-      "sha256": "d89a561be76259f44103886f23b6612b785a067e918c9e8f42c652e635eea59f",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/input-D_u6NsAP.js": {
+      "sha256": "122cbde8c76ec6aca650e5b31e602c8be6a5543f1411b1db3c062e3ad446f41f",
       "bytes": 1221
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/key-round-BWU11Ekg.js": {
-      "sha256": "61fe1baa1284ab4a120b391aa8e2eb1403ba27501f3c97095b7c7c2565007c85",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/key-round-B6QZk7e9.js": {
+      "sha256": "0d1f91ac64df108de78ce59e15b8cdc82b9dee0b83731c149ca54fa05d5e5745",
       "bytes": 349
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/layers-DZbwvMny.js": {
-      "sha256": "18c672dbb3fc1aa05c8abaca9ac65bfeb83f7be005a25d1a70c07f3429ce8538",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/layers-CmM6LPV5.js": {
+      "sha256": "f15c662ebcd81559196bfc1ce64e390e7fb99b14a6366f2f4bfea003b3f5b807",
       "bytes": 420
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/life-buoy-BJrZsccz.js": {
-      "sha256": "21caf718c6053bd1c8da140438c98f0b1ffe8e23150de727107c5a21e26e22d8",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/life-buoy-sNOMij4Q.js": {
+      "sha256": "e2b4c53aded61b8e45b99f1b864b3f1f480beb0b9f175321fdfe408fa463b356",
       "bytes": 678
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/lock-CJv3DzMu.js": {
-      "sha256": "cab7369d30a79a0dcd6e642d7523fa4ed80c73da1907e4276476fe3acb02fb7b",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/lock-D4liD8_C.js": {
+      "sha256": "89e3c910825be8da2b8fcb41c9d981a8f4f0f63b2995713f024b7fc0ba5cd09a",
       "bytes": 200
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/member-navigation-BE7RFkIS.js": {
-      "sha256": "dd861d70a91b5ecb9f9ad909f0dc284d72d06ede7685a44fa45c570a43553666",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/member-navigation-BlExJnsA.js": {
+      "sha256": "248d84b3b10d00d8aacf45caaf562ab53bc3b045e3f30d4526539c1f91dab8ad",
       "bytes": 2934
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/network-BLd0Y19D.js": {
-      "sha256": "35954b6caef1fe895dc8232747f87c2e21aac52d4dd7c4114c4befa777d39eba",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/network-BPJXsJXe.js": {
+      "sha256": "7d0c83637817680fb91e47ab36c879733cada7386ff6999b160e53b6b4146033",
       "bytes": 571
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/newspaper-RzG3HEQJ.js": {
-      "sha256": "633b02ae0c8b269df0bef58423c9799e320edbd8c329ba0f24f76ca8b4867a1d",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/newspaper-BchUKuwy.js": {
+      "sha256": "b11e66942c0f8727239e73ceb6c2a410a342a2ec8f7648653d657b323a8b885a",
       "bytes": 343
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/oauth-flow-DmVYC82F.js": {
-      "sha256": "8076dc75bd4e30cbd84fd921ae4cee2ad50fed8ff5b39002ca8aa795022a2aec",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/oauth-flow-LHNjDCAr.js": {
+      "sha256": "88ab989ff87668395dc5166f42f288d8794ccf328194f740fccae3212e56971e",
       "bytes": 3259
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/operate-password-dialog-CfxJyIoG.js": {
-      "sha256": "fc1c428552380eb1ad3f38a1df6e0643430f628e22be39bb9276f2112737b57c",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/operate-password-dialog-DpsO9au_.js": {
+      "sha256": "798aead90b0eb4304b8f22359523824186a36c4e52953b1f105fa2e6bbbbeed2",
       "bytes": 2366
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/package-DeyWyIh5.js": {
-      "sha256": "c4950bf2b788b17a65de908f8c511e14c313f5f69c102f236f2c7a6aa31d19b0",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/package-CecjIfu5.js": {
+      "sha256": "44fffdc432a75fabf5adc5b122f9634a84cff8021f63175565284b15bc03b298",
       "bytes": 371
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/pencil-fwvTMZ08.js": {
-      "sha256": "0783810ef32688204c4f9d9e3c8141c01190eaa326ad0c11482b3120f0777930",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/pencil-MAc9Fae-.js": {
+      "sha256": "ce085f5ce7e8a1d5f4c222bb1dc826009a30ff63660fd6ae8fa7e38ddbaa5350",
       "bytes": 275
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/plus-BU63D9oX.js": {
-      "sha256": "3b36b8fc5a6acb4fc8f86c706ad18ddb05b17a1556dec3ce0d36c4c544982e48",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/plus-BwIE0aha.js": {
+      "sha256": "0f24b0b49544867ea55205f3478d5f6b48c4baeb2f569e9e05c8da019fed24c0",
       "bytes": 152
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/preload-helper-PPVm8Dsz.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/preload-helper-PPVm8Dsz.js": {
       "sha256": "0bcb72f8ec0d95f592f3a84b3554b9ef5a5325ff5416a9114d6913e03c1c9eb4",
       "bytes": 1232
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/product-2TzsgWmR.js": {
-      "sha256": "3ad0dafdfccf6c2489105a55678d4daf03ec77714745af6804561781e9971b5d",
-      "bytes": 112272
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/product-LzgS30YM.js": {
+      "sha256": "00cb188be822fe58a1b4a70ca1f3600870654a7c2f38c51dbab7f4b98ed6128b",
+      "bytes": 112956
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/productList-j76yDMm7.js": {
-      "sha256": "497eb635e671179fce302a2a052f7ef6f2bfdfa8242226b2f3744227523066c9",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/productList-CTV_JtVV.js": {
+      "sha256": "db7d1f5860034cf4829d675f3e868a315451936b5d0d235461da1564c751d28f",
       "bytes": 74329
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/receipt-BQ3aoXi5.js": {
-      "sha256": "8658442992855ccdcf39cdf561d6e1d4fb75e224f143c5cd115546f5daef7da1",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/receipt-c1or4_nE.js": {
+      "sha256": "9a5d4116d5863b536509fa0f47fe275700f15d96f88ec5ef16a7862f7f93091f",
       "bytes": 291
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/refresh-cw-GynXdV7J.js": {
-      "sha256": "99c85bdc5b62310eb22b420512e5eaea0d9a88fcb3a2729b202dcc91c1b5ea32",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/refresh-cw-Pd3FJeEM.js": {
+      "sha256": "8cfd3f8212e8d09d6ed10cad1eeb6cfb8ec48eaf6fa64a800f465bf7aec665be",
       "bytes": 320
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/search-CCI7MTSj.js": {
-      "sha256": "6dce4af51ccd48a57b29b779db0af70aa44baa9db9bbc5765688977a151dfe53",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/search-aKZBzh-8.js": {
+      "sha256": "e43ca4f1eabda29c0a7307c2583af71f138eb390d1e03070289b87a5a0927d42",
       "bytes": 534
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/search-x-Cl82--Tn.js": {
-      "sha256": "1c521ca0997c01355b5c5ff13eec2c8e8a3ab6210dc9e4afc8a1583c21c1ee26",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/search-x-CAcVYCqC.js": {
+      "sha256": "d64a914692d4fab5a049687c14fdc6015a9d087dec3ee02fa5fc1c299ebf708a",
       "bytes": 256
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/security-B-uIoZeR.js": {
-      "sha256": "fa6793bc64b9449e31fb38fc22960cd18e43933e34bdc9a249d2ef18eea7f871",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/security-x1Cce1I8.js": {
+      "sha256": "39531d5f0922ae2c962faa8f3e592baecb40e26f8d590862abdd95ca9a96fd3b",
       "bytes": 33025
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/select-D-605wzo.js": {
-      "sha256": "b7eed6618b688713b912e3ea09a28caa51bc7a7bd161f0e88eaa3e9a4598ad12",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/select-CYn2mU1t.js": {
+      "sha256": "2ede71271888810d6265180c0e931a6eaf3e7f327b9b93aca60df381c1abde51",
       "bytes": 21649
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/server-BJbiVVTw.js": {
-      "sha256": "bea7354b65919d5d343a01e01c1f8c3707f33ff50344205fd3f5e0881dbd72b2",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/server-rorIZ644.js": {
+      "sha256": "a0cffcc0290260717b081eeee563d3f61860c5f241190f77c4783f4ff2643e46",
       "bytes": 337
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/shield-BKAe1E85.js": {
-      "sha256": "aa89ddf1bd5ad13f944d32fa0794d540385bcc6790084b1a0c17aa8a68598c17",
-      "bytes": 266
-    },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/shield-alert-BUvLuUi0.js": {
-      "sha256": "b0abfde5b3b4432e84f3db83320a65611ceb583ac6bee514059c6732072bdd98",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/shield-alert-D7vb6AqF.js": {
+      "sha256": "9f3f7a5437f4bc5ff9073029844b0f8d01caef0d405292a20b22b5ff104b9b27",
       "bytes": 352
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/shield-check-XJI7KVQG.js": {
-      "sha256": "4846245cb8c4e41b4da73da2515f0ca591648b0a0318a853870e330cacb8bdab",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/shield-check-DvNGb3Xw.js": {
+      "sha256": "a885d1e135e6db4bf7461d64c3abb162e50715f3ae9a2010b03df554011c68f7",
       "bytes": 314
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/shopping-cart-CqFK6lhs.js": {
-      "sha256": "f3d27b4370dca853a123fb4335f0b6d50aca77abd5d8ff14ba5d1f32e8ca07aa",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/shield-v3O28XNZ.js": {
+      "sha256": "2cde32db2f2578d4339f45a1c21c0d36cc6894159890c2215b34e9219bbdf03b",
+      "bytes": 266
+    },
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/shopping-cart-LfPHsHzA.js": {
+      "sha256": "44b9e07723b5b1d1e93ae94f46bd68859d5e2733357d77909d064c15b0675ef9",
       "bytes": 286
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/stat-card-CezfOx3L.js": {
-      "sha256": "041f9ea2245a55f9f0f9d760a6888d5328e257ce68df1fd373feacc38dd87b59",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/stat-card-BbMkXDyk.js": {
+      "sha256": "37674526f65f041650a378519629dfa3760e4f9fde45737fb4030d091b909849",
       "bytes": 2206
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/tabs-CQp086cu.js": {
-      "sha256": "650b2a94b770938989e775173f7cd2ebc490854e1a0e79f290adb045425edf79",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/tabs-CAUijM-y.js": {
+      "sha256": "d9d5874685c3cf0d8ad94713c4efdb10b3189460443bd43eaa612a424c142d9f",
       "bytes": 2989
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/trash-2-ClBOzm9F.js": {
-      "sha256": "6f63607e3253f3c544748c0845c76dcb28735dfc3e4e9cd96714185f8df85854",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/trash-2-C_naOg4I.js": {
+      "sha256": "ae0441d0182c32926210f84ba17d89caa305e5f2d90ba7d0f84ea3745e75416a",
       "bytes": 327
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/triangle-alert-B7IVr3SR.js": {
-      "sha256": "8ceb7be60d3ca4addeaf222e5be0454663bb613cfd7522f05ec8e9c5bbf0a497",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/triangle-alert-BpJnr3jv.js": {
+      "sha256": "4b8300826f5dbe495728f3e6acdbeb5e3f189d637be95c8eb394dabd5ec007dd",
       "bytes": 264
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/usePageTab-CiqX-WI0.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/usePageTab-CiqX-WI0.js": {
       "sha256": "0bee85771762134a02790013aed2abd85633a8a49fe739742027ec508c82e370",
       "bytes": 556
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/vendor-motion-CPP2Ij1U.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/vendor-motion-CPP2Ij1U.js": {
       "sha256": "a010171563f3137f3eda198fae7a7896876f9bdeee4f4a7a9e43d679bd7beaa4",
       "bytes": 128242
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/vendor-recharts-DyxwEn9b.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/vendor-recharts-DyxwEn9b.js": {
       "sha256": "9bd9efc0a8d758ffb0345b8be19b416d9a21f0716c7a836f0dd486961a09c8a9",
       "bytes": 386743
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/wallet-MGyz2uXA.js": {
-      "sha256": "8b21023a35b48a8c2da3d67455bb88ad7fae714c1c58edf11e707e2e462a7de2",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/wallet-CKddGsl4.js": {
+      "sha256": "5fbd98df499038cfb7113a65adc763747aa068b98a294783b7abe31fe6bc8df4",
       "bytes": 285
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/chunks/x-Bmm6fElF.js": {
-      "sha256": "a08544d44c87958d105b1b6638cfef426ffc7c13ad40c74c5869984ebf966345",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/chunks/x-DWk8siqL.js": {
+      "sha256": "bcb6b8c85537d1b1991c15db02490c6e011ecda1ceac4b9682348a708c788a34",
       "bytes": 153
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/crossModule.js": {
-      "sha256": "c6601889a7a87b939200ee8f9123c6115f84385762a0bd1bbeb27033e0851461",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/crossModule.js": {
+      "sha256": "7cab4ff7a8d75a19b7c345f52aa00f5b66e256d459a2126c196313bf00ea2a77",
       "bytes": 8019
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/finance.js": {
-      "sha256": "0d1c6bf707ff8bcc757112162353eb1da05a732594b529a03e813caf6122530d",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/finance.js": {
+      "sha256": "030bbb701bea684f5d5e6ac6f44ee28633704c159e0cf3a28351203ab7706747",
       "bytes": 15776
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/forget.js": {
-      "sha256": "8454770e058a06eb54acd182e0e3f184ccac6696cb5d5e7e108a7b0ffcddc257",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/forget.js": {
+      "sha256": "07ded4ea324e3f6046db9d54f39417aff3541d9b80c220fe34a340032e4ebd54",
       "bytes": 985
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/group_rules.js": {
-      "sha256": "8c01830abb4f5a0535fd788f80b81b5c09d1855aefb590da4551be07a6b51798",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/group_rules.js": {
+      "sha256": "729ff1a15583ba27289eeb67f925f5b129420ebf7e34b9e35867e61406ad1c09",
       "bytes": 12018
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/home.js": {
-      "sha256": "99d81c8874e8b327d42ed4b51ac9d7cb445027204b659c44036da3c886535d02",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/home.js": {
+      "sha256": "461edc994830ebf7dcede2672d2ccd47b8535323cb65b2a39199b516d46f9729",
       "bytes": 43508
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/login.js": {
-      "sha256": "31e7171d17ecd3897eedc092c07bb2bea07faa3e932f1ee21b114a7296622f99",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/login.js": {
+      "sha256": "09aab4b881c5b712478bf13d2030ed39d8db97d18a2bf85f7481d9d7fa34c05b",
       "bytes": 904
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/networkErro.js": {
-      "sha256": "60ceedcebaa52ee6744f97be17be7100e76c7570d604f0ab8f1335d25c105953",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/networkErro.js": {
+      "sha256": "6b21554080be5564a30f4194b15c31375788c3345ecd274c081cc4d4910fbf8d",
       "bytes": 265
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/newsView.js": {
-      "sha256": "2c46ee6b0033cb2960d3826b5c96248554a14dc5e8fb37d1055bb907740bcbc4",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/newsView.js": {
+      "sha256": "f96cd83a180f570b454d10d87ca754d1e1b3b57bf121cf484b4c71c60ddfef91",
       "bytes": 4538
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/noPermissions.js": {
-      "sha256": "93e80d11c08dccae097769b55a3e1a790504bb9c9d2a0f7914a6dce0646bb4cf",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/noPermissions.js": {
+      "sha256": "fb06d4ddb8b8218ab611dca27f1ab203ef3356a426288a4130c04afabc9f0539",
       "bytes": 265
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/oauth.js": {
-      "sha256": "05224f25f3d579a88d6c302855f729529c530b57c33c1bde0df8041e98e4101e",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/oauth.js": {
+      "sha256": "ebe4b1ec43d9d75c90062ec0111fafa959e76c2ff87bb71aa221fbc3b5655c91",
       "bytes": 1890
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/orderDetail.js": {
-      "sha256": "d237feca147de3d2f2256cd8c30d0cdb89eabbdac1e2dcb59c1bb1afc658df9f",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/orderDetail.js": {
+      "sha256": "75c8ecca52be0b0e7fe85b22c968be75a678c3be40d5b3c08aeac6e6a500ae04",
       "bytes": 8526
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/product.js": {
-      "sha256": "6e1f21628308cf6194feb3eb4b83716e5655be8a9b7655cc1208eef9853241f2",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/product.js": {
+      "sha256": "2ef1b80f5b03288b9468e3233fbcf2c8acc0b7ff491ad16e8fe0ad0f4b18c5f0",
       "bytes": 1646
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/productList.js": {
-      "sha256": "09106f0e9eb99a3fea917c1f5727f7afe4438e2d141539b9deac08991f6c5574",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/productList.js": {
+      "sha256": "775c9105d68e93dc1aa0f2f768b0b67d2088d19347121fefe426aca2e79e603d",
       "bytes": 983
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/product_list.js": {
-      "sha256": "be93b59e33afb9f519db4000d1205bbfb4cd5263dc0c53af3b7b6cadd67eabe3",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/product_list.js": {
+      "sha256": "ea73168e447a7689464c130f973e40a60daca10bd4a6eca05f948b64c01f5b0a",
       "bytes": 4788
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/productdetail.js": {
-      "sha256": "10f8739dd46d6c53fcee3fc73b15929412f1a9f43f49b51f9e521e477a2a839f",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/productdetail.js": {
+      "sha256": "9a33b8a11b4f91deadbd94eb3a4c5e6d8e346239965cd05427357d804baa01cb",
       "bytes": 1643
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/recharge.js": {
-      "sha256": "e020f0d4453b57523ff9650c72f87395540daa7b42d81cd83c1db63b0f183c41",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/recharge.js": {
+      "sha256": "98295ad1a94f13b4799b4ca054ae92f46c2fa79c9e3a2cf2c15ef2be2ca8214f",
       "bytes": 11351
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/regist.js": {
-      "sha256": "b6c2ba25bdbd9c6a2224b8c43021abda521e2144e21b34c72df3a77a565d1b0e",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/regist.js": {
+      "sha256": "ce0d4fb10f810840087f6e7e017c5a629ca8998f10cd002a261275877f32899b",
       "bytes": 861
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/security.js": {
-      "sha256": "101ac59ea8d2064e91a7e7797fc2f26ba8f975624e5c1df6eb0b5e4d155f606e",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/security.js": {
+      "sha256": "af48e71ab4ee68cbe7c1253b394cb5ce8b6a255c2516618c66037760d2eb6a63",
       "bytes": 1091
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/security_group.js": {
-      "sha256": "fe035fe9425a5a2c5bf7c8095273a620687cbd44fffd14e85ed6bd14481d7b25",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/security_group.js": {
+      "sha256": "58eccfa98ea5b2d69b0ce96ee34f4f4a1998c0fe1334f83375b29f3234d35e62",
       "bytes": 1088
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/security_log.js": {
-      "sha256": "058eedc9ac027216ecb60283049415336aeea9842f1a9c1f7673797f7779144d",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/security_log.js": {
+      "sha256": "98d1afb6fe7ef5ff2029b50c9381222e2d244df5add814b8084e04ab5af22b5d",
       "bytes": 1086
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/security_ssh.js": {
-      "sha256": "1378e8f7f41447c5ab9cb6865c43dd695f7482582b7367637e7edd18619855a4",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/security_ssh.js": {
+      "sha256": "00840cb7455c3c12f75b3178606fce68d2fec0114851d877747bb59de85d5f77",
       "bytes": 1086
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/template.js": {
-      "sha256": "4e9d2e2c99fe86814a975f5bef0a55b96b0e63c37f4f31c32be470126c893696",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/template.js": {
+      "sha256": "1ee492753009bb1553797b22979af8305ab20c961716d282a36e6ecc575ab432",
       "bytes": 7191
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/transfer.js": {
-      "sha256": "f2af8ce3f55ad374711eba8c28bdbd74101bc039f2ecb86510025f2c4c50bb65",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/transfer.js": {
+      "sha256": "636bb691f9ab7859729b9a4b065be450ba7f9c7547ae8a6dc8456a8edaf19480",
       "bytes": 4562
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/assets/js/withdrawal.js": {
-      "sha256": "fbfdddec489629e28967e4f12a10a7f8d3ce5bd919af0898248e816153f8a0d6",
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/assets/js/withdrawal.js": {
+      "sha256": "c1002c29ee7f374ddc7e6ee9617ce7d16cf7f2b959771660f1f64a2e8ab6afb3",
       "bytes": 10807
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/components/asideMenu/asideMenu.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/components/asideMenu/asideMenu.js": {
       "sha256": "c261d2b5b97c36597e3e9b2913a25aa3c779772123b3a92a73154f54e83a3fe8",
       "bytes": 67218
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/components/payDialog/payDialog.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/components/payDialog/payDialog.js": {
       "sha256": "db5f507881f2b45e9a69b6260c15b84d23ea487c5256519a78bae7b0d9b3c582",
       "bytes": 66318
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/components/topMenu/topMenu.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/components/topMenu/topMenu.js": {
       "sha256": "c1d4f141cbfe5fa487bf03e0d847aceaae5c3e986f4e877968544f5197af6474",
       "bytes": 25972
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/js/embedded.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/js/embedded.js": {
       "sha256": "64ab38a826fc0760c3cd9d1bef6b5c9becd6e58413464a112f864e7c7c3d1401",
       "bytes": 1965
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/js/module-deps.js": {
-      "sha256": "d8e2c01ccaab432528cbf0b6ac698bb7f44ffc3c0e4c41dc0422180c63a25d0d",
-      "bytes": 20711
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/js/module-deps.js": {
+      "sha256": "265ba4d53aa131679c074d63fae7f6a0ed2085dd236a5439138bc0eb83bc5007",
+      "bytes": 22858
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/js/native-capabilities.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/js/native-capabilities.js": {
       "sha256": "925e25900ade3d05c74e80a6eab7b4759d4ee2ad0a075068ee6377ca46c9954d",
       "bytes": 2133
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/js/native-page.js": {
-      "sha256": "36b928ab3fc0a0ad38ceea60dad25c971124ae93b2bcfd112746a0a7577b2fd9",
-      "bytes": 4077
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/js/native-page.js": {
+      "sha256": "637ddbe702fa76dcaca36690accc806ec49736391bc03a803219413d78f3c414",
+      "bytes": 4535
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/js/plugin-pages.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/js/plugin-pages.js": {
       "sha256": "4ffc5dff65ff47eb45b07af14143607d0af274bc03db34fbaf3bdc8ba6f5c433",
       "bytes": 32690
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/js/shell.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/js/shell.js": {
       "sha256": "86f0c5d91c4aef0b84919fb2475f33932785c42a55c5631f884d1c077443c125",
       "bytes": 3113
     },
-    "public/clientarea/template/pc/cra1/releases/20261109-cra1-v17-6-8/js/ticket-assist.js": {
+    "public/clientarea/template/pc/cra1/releases/20261111-cra1-domain-list-fixes-v4/js/ticket-assist.js": {
       "sha256": "028210702eee920cdeddc438af4dac5712526f291f9b0398a8009a15da22cc3d",
       "bytes": 33954
     },
@@ -10871,63 +10871,63 @@
       "sha256": "11cb749f546da5bf5a508c6304367849da51f6da3f9c9a7aed8179ff970b4fb9",
       "bytes": 10998
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/announcements-preview.js": {
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/announcements-preview.js": {
       "sha256": "14c5a164a990dc77dcdccc13ed3d62726298aa65cfdc233d6a3a0cf268e67e7e",
       "bytes": 26985
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/cra1-shared.css": {
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/cra1-shared.css": {
       "sha256": "4b7eb1d59fae4160d38e6d82d00243c77de34167ddd75fa332f8ab8b54a4c7c2",
       "bytes": 144529
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/cra1-shared.js": {
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/cra1-shared.js": {
       "sha256": "35fd44ff949f7330519c1001515eb11b4fc29dcc57f9e0a1d1b61439101ec001",
       "bytes": 201799
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/manifest.json": {
-      "sha256": "890f029e65d7ba25ceccaf7789da6444ed0407424915f4aab1aa091c336cda42",
-      "bytes": 1200
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/manifest.json": {
+      "sha256": "3e167c32450488f1d62c8dcd870ba9166a87348a0429d26f881fa52bdf1d685b",
+      "bytes": 1213
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/member-session.js": {
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/member-session.js": {
       "sha256": "c924d67d826c9a9b189ab90b4af57140f1a0e2d3cbe28d779afb4ee32ed3f58d",
       "bytes": 21220
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/native-cart-navigation.css": {
-      "sha256": "3e2ff1b6c325bf7b7d1b7173b4304d441ed2fa1191318a2290aabd6f9bd50c8b",
-      "bytes": 144656
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/native-cart-navigation.css": {
+      "sha256": "93920238fd47388ae40546244041eed0d331ec63784ed56dc0d6aa0387fd0afa",
+      "bytes": 149115
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/native-cart-navigation.js": {
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/native-cart-navigation.js": {
       "sha256": "bebb8ce7ae30262e23760f4431fa40480dd7dbc770d8e8e605eb000e401a450b",
       "bytes": 104897
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/preview-runtime.js": {
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/preview-runtime.js": {
       "sha256": "11cb749f546da5bf5a508c6304367849da51f6da3f9c9a7aed8179ff970b4fb9",
       "bytes": 10998
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/preview/member/home.js": {
-      "sha256": "8c036b7173c35ceb3f7933ff4462ab49b52851ed109a848783d4442113cf303b",
-      "bytes": 900648
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/preview/member/home.js": {
+      "sha256": "6c7e4110aa1ed0345e9931c9c98064bbf0548b1e3501f3e056261c78a86504a7",
+      "bytes": 900674
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/preview/member/login.js": {
-      "sha256": "115647660af0fc7f951790c8b6f54a847cdcee8ac74a802b8621616c4b4588c8",
-      "bytes": 907044
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/preview/member/login.js": {
+      "sha256": "380ab703f0fb0d4d72561002b8367f4558e5e2c7f1ca31fca1273e31b1432d8e",
+      "bytes": 907070
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/preview/member/productList.js": {
-      "sha256": "d265a0eed7958eb4078ccd2c00099f437af49e8c44f67073de986078b62eaa03",
-      "bytes": 1151702
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/preview/member/productList.js": {
+      "sha256": "6b8cade45e0f031e94143be7bab894f4329370ba00ba3671ba8e08e544b76036",
+      "bytes": 1151728
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/preview/member/productdetail.js": {
-      "sha256": "26b20edf77eee23557e47ee85ab6f0a24308dfe9c9070c7aabee18e5ea41edea",
-      "bytes": 1312544
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/preview/member/productdetail.js": {
+      "sha256": "f11d39676c017f399e57d61be307c303688e2b9dd7439cb6f2ecf0c00cf365f5",
+      "bytes": 1313369
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/preview/member/regist.js": {
-      "sha256": "c42f121084ea22abe704f42286c3f2dc3ddf6b76d5b0345f669ff8805def86d5",
-      "bytes": 907002
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/preview/member/regist.js": {
+      "sha256": "7b5dc5f8cde50dfd6cc16483784921bdfac0a54b90d8cfa7346ec71f94104734",
+      "bytes": 907028
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/tokens.css": {
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/tokens.css": {
       "sha256": "b3b0078edd8f8e9afc28a43092577bc02ffd857ba5efd7bf81ddb8e190a940dd",
       "bytes": 5991
     },
-    "public/cra1-shared/releases/20261109-cra1-v17-6-8/v10-axios.js": {
+    "public/cra1-shared/releases/20261111-cra1-domain-list-fixes-v4/v10-axios.js": {
       "sha256": "1898122078adcb8f8bffc9f9e6fa679f786203eea7752d7beb11484812d8b314",
       "bytes": 7768
     },
@@ -10940,8 +10940,8 @@
       "bytes": 1768
     },
     "public/cra1-shared/theme-sources/cart/cart-theme.css": {
-      "sha256": "d589ba4733b5eeee967e6210b4c8ab93a6345a9402548442f3f13ba55fa8413b",
-      "bytes": 109029
+      "sha256": "057376094c03a45d46cd901e7f7120b740eb6ab40da90118fb58992b48639832",
+      "bytes": 120735
     },
     "public/cra1-shared/theme-sources/cart/goods.css": {
       "sha256": "1acc7094a81fba6ddd8ea35328f0abfd174e1b509a5bd6af7e697564c4c3cf83",
@@ -10968,12 +10968,12 @@
       "bytes": 4977
     },
     "public/cra1-shared/theme-sources/member/cra1-shell.css": {
-      "sha256": "c50a80d448e35c973a3ee7296c659759b62e0d88c3a4d5ba041f892c9b13bb0c",
-      "bytes": 113083
+      "sha256": "ee5dce45b61b20fcbf87875810a249cc762162eba244b5ae0218710f3fb4a5e2",
+      "bytes": 127449
     },
     "public/cra1-shared/theme-sources/website/app.js": {
-      "sha256": "6cd8a79ee8d33756d4761d31fa607ca67c38f282efb261fab0fc7722da677f93",
-      "bytes": 99087
+      "sha256": "882185ec3b3437f67cc97e41cbe5687b138423fa0bd0d092bd735657c43483bb",
+      "bytes": 103244
     },
     "public/cra1-shared/theme-sources/website/marketing.css": {
       "sha256": "1b3b41d0a8971083635be79143ea71adb293a462745bd9557f1b425ada1d985e",
@@ -10995,159 +10995,159 @@
       "sha256": "7aed76249c82ae09e8028196fc8fa88623a26154e0b1a682ceaf9d646c3d5a8c",
       "bytes": 590171
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/admin.css": {
-      "sha256": "84975fc645ec32d8fe3aceb7142f5760ba65a7638d0e07f4a23bc6672e5f5cff",
-      "bytes": 72623
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/admin.css": {
+      "sha256": "194e78c16f7eaf2fe8a2c679a7817cb0857ea3b48cb29fe21b856bbdb3d1e6cb",
+      "bytes": 72891
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/admin.js": {
-      "sha256": "1400cbf8a814cfd49c20e65eb0d6fe0da1e0d57b03fbadc3b0507b12b31b1861",
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/admin.js": {
+      "sha256": "e63ba41b816eb9117070ef5ef81bb4c3a4964ddeb28e75648d7d9ae75716ffe8",
       "bytes": 804003
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/admin2.css": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/admin2.css": {
       "sha256": "cc35ce8a4be4610b1ff2d145b777024629681550f60c13c793d3ee98a305409b",
       "bytes": 5188
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/admin3.css": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/admin3.css": {
       "sha256": "0b8a5f8ea4816f00a65f8d601b038844c8855380c0bf628f7c0b51423ab2b627",
       "bytes": 4836
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/admin4.css": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/admin4.css": {
       "sha256": "37a4001d7c37d429d435552342de6d048e3a6608bfd790142638fa6624b5c06b",
       "bytes": 3282
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/admin5.css": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/admin5.css": {
       "sha256": "6a98b44def67b33ce5e1410e57ce99051e0926c14c1980ac4cf727530529c0d1",
       "bytes": 16977
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/admin6.css": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/admin6.css": {
       "sha256": "f48a60f8b5e35354e92542d111695e0533269fd88c791961f126c971e0f9c243",
       "bytes": 4170
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/admin7.css": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/admin7.css": {
       "sha256": "d2926861f190e87d51757a8fa6069a00fa980451bba31abf239da75186f3e67f",
       "bytes": 2418
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/Announcements-CrBRMJhv.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/Announcements-CrBRMJhv.js": {
       "sha256": "15e8ecd44aaa79ea4ffb1836498d9cea4d9a889b0582943674f8266b99853008",
       "bytes": 20684
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/Attachments-DyO-0vh1.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/Attachments-DyO-0vh1.js": {
       "sha256": "f187e2be5f9ca9e50ab0e3380429eee2a50ae76f652f5f3b1c7a3b374c8b65e6",
       "bytes": 11418
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/CartContent-CKKvCSlx.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/CartContent-CKKvCSlx.js": {
       "sha256": "6175b9eb5f61c0920c453727c53aa5b9623fa99b78398e352b9c8344010f417c",
       "bytes": 23835
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/FloatingActions-ASLEGbV4.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/FloatingActions-ASLEGbV4.js": {
       "sha256": "22a29c564031a0254525ab65bb3d6d1add83b6326961a507e3c9d5b940462b3b",
       "bytes": 2348
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/IconPicker-BvRrUJdo.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/IconPicker-BvRrUJdo.js": {
       "sha256": "95f2e1b07da567df38acdb52087db2673d9fb4f312ce09fdb738923b167f649f",
       "bytes": 22024
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/MediaPicker-Btp8E3ch.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/MediaPicker-Btp8E3ch.js": {
       "sha256": "c35240efc1a420d686b3ceee33381d0360bac0bcf075d396c486ae23097974b8",
       "bytes": 3485
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/MemberAppearance-CPXCAvvP.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/MemberAppearance-CPXCAvvP.js": {
       "sha256": "fabe43a9ce24c9e237dac5832cddfa400cd34c5126138f3f33f4d56874e6e829",
       "bytes": 4143
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/MemberAuth-DOSnh5Km.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/MemberAuth-DOSnh5Km.js": {
       "sha256": "78cf5dd117675a884daba63c057d3af4732dd098fd2925323e2126e214709329",
       "bytes": 8352
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/MemberContent-BY7wtwqE.js": {
-      "sha256": "b9fa8c4cd7b3076509fa591099589b7d05bd9f54f6b7265619364e0553fa10f7",
-      "bytes": 37124
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/MemberContent-XDXoSibw.js": {
+      "sha256": "53076f2322d4947d615271c84457ae6e792e05c2257fc72aa3fcb0c42d9dbf35",
+      "bytes": 37191
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/MemberSidebar-vS-C0ky0.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/MemberSidebar-vS-C0ky0.js": {
       "sha256": "4e16f59ad8db6d630ba1229635bca839af61555ee4430503afe87603b89d0aec",
       "bytes": 29797
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/MenuTransfer-DMODGZKp.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/MenuTransfer-DMODGZKp.js": {
       "sha256": "1bdc3417a62a335de4a358536a186555602b928390969cd67753262afbcfaf58",
       "bytes": 9176
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/RichText-Br5WVyor.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/RichText-Br5WVyor.js": {
       "sha256": "f8eab99e42e23c08c472a6197deedb9111835430e0472e20411c351393036d3e",
       "bytes": 7058
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/Security-6PUw-vMv.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/Security-6PUw-vMv.js": {
       "sha256": "fd2d515fd66d7c422a282acdd7bff995d2a7f4e677fff03a150b972d119db830",
       "bytes": 26582
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/Switch-XXrm42Ig.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/Switch-XXrm42Ig.js": {
       "sha256": "8e39716ee1e5a9541009d04673aad4e7c0851b918b9d7ab770bf562c936a74a3",
       "bytes": 1054
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/ThemeLifecycle-BsR7eBoJ.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/ThemeLifecycle-BsR7eBoJ.js": {
       "sha256": "8a5d0d6e6957ab2e69acfde0eefd505c7699bdba34a69394b675d2d431263a1a",
       "bytes": 7048
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/ThemeManagement-wdkR95EH.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/ThemeManagement-wdkR95EH.js": {
       "sha256": "f1d2a04be2794a06b1b5b0aafd6d10b51b3fb62c827c88c5ba52eb12baf12144",
       "bytes": 29514
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/VisualWebsite-CuXTbbxu.js": {
-      "sha256": "151f754cf715d8966b553f99f1125049128ccc849f284b72aaeb9486863d3cb3",
-      "bytes": 60421
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/VisualWebsite-DZz6EfNg.js": {
+      "sha256": "c7f2e6826e2ed0a657be4774862fc4ad8f6011c55b3c2ac57a45f3563bb2e7ee",
+      "bytes": 60449
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/arrow-up-CIaiC9p0.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/arrow-up-CIaiC9p0.js": {
       "sha256": "af044875a98f400b54cfb23d7c67bc5265ac0a80fa1506caa8ebd89058087311",
       "bytes": 272
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/copy-CEHYMEpa.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/copy-CEHYMEpa.js": {
       "sha256": "6ecbf0f29a6491e8ca5287c34040a1e75ac18f497d571c83978e53a1b59cfd61",
       "bytes": 224
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/download-BUPAhhBN.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/download-BUPAhhBN.js": {
       "sha256": "d4d069c2dea1e1f381dd463495ee71aa4e991fd73857c400b4b6e382e6952429",
       "bytes": 225
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/dragSort-DscAQgoY.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/dragSort-DscAQgoY.js": {
       "sha256": "99d27edecff8b7f15f11607432979254a50164af4725e22d74abff4ef366f431",
       "bytes": 11070
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/plus-CmeVDO6e.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/plus-CmeVDO6e.js": {
       "sha256": "110f821695819db9f5142a0415df10744c005800970139ca251f3f8238e5f8e1",
       "bytes": 146
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/power-BJKKdnNy.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/power-BJKKdnNy.js": {
       "sha256": "d1286a54c63a9bfa4da460d360f2a4cf6235677154ce2f284808af6a4b9cce76",
       "bytes": 166
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/qrcode-5IewWFXk.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/qrcode-5IewWFXk.js": {
       "sha256": "2970b32cca017d3a139d8d57ce77710f95c68a448624447be30ef9ffe2664099",
       "bytes": 21140
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/random-id-C_1XS9px.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/random-id-C_1XS9px.js": {
       "sha256": "3703ec3b07b74883b6bb87caad61e71ee4ba6df2c4a2c4a79b7eff3efa5661db",
       "bytes": 341
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/select-DmOHX1Rd.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/select-DmOHX1Rd.js": {
       "sha256": "de5ae256be167bee882b9a8a02f0ade63fa03b5425c13c75753440987e3780e2",
       "bytes": 55377
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/trash-2-YuKx9CWf.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/trash-2-YuKx9CWf.js": {
       "sha256": "8121dfea5f75138debb7ae6c4e8f2b8f8cbc61f06e8122bf37f5f4459d7df1e5",
       "bytes": 549
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/treeSort-DW6lBGG7.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/treeSort-DW6lBGG7.js": {
       "sha256": "3ee3abea5a5e5210e5b56c262990783a1f1fe18045c1cb5ef8bdd5eafe8580c8",
       "bytes": 9300
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/undo-2-C-G8STX7.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/undo-2-C-G8STX7.js": {
       "sha256": "7622ff554867367aa6f240fa9f5ec2ef7a26e5f6c6ddd9e76d904f2c5854e1a3",
       "bytes": 201
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/chunks/upload-tdFTTbq8.js": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/chunks/upload-tdFTTbq8.js": {
       "sha256": "90ea4d8c39dbd22544ac9b774937252b63d3282aa891a8f7c4a59df304d45adf",
       "bytes": 223
     },
-    "public/cra1admin/assets/releases/20261109-cra1-v17-6-8/security-login.css": {
+    "public/cra1admin/assets/releases/20261111-cra1-domain-list-fixes-v4/security-login.css": {
       "sha256": "cebcdb6f886914e9d843cba6f7671ad1af9ebfbff9f34277662e23077b32f754",
       "bytes": 3728
     },
@@ -14924,8 +14924,8 @@
       "bytes": 4985
     },
     "public/web/cra1/domain_register.html": {
-      "sha256": "1d2f8402fbe8424587e594a7e6874546e038b8077816178d93f7d47922d2ca47",
-      "bytes": 4567
+      "sha256": "a736a281223f8afade19f28f5efc08a268ad51f660d5021074166b40f601f8f3",
+      "bytes": 5391
     },
     "public/web/cra1/domain_shop.html": {
       "sha256": "0804741a46a67bafbae0820b2b7b8285dc4e0418a4a9c59ff2e45f89c9334fa6",
@@ -15011,37 +15011,37 @@
       "sha256": "0586f9c94ae8ed0c8b9563c5b0c68151aa570e1ea116bd4c1a5c4f7f98163f64",
       "bytes": 1630
     },
-    "public/web/cra1/releases/20261109-cra1-v17-6-8/20261011-business-icons-v1/manifest.json": {
+    "public/web/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261011-business-icons-v1/manifest.json": {
       "sha256": "b997404db7d2b23a71a9a8703e5dc96f776bf732a6205a4138ffa325e422bc1f",
       "bytes": 197
     },
-    "public/web/cra1/releases/20261109-cra1-v17-6-8/20261011-business-icons-v1/marketing.css": {
+    "public/web/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261011-business-icons-v1/marketing.css": {
       "sha256": "89f276a340368e6636a5cd163d4c5ca188542d4c51fc6e20778d3d841e98b045",
       "bytes": 20622
     },
-    "public/web/cra1/releases/20261109-cra1-v17-6-8/20261014-theme-fixes-v1/app.css": {
+    "public/web/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261014-theme-fixes-v1/app.css": {
       "sha256": "6cf3cc6772cb56025fd5a8749a32a97328f6703930c23e5a50588e0391b22954",
       "bytes": 285989
     },
-    "public/web/cra1/releases/20261109-cra1-v17-6-8/20261014-theme-fixes-v1/app.js": {
+    "public/web/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261014-theme-fixes-v1/app.js": {
       "sha256": "583169724f618edf6bc1d9a743f30791f325490d806e8e7472d743e60bd95374",
       "bytes": 97718
     },
-    "public/web/cra1/releases/20261109-cra1-v17-6-8/20261014-theme-fixes-v1/manifest.json": {
+    "public/web/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261014-theme-fixes-v1/manifest.json": {
       "sha256": "b363a325b07d3386fa5f9456268e250f31a22988f3ae69deb77fc39b303c78a6",
       "bytes": 318
     },
-    "public/web/cra1/releases/20261109-cra1-v17-6-8/20261017-compat-v3/app.js": {
-      "sha256": "6cd8a79ee8d33756d4761d31fa607ca67c38f282efb261fab0fc7722da677f93",
-      "bytes": 99087
+    "public/web/cra1/releases/20261111-cra1-domain-list-fixes-v4/20261017-compat-v3/app.js": {
+      "sha256": "882185ec3b3437f67cc97e41cbe5687b138423fa0bd0d092bd735657c43483bb",
+      "bytes": 103244
     },
-    "public/web/cra1/releases/20261109-cra1-v17-6-8/app.css": {
+    "public/web/cra1/releases/20261111-cra1-domain-list-fixes-v4/app.css": {
       "sha256": "4f9ed76743a0d18d408c5e028482adb17965f22bb74b59bc3c403dba7d4c1e73",
       "bytes": 191286
     },
-    "public/web/cra1/releases/20261109-cra1-v17-6-8/app.js": {
-      "sha256": "6cd8a79ee8d33756d4761d31fa607ca67c38f282efb261fab0fc7722da677f93",
-      "bytes": 99087
+    "public/web/cra1/releases/20261111-cra1-domain-list-fixes-v4/app.js": {
+      "sha256": "882185ec3b3437f67cc97e41cbe5687b138423fa0bd0d092bd735657c43483bb",
+      "bytes": 103244
     },
     "public/web/cra1/rent.html": {
       "sha256": "b29e62ee169b48cfecf2fd3f231285e55c69fccf1871d2e33a55371aa047e71f",

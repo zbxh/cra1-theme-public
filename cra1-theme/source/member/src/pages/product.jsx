@@ -295,6 +295,7 @@ function HostDetailPage({ hostId }) {
             params={{ id: hostId }}
             title={host.product_name}
             deps="detail"
+            moduleName={host.module}
             empty={
               <Card>
                 <CardContent className="p-5">

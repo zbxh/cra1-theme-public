@@ -1142,6 +1142,130 @@ body {
 .cra1-module-view .domain_details .tab .box>.item .com-r{min-width:0;padding:0;flex:1}
 @media(max-width:767px){.cra1-module-view .domain_details .main-card{padding:18px!important}.cra1-module-view .domain_details .com-top .r-btn{flex:1 1 100%}.cra1-module-view .domain_details .auth-pass>.item{flex-basis:100%}.cra1-module-view .domain_details .auth-pass .com-l{min-width:72px}.cra1-module-view .domain_details .auth-pass .com-r .el-switch{margin-right:8px}}
 
+/* Direct native resource pages use the same scoped presentation as embedded
+   panels. Keep the module's DOM, Vue instance and operation handlers intact. */
+.cra1-module-view .top-msg{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px!important;width:100%!important;min-width:0}
+.cra1-module-view .top-msg>.msg-l,
+.cra1-module-view .top-msg>.msg-r{box-sizing:border-box;width:auto!important;min-width:0!important;max-width:100%;height:auto!important;margin:0!important;padding:18px!important}
+.cra1-module-view .top-msg :is(.l-t,.r-t){flex-wrap:wrap;gap:8px;height:auto!important;margin-bottom:16px}
+.cra1-module-view .top-msg :is(.l-t-l-text,.r-t-l-text){font-size:15px!important;line-height:1.5}
+.cra1-module-view .top-msg :is(.l-b,.r-b){min-width:0}
+.cra1-module-view .top-msg :is(.l-b,.r-b)>.row{display:flex!important;flex-wrap:wrap;gap:12px 20px;margin:0 0 12px!important}
+.cra1-module-view .top-msg .row>:is(.row-l,.row-m,.row-r){display:flex!important;flex:1 1 180px;gap:6px;min-width:0!important;width:auto!important;align-items:flex-start;line-height:1.7}
+.cra1-module-view .top-msg .label{width:auto!important;min-width:0!important;flex:0 0 auto;white-space:normal;font-size:12px!important;line-height:1.7}
+.cra1-module-view .top-msg .value{width:auto!important;min-width:0!important;max-width:100%;font-size:12px!important;line-height:1.7;overflow-wrap:anywhere}
+.cra1-module-view .top-msg .r-b:has(>.s-item){display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px 24px}
+.cra1-module-view .top-msg .r-b>.s-item{display:flex!important;align-items:flex-start;flex-wrap:wrap;gap:6px;min-width:0!important;width:auto!important;margin:0!important}
+.cra1-module-view :is(.operation-row1,.operation-row2,.main-card-title){flex-wrap:wrap;gap:10px;height:auto!important}
+.cra1-module-view :is(.operation-row1 .top-product-name,.main-card-title .title){min-width:0;max-width:100%;overflow-wrap:anywhere}
+.cra1-module-view .operation-row1>.left{flex:1 1 280px;min-width:0;max-width:100%;flex-wrap:wrap;align-items:center!important;gap:8px 10px}
+.cra1-module-view .operation-row1>.left>.back-img{width:18px!important;height:18px!important;flex:0 0 18px;margin:0!important}
+.cra1-module-view .operation-row1>.left>.top-product-name{flex:1 1 180px;font-size:18px!important;line-height:1.5}
+.cra1-module-view .operation-row1>.left .host-status{flex-shrink:0;margin:0!important;white-space:nowrap}
+.cra1-module-view .operation-row1>.left>.top-area{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%;line-height:1.6;overflow-wrap:anywhere}
+.cra1-module-view .operation-row1 .top-area .country-img{flex-shrink:0;margin:0!important}
+.cra1-module-view .operation-row1>.right{min-width:0;max-width:100%}
+.cra1-module-view .common_product_detail .manage-content{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:16px}
+.cra1-module-view .common_product_detail .manage-content>.manage-item{width:auto!important;min-width:0;min-height:0;padding:18px!important;margin:0!important}
+.cra1-module-view .common_product_detail .manage-item .item-top{flex-wrap:wrap;gap:8px;min-width:0}
+.cra1-module-view .common_product_detail .manage-item .item-top-btn{box-sizing:border-box;width:auto!important;min-width:0!important;min-height:36px;height:auto!important;padding:8px 12px;margin:0!important;max-width:100%;font-size:13px;line-height:1.5;text-align:center;white-space:normal}
+.cra1-module-view .common_product_detail .manage-item :is(.el-select,.el-input){max-width:100%;min-width:0}
+.cra1-module-view .common_product_detail .manage-item .item-bottom{font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.cra1-module-view .main-card .echart-main{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px;min-width:0}
+.cra1-module-view .main-card .echart-main .echart-item{width:auto!important;min-width:0;max-width:100%;box-sizing:border-box}
+.cra1-module-view .main-card .echart-main .my-echart{width:100%!important;max-width:100%}
+@media(max-width:767px){
+ .cra1-module-view .top-msg{grid-template-columns:minmax(0,1fr)}
+ .cra1-module-view .top-msg :is(.msg-l,.msg-r){padding:16px!important}
+ .cra1-module-view .top-msg .row>:is(.row-l,.row-m,.row-r){flex-basis:100%}
+ .cra1-module-view .common_product_detail .manage-content{grid-template-columns:minmax(0,1fr)}
+ .cra1-module-view :is(.operation-row2,.notes){padding-left:0!important}
+}
+
+/* Native module dialogs may be moved to body by Element. Keep the same
+   viewport bounds there without changing the module's open/close handlers.
+   The root rem scale remains owned by V10; only controls and text are sized. */
+html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog{
+  box-sizing:border-box;max-width:calc(100vw - 32px)!important;min-width:0!important;
+}
+html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog :is(.btn-no,.btn-no:hover,.btn-no:focus){
+  color:var(--cui-body)!important;background:var(--cui-accent)!important;
+}
+@media(max-width:1024px){
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog__body{
+    padding:20px 16px!important;font-size:14px!important;line-height:1.6;overflow-wrap:anywhere;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog :is(.dialog-title,.del-dialog-title,.del-dialog-title>.tit,.el-dialog__title){
+    font-size:18px!important;line-height:1.5;overflow-wrap:anywhere;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog :is(.dialog-main,.del-dialog-main,.el-form,.el-form-item,.el-form-item__content,.el-input,.el-select,.el-textarea,.el-radio-group){
+    box-sizing:border-box;min-width:0!important;max-width:100%!important;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog :is(.el-form-item__label,.el-form-item__content,.el-radio__label,.el-checkbox__label,.label,.money-text,.s-tip,.row-1,.row-2){
+    font-size:14px!important;line-height:1.6!important;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog :is(.el-input__inner,.el-textarea__inner){
+    box-sizing:border-box;min-width:0!important;max-width:100%!important;min-height:44px;font-size:16px!important;line-height:1.5!important;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog :is(.dialog-footer,.del-dialog-footer,.el-dialog__footer,.footer-top,.footer-bottom){
+    min-width:0;max-width:100%;box-sizing:border-box;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog :is(.dialog-footer:not(:has(>.footer-bottom)),.del-dialog-footer,.el-dialog__footer,.footer-bottom){
+    display:flex!important;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog .footer-top{
+    flex-wrap:wrap;gap:8px;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog :is(.el-button,.btn-ok,.btn-no){
+    box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;max-width:100%;min-height:44px;height:auto!important;padding:9px 16px!important;font-size:14px!important;line-height:1.6!important;white-space:normal;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog :is(.el-button,.btn-ok,.btn-no)>span{
+    font-size:inherit!important;line-height:inherit;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog :is(.dialog-footer,.del-dialog-footer,.el-dialog__footer,.footer-bottom)>:is(.el-button,.btn-ok,.btn-no){
+    margin:0!important;
+  }
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog .money-num{font-size:20px!important;line-height:1.5}
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper,body:has(.chinac-phone-app) .el-dialog__wrapper) .el-dialog .original-price{font-size:13px!important;line-height:1.5}
+  .cra1-module-view .upgrade-dialog .el-form .el-form-item{padding-left:0!important}
+  .cra1-module-view .upgrade-dialog .el-form-item__label{float:none!important;display:block;width:auto!important;text-align:left;padding:0 0 8px!important}
+  .cra1-module-view .upgrade-dialog .el-form-item__content{margin-left:0!important}
+  .cra1-module-view .upgrade-dialog .el-slider{width:100%!important;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+  .cra1-module-view .upgrade-dialog .el-slider__runway{width:auto!important;flex:1 1 130px;margin:20px 0!important}
+  .cra1-module-view .upgrade-dialog .el-slider__input{float:none;flex:0 0 120px;width:120px!important}
+  .cra1-module-view .upgrade-dialog .marks{width:100%!important;margin-top:0!important;height:auto!important;gap:8px}
+  .cra1-module-view .upgrade-dialog .marks .item{font-size:12px!important;line-height:1.5!important}
+  .cra1-module-view .upgrade-dialog .el-radio-group{display:flex;flex-wrap:wrap;gap:8px}
+  .cra1-module-view .upgrade-dialog .el-radio-button__inner{width:auto!important;min-width:72px;min-height:44px;padding:10px 12px!important;line-height:22px!important;font-size:14px!important;border-radius:6px!important;border-left:1px solid var(--cui-control-edge)}
+  html[data-cra1-theme="member"] body:has(.cra1-module-view)>.el-dialog__wrapper .el-dialog:has(.el-slider):has(.footer-top) .el-form-item__label{float:none;display:block;width:auto!important;text-align:left;padding-bottom:8px}
+  html[data-cra1-theme="member"] body:has(.cra1-module-view)>.el-dialog__wrapper .el-dialog:has(.el-slider):has(.footer-top) .el-form-item__content{margin-left:0!important}
+  html[data-cra1-theme="member"] body:has(.cra1-module-view)>.el-dialog__wrapper .el-dialog:has(.el-slider):has(.footer-top) .el-slider{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+  html[data-cra1-theme="member"] body:has(.cra1-module-view)>.el-dialog__wrapper .el-dialog:has(.el-slider):has(.footer-top) .el-slider__runway{flex:1 1 130px;margin:20px 0}
+  html[data-cra1-theme="member"] body:has(.cra1-module-view)>.el-dialog__wrapper .el-dialog:has(.el-slider):has(.footer-top) .el-slider__input{float:none;flex:0 0 120px;width:120px}
+  html[data-cra1-theme="member"] body:has(.cra1-module-view)>.el-dialog__wrapper .el-dialog:has(.el-slider):has(.footer-top) .marks{display:flex;justify-content:space-between;gap:8px;font-size:12px}
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper) .el-dialog .dialog-footer:has(>.footer-bottom){display:block!important}
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper) .el-dialog .footer-top{display:flex;justify-content:flex-end;align-items:baseline}
+  html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)>.el-dialog__wrapper) .el-dialog .footer-bottom{margin-top:20px}
+  .cra1-module-view .change-dns .add-dns{display:flex;align-items:center;justify-content:center;min-height:44px;line-height:1.5}
+  .cra1-module-view .change-dns .add-dns .add,
+  .cra1-module-view .change-dns .other-dns .sub{font-size:18px!important}
+  html[data-cra1-theme="member"]:has(.cra1-module-view) .el-message{box-sizing:border-box;min-width:0;width:calc(100vw - 24px);max-width:480px;align-items:flex-start}
+  html[data-cra1-theme="member"]:has(.cra1-module-view) .el-message__content{font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+  .cra1-module-view #product_detail_cloud .com-s-tit{font-size:16px!important;line-height:1.5;margin-bottom:14px}
+  .cra1-module-view #product_detail_cloud .site-info{gap:18px;padding:16px;margin-bottom:24px}
+  .cra1-module-view #product_detail_cloud .site-info>.item{flex:1 1 180px!important;min-width:0;max-width:100%;font-size:14px!important;line-height:1.7;overflow-wrap:anywhere}
+  .cra1-module-view #product_detail_cloud .site-info .item p{flex-wrap:wrap;gap:4px;min-width:0}
+  .cra1-module-view #product_detail_cloud .site-info .space{font-size:13px!important;line-height:1.7;max-width:100%}
+  .cra1-module-view #product_detail_cloud .site-info .site-tit{color:var(--cui-muted);margin-bottom:6px}
+  .cra1-module-view #product_detail_cloud .site-info .password{display:inline-flex;align-items:center;min-height:44px;margin-left:0;font-size:14px!important}
+  .cra1-module-view #product_detail_cloud .site-info :is(.com-copy,.eyes){box-sizing:content-box;width:18px!important;height:18px!important;padding:10px;margin:0;object-fit:contain;flex:none}
+  .cra1-module-view #product_detail_cloud .func-box{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,110px),1fr));gap:10px;margin:0 0 24px}
+  .cra1-module-view #product_detail_cloud .func-box>.item{min-width:0;width:auto;height:auto;min-height:100px;margin:0;padding:14px 8px;font-size:14px!important}
+  .cra1-module-view #product_detail_cloud .func-box .item>.name{font-size:14px!important;line-height:1.5;overflow-wrap:anywhere}
+  .cra1-module-view #product_detail_cloud .func-box .item>img{width:26px;height:26px;margin-bottom:10px}
+  .cra1-module-view #product_detail_cloud .func-box .status-tag img{width:16px;height:16px}
+}
+
 /* 模块筛选栏在窄屏换行
    模块用 `.main-card-search{display:flex; justify-content:space-between}` 单行布局，
    其中 `.right-search .el-select/.el-input{width:2.2rem}`（≈165px @75px 根字号）。
@@ -2022,9 +2146,9 @@ html:not([data-cra1-native-module]) .goods > .el-container .footer-box {
 /* 结算页同样受益：标题与表格间距 */
 html:not([data-cra1-native-module]) .template .main-content-box { padding: 0 !important; }
 
-/* 购物车底栏：el-footer 固定条本身透明化（原为白底横条，宽 1475 与内容错位），
-   footer-box 升级为与内容区同宽（1440 居中）的玻璃卡，56px 高、左右 24px 内边距，
-   全部子项垂直居中。注意 footer-box 无 cra1- 类，不在全局 border-box 组内，需显式声明 */
+/* 购物车底栏：固定条本身透明，内部卡片与内容区同宽。
+   56px 仅作为最小高度；手机两行、长金额及字体放大时由内容撑高。
+   footer-box 不在全局 border-box 组内，需显式声明。 */
 html:not([data-cra1-native-module]) .template .el-footer,
 html:not([data-cra1-native-module]) .goods > .el-container .el-footer {
   position: fixed !important;
@@ -2043,7 +2167,8 @@ html:not([data-cra1-native-module]) .goods > .el-container .footer-box {
   width: 100% !important;
   max-width: 1440px !important;
   margin: 0 auto !important;
-  height: 56px !important;
+  height: auto !important;
+  min-height: 56px;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;

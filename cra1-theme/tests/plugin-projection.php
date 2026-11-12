@@ -19,4 +19,11 @@ check($p['host']['module']==='mf_dcim'&&$calls===[12],'authorized native host re
 check(!isset($p['self_defined_field'][0]['value']),'protected custom field values remain hidden');
 CRA1ThemeCompatibility::host(['host'=>[]],$resolve);
 check($calls===[12],'empty native host never triggers a module lookup');
+foreach ([[], [['id'=>4,'name'=>'IdcsmartDomain','status'=>0]], [['id'=>4,'name'=>'IdcsmartDomain','status'=>1]]] as $plugins) {
+    $projection=CRA1ThemeRuntime::project([], $plugins, 'website');
+    check($projection['features']['domain_search']===(!empty($plugins)&&(int)$plugins[0]['status']===1),'website domain search follows the native plugin enable state');
+    check(!isset($projection['plugins'])&&!isset($projection['common']['plugins']),'domain lookup does not expose plugin configuration');
+    $cart=CRA1ThemeRuntime::project([], $plugins, 'goodsList');
+    check(!isset($cart['features']['domain_search']),'website-specific search capability stays out of unrelated projections');
+}
 echo json_encode(['status'=>'passed','checks'=>$checks]),PHP_EOL;

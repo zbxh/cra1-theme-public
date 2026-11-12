@@ -32,18 +32,18 @@ html[data-cra1-native-cart] .cra1-aside { font-size: 13px; line-height: 1.5; }
 html[data-cra1-native-cart] .cra1-notices-host { flex: 0 0 auto; }
 /* The common native desktop fallback has a fixed sidebar at top:0. Put those
    same nodes in two columns so it cannot cover the header or page notices. */
-html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) {
+html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) {
   display: grid;
   grid-template-columns: minmax(0,1fr) minmax(260px,300px);
   align-items: start;
   gap: 24px;
 }
-html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) > .l-config {
+html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) > .l-config {
   min-width: 0;
   width: auto;
   margin-right: 0;
 }
-html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) > .order-right {
+html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) > .order-right {
   position: sticky;
   top: calc(var(--header-h) + 16px);
   right: auto;
@@ -57,18 +57,18 @@ html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-
   border-radius: 16px;
   box-shadow: var(--cui-shadow-card);
 }
-html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) > .l-config > .main-card {
+html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) > .l-config > .main-card {
   border: 1px solid var(--cui-line);
   border-radius: 16px;
   padding: 24px;
   box-sizing: border-box;
   background: var(--cui-surface);
 }
-html[data-cra1-native-cart] .common-box:has(> .l-config + .order-right) .f-btn {
+html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) .f-btn {
   display: flex;
   gap: 8px;
 }
-html[data-cra1-native-cart] .common-box:has(> .l-config + .order-right) .f-btn > .el-button {
+html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) .f-btn > .el-button {
   flex: 1 1 0;
   min-width: 0;
   min-height: 40px;
@@ -79,6 +79,10 @@ html[data-cra1-native-cart] .common-box:has(> .l-config + .order-right) .f-btn >
   font-size: 13px;
   line-height: 1.4;
   white-space: normal;
+}
+/* A native flyout handle is redundant when the same price panel is in the flow. */
+html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) > .order-right > .flod {
+  display: none;
 }
 /* Color and shape only: no sizing, positioning, extra controls or DOM rewriting. */
 html[data-cra1-native-cart] .config-box .el-input__inner,
@@ -102,16 +106,112 @@ html[data-cra1-native-cart] .config-box :is(button,a,input,textarea):focus-visib
   outline: 2px solid var(--cui-focus);
   outline-offset: 2px;
 }
+/* The native bottom-order layout reserves 190px for its permanent sidebar.
+   CRA1's navigation is an overlay; retain every original order control. */
+html[data-cra1-native-cart] .config-box .content .f-order:has(> .el-main > .main-card > .left .duration-select) > .l-empty {
+  display: none;
+}
 @media (max-width:1024px) {
-  html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) { grid-template-columns: minmax(0,1fr); gap: 16px; }
-  html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) > .order-right {
+  html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) { grid-template-columns: minmax(0,1fr); gap: 16px; }
+  html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) > .order-right {
     position: static;
     max-height: none;
     overflow: visible;
     font-size: 14px;
   }
-  html[data-cra1-native-cart] .common-config .common-box:has(> .l-config + .order-right) > .l-config > .main-card { padding: 16px; }
-  html[data-cra1-native-cart] .common-box:has(> .l-config + .order-right) .l-config :is(.el-input,.el-select,.el-textarea) { max-width: 100%; }
+  html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) > .l-config > .main-card { padding: 16px; }
+  html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) .l-config :is(.el-input,.el-select,.el-textarea) { max-width: 100%; }
+  /* Some installed native modules only ship a desktop fixed footer. Reflow
+     that recognized footer at narrow widths, without cloning its calculator. */
+  html[data-cra1-native-cart] .config-box .content .f-order:has(> .el-main > .main-card > .left .duration-select) {
+    position: static;
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    display: block;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order:has(> .el-main > .main-card > .left .duration-select) > .el-main {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+    margin: 0;
+    padding: 16px;
+    border: 1px solid var(--cui-line);
+    border-radius: 16px;
+    background: var(--cui-surface);
+    box-shadow: var(--cui-shadow-card);
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order:has(> .el-main > .main-card > .left .duration-select) > .el-main > .main-card {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    gap: 16px;
+    min-width: 0;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order .main-card > .left:has(.duration-select) {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 16px;
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order .left:has(.duration-select) :is(.time,.num) {
+    min-width: 0;
+    margin: 0;
+    line-height: 1.5;
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order .left:has(.duration-select) .l-txt {
+    display: block;
+    margin: 0 0 6px;
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order .left:has(.duration-select) :is(.duration-select,.el-input-number,.el-input__inner) {
+    width: 100%;
+    max-width: 100%;
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order .left:has(.duration-select) :is(.el-input-number,.el-input__inner) {
+    height: 40px;
+    line-height: 40px;
+    box-sizing: border-box;
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order .left:has(.duration-select) .el-input-number .el-input__inner { padding: 0 34px; }
+  html[data-cra1-native-cart] .config-box .content .f-order .left:has(.duration-select) :is(.el-input-number__decrease,.el-input-number__increase) {
+    top: 1px;
+    bottom: 1px;
+    width: 32px;
+    height: auto;
+    line-height: 38px;
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order .left:has(.duration-select) .el-input-number__decrease { left: 1px; }
+  html[data-cra1-native-cart] .config-box .content .f-order .left:has(.duration-select) .el-input-number__increase { right: 1px; }
+  html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .main-card > .mid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .mid > .line-empty { display: none; }
+  html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .mid > .bot-price {
+    min-width: 0;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .bot-price .new span { font-size: 22px; }
+  html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .main-card > .right { gap: 8px; min-width: 0; }
+  html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .right .add-cart { width: 44px; height: 44px; border-radius: 8px; }
+  html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .right .buy {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 44px;
+  }
 }
 @media (max-width:750px) {
   html[data-cra1-native-cart] .goods > .el-container > .el-container > .el-main { padding-top: 16px; }

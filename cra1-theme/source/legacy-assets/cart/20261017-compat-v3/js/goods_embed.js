@@ -111,6 +111,145 @@
   var railWatchTimer = null;
   var railAwaitSince = null;
   var railAddPending = null;
+  var quoteExecution = null;
+  var quotePrepared = false;
+  var couponPending = false;
+  var couponFailure = '';
+
+  function quoteSelection(vm) {
+    return JSON.stringify(vm.params ? [vm.params, vm.qty, vm.activeName, vm.packageId, vm.promo]
+      : [vm.configForm, vm.cycle, vm.orderData && vm.orderData.qty, vm.customfield]);
+  }
+
+  // The three integrated modules retain their native calculation method. Run
+  // it once at a time and coalesce changes made while it is awaiting a quote.
+  // In particular, an old response may update its native VM, but can never
+  // unlock the parent calculator before the current configuration is priced.
+  window.__CART_EMBED__.prepare = function (module) {
+    if (quotePrepared || !['mf_cloud', 'mf_dcim', 'idcsmart_common'].includes(module)) return;
+    if (!window.Vue || !window.Axios) return;
+    quotePrepared = true;
+    var axios = window.Axios, nativePost = axios.post;
+    axios.post = function (url, data) {
+      var path = String(url).split('?')[0].replace(/^\/console\/v1/, '');
+      var quote = path === '/product/' + productId + '/config_option';
+      var cycles = path === '/product/' + productId + '/configoption/calculate';
+      var operation = (quote || cycles) ? quoteExecution : null;
+      if (operation && quote) operation.selection = quoteSelection(operation.owner);
+      var response = nativePost.apply(this, arguments);
+      if (!operation && path !== '/promo_code/apply') return response;
+      return response.then(function (result) {
+        if (operation && quote) {
+          var value = result && result.data && result.data.data;
+          operation.success = !!value && Number(result.data.status) === 200
+            && railIsFiniteNum(value.price_total) && Number(value.price_total) >= 0;
+          if (!operation.success) operation.failed = true;
+        }
+        return result;
+      }, function (error) {
+        if (operation) operation.failed = true;
+        if (path === '/promo_code/apply') couponFailure = window.CRA1Shared?.Errors?.message(error,
+          { fallback: '优惠码暂时无法使用，请检查后重试' }) || '优惠码暂时无法使用，请检查后重试';
+        throw error;
+      });
+    };
+    window.Vue.mixin({
+      beforeCreate: function () {
+        var methods = this.$options.methods;
+        if (!methods || typeof methods.changeConfig !== 'function'
+            || !(methods.handlerCart && methods.submitOrder || methods.addCart && methods.buyNow)) return;
+        var nativeChange = methods.changeConfig;
+        this.__cra1Quote = { state: 'loading', pending: false, running: null, args: [] };
+        this.$options.methods = Object.assign({}, methods, { changeConfig: function () {
+          var vm = this, state = vm.__cra1Quote;
+          state.args = Array.from(arguments);
+          state.pending = true;
+          state.state = 'loading';
+          if (railVM === vm) railPush(true);
+          if (state.running) return state.running;
+          // Defer one microtask so running is assigned even if the native
+          // method returns before an image or billing period is available.
+          state.running = Promise.resolve().then(async function () {
+            while (state.pending && !vm._isDestroyed) {
+              state.pending = false;
+              var operation = { owner: vm, success: false, failed: false, selection: '' };
+              quoteExecution = operation;
+              try { await nativeChange.apply(vm, state.args); }
+              catch (error) { operation.failed = true; }
+              finally { if (quoteExecution === operation) quoteExecution = null; }
+              if (!state.pending) {
+                state.state = operation.success && !operation.failed ? 'ready' : 'error';
+                state.selection = operation.selection;
+              }
+            }
+          }).finally(function () {
+            state.running = null;
+            if (railVM === vm) railPush(true);
+          });
+          return state.running;
+        } });
+      },
+    });
+  };
+
+  function couponComponent() {
+    var pending = railVM ? [railVM] : [];
+    while (pending.length) {
+      var component = pending.shift();
+      if (typeof component.handelApplyPromoCode === 'function'
+          && typeof component.removePromoCode === 'function'
+          && String(component.product_id) === String(productId)) return component;
+      if (component.$children) pending.push.apply(pending, component.$children);
+    }
+    return null;
+  }
+
+  function couponAction(value, remove) {
+    if (couponPending) return;
+    var component = couponComponent();
+    var restoreMessage = null;
+    function finish(success, message) {
+      if (restoreMessage) restoreMessage();
+      couponPending = false;
+      post('rail-coupon-result', { success: success, message: message || '',
+        applied: String(component && component.appliedPromoCode || '') });
+      railPush(true);
+    }
+    if (!component) { finish(false, '优惠码暂时无法使用，请刷新后重试'); return; }
+    couponPending = true;
+    couponFailure = '';
+    // The native component owns validation and discount events. Its toast is
+    // presented once in the parent document instead of inside a clipped frame.
+    var originalMessage = component.$message;
+    var hadMessage = Object.prototype.hasOwnProperty.call(component, '$message');
+    var quietMessage = function () {};
+    ['success', 'warning', 'error', 'info'].forEach(function (type) { quietMessage[type] = quietMessage; });
+    component.$message = quietMessage;
+    restoreMessage = function () {
+      if (component.$message !== quietMessage) return;
+      if (hadMessage) component.$message = originalMessage;
+      else delete component.$message;
+    };
+    try {
+      if (remove) {
+        component.removePromoCode();
+        finish(true, '已移除优惠码');
+        return;
+      }
+      component.discountInputVal = String(value || '').trim();
+      component.handelApplyPromoCode();
+      var started = Date.now();
+      var timer = setInterval(function () {
+        if (component._isDestroyed || Date.now() - started > 65000) {
+          clearInterval(timer); finish(false, '优惠码验证暂未完成，请稍后重试');
+        } else if (!component.isLoading) {
+          clearInterval(timer);
+          var success = component.appliedPromoCode === String(value || '').trim() && !couponFailure;
+          finish(success, success ? '优惠码已应用' : (couponFailure || '优惠码暂时无法使用，请检查后重试'));
+        }
+      }, 100);
+    } catch (error) { finish(false, '优惠码暂时无法使用，请检查后重试'); }
+  }
 
   function railFindVM() {
     var els = document.querySelectorAll('.m-cloud-m, .m-dcim-m, .template');
@@ -212,7 +351,7 @@
           suffix: String(window.CRA1Shared.Runtime.common().currency_suffix ?? vm.currency_suffix ?? ''),
           calcText: pay !== null ? railFmt(pay) : '',
           originText: orig !== null && pay !== null && orig > pay ? railFmt(orig) : '',
-          hasDiscount: false,
+          hasDiscount: !!vm.isShowPromo,
         },
         preview: cItems,
       };
@@ -223,9 +362,15 @@
       });
       var priced = railKind === 'f-order' ? calc !== null : pay !== null;
       snap.availability = selected && priced && !vm.loadingPrice && !vm.dataLoading ? 'ready' : 'loading';
+      if (vm.__cra1Quote && vm.__cra1Quote.state !== 'ready') snap.availability = vm.__cra1Quote.state;
+      if (vm.__cra1Quote?.state === 'ready' && vm.__cra1Quote.selection !== quoteSelection(vm)) snap.availability = 'error';
+      if (vm.__cra1Quote?.running || vm.__cra1Quote?.pending || couponPending) snap.availability = 'loading';
+      var coupon = couponComponent();
+      snap.couponApplied = String(coupon && coupon.appliedPromoCode || '');
       if (snap.availability !== 'ready') {
         snap.price.calcText = '';
         snap.price.originText = '';
+        snap.preview = [];
       }
     }
     return snap;
@@ -291,20 +436,11 @@
           vm.orderData.qty = q;
           if (typeof vm.changeConfig === 'function') vm.changeConfig();
         }
-      } else if (field === 'coupon') {
-        var inp = document.querySelector('.discount-code input, .discount-box input');
-        if (inp) {
-          var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-          setter.call(inp, String(value || ''));
-          inp.dispatchEvent(new Event('input', { bubbles: true }));
-          var btn = inp.closest('.discount-code, .discount-box');
-          btn = btn && btn.querySelector('button, .btn, [class*="confirm"], [class*="exchange"]');
-          if (btn) btn.click();
-          else inp.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      }
+      } else if (field === 'coupon' || field === 'coupon-remove') couponAction(value, field === 'coupon-remove');
     } catch (e) { /* 模块方法异常：轮询会把实际状态回传父页 */ }
-    setTimeout(function () { railPush(false); }, 900);
+    // Always acknowledge actions, including unchanged quantities and rejected
+    // coupons; deduplicated polling alone cannot clear the parent's busy state.
+    setTimeout(function () { railPush(true); }, 900);
   }
 
   function railCanSubmit() {
@@ -380,6 +516,9 @@
     if (!data || data.v !== 1 || data.source !== 'cart-parent') return;
     if (String(data.productId) !== String(productId) || data.nonce !== nonce) return;
     if (data.type === 'rail-init') railBoot(true);
+    else if (data.type === 'rail-requote') {
+      if (railVM && typeof railVM.changeConfig === 'function') railVM.changeConfig();
+    }
     else if (data.type === 'shell-config') {
       // 父页下发壳层配置（v6.5：选配方式标题文本，后台可自定义）
       if (data.tabsTitle) {

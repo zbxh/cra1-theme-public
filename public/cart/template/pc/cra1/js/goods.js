@@ -176,20 +176,32 @@ localStorage.setItem = function (key, newValue) {
               this.configError("商品配置暂不可用，请重试或选择其他商品。");
               return false;
             }
+            const module=typeof res.data.data.module === 'string' ? res.data.data.module : '';
+            const modules=window.CRA1CartModules;
+            if (!modules) throw new Error('商品页面尚未加载');
+            const managed=!!modules.profile(module);
+            if (!managed) {
+              // Legacy embed links retain the complete native document.
+              window.top.location.replace(modules.url('/cart/goods.htm', this.id));
+              return false;
+            }
             await this.$nextTick();
             const host=document.querySelector('.config-box .content');
             if (!host || !window.CRA1ModuleDeps) throw new Error('配置组件尚未加载');
             await window.CRA1ModuleDeps.ensure('config');
-            const controls=window.CRA1CartControls;
-            const module=typeof res.data.data.module === 'string' ? res.data.data.module : '';
-            const nativeModule=!(controls && typeof controls.profile==='function' && controls.profile(module));
+            const nativeModule=!this.isEmbed;
             document.documentElement.toggleAttribute('data-cra1-native-module',nativeModule);
             const root=document.querySelector('.goods.cart-page');
             if(root)root.toggleAttribute('data-cra1-native-module',nativeModule);
             if(window.__CART_EMBED__)window.__CART_EMBED__.nativeModule=nativeModule;
-            const content = controls ? controls.transform(res.data.data.content,module) : res.data.data.content;
-            host.innerHTML=content;
-            await window.CRA1ModuleDeps.mountScripts(host);
+            if (this.isEmbed && window.__CART_EMBED__?.prepare) window.__CART_EMBED__.prepare(module);
+            if (nativeModule) {
+              $.ajaxSetup({cache:true});
+              $(host).html(res.data.data.content);
+            } else {
+              host.innerHTML=window.CRA1CartControls.transform(res.data.data.content,module);
+              await window.CRA1ModuleDeps.mountScripts(host);
+            }
             if (window.__CART_EMBED__ && this.isEmbed) window.__CART_EMBED__.markReady();
             this.content = res.data.data.content;
             return true;

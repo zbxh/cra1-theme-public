@@ -134,6 +134,7 @@ final class CRA1ThemeRuntime
         $activeNames=array_map('strtolower',array_column(array_filter($plugins,static function($p){return (int)($p['status'] ?? 0)===1;}),'name'));
         $features=[]; foreach (['renew'=>'idcsmartrenew','refund'=>'idcsmartrefund','flow_packet'=>'flowpacket','unified_expiry'=>'unifiedexpiry','ticket'=>'idcsmartticket','news'=>'idcsmartnews','announcement'=>'idcsmartannouncement','help'=>'idcsmarthelp','client_care'=>'clientcare','certification_available'=>'idcsmartcertification','ssh'=>'idcsmartsshkey','security_group'=>'idcsmartcloud'] as $cap=>$plugin) $features[$cap]=in_array($plugin,$activeNames,true);
         $features += ['recharge_open' => 0, 'withdraw_open' => !empty($extra['withdraw']) ? 1 : 0];
+        if ($page === 'website') $features['domain_search'] = in_array('idcsmartdomain', $activeNames, true);
         if ($on('recharge_open')) {
             $features['recharge_open'] = 1;
             $common['recharge_open'] = 1;

@@ -67,11 +67,23 @@
           this.isShowFull = true;
         }
         this.getCartList();
+        const footer = this.$el.querySelector('.el-footer');
+        if (footer && typeof ResizeObserver !== 'undefined') {
+          this._cartFooterObserver = new ResizeObserver(this.syncCartFooterHeight);
+          this._cartFooterObserver.observe(footer);
+        }
+        window.addEventListener('resize', this.syncCartFooterHeight);
+        this.syncCartFooterHeight();
       },
       updated() {
         // 关闭loading
         document.getElementById("mainLoading").style.display = "none";
         document.getElementsByClassName("template")[0].style.display = "block";
+        this.syncCartFooterHeight();
+      },
+      beforeDestroy() {
+        if (this._cartFooterObserver) this._cartFooterObserver.disconnect();
+        window.removeEventListener('resize', this.syncCartFooterHeight);
       },
       destroyed() { this.hotRequestId++; },
       data() {
@@ -150,6 +162,10 @@
         },
       },
       methods: {
+        syncCartFooterHeight() {
+          const footer = this.$el.querySelector('.el-footer');
+          if (footer) this.$el.style.setProperty('--cra1-basket-footer-height', Math.ceil(footer.getBoundingClientRect().height) + 'px');
+        },
         go(url) {
           location.href = url;
         },
