@@ -151,15 +151,15 @@ export default function AgreementPage() {
       {(docs.prev?.id || docs.next?.id) && (
         <nav className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label="相邻文档">
           {docs.prev?.id ? (
-            <a href={`/agreement.htm?id=${docs.prev.id}`}
-               className="rounded-xl border border-line bg-surface p-4 transition-colors duration-150 hover:border-brand/40 hover:bg-brand/4">
+            <a href={`/agreement.htm?id=${docs.prev.id}`} data-cui-edge="hover"
+               className="rounded-xl border border-line bg-surface p-4 transition-colors duration-150 hover:bg-brand/4">
               <span className="text-xs text-muted-foreground">上一篇</span>
               <p className="mt-1 truncate text-[13px] font-medium text-ink">{docs.prev.title}</p>
             </a>
           ) : <span />}
           {docs.next?.id && (
-            <a href={`/agreement.htm?id=${docs.next.id}`}
-               className="rounded-xl border border-line bg-surface p-4 text-right transition-colors duration-150 hover:border-brand/40 hover:bg-brand/4">
+            <a href={`/agreement.htm?id=${docs.next.id}`} data-cui-edge="hover"
+               className="rounded-xl border border-line bg-surface p-4 text-right transition-colors duration-150 hover:bg-brand/4">
               <span className="text-xs text-muted-foreground">下一篇</span>
               <p className="mt-1 truncate text-[13px] font-medium text-ink">{docs.next.title}</p>
             </a>

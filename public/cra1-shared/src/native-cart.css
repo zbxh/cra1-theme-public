@@ -54,12 +54,12 @@ html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .
   overflow: auto;
   padding: 20px;
   border: 1px solid var(--cui-line);
-  border-radius: 16px;
+  border-radius: var(--cui-radius-card);
   box-shadow: var(--cui-shadow-card);
 }
 html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) > .l-config > .main-card {
   border: 1px solid var(--cui-line);
-  border-radius: 16px;
+  border-radius: var(--cui-radius-card);
   padding: 24px;
   box-sizing: border-box;
   background: var(--cui-surface);
@@ -85,14 +85,14 @@ html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .
   display: none;
 }
 /* Color and shape only: no sizing, positioning, extra controls or DOM rewriting. */
-html[data-cra1-native-cart] .config-box .el-input__inner,
-html[data-cra1-native-cart] .config-box .el-textarea__inner {
+html[data-cra1-native-cart] :where(.config-box) .el-input__inner,
+html[data-cra1-native-cart] :where(.config-box) .el-textarea__inner {
   background-color: var(--cui-field);
   border-color: var(--cui-control-edge);
-  border-radius: 8px;
+  border-radius: var(--cui-radius-control);
   color: var(--cui-body);
 }
-html[data-cra1-native-cart] .config-box .el-button { border-radius: 8px; }
+html[data-cra1-native-cart] .config-box .el-button { border-radius: var(--cui-radius-control); }
 html[data-cra1-native-cart] .config-box .el-button--primary:not(.is-plain):not(.is-disabled) {
   background: var(--cui-button-highlight),var(--cui-button-gradient);
   border-color: var(--cui-brand);
@@ -102,6 +102,17 @@ html[data-cra1-native-cart] .config-box .el-input__inner:focus,
 html[data-cra1-native-cart] .config-box .el-textarea__inner:focus {
   border-color: var(--cui-focus);
 }
+/* Only known Element poppers are adapted outside the module subtree. Their
+   values, geometry, mounting, selection events and price handlers stay native. */
+html[data-cra1-native-cart] :is(.el-select-dropdown,.el-dropdown-menu,.el-cascader__dropdown,.el-picker-panel,.el-popover) {
+  border-color:var(--cui-control-edge); border-radius:var(--cui-radius-popover); background:var(--cui-surface);
+  color:var(--cui-body); box-shadow:var(--cui-shadow-pop);
+}
+html[data-cra1-native-cart] .el-select-dropdown__list {padding:5px;}
+html[data-cra1-native-cart] :is(.el-select-dropdown__item,.el-dropdown-menu__item,.el-cascader-node) {border-radius:var(--cui-radius-control);color:var(--cui-body);}
+html[data-cra1-native-cart] :is(.el-select-dropdown__item.selected,.el-select-dropdown__item.hover,.el-dropdown-menu__item:focus,.el-dropdown-menu__item:hover,.el-cascader-node.in-active-path) {background:var(--cui-selected);color:var(--cui-ink);}
+html[data-cra1-native-cart] :is(.el-select-dropdown__item.is-disabled,.el-dropdown-menu__item.is-disabled,.el-cascader-node.is-disabled) {background:transparent;color:var(--cui-muted);}
+html[data-cra1-native-cart] :is(.el-dialog,.el-message-box) {border-color:var(--cui-control-edge);border-radius:var(--cui-radius-card);background:var(--cui-surface);color:var(--cui-body);box-shadow:var(--cui-shadow-pop);}
 html[data-cra1-native-cart] .config-box :is(button,a,input,textarea):focus-visible {
   outline: 2px solid var(--cui-focus);
   outline-offset: 2px;
@@ -120,7 +131,9 @@ html[data-cra1-native-cart] .config-box .content .f-order:has(> .el-main > .main
     font-size: 14px;
   }
   html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) > .l-config > .main-card { padding: 16px; }
-  html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) .l-config :is(.el-input,.el-select,.el-textarea) { max-width: 100%; }
+  /* Table cells keep the module's own control widths; their table already
+     scrolls horizontally. Clamping them to a narrow cell hides selected values. */
+  html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) .l-config :is(.el-input,.el-select,.el-textarea):not(.el-table *) { max-width: 100%; }
   /* Some installed native modules only ship a desktop fixed footer. Reflow
      that recognized footer at narrow widths, without cloning its calculator. */
   html[data-cra1-native-cart] .config-box .content .f-order:has(> .el-main > .main-card > .left .duration-select) {
@@ -139,7 +152,7 @@ html[data-cra1-native-cart] .config-box .content .f-order:has(> .el-main > .main
     margin: 0;
     padding: 16px;
     border: 1px solid var(--cui-line);
-    border-radius: 16px;
+    border-radius: var(--cui-radius-card);
     background: var(--cui-surface);
     box-shadow: var(--cui-shadow-card);
   }
@@ -202,13 +215,13 @@ html[data-cra1-native-cart] .config-box .content .f-order:has(> .el-main > .main
   }
   html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .bot-price .new span { font-size: 22px; }
   html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .main-card > .right { gap: 8px; min-width: 0; }
-  html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .right .add-cart { width: 44px; height: 44px; border-radius: 8px; }
+  html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .right .add-cart { width: 44px; height: 44px; border-radius: var(--cui-radius-control); }
   html[data-cra1-native-cart] .config-box .content .f-order:has(.left .duration-select) .right .buy {
     flex: 1 1 0;
     width: auto;
     min-width: 0;
     margin: 0;
-    border-radius: 8px;
+    border-radius: var(--cui-radius-control);
     font-size: 14px;
     line-height: 44px;
   }

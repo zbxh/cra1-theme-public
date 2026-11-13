@@ -17,7 +17,7 @@
         </div>
         <ul class="mt-8 space-y-3">
             {foreach $data.cra1.price_slider_rows as $ps => $psr}
-            <li class="price-row group grid gap-4 border border-line bg-white px-5 py-5 transition-colors duration-150 hover:border-brand/35 md:grid-cols-[14rem_minmax(0,1fr)_10rem] md:items-center md:gap-8 md:px-7" data-reveal>
+            <li data-cui-edge="hover" class="price-row group grid gap-4 border border-line bg-white px-5 py-5 transition-colors duration-150 md:grid-cols-[14rem_minmax(0,1fr)_10rem] md:items-center md:gap-8 md:px-7" data-reveal>
                 <div class="min-w-0">
                     <p class="flex items-center gap-2 text-sm font-semibold text-ink">
                         {$psr['icon_tile']|default=''|raw}{$psr['name']}

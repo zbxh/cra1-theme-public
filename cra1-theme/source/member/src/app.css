@@ -47,13 +47,14 @@
      色值与 ui/feedback.jsx 的 Badge tones 同源（硬性标准 §8：颜色走令牌） */
   --color-success: var(--cui-success);
   --color-warning: var(--cui-warning);
-  /* 圆角尺度（阿里云卡片 8px 基准） */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 10px;
-  --radius-2xl: 12px;
+  /* Match shared controls and cards without depending on the V10 rem scale. */
+  --radius: var(--cui-radius-control);
+  --radius-xs: var(--cui-radius-sm);
+  --radius-sm: var(--cui-radius-control);
+  --radius-md: var(--cui-radius-control);
+  --radius-lg: var(--cui-radius-card);
+  --radius-xl: var(--cui-radius-card);
+  --radius-2xl: var(--cui-radius-card);
   --radius-3xl: var(--cui-radius-card);
   --color-steel:var(--cui-steel); --color-champagne:var(--cui-champagne); --color-silver:var(--cui-silver);
   /* ── 单位基准修正（关键）────────────────────────────────────────────
@@ -75,7 +76,9 @@
 
 /* 基础按钮与输入控件由三端共用 cra1-shared.css 提供。 */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  :is(#root,#cra1-content-slot,.cra1-auth-page) *,
+  :is(#root,#cra1-content-slot,.cra1-auth-page) *::before,
+  :is(#root,#cra1-content-slot,.cra1-auth-page) *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
 
 /* 登录页品牌区雾气流动（§8.2 动态背景必须真的在动；
@@ -100,9 +103,6 @@
 .auth-fog-c { animation: auth-fog-c 22s ease-in-out infinite; }
 
 /* 服务器控制面板 aceternity 原语（浅色改良；仅 transform/opacity） */
-@keyframes beam-spin {
-  to { transform: rotate(360deg); }
-}
 @keyframes fog-drift-a {
   0% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(90px, 50px) scale(1.14); }

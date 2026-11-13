@@ -225,7 +225,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
   border: none;
   background: transparent;
   padding: 6px 14px;
-  border-radius: 999px;
+  border-radius: var(--cui-radius-control);
   font-size: 14px;
   line-height: 20px;
   color: var(--muted-foreground);
@@ -807,7 +807,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
 .cart-page .cl-desc-toggle:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: var(--cui-radius-control);
 }
 
 /* ---- 底部加载提示 ---- */
@@ -834,7 +834,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
 .cart-page .cl-sec-bar {
   width: 3px;
   height: 16px;
-  border-radius: 2px;
+  border-radius: var(--cui-radius-card);
   background: var(--primary);
   align-self: center;
 }
@@ -934,7 +934,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
 
 .cart-page .cl-tag {
   padding: 1px 8px;
-  border-radius: 4px;
+  border-radius: var(--cui-radius-sm);
   background: color-mix(in srgb,var(--cui-titanium) 8.0%,transparent);
   color: var(--primary);
   font-size: 12px;
@@ -1048,7 +1048,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
 
 .cart-page .cl-skel-line {
   height: 14px;
-  border-radius: 7px;
+  border-radius: var(--cui-radius-card);
   background: var(--muted);
   margin-top: 12px;
 }
@@ -1356,7 +1356,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
 .cart-page .cl-result-icon {
   width: 72px;
   height: 72px;
-  border-radius: 50%;
+  border-radius: var(--cui-radius-card);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1789,7 +1789,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
   .cart-page .config-box .el-form-item {
     display: block !important;
     background: var(--muted) !important;
-    border-radius: 10px;
+    border-radius: var(--cui-radius-card);
     padding: 10px 12px 14px !important;
     margin-bottom: 16px;
     box-sizing: border-box;
@@ -1953,7 +1953,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
     display: block !important;
     background: var(--background) !important;
     border: 1px solid var(--border) !important;
-    border-radius: 10px;
+    border-radius: var(--cui-radius-card);
     padding: 8px 10px;
     margin-bottom: 8px;
     box-sizing: border-box;
@@ -2231,7 +2231,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
   align-items: center;
   height: 22px;
   border-left: 3px solid var(--primary);
-  border-radius: 2px;
+  border-radius: var(--cui-radius-control);
   padding-left: 10px;
   font-size: 15px;
   font-weight: 600;
@@ -2357,7 +2357,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
     /* 外壳 common.css 给弹层留了 margin（实测 12px 缝隙），清零才能贴住视口底 */
     margin: 0 !important;
     border: none !important;
-    border-radius: 14px 14px 0 0 !important;
+    border-radius: var(--cui-radius-card) var(--cui-radius-card) 0 0 !important;
     box-shadow: 0 -8px 30px -10px color-mix(in srgb,var(--cui-night) 30.0%,transparent) !important;
     box-sizing: border-box !important;
     padding: 8px 0 calc(10px + env(safe-area-inset-bottom, 0px)) !important;
@@ -2464,7 +2464,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
     background: #ffffff;
     border-top: 1px solid var(--border);
     box-shadow: 0 -8px 30px -10px color-mix(in srgb,var(--cui-night) 25.0%,transparent);
-    border-radius: 14px 14px 0 0;
+    border-radius: var(--cui-radius-card) var(--cui-radius-card) 0 0;
     padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
   }
@@ -2618,7 +2618,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
   }
 }
 
-.cl-config-toggle { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:44px; padding:10px 14px; border:1px solid var(--cui-edge); border-radius:8px; background:#fff; color:var(--cui-ink); cursor:pointer; margin-bottom:12px; }
+.cl-config-toggle { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:44px; padding:10px 14px; border:1px solid var(--cui-edge); border-radius:var(--cui-radius-control); background:#fff; color:var(--cui-ink); cursor:pointer; margin-bottom:12px; }
 .cl-config-toggle:focus-visible { outline:2px solid var(--cui-focus); outline-offset:2px; }
 
 /* Read failures remain legible under V10's responsive root font size. */

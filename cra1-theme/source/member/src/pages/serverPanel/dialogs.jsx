@@ -827,7 +827,7 @@ function ReinstallDialog({ api, cloud, host, module, caps, close, refreshStatus,
             <span key={s} className="flex items-center gap-1.5">
               <span
                 className={cn(
-                  'inline-flex size-5 items-center justify-center rounded-full border text-[11px]',
+                  'inline-flex size-5 items-center justify-center rounded-sm border text-[11px]',
                   step > i ? 'border-brand bg-brand text-white' : 'border-line text-muted'
                 )}
               >

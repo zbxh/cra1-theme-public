@@ -119,7 +119,7 @@
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
   max-height: 5.7em; overflow: hidden; overflow-wrap: anywhere;
 }
-.marketing-hero-visual { min-width: 0; border-radius: 24px; }
+.marketing-hero-visual { min-width: 0; border-radius: var(--cui-radius-card); }
 /* Focus stays outside the feathered surface so linked images remain accessible. */
 .marketing-hero-visual:focus-within { outline: 2px solid var(--brand); outline-offset: 4px; }
 @supports selector(:has(*)) {
@@ -185,7 +185,7 @@
 .cra1-marketing--home #pricing::before, .cra1-marketing--home #pricing::after { opacity: .25; }
 .cra1-marketing--home #pricing > .container-page > .grid { display: block; margin-top: 2rem; }
 .cra1-marketing--home #pricing [x-show="productGroups.length"] { display: flex; flex-direction: row; gap: .5rem; overflow-x: auto; padding-bottom: 1.25rem; }
-.cra1-marketing--home .rail-link { width: auto; flex-shrink: 0; border: 1px solid transparent; border-radius: .5rem; padding-inline: 1rem; }
+.cra1-marketing--home .rail-link { width: auto; flex-shrink: 0; border: 1px solid transparent; border-radius: var(--cui-radius-card); padding-inline: 1rem; }
 .cra1-marketing--home .rail-link-active { box-shadow: none; background: var(--surface); color: var(--brand); border-color: var(--marketing-rule); }
 .cra1-marketing--home [x-ref="productGrid"] { grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 1rem; }
 .cra1-marketing--home .product-card { min-height: 230px; padding: 1.5rem; }
@@ -260,8 +260,8 @@
 .cra1-marketing--product #faq .faq-item { margin: 0; padding: .25rem 0; background: transparent; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
 .cra1-marketing--product #faq .faq-item summary { padding: 1.3rem 0; font-size: .95rem; }
 .cra1-marketing--product #faq .faq-item p { margin: 0 0 1.3rem; }
-.cra1-marketing--product .cta-band { position: relative; overflow: hidden; background: var(--brand); border: 0; border-radius: 1rem; padding: 2.8rem; }
-.cra1-marketing--product .cta-band::before { content: ''; position: absolute; width: 22rem; height: 22rem; right: -6rem; top: -9rem; border: 1px solid color-mix(in srgb, var(--surface) 25%, transparent); border-radius: 50%; pointer-events: none; }
+.cra1-marketing--product .cta-band { position: relative; overflow: hidden; background: var(--brand); border: 0; border-radius: var(--cui-radius-card); padding: 2.8rem; }
+.cra1-marketing--product .cta-band::before { content: ''; position: absolute; width: 22rem; height: 22rem; right: -6rem; top: -9rem; border: 1px solid color-mix(in srgb, var(--surface) 25%, transparent); border-radius: var(--cui-radius-card); pointer-events: none; }
 .cra1-marketing--product .cta-band :is(h2, p) { color: var(--surface); }
 .cra1-marketing--product .cta-band p { opacity: .85; }
 .cra1-marketing--product .mobile-action-bar { padding-bottom: max(.75rem, env(safe-area-inset-bottom)); }
@@ -285,7 +285,7 @@
   .marketing-hero-description { font-size: .9rem; min-height: 3.8em; max-height: 3.8em; -webkit-line-clamp: 2; }
   .marketing-hero-action { margin-top: 1.25rem; }
   .marketing-hero-media { --hero-media-feather: 20px; aspect-ratio: 1.8; }
-  .marketing-hero-visual { border-radius: 16px; }
+  .marketing-hero-visual { border-radius: var(--cui-radius-card); }
   .marketing-hero-footer { gap: .5rem; }
   .marketing-tabs button { min-height: 3.4rem; font-size: .75rem; }
   .cra1-marketing--home .promo-strip { padding-block: 1.4rem; }

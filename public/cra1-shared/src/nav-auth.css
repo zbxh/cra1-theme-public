@@ -14,7 +14,7 @@ html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-them
   min-height: 32px;
   padding: 0 16px;
   border: 1px solid color-mix(in srgb,var(--cui-white) 10%,transparent);
-  border-radius: 8px;
+  border-radius: var(--cui-radius-control);
   color: #fff;
   background: var(--cui-button-gradient);
   box-shadow: 0 6px 16px -8px color-mix(in srgb,var(--cui-night) 80%,transparent);
@@ -26,36 +26,9 @@ html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-them
   transition: border-color 300ms ease, transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* The opaque face keeps the glow outside the button. */
-html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-theme="cart"]) :is(.btn-aurora, .cra1-header__login)::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  background: var(--cui-button-gradient);
-}
-
-html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-theme="cart"]) :is(.btn-aurora, .cra1-header__login)::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  z-index: -2;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  filter: blur(10px);
-  background: linear-gradient(110deg,var(--cui-steel),var(--cui-champagne),var(--cui-mist-400));
-  transition: opacity 300ms ease;
-}
-
 @media (hover: hover) and (pointer: fine) {
   html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-theme="cart"]) :is(.btn-aurora, .cra1-header__login):hover {
     border-color: color-mix(in srgb,var(--cui-white) 28%,transparent);
-  }
-  html:is([data-cra1-theme="website"], [data-cra1-theme="member"], [data-cra1-theme="cart"]) :is(.btn-aurora, .cra1-header__login):hover::after {
-    opacity: 1;
   }
 }
 

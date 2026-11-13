@@ -36,5 +36,6 @@ final class HookBootstrap
             }
         });
         if (\CRA1\Theme\Context::memberActive()) Routes::register();
+        elseif (\CRA1\Theme\Context::active()) Routes::register(true);
     }
 }

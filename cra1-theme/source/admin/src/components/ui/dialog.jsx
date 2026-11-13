@@ -2,6 +2,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { useRef } from 'react'
 import { X } from 'lucide-react'
 import { cn } from './utils'
+import { Button } from './button'
 
 /**
  * Dialog（基于 Radix）
@@ -30,6 +31,7 @@ export function DialogContent({ className, children, onOpenAutoFocus, onCloseAut
         )}
       />
       <DialogPrimitive.Content
+        data-cra1-ui="admin"
         onEscapeKeyDown={(event) => {
           // Radix listens on document before the native picker receives Esc.
           // Let the topmost icon dialog discard its draft without closing this editor.
@@ -40,7 +42,7 @@ export function DialogContent({ className, children, onOpenAutoFocus, onCloseAut
         onCloseAutoFocus={(event) => { onCloseAutoFocus?.(event); if (!event.defaultPrevented && focusOrigin.current?.isConnected) { event.preventDefault(); focusOrigin.current.focus() } }}
         className={cn(
           'fixed left-1/2 top-1/2 z-[101] w-[min(92vw,480px)] -translate-x-1/2 -translate-y-1/2',
-          'max-h-[88vh] overflow-y-auto rounded-xl border border-line bg-surface p-5',
+          'max-h-[88vh] overflow-y-auto rounded-card border border-line bg-surface p-5',
           'shadow-[0_2px_5px_rgba(22,32,51,0.06),0_24px_48px_rgba(22,32,51,0.16)]',
           'data-[state=open]:animate-[cra1-dialog-in_200ms_cubic-bezier(0.23,1,0.32,1)]',
           className
@@ -96,24 +98,19 @@ export function ConfirmDialog({ open, title, description, confirmText = '确认'
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         <DialogFooter>
-          <button
-            type="button"
+          <Button
+            variant="outline"
             onClick={onCancel}
-            className="h-10 rounded-lg border border-line bg-surface px-4 text-sm text-ink transition-colors duration-150 hover:bg-surface-alt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             取消
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
             onClick={onConfirm}
             disabled={busy}
-            className={cn(
-              'h-10 rounded-lg px-4 text-sm font-medium text-white transition-[background-color,transform] duration-150 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:pointer-events-none disabled:opacity-50',
-              tone === 'danger' ? 'bg-danger hover:brightness-95' : 'bg-brand hover:bg-brand-hover'
-            )}
+            variant={tone === 'danger' ? 'danger' : 'default'}
           >
             {busy ? '处理中…' : confirmText}
-          </button>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

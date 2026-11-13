@@ -22,7 +22,7 @@ export function TabsList({ className, ...props }) {
   )
 }
 
-export function TabsTrigger({ className, permission, ...props }) {
+export function TabsTrigger({ className, permission, children, ...props }) {
   const {can} = useAccess(); if (permission && !can(permission)) return null
   return (
     <TabsPrimitive.Trigger
@@ -31,7 +31,9 @@ export function TabsTrigger({ className, permission, ...props }) {
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </TabsPrimitive.Trigger>
   )
 }
 

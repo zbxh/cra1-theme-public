@@ -12,13 +12,13 @@ html[data-cra1-theme="member"] .server-auto-renew {
 }
 html[data-cra1-theme="member"] .server-auto-renew .ar-switch {
   display: block; width: 100%; padding: 0; margin: 0; border: 0;
-  border-radius: 999px; background: transparent; color: var(--cui-ink);
+  border-radius: var(--cui-radius-control); background: transparent; color: var(--cui-ink);
   font: inherit; cursor: pointer;
 }
 html[data-cra1-theme="member"] .server-auto-renew .ar-track {
   display: block; position: relative; width: 100%; height: var(--ar-height);
   box-sizing: border-box; overflow: hidden; border: 1px solid var(--cui-control-edge);
-  border-radius: 999px; background: linear-gradient(180deg, var(--cui-surface), var(--cui-accent));
+  border-radius: var(--cui-radius-control); background: linear-gradient(180deg, var(--cui-surface), var(--cui-accent));
   box-shadow: inset 0 1px 0 var(--cui-white), 0 2px 6px color-mix(in srgb, var(--cui-graphite) 12%, transparent);
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
@@ -29,7 +29,7 @@ html[data-cra1-theme="member"] .server-auto-renew .ar-label {
 }
 html[data-cra1-theme="member"] .server-auto-renew .ar-knob {
   position: absolute; top: 3px; left: 3px; display: grid; place-items: center;
-  width: calc(var(--ar-height) - 8px); height: calc(var(--ar-height) - 8px); border-radius: 50%;
+  width: calc(var(--ar-height) - 8px); height: calc(var(--ar-height) - 8px); border-radius: var(--cui-radius-control);
   background: var(--cui-surface);
   box-shadow: 0 1px 4px color-mix(in srgb, var(--cui-graphite) 12%, transparent), inset 0 1px 0 var(--cui-white);
   transition: left 180ms ease;

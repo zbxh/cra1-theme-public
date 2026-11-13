@@ -38,7 +38,7 @@
                     <template x-if="done">
                         <div class="py-12 text-center"
                              x-transition:enter="x-enter-active" x-transition:enter-start="x-enter-start" x-transition:enter-end="x-enter-end"> role="status">
-                            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-success/10 text-2xl text-success" aria-hidden="true">✓</div>
+                            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-lg bg-success/10 text-2xl text-success" aria-hidden="true">✓</div>
                             <h2 class="mt-5 text-xl font-semibold text-ink">{if ( cra1_content_explicit($data.cra1, 'contact_form_copy.title2') || (( isset($data.cra1.contact_form_copy['title2']) && $data.cra1.contact_form_copy['title2'] )) ) }{$data.cra1.contact_form_copy['title2']}{else /}提交成功{/if}</h2>
                             <p class="mt-2 text-sm text-body">{if ( cra1_content_explicit($data.cra1, 'contact_form_copy.txt2') || (( isset($data.cra1.contact_form_copy['txt2']) && $data.cra1.contact_form_copy['txt2'] )) ) }{$data.cra1.contact_form_copy['txt2']}{else /}我们已收到您的咨询，后续将根据您留下的联系方式跟进。{/if}</p>
                         </div>

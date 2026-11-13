@@ -13,7 +13,8 @@
   right:11px; left:11px; bottom:0;
   background:linear-gradient(90deg,var(--cui-gold),var(--cui-champagne),var(--cui-gold));
 }
-.cra1-site-header .cra1-nav-dropdown.is-open .cra1-nav-trigger {
+.cra1-site-header .cra1-nav-dropdown.is-open .cra1-nav-trigger,
+.cra1-site-header .cra1-primary-nav .nav-link-active {
   background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--cui-highlight) 38%,transparent));
   color:var(--cui-ink); font-weight:500;
 }
@@ -33,13 +34,13 @@
 .cra1-site-header .cra1-nav-pointer path:first-child { fill:var(--cui-white); }
 .cra1-site-header .cra1-nav-pointer path:last-child { fill:none; stroke:var(--cui-line); stroke-width:1; stroke-linejoin:round; }
 .cra1-site-header .cra1-nav-surface {
-  position:relative; overflow:auto; max-height:calc(100dvh - 104px); border:1px solid var(--cui-line); border-radius:12px;
+  position:relative; overflow:auto; max-height:calc(100dvh - 104px); border:1px solid var(--cui-line); border-radius:var(--cui-radius-popover);
   background:var(--cui-white); animation:none;
   box-shadow:0 22px 48px -16px color-mix(in srgb,var(--cui-graphite) 35%,transparent),0 5px 15px -7px color-mix(in srgb,var(--cui-graphite) 28%,transparent),inset 0 1px 0 var(--cui-white);
 }
 /* A light top edge joins the pointer to both silver and white content columns. */
 .cra1-site-header .cra1-nav-panel::after {
-  content:''; position:absolute; top:17px; right:1px; left:1px; z-index:1; height:16px; border-radius:11px 11px 0 0; pointer-events:none;
+  content:''; position:absolute; top:17px; right:1px; left:1px; z-index:1; height:16px; border-radius:var(--cui-radius-popover) var(--cui-radius-popover) 0 0; pointer-events:none;
   background:linear-gradient(180deg,var(--cui-white),transparent);
 }
 .cra1-site-header .cra1-nav-layout { display:grid; grid-template-columns:184px minmax(0,1fr); }
@@ -58,7 +59,7 @@
 .cra1-site-header .cra1-nav-group + .cra1-nav-group { margin-top:5px; }
 .cra1-site-header .cra1-nav-group svg { flex-shrink:0; width:11px; height:11px; color:var(--cui-steel); }
 .cra1-site-header .cra1-nav-group.is-selected {
-  background:linear-gradient(110deg,var(--cui-graphite),var(--cui-titanium)); color:var(--cui-white); box-shadow:inset 0 1px 0 color-mix(in srgb,var(--cui-white) 15%,transparent);
+  background:var(--cui-selected); color:var(--cui-ink); box-shadow:inset 0 1px 0 var(--cui-white);
 }
 .cra1-site-header .cra1-nav-group.is-selected::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--cui-selection-mark); }
 .cra1-site-header .cra1-nav-group.is-selected svg { color:var(--cui-selection-mark); }
@@ -116,7 +117,7 @@
   background:radial-gradient(ellipse at 0 0,color-mix(in srgb,var(--cui-white) 80%,transparent),transparent 70%),linear-gradient(145deg,var(--cui-accent),var(--cui-line) 85%,color-mix(in srgb,var(--cui-champagne) 16%,var(--cui-accent)));
 }
 .cra1-site-header .cra1-nav-intro::after {
-  content:''; position:absolute; z-index:-1; bottom:-135px; right:-95px; width:260px; height:260px; border:1px solid color-mix(in srgb,var(--cui-steel) 25%,transparent); border-radius:50%;
+  content:''; position:absolute; z-index:-1; bottom:-135px; right:-95px; width:260px; height:260px; border:1px solid color-mix(in srgb,var(--cui-steel) 25%,transparent); border-radius:var(--cui-radius-card);
   box-shadow:0 0 0 20px color-mix(in srgb,var(--cui-white) 16%,transparent),0 0 0 40px color-mix(in srgb,var(--cui-white) 13%,transparent); pointer-events:none;
 }
 .cra1-site-header .cra1-nav-intro h2 { margin:0 0 13px; font-size:20px; line-height:30px; font-weight:600; color:var(--cui-ink); overflow-wrap:anywhere; }
@@ -128,7 +129,7 @@
 .cra1-site-header .cra1-nav-intro-links { margin-top:auto; padding-top:24px; }
 .cra1-site-header .cra1-nav-intro-links a + a { margin-top:10px; }
 .cra1-site-header .cra1-nav-intro-links a:last-child {
-  padding:7px 12px; min-height:35px; border:1px solid var(--cui-titanium); border-radius:5px; color:var(--cui-white);
+  padding:7px 12px; min-height:36px; border:1px solid var(--cui-titanium); border-radius:var(--cui-radius-control); color:var(--cui-white);
   background:linear-gradient(115deg,var(--cui-steel),var(--cui-graphite)); box-shadow:inset 0 1px 0 color-mix(in srgb,var(--cui-white) 25%,transparent);
   transition:background-color 180ms ease,border-color 180ms ease,box-shadow 180ms ease;
 }
@@ -136,7 +137,7 @@
 .cra1-site-header .cra1-nav-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-content:start; gap:14px; padding:22px; margin:0; list-style:none; background:linear-gradient(125deg,var(--cui-white),var(--cui-surface)); }
 .cra1-site-header .cra1-nav-cards li { min-width:0; }
 .cra1-site-header .cra1-nav-card {
-  display:flex; align-items:center; gap:18px; position:relative; isolation:isolate; min-width:0; padding:20px 18px; min-height:124px; height:100%; border:1px solid var(--cui-line); border-radius:9px;
+  display:flex; align-items:center; gap:18px; position:relative; isolation:isolate; min-width:0; padding:20px 18px; min-height:124px; height:100%; border:1px solid var(--cui-line); border-radius:var(--cui-radius-card);
   background:radial-gradient(ellipse at 0 0,var(--cui-white),transparent 65%),linear-gradient(128deg,var(--cui-surface) 24%,var(--cui-accent) 80%,var(--cui-line));
   box-shadow:inset 0 1px 0 var(--cui-white),inset 0 -1px 0 color-mix(in srgb,var(--cui-white) 50%,transparent),0 4px 12px -9px color-mix(in srgb,var(--cui-graphite) 22%,transparent);
   transition:border-color 180ms ease,box-shadow 180ms ease;
@@ -146,7 +147,7 @@
 .cra1-site-header .cra1-nav-card .cra1-nav-item__description { font-size:12px; line-height:20px; }
 .cra1-site-header .cra1-nav-card-arrow { flex-shrink:0; margin-left:auto; width:13px; height:13px; color:var(--cui-steel); transition:color 180ms ease; }
 /* Shared business-icon tiles own the feathered surface and hover halo. */
-.cra1-site-header .cra1-nav-card-icon { position:relative; isolation:isolate; display:grid; place-items:center; flex-shrink:0; width:50px; height:50px; border-radius:13px; color:var(--cui-accent); }
+.cra1-site-header .cra1-nav-card-icon { position:relative; isolation:isolate; display:grid; place-items:center; flex-shrink:0; width:50px; height:50px; border-radius:var(--cui-radius-card); color:var(--cui-accent); }
 .cra1-site-header .cra1-nav-card-icon svg,.cra1-site-header .cra1-nav-card-icon img { width:24px; height:24px; object-fit:contain; }
 
 /* Four levels: first cart category on the left, second category headings and product links on the right. */
@@ -161,7 +162,8 @@
 .cra1-site-header .cra1-nav-directory-links a span { overflow-wrap:anywhere; }
 .cra1-site-header .cra1-nav-directory-links svg { flex-shrink:0; width:12px; height:12px; color:var(--cui-gold); opacity:0; transition:opacity 150ms ease; }
 @media (hover:hover) and (pointer:fine) {
-  .cra1-site-header .cra1-nav-card:hover,.cra1-site-header .cra1-nav-card:focus-visible { border-color:var(--cui-focus); box-shadow:inset 0 1px 0 var(--cui-white),0 8px 24px -12px color-mix(in srgb,var(--cui-graphite) 42%,transparent),0 0 18px -10px color-mix(in srgb,var(--cui-focus) 75%,transparent); }
+  .cra1-site-header .cra1-nav-card:hover { border-color:var(--cui-line); box-shadow:var(--cui-shadow-pop); }
+  .cra1-site-header .cra1-nav-card:focus-visible { border-color:var(--cui-focus); box-shadow:inset 0 1px 0 var(--cui-white),0 8px 24px -12px color-mix(in srgb,var(--cui-graphite) 42%,transparent),0 0 18px -10px color-mix(in srgb,var(--cui-focus) 75%,transparent); }
   .cra1-site-header .cra1-nav-card:hover .cra1-nav-card-arrow,.cra1-site-header .cra1-nav-intro-overview:hover { color:var(--cui-gold); }
   .cra1-site-header .cra1-nav-intro-links a:last-child:hover { border-color:var(--cui-gold); box-shadow:inset 0 1px 0 color-mix(in srgb,var(--cui-white) 30%,transparent),0 4px 12px -8px color-mix(in srgb,var(--cui-graphite) 55%,transparent); }
   .cra1-site-header .cra1-nav-directory-links a:hover { color:var(--cui-ink); background:linear-gradient(110deg,color-mix(in srgb,var(--cui-highlight) 40%,var(--cui-surface)),var(--cui-accent)); box-shadow:inset 2px 0 0 var(--cui-selection-mark); }

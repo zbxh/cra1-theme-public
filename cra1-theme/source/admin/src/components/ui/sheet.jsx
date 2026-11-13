@@ -24,6 +24,7 @@ export function SheetContent({ className, children, side = 'left', onOpenAutoFoc
         )}
       />
       <SheetPrimitive.Content
+        data-cra1-ui="admin"
         onOpenAutoFocus={(event) => { focusOrigin.current = document.activeElement; onOpenAutoFocus?.(event) }}
         onCloseAutoFocus={(event) => { onCloseAutoFocus?.(event); if (!event.defaultPrevented && focusOrigin.current?.isConnected) { event.preventDefault(); focusOrigin.current.focus() } }}
         aria-describedby={undefined}

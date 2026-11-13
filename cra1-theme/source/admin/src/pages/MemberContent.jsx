@@ -978,8 +978,8 @@ function TicketAssistCard({ content, setContentSection }) {
                       setField('require_host_types', on ? cur.filter((x) => x !== Number(t.id)) : [...cur, Number(t.id)])
                     }}
                     className={cn(
-                      'rounded-full border px-3 py-1 text-[12px] transition-colors duration-150',
-                      on ? 'border-brand bg-brand/10 text-brand' : 'border-line bg-surface text-muted-foreground hover:border-brand/40'
+                      'rounded-control border px-3 py-1 text-[12px] transition-colors duration-150',
+                      on ? 'border-brand bg-brand/10 text-brand' : 'border-line bg-surface text-muted-foreground'
                     )}
                   >
                     {t.name}

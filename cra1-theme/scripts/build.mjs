@@ -101,10 +101,14 @@ fs.mkdirSync(path.dirname(purchaseTheme),{recursive:true})
 fs.writeFileSync(purchaseTheme,fs.readFileSync(path.join(cartRelease,'20261011-titanium-v1/css/cart-theme.css'),'utf8')+'\n'+fs.readFileSync(path.join(root,'cra1-theme/source/legacy-assets/cart/20261017-compat-v3/css/purchase-pages.css'),'utf8'))
 const websiteRelease=path.join(output,'public/web/cra1/releases',release)
 for(const old of ['20261011-business-icons-v1','20261014-theme-fixes-v1','20261017-compat-v3'])copyRegularTree(path.join(root,'cra1-theme/source/legacy-assets/website',old),path.join(websiteRelease,old))
-// Current templates still consume the compatibility CSS. Both entry points share
-// the same footer source, without adding a request or replacing unrelated styles.
+// Current templates still consume the compatibility URL. Both URLs must use the
+// current source build, rather than a frozen stylesheet from an earlier release.
 const footerAttribution=fs.readFileSync(path.join(root,'public/web/cra1/src/footer-attribution.css'),'utf8')
-for(const target of ['app.css','20261014-theme-fixes-v1/app.css'])fs.appendFileSync(path.join(websiteRelease,target),'\n'+footerAttribution)
+fs.appendFileSync(path.join(websiteRelease,'app.css'),'\n'+footerAttribution)
+fs.copyFileSync(path.join(websiteRelease,'app.css'),path.join(websiteRelease,'20261014-theme-fixes-v1/app.css'))
+// The marketing layer is still consumed through its original relative path.
+// Feed that actual consumer from the maintained design source too.
+fs.copyFileSync(path.join(root,'public/cra1-shared/theme-sources/website/marketing.css'),path.join(websiteRelease,'20261011-business-icons-v1/marketing.css'))
 fs.mkdirSync(path.join(websiteRelease,'20261017-compat-v3'),{recursive:true})
 fs.copyFileSync(path.join(root,'public/cra1-shared/theme-sources/website/app.js'),path.join(websiteRelease,'20261017-compat-v3/app.js'))
 // Compatibility styles are frozen source inputs; the website script has its canonical source.

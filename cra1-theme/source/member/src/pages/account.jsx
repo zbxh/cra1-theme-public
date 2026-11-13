@@ -94,13 +94,13 @@ export default function AccountPage() {
                 {account?.phone ? `+${account.phone_code} ${account.phone}` : '未绑定手机号'}
               </p>
             </div>
-            <a href="/finance.htm"
-               className="mt-4 w-full rounded-lg border border-line px-4 py-2.5 transition-colors duration-150 hover:border-brand/40">
+            <a href="/finance.htm" data-cui-edge="hover"
+               className="mt-4 w-full rounded-lg border border-line px-4 py-2.5 transition-colors duration-150">
               <p className="text-xs text-muted-foreground">余额</p>
               <p className="mt-0.5 text-lg font-semibold tabular-nums text-ink">{formatMoney(account?.credit)}</p>
             </a>
-            <a href="/security.htm"
-               className="mt-2 w-full rounded-lg border border-line px-4 py-2.5 text-[13px] text-body transition-colors duration-150 hover:border-brand/40 hover:text-brand">
+            <a href="/security.htm" data-cui-edge="hover"
+               className="mt-2 w-full rounded-lg border border-line px-4 py-2.5 text-[13px] text-body transition-colors duration-150 hover:text-brand">
               安全中心 · 管理密钥
             </a>
           </CardContent>

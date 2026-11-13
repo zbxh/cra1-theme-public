@@ -232,10 +232,11 @@ function RecentVisitLink({ item, newTab, card = false, onVisit, linkRef }) {
       title={`${item.name} · ${visitTime(item.ts)}`}
       onClick={onVisit}
       className={cn(
-        'items-center rounded-md border border-line text-[13px] text-body transition-colors hover:border-brand/40 hover:bg-brand/5 hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+        'items-center rounded-md border border-line text-[13px] text-body transition-colors hover:bg-brand/5 hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
         card ? 'flex min-cui-button--tile w-full gap-3 bg-surface-alt px-3 py-2' : 'inline-flex min-h-9 shrink-0 gap-2 bg-surface px-3'
       )}
       data-recent-card={card ? '' : undefined}
+      data-cui-edge={card ? 'hover' : undefined}
     >
       <Icon className="size-3.5 shrink-0 text-brand" aria-hidden="true" />
       <span className={card ? 'min-w-0 flex-1 break-words leading-5' : 'max-w-48 truncate'} data-recent-name>{item.name}</span>
@@ -404,10 +405,10 @@ function TodoSection({ cfg, account }) {
                     onClick={() => setCat(c.key)}
                     className={cn(
                       'inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-[13px] font-medium transition-colors duration-150',
-                      cat === c.key ? 'border-brand bg-brand/5 text-brand' : 'border-line bg-surface text-body hover:border-brand/40'
+                      cat === c.key ? 'border-brand bg-brand/5 text-brand' : 'border-line bg-surface text-body'
                     )}>
               {c.label}
-              <span className={cn('rounded-full px-1.5 text-[11px] font-semibold',
+              <span className={cn('rounded-xs px-1.5 text-[11px] font-semibold',
                 c.n > 0 ? (cat === c.key ? 'bg-brand text-white' : c.key === 'renew' ? 'bg-warning/15 text-warning' : 'bg-brand/10 text-brand') : 'bg-muted-bg text-muted-foreground')}>
                 {c.n}
               </span>
@@ -441,7 +442,7 @@ function TodoSection({ cfg, account }) {
                       {h.product_name || h.name || `产品 #${h.id}`}
                     </a>
                     <span className={cn(
-                      'inline-flex shrink-0 items-center whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-medium',
+                      'inline-flex shrink-0 items-center whitespace-nowrap rounded-xs border px-2 py-0.5 text-[11px] font-medium',
                       urgent ? 'border-danger/20 bg-danger/8 text-danger' : 'border-warning/20 bg-warning/8 text-warning'
                     )}>
                       {remain <= 0 ? '已到期' : `剩 ${remain} 天`}
@@ -869,7 +870,7 @@ function TicketSection() {
                    className="flex items-start gap-3 px-5 py-3.5 transition-colors duration-150 hover:bg-muted-bg">
                   <span className="mt-0.5 shrink-0">
                     <span
-                      className="inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium"
+                      className="inline-flex items-center whitespace-nowrap rounded-xs px-2 py-0.5 text-xs font-medium"
                       style={statusCls(t)}
                     >
                       {statusText(t)}
@@ -1079,7 +1080,7 @@ function SecurityOverview({ cfg, account }) {
           {checks.map((c) => (
             <li key={c.label} className="flex items-center gap-2.5 text-[13px]">
               <span className={cn(
-                'flex size-4.5 shrink-0 items-center justify-center rounded-full',
+                'flex size-4.5 shrink-0 items-center justify-center rounded-sm',
                 c.loading || c.unknown ? 'bg-muted-bg text-muted-foreground'
                   : c.done ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
               )} aria-hidden="true">

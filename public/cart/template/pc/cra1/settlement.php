@@ -20,7 +20,7 @@
         <el-main>
           <!-- 自己的东西 -->
           <div class="main-card">
-            <div class="main-title">
+            <div class="main-title" data-cui-reveal>
               {{ pageTitle || lang.settlement_title }}
               <p class="dont-save-password" v-if="commonData.donot_save_client_product_password === 1">
                 {{lang.dont_save_password_tip}}

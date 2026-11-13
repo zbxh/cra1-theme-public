@@ -10,7 +10,8 @@
     --brand-hover: var(--cui-brand-hover);
     --ink: var(--cui-ink);
     --body: var(--cui-body);
-    --muted: var(--cui-accent);
+    --muted: var(--cui-muted);
+    --muted-foreground: var(--muted);
     --surface: var(--cui-surface);
     --surface-alt: var(--cui-accent);
     --line: var(--cui-line);
@@ -28,7 +29,7 @@
     --night-brand: var(--cui-highlight);
     --night-btn-ink: var(--cui-white);  /* 深色页脚里浅色表面（白色描边按钮/二维码砖）上的文字 */
     --night-raised: var(--cui-night-raised);   /* 深色卡片 hover 抬升底 */
-    --radius-sheet: 1.5rem;
+    --radius-sheet: var(--cui-radius-hero);
     --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
     /* 模块进场专用：比 --ease-out-strong 平缓得多。
        --ease-out-strong 的控制点 y 直接到 1，位移在名义时长的前 1/5 就基本走完
@@ -61,7 +62,6 @@
        参考阿里云 246deg 与腾讯云 90deg 的"偏轴渐变"——纯正 90deg 会显得呆板。 */
     --gradient-text-active: var(--cui-button-gradient);
     /* 卡片描边扫光：环形渐变的亮段颜色（只用品牌色，避免引入新色） */
-    --ring-sheen: color-mix(in srgb,var(--cui-titanium) 55.0%,transparent);
 
     /* FAQ 折叠指示器的 chevron（内联 SVG data URI，避免额外请求） */
     --faq-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
@@ -171,9 +171,9 @@
 
   .btn {
     @apply inline-flex items-center justify-center font-medium;
-    height: 2.75rem;
-    min-height: 2.75rem;
-    border-radius: 0.375rem;
+    height: var(--cui-height-control);
+    min-height: var(--cui-height-control);
+    border-radius: var(--cui-radius-control);
     /* 按压反馈走 transform 160ms ease-out；属性显式列出，不用 transition: all */
     transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
       box-shadow 160ms ease,
@@ -188,30 +188,11 @@
 
   .btn-sm,
   .btn-xs {
-    height: 2.25rem;
-    min-height: 2.25rem;
+    height: var(--cui-height-compact,36px);
+    min-height: var(--cui-height-compact,36px);
   }
 
-  /* 强调按钮：五色流动渐变（蓝→紫→粉→青→蓝循环）+ 白字 + 右箭头 + 胶囊形 + 柔和彩色阴影；
-     首尾同色 + background-size 300% + 0%→150% 位移实现无缝循环流动 */
-
-  /* 禁用态：自写类覆盖了 daisyUI 的 .btn，必须自己接管 disabled 契约。
-     background-image / animation 只有本类定义，框架的 .btn:disabled 管不到，
-     不显式清除会导致「文字变淡但渐变照常鲜艳、动画照常播放」的矛盾状态。 */
-
-  @keyframes gradient-flow {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 150% 50%; }
-  }
-
-  @keyframes gradient-hue {
-    to { filter: hue-rotate(360deg); }
-  }
-
-  /* 导航登录／注册按钮由 cra1-shared/src/nav-auth.css 统一维护。 */
-
-  /* 普通按钮：浅灰底 + hover 阴影（不使用上浮） */
-  /* 普通按钮：白底 + 细浅灰描边 + 深色字 + 外链箭头 + 胶囊形，hover 描边变主色 */
+  /* Button surfaces and decoration are owned by CRA1Shared. */
 
   .text-gradient {
     @apply bg-clip-text text-transparent;
@@ -220,7 +201,7 @@
 
   .badge-soft {
     @apply inline-flex items-center border border-brand/20 bg-brand/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand;
-    border-radius: 999px;
+    border-radius: var(--cui-radius-sm);
   }
 
   .section-kicker {
@@ -330,11 +311,11 @@
       border-color var(--duration-base) ease;
   }
 
-  /* hover 仅出现边框着色与阴影，不改变卡片背景色/透明度 */
+  /* 悬停保留中性边框，沿边光由共用交互层处理。 */
   @media (hover: hover) and (pointer: fine) {
     .lift-card:hover {
-      border-color: rgba(43, 140, 255, 0.5);
-      box-shadow: 0 6px 14px color-mix(in srgb,var(--cui-night) 7.0%,transparent), 0 24px 52px -14px color-mix(in srgb,var(--cui-titanium) 38.0%,transparent);
+      border-color: var(--cui-line);
+      box-shadow: var(--cui-shadow-pop);
     }
   }
 
@@ -390,7 +371,7 @@
   .dropdown > .nav-link:focus-visible {
     outline: 3px solid color-mix(in srgb,var(--cui-titanium) 38.0%,transparent);
     outline-offset: 3px;
-    border-radius: 0.375rem;
+    border-radius: var(--cui-radius-control);
   }
 
   .nav-link::after {
@@ -405,6 +386,9 @@
     transform-origin: left;
     transition: transform var(--duration-base) var(--ease-out-strong);
   }
+
+  .nav-link-active { color: var(--brand); font-weight: 600; }
+  .nav-link-active::after { transform: scaleX(1); }
 
   @media (hover: hover) and (pointer: fine) {
     .nav-link:hover {
@@ -429,7 +413,7 @@
   .mega-trigger {
     @apply inline-flex items-center gap-2 px-2.5 text-body;
     height: 2.25rem;
-    border-radius: 0.375rem;
+    border-radius: var(--cui-radius-control);
     transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
   }
 
@@ -468,89 +452,22 @@
 
   .drawer-link {
     @apply block w-full px-3 py-2.5 text-left font-medium text-ink;
-    border-radius: 0.375rem;
+    border-radius: var(--cui-radius-control);
   }
 
   .drawer-sub {
     @apply block px-2.5 py-2 text-body;
-    border-radius: 0.375rem;
+    border-radius: var(--cui-radius-control);
   }
 
-  /* 首页卡片统一视觉：纯白底、12px 圆角、1px 极浅边框、柔和扩散阴影、无硬边。
-     悬停 = 背景微调 + 阴影加深 + 环形扫光（见 .ring-sheen）。 */
+  /* 首页卡片统一视觉：白底、8px 圆角、1px 边框及中性阴影。
+     沿边装饰仅由共用交互生命周期在悬停或真实选中时显示。 */
   .product-card {
     @apply flex h-full flex-col p-5;
   }
 
-  /* --------------------------------------------------------------------------
-     环形扫光（卡片 hover 时一道高光沿边缘扫一圈）
-     --------------------------------------------------------------------------
-     参考腾讯云产品卡的招牌做法（.tpm-portal-product__card-wrap）。
-     他们的实现是「外层 padding:1px + overflow:hidden + 旋转的大号 conic 方块」，
-     需要额外包一层 DOM；这里改用掩膜实现，**不动模板结构**：
-
-       ::after 用 mask-composite: exclude 把中心挖空，只留 1px 边框ring，
-       conic-gradient 的起始角由 @property 注册后即可用 animation 平滑旋转。
-
-     关键约束（与 r66 的「卡片无渐变」防线共存）：
-       描边画在 ::after 上，卡片**自身**的 background-image 保持 none，
-       因此 r66 的 bgi 断言仍然成立——它们检查的是卡片元素本身，不是伪元素。
-
-     只在 hover 时显示：常驻旋转会让整页同时有几十个动画在跑（§8.2「不得卡顿」）。
-     @property 在旧浏览器上退化为「不旋转但描边可见」，不会整块失效。 */
-  @property --ring-angle {
-    syntax: '<angle>';
-    initial-value: 0deg;
-    inherits: false;
-  }
-
-  .ring-sheen {
-    position: relative;
-  }
-
-  .ring-sheen::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    pointer-events: none;
-    opacity: 0;
-    background: conic-gradient(
-      from var(--ring-angle),
-      transparent 0deg,
-      transparent 210deg,
-      var(--ring-sheen) 300deg,
-      rgba(75, 123, 236, 0.65) 330deg,
-      var(--ring-sheen) 1turn
-    );
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    transition: opacity var(--duration-base) var(--ease-out-strong);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .ring-sheen:hover::after {
-      opacity: 1;
-      animation: ring-sheen-spin 4.5s linear infinite;
-    }
-  }
-
-  @keyframes ring-sheen-spin {
-    to {
-      --ring-angle: 360deg;
-    }
-  }
-
-  /* 偏好减少动效时保留描边、去掉旋转（§7.5.8「更轻柔而非完全不动」） */
-  @media (prefers-reduced-motion: reduce) {
-    .ring-sheen:hover::after {
-      animation: none;
-      opacity: 1;
-    }
-  }
+  /* Edge decoration is provided by the shared UIEffects lifecycle. */
+  .ring-sheen { position: relative; }
 
   .product-card-price {
     @apply mt-auto border-t border-line pt-4 text-ink;
@@ -701,40 +618,6 @@
   @media (prefers-reduced-motion: reduce) {
     .hero-aura {
       animation: none;
-    }
-  }
-
-  /* --------------------------------------------------------------------------
-     光标跟随光斑（参考腾讯云 hero 按钮 / 阿里云 secondary-action）
-     --------------------------------------------------------------------------
-     用 radial-gradient + 两个 CSS 变量定位；JS 只在 pointermove 时写变量，
-     动画本身是纯 CSS 的 opacity 过渡——不引入任何动效库（§7.5.3）。
-     变量默认值 -100px 使光斑初始落在元素外，避免首次 hover 时从左上角"窜入"。 */
-  .spotlight-hover {
-    position: relative;
-    overflow: hidden;
-    --mx: -100px;
-    --my: -100px;
-  }
-
-  .spotlight-hover::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 250ms ease;
-    background: radial-gradient(
-      180px circle at var(--mx) var(--my),
-      color-mix(in srgb,var(--cui-white) 30%,transparent),
-      transparent 65%
-    );
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .spotlight-hover:hover::before {
-      opacity: 1;
     }
   }
 
@@ -995,7 +878,7 @@
 
   .form-panel {
     @apply border border-line bg-white p-5 md:p-7;
-    border-radius: 0.5rem;
+    border-radius: var(--cui-radius-card);
     box-shadow: 0 1px 2px color-mix(in srgb,var(--cui-night) 4.0%,transparent), 0 10px 28px color-mix(in srgb,var(--cui-night) 6.0%,transparent);
   }
 
@@ -1021,7 +904,7 @@
   /* v2.40 用户需求②：正文链接 hover 变色而非下划线（默认也去掉下划线语言） */
   .rich-content a { @apply text-brand; }
   .rich-content a:hover { @apply text-brand-hover; }
-  .rich-content img { max-width: 100%; height: auto; margin: 1em 0; border-radius: 0.375rem; }
+  .rich-content img { max-width: 100%; height: auto; margin: 1em 0; border-radius: var(--cui-radius-card); }
   .rich-content ul, .rich-content ol { margin: 0.9em 0; padding-left: 1.4em; }
   .rich-content ul { list-style: disc; }
   .rich-content ol { list-style: decimal; }
@@ -1135,7 +1018,7 @@
     padding: 0.3rem 0;
     background: #fff;
     border: 1px solid var(--line);
-    border-radius: 1.75rem;
+    border-radius: var(--cui-radius-card);
     box-shadow: 0 6px 24px -8px color-mix(in srgb,var(--cui-night) 18.0%,transparent), 0 2px 8px color-mix(in srgb,var(--cui-night) 6.0%,transparent);
   }
 
@@ -1151,7 +1034,7 @@
     width: 3.25rem;
     padding: 0.55rem 0.2rem;
     color: var(--cui-body);
-    border-radius: 9999px;
+    border-radius: var(--cui-radius-control);
     transition: color 150ms ease;
   }
 
@@ -1206,7 +1089,7 @@
     color: var(--cui-body);
     background: #fff;
     border: 1px solid var(--line);
-    border-radius: 9999px;
+    border-radius: var(--cui-radius-control);
     box-shadow: 0 6px 24px -8px color-mix(in srgb,var(--cui-night) 18.0%,transparent), 0 2px 8px color-mix(in srgb,var(--cui-night) 6.0%,transparent);
     transition: color 150ms ease, box-shadow 150ms ease;
   }
@@ -1223,7 +1106,7 @@
     transform: translate(6px, -50%);
     margin-right: 0.5rem;
     padding: 0.45rem 0.7rem;
-    border-radius: 0.375rem;
+    border-radius: var(--cui-radius-popover);
     background: var(--brand);
     color: #fff;
     font-size: 0.75rem;
@@ -1854,7 +1737,7 @@
 
 /* 轮播文案：Mac 软件窗口样式 */
 .mac-window {
-  border-radius: 0.875rem;
+  border-radius: var(--cui-radius-card);
   border: 1px solid color-mix(in srgb,var(--cui-white) 16%,transparent);
   background: color-mix(in srgb,var(--cui-night) 58%,transparent);
   backdrop-filter: blur(20px) saturate(1.35);
@@ -1886,7 +1769,7 @@
   overflow: hidden;
   isolation: isolate;
   border: 1px solid transparent;
-  border-radius: 1.1rem;
+  border-radius: var(--cui-radius-card);
   background-image:
     linear-gradient(color-mix(in srgb,var(--cui-white) 82%,transparent), color-mix(in srgb,var(--cui-white) 72%,transparent)),
     linear-gradient(120deg, rgba(43, 140, 255, 0.28) 0%, rgba(14, 159, 110, 0.16) 45%, rgba(122, 90, 248, 0.14) 100%);
@@ -1938,7 +1821,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.95rem 0.5rem 0.8rem;
-  border-radius: 9999px;
+  border-radius: var(--cui-radius-sm);
   border: 1px solid color-mix(in srgb,var(--cui-night) 8.0%,transparent);
   background: #fff;
   font-size: 0.8rem;
@@ -2026,7 +1909,7 @@
   justify-content: center;
   width: 1.9rem;
   height: 1.9rem;
-  border-radius: 0.55rem;
+  border-radius: var(--cui-radius-card);
   transition: transform 200ms var(--ease-out-strong);
 }
 
@@ -2100,7 +1983,7 @@
     background: var(--brand);
     color: #fff;
     font-size: 0.875rem;
-    border-radius: 0 0 0.5rem 0.5rem;
+    border-radius: 0 0 var(--cui-radius-card) var(--cui-radius-card);
     transform: translateY(-110%);
     transition: transform 150ms ease;
   }
@@ -2181,7 +2064,7 @@
   flex: none;
   width: 2.4rem;
   height: 2.4rem;
-  border-radius: 9999px;
+  border-radius: var(--cui-radius-control);
   font-weight: 700;
   font-size: 0.95rem;
   color: var(--brand);
@@ -2201,7 +2084,7 @@
     left: calc(100% + 0.15rem);
     width: 1.1rem;
     height: 2px;
-    border-radius: 9999px;
+    border-radius: var(--cui-radius-card);
     background: linear-gradient(90deg, rgba(43, 140, 255, 0.45), rgba(14, 159, 110, 0.3));
   }
 }
@@ -2273,7 +2156,7 @@
   text-align: left;
   background: rgba(15, 23, 40, 0.96);
   border: 1px solid rgba(127, 178, 255, 0.32);
-  border-radius: 0.5rem;
+  border-radius: var(--cui-radius-popover);
   box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7);
   transform: translateX(-50%);
   pointer-events: none;
@@ -2340,7 +2223,7 @@
   color: #9fd0ff;
   background: rgba(79, 148, 255, 0.14);
   border: 1px solid rgba(127, 178, 255, 0.28);
-  border-radius: 0.25rem;
+  border-radius: var(--cui-radius-popover);
   white-space: nowrap;
 }
 
@@ -2574,7 +2457,7 @@
   /* 令牌重映射（只影响 footer 内部）：手写 CSS 类读这批变量 */
   --ink: var(--night-ink);
   --body: var(--night-body);
-  --muted: var(--cui-accent);
+  --muted: var(--night-muted);
   --line: var(--night-line);
   --brand: var(--night-brand);
   --brand-hover: var(--cui-brand-hover);
@@ -2644,9 +2527,9 @@ html.js body {
 }
 
 /* v2.52 价格条行卡（13 个产品页共用）：白卡语言（圆角/柔影/内高光），
-   hover 边框着色由模板既有 hover:border-brand/35 承担 */
+   hover 沿边光由共用交互层处理 */
 .price-row {
-  border-radius: 0.75rem;
+  border-radius: var(--cui-radius-card);
   border-color: color-mix(in srgb,var(--cui-night) 4%,transparent);
   box-shadow: var(--shadow-card);
   transition: box-shadow 200ms var(--ease-out-strong), border-color 150ms ease;

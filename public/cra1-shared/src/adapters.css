@@ -4,7 +4,7 @@
 :where(html[data-cra1-theme]) { --el-color-primary:var(--cui-titanium);--el-color-primary-light-3:var(--cui-silver);--el-color-primary-light-5:var(--cui-steel);--el-color-primary-light-7:var(--cui-highlight);--el-color-primary-light-8:var(--cui-accent);--el-color-primary-light-9:var(--cui-surface);--el-color-primary-dark-2:var(--cui-graphite);--el-border-color:var(--cui-line);--el-border-color-light:var(--cui-edge);--el-text-color-primary:var(--cui-ink);--el-text-color-regular:var(--cui-body);--el-text-color-secondary:var(--cui-muted);--el-text-color-placeholder:var(--cui-muted);--el-font-family:var(--cui-font); }
 html[data-cra1-theme="website"] :is(.cui-button,.cui-input) {animation:none;}
 html[data-cra1-theme="website"] :is(.footer-night,.night-section,.bento-featured,.product-card-featured) {--cui-brand:var(--cui-highlight);--cui-brand-hover:var(--cui-night-ink);--cui-title:var(--cui-night-ink);--cui-ink:var(--cui-night-ink);--cui-body:var(--cui-night-body);--cui-muted:var(--cui-night-muted);--cui-surface:var(--cui-night);--cui-field:var(--cui-night-raised);--cui-accent:var(--cui-night-raised);--cui-focus:var(--cui-night-focus);--cui-line:var(--cui-night-line);--cui-control-edge:var(--cui-mist-500);--cui-edge:var(--cui-night-line);}
-html[data-cra1-theme="website"] :is(.feature-item,.product-card,.article-card) > img {border-radius:15px 15px 0 0;}
+html[data-cra1-theme="website"] :is(.feature-item,.product-card,.article-card) > img {border-radius:var(--cui-radius-card) var(--cui-radius-card) 0 0;}
 html[data-cra1-theme="website"] .ring-sheen::after {content:none;}
 html[data-cra1-theme="website"] .icon-box {background:linear-gradient(135deg,color-mix(in srgb,var(--cui-champagne) 14%,var(--cui-surface)),color-mix(in srgb,var(--cui-champagne) 5%,var(--cui-surface)));color:var(--cui-gold);}
 html[data-cra1-theme="website"] .node-name {color:var(--cui-night-ink);background:color-mix(in srgb,var(--cui-night) 90%,transparent);border-radius:3px;padding:2px 4px;}
@@ -14,7 +14,13 @@ html[data-cra1-theme="website"] :is(.anchor-nav a.active,.anchor-nav a[aria-curr
 /* Legacy index_iframe nests the header and notice in one fixed flex row.
    Keep both in document flow so the notice and product title remain visible. */
 html[data-cra1-theme="cart"] .goods.cart-page > .el-container > .el-container > .el-header {display:block;position:static;width:100%;height:auto !important;padding:0;}
-:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-dialog,.el-popover,.el-dropdown-menu,.el-select-dropdown,.el-message-box,.el-message,.el-notification,.el-picker-panel) {background:var(--cui-surface);border:1px solid var(--cui-control-edge);border-radius:16px;color:var(--cui-ink);box-shadow:var(--cui-shadow-pop);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-dialog,.el-popover,.el-dropdown-menu,.el-select-dropdown,.el-message-box,.el-message,.el-notification,.el-picker-panel,.el-cascader__dropdown) {background:var(--cui-surface);border:1px solid var(--cui-control-edge);border-radius:var(--cui-radius-popover);color:var(--cui-ink);box-shadow:var(--cui-shadow-pop);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-dialog,.el-message-box,.el-notification) {border-radius:var(--cui-radius-card);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-select-dropdown__list,.el-dropdown-menu) {padding:5px;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-select-dropdown__item,.el-dropdown-menu__item,.el-cascader-node) {position:relative;min-height:36px;height:auto;padding:7px 10px;border-radius:var(--cui-radius-control);font:400 14px/22px var(--cui-font);color:var(--cui-body);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-select-group__title {height:auto;padding:8px 10px 5px;color:var(--cui-muted);font:500 12px/20px var(--cui-font);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-select-dropdown__item.is-disabled,.el-dropdown-menu__item.is-disabled,.el-cascader-node.is-disabled) {color:var(--cui-muted);background:transparent;opacity:.55;cursor:not-allowed;}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-select-dropdown__item,.el-dropdown-menu__item,.el-cascader-node):focus-visible {outline:2px solid var(--cui-focus);outline-offset:-2px;}
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-popper[x-placement^=bottom] .popper__arrow {border-bottom-color:var(--cui-line);}
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-popper[x-placement^=bottom] .popper__arrow::after {border-bottom-color:var(--cui-surface);}
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-select-dropdown__item.selected,.el-dropdown-menu__item:focus) {color:var(--cui-ink);background:var(--cui-tint);}
@@ -24,7 +30,7 @@ html[data-cra1-theme="cart"] .goods.cart-page > .el-container > .el-container > 
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-input__inner,.el-textarea__inner) {background:var(--cui-field);border-color:var(--cui-control-edge);}
 /* Nested module selectors are more specific than a native control. Keep their
    layout, but resolve the purchasing and focus states through shared tokens. */
-:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .f-order .right .cui-button--primary {display:inline-flex;align-items:center;justify-content:center;background:var(--cui-button-gradient);color:var(--cui-button-ink);font:500 14px/1.4 var(--cui-font);}
+:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .f-order .right .cui-button--primary {display:inline-flex;align-items:center;justify-content:center;--cui-button-face:var(--cui-button-gradient);color:var(--cui-button-ink);font:500 14px/1.4 var(--cui-font);}
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-select .el-input.is-focus .cui-input,.el-input.is-active .cui-input,.f-order .cui-input:focus,.mf-cloud .cui-input:focus) {border-color:var(--cui-focus);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--cui-focus) 20%,transparent),inset 0 1px 2px color-mix(in srgb,var(--cui-ink) 3%,transparent);}
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-form-item.is-error :is(.el-input__inner,.el-textarea__inner) {border-color:var(--cui-danger);box-shadow:0 0 0 3px color-mix(in srgb,var(--cui-danger) 12%,transparent);}
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-form-item.is-error :is(.el-input.is-focus .cui-input,.cui-input:focus) {border-color:var(--cui-danger);box-shadow:0 0 0 3px color-mix(in srgb,var(--cui-danger) 12%,transparent);}
@@ -81,8 +87,8 @@ html:root:is([data-cra1-theme="member"],[data-cra1-theme="cart"]) {
 .cui-alert--warning {background:color-mix(in srgb,var(--cui-warning) 6%,var(--cui-surface));color:var(--cui-warning);border-color:color-mix(in srgb,var(--cui-warning) 16%,var(--cui-surface));}
 .cui-alert--error {background:color-mix(in srgb,var(--cui-danger) 6%,var(--cui-surface));color:var(--cui-danger);border-color:color-mix(in srgb,var(--cui-danger) 16%,var(--cui-surface));}
 .cra1-header__icon-btn.cui-button {width:var(--cui-height-control);height:var(--cui-height-control);min-height:var(--cui-height-control);border-radius:var(--cui-radius-control);}
-.cra1-header-search__list,.cra1-header-support__panel,.cra1-account__menu--rich {border-radius:var(--cui-radius-card);}
-.cl-card-head {border-radius:15px 15px 0 0;}
+.cra1-header-search__list,.cra1-header-support__panel,.cra1-account__menu--rich {border-radius:var(--cui-radius-popover);}
+.cl-card-head {border-radius:var(--cui-radius-card) var(--cui-radius-card) 0 0;}
 .cui-toast__close {width:32px;height:32px;flex-basis:32px;padding:8px;margin:-4px -4px -4px 0;}
 :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-dialog__headerbtn {width:40px;height:40px;top:8px;right:8px;display:flex;align-items:center;justify-content:center;border-radius:8px;}
 @media (hover:hover) and (pointer:fine) {
@@ -91,6 +97,7 @@ html:root:is([data-cra1-theme="member"],[data-cra1-theme="cart"]) {
 @media (max-width:767px),(pointer:coarse) {
  :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-input-number {line-height:42px;}
  :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) .el-button {min-height:44px;}
+ :is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-select-dropdown__item,.el-dropdown-menu__item,.el-cascader-node) {min-height:44px;padding-block:11px;}
  .cra1-header-search__input {font-size:16px;}
  .cui-button--tile {height:44px;min-height:44px;}
  :where(html[data-cra1-theme]) label:has(> .cui-checkbox),:is(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) :is(.el-checkbox,.el-radio) {min-height:44px;display:inline-flex;align-items:center;}

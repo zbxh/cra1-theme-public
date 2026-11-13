@@ -1,0 +1,46 @@
+{
+  "version": "1.1.0",
+  "release": "20261113-cra1-v17-8-0",
+  "files": {
+    "announcements-preview.js": {
+      "bytes": 27711,
+      "sha256": "32d50d9348ce3263b0d3b84b4fc4c72b1b0c16d82b181e2f6a351551d83b2372"
+    },
+    "cra1-shared.css": {
+      "bytes": 158922,
+      "sha256": "82d4733e3a7ad5e8b69eeef03f2b5dde8058f2c691e0fe92b23819f1020673db"
+    },
+    "cra1-shared.js": {
+      "bytes": 261979,
+      "sha256": "12f5eb6ddca081c5ee74fbaa7835bcc75adfcc17350dcf43cf97078e167039ac"
+    },
+    "member-session.js": {
+      "bytes": 21220,
+      "sha256": "c924d67d826c9a9b189ab90b4af57140f1a0e2d3cbe28d779afb4ee32ed3f58d"
+    },
+    "native-cart-navigation.css": {
+      "bytes": 165472,
+      "sha256": "c757550da55e330340a780d6e1cb0f3aabbf4e56a54325572f0a9593917ca433"
+    },
+    "native-cart-navigation.js": {
+      "bytes": 164500,
+      "sha256": "d6a1792ea238496a067180bee3e1d0e19614b7f8aa613d9f87bc639a6997cc35"
+    },
+    "tokens.css": {
+      "bytes": 6587,
+      "sha256": "bf2fb5cee898691640d5d2ff7beededd511b785edde8b635dedf7e899d2096c5"
+    },
+    "ui-effects.css": {
+      "bytes": 8424,
+      "sha256": "b68c996cb1ef144979498c1689a3c5471f182679adcd1fcb04fcfcdcdd06395a"
+    },
+    "ui-effects.js": {
+      "bytes": 15084,
+      "sha256": "3448d4b306e248dcf3db7e3009f719689a6e794c2179104c66fa0dbfedf68c74"
+    },
+    "v10-axios.js": {
+      "bytes": 7768,
+      "sha256": "1898122078adcb8f8bffc9f9e6fa679f786203eea7752d7beb11484812d8b314"
+    }
+  }
+}

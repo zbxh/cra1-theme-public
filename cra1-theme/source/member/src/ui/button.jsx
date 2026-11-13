@@ -31,7 +31,7 @@ const buttonVariants = cva(
 )
 
 const Button = forwardRef(function Button(
-  { className, variant, size, permission, type = 'button', ...props },
+  { className, variant, size, permission, type = 'button', children, ...props },
   ref
 ) {
   const {can} = useAccess()
@@ -42,7 +42,11 @@ const Button = forwardRef(function Button(
       type={type}
       className={cn(buttonVariants({ variant, size }), className)}
       {...props}
-    />
+    >
+      {children}
+      {props['data-cui-effects'] !== 'none' && (!variant || variant === 'default' || variant === 'outline') && size !== 'icon'
+        ? <span className="cui-button-glow" aria-hidden="true" /> : null}
+    </button>
   )
 })
 

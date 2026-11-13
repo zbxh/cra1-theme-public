@@ -1,9 +1,9 @@
-/* 顶栏搜索：桌面在操作区展开长输入框，手机在顶栏下方展开整行。 */
+/* 顶栏搜索：桌面常驻紧凑输入框，窄屏继续使用原有图标入口。 */
 .cra1-header-search { position: relative; display: flex; align-items: center; min-width: 0; }
 .cra1-header-search__panel { position: relative; width: clamp(280px, 32vw, 460px); }
 .cra1-header-search__form {
   display: flex; align-items: center; gap: 4px; width: 100%; height: var(--cui-height-control, 40px); box-sizing: border-box;
-  padding: 0 5px; border: 1px solid var(--primary, var(--brand, var(--cui-titanium))); border-radius: var(--radius, 6px);
+  padding: 0 5px; border: 1px solid var(--primary, var(--brand, var(--cui-titanium))); border-radius: var(--cui-radius-control, 4px);
   background: var(--background, var(--surface, #fff)); box-shadow: 0 0 0 2px color-mix(in srgb,var(--cui-titanium) 8%,transparent);
 }
 /* The form owns the control surface; scoped primitives must not paint or size a second input inside it. */
@@ -21,10 +21,15 @@ html[data-cra1-theme] .cra1-header-search .cra1-header-search__input {
 .cra1-header-search__input::placeholder { color: var(--muted-foreground, var(--muted, var(--cui-muted))); }
 .cra1-header-search__search-btn, .cra1-header-search__small-btn, .cra1-header-search__close {
   display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;
-  width: 28px; height: 28px; padding: 0; border: 0; border-radius: calc(var(--radius, 6px) - 4px);
+  width: 28px; height: 28px; padding: 0; border: 0; border-radius: var(--cui-radius-small, 2px);
   background: transparent; color: var(--muted-foreground, var(--muted, var(--cui-muted))); cursor: pointer;
 }
 .cra1-header-search__search-btn svg, .cra1-header-search__small-btn svg { width: 16px; height: 16px; }
+/* The leading search icon belongs to the input surface, not a separate hover tile. */
+html[data-cra1-theme] .cra1-header-search .cra1-header-search__search-btn,
+html[data-cra1-theme] .cra1-header-search .cra1-header-search__search-btn:is(:hover, :active, :focus-visible) {
+  background: transparent; box-shadow: none; transform: none;
+}
 .cra1-header-search__close { width: 30px; font-size: 10px; }
 /* Esc is a quiet dismiss action; keyboard focus stays visible without a hover surface. */
 html[data-cra1-theme] .cra1-header-search .cra1-header-search__close,
@@ -36,25 +41,67 @@ html[data-cra1-theme] .cra1-header-search .cra1-header-search__close:is(:hover, 
 .cra1-header-search__results {
   position: absolute; top: calc(100% + 8px); right: 0; width: 100%;
   max-height: min(540px, calc(100dvh - var(--header-h, 64px) - 32px)); overflow-y: auto;
-  overscroll-behavior: contain; padding: 8px; border: 1px solid var(--border, var(--line, var(--cui-edge)));
-  border-radius: var(--radius, 6px); background: var(--background, var(--surface, #fff)); box-shadow: 0 12px 32px color-mix(in srgb,var(--cui-night) 13%,transparent);
+  overscroll-behavior: contain; box-sizing: border-box; padding: 8px; border: 1px solid var(--border, var(--line, var(--cui-edge)));
+  border-radius: var(--cui-radius-popover, 6px); background: var(--background, var(--surface, #fff)); box-shadow: var(--cui-shadow-pop);
 }
 .cra1-header-search__status { margin: 0; padding: 8px 10px; color: var(--muted-foreground, var(--muted, var(--cui-muted))); font-size: 12px; line-height: 1.6; }
+.cra1-header-search__history-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 5px 10px 7px; color: var(--muted-foreground, var(--muted, var(--cui-muted))); font-size: 11px; font-weight: 600; }
+.cra1-header-search__history-clear { flex: 0 0 auto; padding: 2px 0; border: 0; background: transparent; color: inherit; font: inherit; font-weight: 400; cursor: pointer; }
+.cra1-header-search__history-clear:hover { color: var(--foreground, var(--ink, var(--cui-title))); }
+.cra1-header-search__history-list { display: flex; flex-direction: column; gap: 2px; }
+.cra1-header-search__history-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 38px; box-sizing: border-box; padding: 8px 10px;
+  border: 0; border-radius: var(--cui-radius-control, 4px); background: transparent; color: var(--foreground, var(--ink, var(--cui-title))); font: inherit; font-size: 13px; text-align: left; cursor: pointer;
+}
+.cra1-header-search__history-item.is-active, .cra1-header-search__history-item:hover, .cra1-header-search__history-item:focus-visible { background: var(--accent, var(--surface-alt, var(--cui-selected))); color: var(--primary, var(--brand, var(--cui-titanium))); }
+.cra1-header-search__history-item svg { width: 15px; height: 15px; flex: 0 0 auto; color: var(--muted-foreground, var(--muted, var(--cui-muted))); }
+.cra1-header-search__history-text { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.5; }
 .cra1-header-search__group + .cra1-header-search__group { margin-top: 8px; border-top: 1px solid var(--border, var(--line, var(--cui-edge))); padding-top: 6px; }
 .cra1-header-search__group-title { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; margin: 0; padding: 5px 10px; color: var(--muted-foreground, var(--muted, var(--cui-muted))); font-size: 11px; font-weight: 600; }
 .cra1-header-search__group-title span { font-weight: 400; }
 .cra1-header-search__group-title .cra1-header-search__group-label { font-weight: 600; }
-.cra1-header-search__item { display: flex; flex-direction: column; gap: 3px; padding: 9px 10px; border-radius: calc(var(--radius, 6px) - 2px); color: var(--foreground, var(--ink, var(--cui-title))); text-decoration: none; }
+.cra1-header-search__item { display: flex; flex-direction: column; gap: 3px; padding: 9px 10px; border-radius: var(--cui-radius-control, 4px); color: var(--foreground, var(--ink, var(--cui-title))); text-decoration: none; }
 .cra1-header-search__item.is-active, .cra1-header-search__item:hover, .cra1-header-search__item:focus-visible { background: var(--accent, var(--surface-alt, var(--cui-selected))); color: var(--primary, var(--brand, var(--cui-titanium))); }
 .cra1-header-search__item-title { font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
 .cra1-header-search__item-description { color: var(--muted-foreground, var(--muted, var(--cui-muted))); font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+.cra1-header-search__item-summary {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  color: var(--muted-foreground, var(--muted, var(--cui-muted))); font-size: 12px; line-height: 1.65; overflow-wrap: anywhere;
+}
 .cra1-header-search__error { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; color: var(--muted-foreground, var(--muted, var(--cui-muted))); font-size: 12px; }
 .cra1-header-search__error button { border: 0; background: transparent; color: var(--primary, var(--brand, var(--cui-titanium))); cursor: pointer; }
 .cra1-header-search button:focus-visible { outline: 2px solid var(--sidebar-ring, var(--brand, var(--cui-titanium))); outline-offset: 1px; }
 @media (min-width: 768px) {
   html[data-cra1-theme] .cra1-header-search.is-open > .cra1-header__icon-btn { display: none; }
 }
-@media (max-width: 1100px) {
+@media (min-width: 1024px) {
+  /* Keep the normal slot in the header flow. The focused surface grows left
+     over navigation without moving the brand or the actions to its right. */
+  .cra1-header-search.is-persistent { flex: 0 0 auto; width: clamp(240px, 22vw, 320px); height: 36px; }
+  .cra1-header-search.is-persistent .cra1-header-search__panel { position: absolute; top: 0; right: 0; width: 100%; transition: width 200ms ease; }
+  .cra1-header-search.is-persistent.is-expanded { z-index: 131; }
+  .cra1-header-search.is-persistent.is-expanded .cra1-header-search__panel { width: var(--cra1-search-expanded-width, 60vw); }
+  .cra1-header-search.is-persistent .cra1-header-search__form { height: 36px; border-color: var(--cui-control-edge, var(--border, var(--line))); box-shadow: none; }
+  .cra1-header-search.is-persistent .cra1-header-search__form:focus-within { border-color: var(--cui-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cui-focus) 20%, transparent); }
+  .cra1-header-search.is-persistent .cra1-header-search__results { width: 100%; max-height: min(660px, calc(100dvh - var(--header-h, 64px) - 32px)); padding: 10px; z-index: 130; }
+  .cra1-header-search.is-persistent .cra1-header-search__item { gap: 4px; padding: 11px 12px; }
+  .cra1-header-search.is-persistent .cra1-header-search__item-title { font-size: 14px; }
+  .cra1-header-search.is-persistent .cra1-header-search__item-description { font-size: 12px; line-height: 1.6; }
+  .cra1-header-search.is-persistent .cra1-header-search__item-summary { -webkit-line-clamp: 3; font-size: 13px; }
+  /* The website reuses its menu only when its measured navigation no longer
+     fits in the normal header layout. */
+  .cra1-site-header.is-slogan-collapsed .site-header-slogan { display: none; }
+  .cra1-site-header.is-nav-overflow .cra1-primary-nav { display: none; }
+  .cra1-site-header.is-nav-overflow .nav-menu-button { display: inline-flex; }
+  html[data-cra1-nav-overflow="true"] #cra1-mobile-navigation { display: block; }
+  .cra1-site-header__brand { flex: 0 1 auto; }
+  .cra1-site-header__brand > a { flex: 0 0 auto; max-width: clamp(104px, 16vw, 200px); overflow: hidden; }
+  .cra1-site-header .cra1-primary-nav { flex: 0 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cra1-header-search.is-persistent .cra1-header-search__panel { transition: none; }
+}
+@media (max-width: 1023px) {
   .cra1-header.is-search-open .cra1-breadcrumb { display: none; }
 }
 @media (max-width: 767px) {
@@ -68,16 +115,11 @@ html[data-cra1-theme] .cra1-header-search .cra1-header-search__close:is(:hover, 
   .cra1-header-search__close .cra1-header-search__close-label { display: inline; font-size: 12px; }
   .cra1-header-search__results { max-height: calc(100dvh - var(--header-h, 64px) - 76px); }
   .cra1-header-search__item { min-height: 44px; justify-content: center; }
+  .cra1-header-search__history-item { min-height: 44px; }
 }
 
 /* Search and support entry buttons share their surface and dimensions in header-support.css. */
 .cra1-header-search [x-cloak] { display: none !important; }
-@media (max-width: 1599px) {
-  .cra1-site-header.is-search-open nav[aria-label="主导航"] { display: none; }
-}
-@media (max-width: 1100px) {
-  .cra1-site-header.is-search-open .site-header-slogan { display: none; }
-}
 @media (max-width: 767px) {
   .cra1-site-header .nav-menu-button { width: 44px; height: 44px; justify-content: center; }
 }
@@ -88,4 +130,5 @@ html[data-cra1-theme] .cra1-header-search .cra1-header-search__form .cui-button 
   html[data-cra1-theme] .cra1-header-search .cra1-header-search__input { font-size: 16px; }
 }
 
-html[data-cra1-theme] .cra1-header-search__item-title mark{background:var(--cui-accent);color:var(--cui-title);border-radius:2px;}
+html[data-cra1-theme] .cra1-header-search__item-title mark,
+html[data-cra1-theme] .cra1-header-search__item-summary mark{background:var(--cui-accent);color:var(--cui-title);border-radius:2px;}

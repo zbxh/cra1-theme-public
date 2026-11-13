@@ -21,7 +21,7 @@
         <el-main>
           <!-- 自己的东西 -->
           <div class="main-card">
-            <div class="main-title">{{lang.shoppingCar_title}}</div>
+            <div class="main-title" data-cui-reveal>{{lang.shoppingCar_title}}</div>
             <div class="search-box">
               <el-input :placeholder="lang.shoppingCar_tip_text" suffix-icon="el-icon-search" @change="searchValChange"
                 v-model="searchVal">
@@ -281,7 +281,7 @@
                 <div class="cl-hot" v-if="hotEnabled">
                   <div class="cl-hot-title" v-if="hotTitle">{{ hotTitle }}</div>
                   <div class="cl-hot-grid">
-                    <a v-for="item in hotVisible" :key="item.pid" class="cl-hot-card"
+                    <a v-for="item in hotVisible" :key="item.pid" data-cui-edge="hover" class="cl-hot-card"
                        :href="emptyTarget && emptyTarget !== '/cart/goodsList.htm' ? emptyTarget : '/cart/goodsList.htm?product_id=' + item.pid">
                       <div class="cl-hot-name">{{ item.title }}</div>
                       <div class="cl-hot-desc" v-if="item.desc">{{ item.desc }}</div>

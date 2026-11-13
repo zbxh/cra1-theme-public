@@ -64,7 +64,7 @@ const topMenu = {
   </div>
 
   <div class="cra1-header__right">
-    <!-- 点击只展开搜索框；输入关键词后显示结果，共用会员中心、购物车及插件页外壳。 -->
+    <!-- 桌面常驻搜索；窄屏保留图标展开，共用会员中心、购物车及插件页外壳。 -->
     <div ref="searchRoot" class="cra1-header-search"></div>
     <div ref="supportRoot" class="cra1-header-support" @click.stop></div>
     <a href="/document.html" class="cra1-header-docs" @click.prevent="go('/document.html')">文档</a>
@@ -266,7 +266,8 @@ const topMenu = {
     this._notices = CRA1Shared.Notices.mount(this.$refs.noticeHost, {theme: location.pathname.startsWith('/cart/') ? 'cart' : 'member'})
     this._headerSearch = CRA1Shared.HeaderSearch.mount(this.$refs.searchRoot, {
       idPrefix: 'cra1-header-search-' + this._uid,
-      getSearchOptions: () => ({ sources: CRA1Shared.HeaderSearch.pluginSources({ includeHosts: !this.unLogin }), language: this.seletcLang }),
+      context: location.pathname.startsWith('/cart/') ? 'cart' : 'member',
+      getSearchOptions: () => ({ context: location.pathname.startsWith('/cart/') ? 'cart' : 'member', sources: CRA1Shared.HeaderSearch.pluginSources({ includeHosts: !this.unLogin }), language: this.seletcLang }),
       beforeOpen: () => this.closePopovers(),
       onOpenChange: (open) => { this.searchOpen = open },
       onNavigate: (url) => this.go(url),

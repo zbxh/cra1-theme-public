@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+  window.CRA1Shared?.UIEffects?.start();
   const boot=window.__THEME_AUTH__, $=selector=>document.querySelector(selector);
   const form=$('#authForm'),error=$('#authErr'),submit=$('#authSubmit'),reset=$('#recoveryForm'),resetError=$('#recoveryErr'),resetMessage=$('#recoveryMessage');
   let challenge='',busy=false,resetChallenge='',resetDone=false,retryAt=0;

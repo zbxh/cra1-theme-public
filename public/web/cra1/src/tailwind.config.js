@@ -26,6 +26,17 @@ module.exports = {
   theme: {
     container: { center: true, padding: '1.25rem' },
     extend: {
+      // Component radii share the runtime design system; illustrations and
+      // functional circles use explicit rounded-full only where needed.
+      borderRadius: {
+        DEFAULT: 'var(--cui-radius-control)',
+        sm: 'var(--cui-radius-sm)',
+        md: 'var(--cui-radius-control)',
+        lg: 'var(--cui-radius-card)',
+        xl: 'var(--cui-radius-card)',
+        '2xl': 'var(--cui-radius-card)',
+        '3xl': 'var(--cui-radius-hero)',
+      },
       screens: {
         nav: '62rem',
       },
@@ -91,9 +102,9 @@ module.exports = {
           success: '#07835E',
           warning: '#B45309',
           error: '#B42318',
-          '--rounded-box': '0.5rem',
-          '--rounded-btn': '0.375rem',
-          '--rounded-badge': '999px',
+          '--rounded-box': 'var(--cui-radius-card)',
+          '--rounded-btn': 'var(--cui-radius-control)',
+          '--rounded-badge': 'var(--cui-radius-sm)',
         },
       },
     ],

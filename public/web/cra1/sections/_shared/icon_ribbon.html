@@ -14,7 +14,7 @@
         <ul class="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
             {foreach $data.cra1.icon_ribbon_rows as $ir => $ic}
             <li class="flex min-w-0 gap-3.5" data-reveal>
-                <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full" data-cra1-icon-label="{$ic['name']|htmlspecialchars} {$ic['icon_style_attrs']|default=''|raw}">
+                <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md" data-cra1-icon-label="{$ic['name']|htmlspecialchars} {$ic['icon_style_attrs']|default=''|raw}">
                     <!-- 图标三态与页脚/悬浮导航一致：PNG 用 img；SVG 用遮罩随文字变色；无图标时回退对勾 -->
                     {if $ic['icon_png'] == 1}<img src="{$ic['icon_img']}" alt="" style="width:1.125rem;height:1.125rem">
                     {elseif $ic['icon_img']}<span class="icon-img" style="--icon:url('{$ic['icon_img']}');width:1.125rem;height:1.125rem" aria-hidden="true"></span>

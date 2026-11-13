@@ -27,8 +27,14 @@
     // A translated ancestor changes the containing block of fixed overlays.
     // Broad plugin/form containers therefore fade only when they contain one.
     var floating = element.querySelector('.el-dialog__wrapper,.el-message-box__wrapper,.cl-rail-dock,[role="dialog"],.cui-sheet');
+    var businessArea = element.matches('.el-table,.cui-table,.cl-rail-card,.cl-config-panel,.f-order,.order-right,.manage-content,.cra1-native-page__content') ||
+      element.querySelector('table,.el-table,.cui-table,.cl-rail-card,.cl-rail-dock,.f-order,.order-right,.manage-content,[style*="position: fixed"],[style*="position:fixed"]');
+    if (!businessArea && !floating) floating = Array.from(element.querySelectorAll('*')).some(function (child) {
+      var position = root.getComputedStyle(child).position;
+      return position === 'fixed' || position === 'sticky';
+    });
     var from = { opacity: 0 }, to = { opacity: 1 };
-    if (canTranslate && lift && !floating && getComputedStyle(element).position !== 'fixed') {
+    if (canTranslate && lift && !floating && !businessArea && getComputedStyle(element).position !== 'fixed') {
       from.translate = '0 ' + lift + 'px';
       to.translate = '0 0';
     }

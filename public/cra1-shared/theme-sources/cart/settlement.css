@@ -37,7 +37,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid var(--cui-edge);
-  border-radius: 0.03rem;
+  border-radius: var(--cui-radius-card);
   border-collapse: collapse;
 }
 .info-box {
@@ -161,7 +161,7 @@
   width: 2.04rem;
   height: 0.46rem;
   background: var(--color-primary);
-  border-radius: 0.04rem;
+  border-radius: var(--cui-radius-control);
   font-size: 0.16rem;
   font-weight: 500;
   color: #FFFFFF;
@@ -287,7 +287,7 @@
     width: 2.04rem;
     height: 0.46rem;
     background: var(--color-primary);
-    border-radius: 0.04rem;
+    border-radius: var(--cui-radius-control);
     font-size: 0.16rem;
     font-weight: 500;
     color: #FFFFFF;

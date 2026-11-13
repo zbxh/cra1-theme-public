@@ -64,7 +64,7 @@ html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-
   .cra1-header .cra1-account--mobile-actions .cra1-account__menu {
     position:fixed;top:calc(var(--header-h,48px) + 6px);right:8px;left:auto;
     width:280px;max-width:calc(100vw - 16px);max-height:calc(100dvh - var(--header-h,48px) - 14px);
-    overflow:auto;border-radius:12px;box-shadow:0 6px 20px rgba(128,99,47,.12);
+    overflow:auto;border-radius:var(--cui-radius-popover);box-shadow:var(--cui-shadow-pop);
   }
   .cra1-header .cra1-account__trigger {position:relative;}
   .cra1-header .cra1-account__unread:not([hidden]) {display:block;position:absolute;top:5px;right:5px;width:7px;height:7px;border:1.5px solid #fff;border-radius:50%;background:#987537;}
@@ -78,14 +78,14 @@ html[data-cra1-theme] :is(.cra1-site-header__actions,.cra1-header__right) .cra1-
   .cra1-account-mobile__group+.cra1-account-mobile__group {border-top:1px solid var(--up-line);margin-top:7px;padding-top:7px;}
   .cra1-account-mobile__item,.cra1-account-mobile__back {
     display:flex;align-items:center;gap:10px;width:100%;min-width:0;min-height:44px;
-    padding:8px 10px;border:0;border-radius:7px;background:transparent;color:var(--up-ink);
+    padding:8px 10px;border:0;border-radius:var(--cui-radius-control);background:transparent;color:var(--up-ink);
     font:inherit;font-size:13px;line-height:20px;text-decoration:none;text-align:left;cursor:pointer;
   }
   .cra1-account-mobile__item:hover,.cra1-account-mobile__back:hover {background:var(--cui-accent);color:var(--cui-ink);}
   .cra1-account-mobile__item:focus-visible,.cra1-account-mobile__back:focus-visible {outline:2px solid var(--cui-focus);outline-offset:-2px;}
   .cra1-account-mobile__item .cra1-header-glyph svg,.cra1-account-mobile__back .cra1-header-glyph svg {width:17px;height:17px;color:var(--cui-body);}
   .cra1-account-mobile__label {flex:1 1 0;min-width:0;overflow-wrap:anywhere;}
-  .cra1-account-mobile__count {flex:0 0 auto;min-width:23px;padding:1px 6px;border-radius:5px;background:var(--cui-accent);color:var(--cui-body);font-size:11px;font-variant-numeric:tabular-nums;text-align:center;}
+  .cra1-account-mobile__count {flex:0 0 auto;min-width:23px;padding:1px 6px;border-radius:var(--cui-radius-small);background:var(--cui-accent);color:var(--cui-body);font-size:11px;font-variant-numeric:tabular-nums;text-align:center;}
   .cra1-account-mobile__count--unread {background:var(--cui-accent);color:#80632f;}
   .cra1-account-mobile__back {color:#80632f;}
   .cra1-account-mobile__heading {margin:0;padding:8px 10px 4px;font-size:13px;font-weight:500;}

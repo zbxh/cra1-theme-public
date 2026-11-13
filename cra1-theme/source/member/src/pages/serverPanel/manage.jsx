@@ -537,7 +537,7 @@ export function SecurityGroupCard({ api, cloud, host, setDlg, toast, supportUrl 
                   {rules.map((r) => (
                     <tr key={r.id} className="border-t border-line/70">
                       <td className="py-1.5">
-                        <span className={cn('rounded px-1.5 py-0.5 text-[11px]', r.direction === 'in' ? 'bg-brand/10 text-brand' : 'bg-surface-alt text-body')}>
+                        <span className={cn('rounded-xs px-1.5 py-0.5 text-[11px]', r.direction === 'in' ? 'bg-brand/10 text-brand' : 'bg-surface-alt text-body')}>
                           {SG_DIRECTION[r.direction] || r.direction}
                         </span>
                       </td>

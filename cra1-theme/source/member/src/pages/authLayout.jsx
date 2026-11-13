@@ -10,7 +10,7 @@ export function RegisterAuthLayout({ title, subtitle, children, kind }) {
   const d = defaults[page], configured = runtime.auth_appearance || {}
   const cfg = { ...d, ...configured, brand: { ...d.brand, ...configured.brand }, support: { ...d.support, ...configured.support } }
   const name = common.website_name || window.__CRA1_PAGE__?.website_name || '会员中心'
-  const logo = cfg.logo || common.system_logo, brand = Number(cfg.brand.enabled) === 1
+  const logo = cfg.logo || common.official_website_logo || common.system_logo, brand = Number(cfg.brand.enabled) === 1
   const pageLabel = { login: '登录', regist: '注册', forget: '找回密码', oauth: '关联账户' }[runtime.page] || (page === 'regist' ? '注册' : '登录')
   return <div className={'cra1-auth-page' + (brand ? '' : ' cra1-auth-page--centered')}>
     <header className="cra1-auth-header">
@@ -28,7 +28,7 @@ export function RegisterAuthLayout({ title, subtitle, children, kind }) {
     </header>
     <AnnouncementSlot className="cra1-auth-notices" />
     <main className="cra1-auth-main">
-      {brand && <section className="cra1-auth-brand" aria-label="产品与服务介绍">
+      {brand && <section data-cui-reveal className="cra1-auth-brand" aria-label="产品与服务介绍">
         {cfg.brand.label && <p className="cra1-auth-eyebrow"><span aria-hidden="true" />{cfg.brand.label}</p>}
         {cfg.brand.title && <h2>{cfg.brand.title}</h2>}
         {cfg.brand.description && <p className="cra1-auth-brand-description">{cfg.brand.description}</p>}

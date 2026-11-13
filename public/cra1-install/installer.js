@@ -1,5 +1,6 @@
 (function(){
   'use strict';
+  window.CRA1Shared?.UIEffects?.start();
   const root=document.getElementById('installer'),status=document.getElementById('status'),form=document.getElementById('setup');
   const checkButton=document.getElementById('check'),installButton=document.getElementById('install'),feedback=document.getElementById('setup-status');
   const maintenance=document.getElementById('maintenance'),updateButton=document.getElementById('update'),backup=document.getElementById('backup-confirmed'),updateFeedback=document.getElementById('update-status');

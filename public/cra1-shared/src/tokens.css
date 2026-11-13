@@ -25,7 +25,12 @@
  --cui-card-background:var(--cui-surface);
  --cui-shadow-card:0 2px 4px color-mix(in srgb,var(--cui-night) 4%,transparent),0 12px 28px -16px color-mix(in srgb,var(--cui-night) 16%,transparent);
  --cui-shadow-pop:0 8px 18px -8px color-mix(in srgb,var(--cui-night) 14%,transparent),0 24px 48px -20px color-mix(in srgb,var(--cui-night) 20%,transparent);
- --cui-height-control:40px; --cui-radius-control:8px; --cui-radius-card:16px; --cui-duration-fast:150ms; --cui-duration-base:200ms; --cui-duration-out:120ms; --cui-ease-out:cubic-bezier(.23,1,.32,1); --cui-ease-inout:cubic-bezier(.77,0,.175,1);
+ --cui-height-control:40px; --cui-height-compact:36px; --cui-height-touch:44px;
+ --cui-radius-small:2px; --cui-radius-control:4px; --cui-radius-popover:6px; --cui-radius-card:8px;
+ --cui-radius-sm:var(--cui-radius-small); --cui-radius-hero:var(--cui-radius-card);
+ --cui-space-1:4px; --cui-space-2:8px; --cui-space-3:12px; --cui-space-4:16px; --cui-space-6:24px;
+ --cui-effect-line:1px; --cui-effect-spectrum:#e54c53 0%,#a5d75d 25%,#5c9bec 50%,#63c6df 75%,#a66be6 100%;
+ --cui-duration-fast:150ms; --cui-duration-base:200ms; --cui-duration-out:120ms; --cui-ease-out:cubic-bezier(.23,1,.32,1); --cui-ease-inout:cubic-bezier(.77,0,.175,1);
 }
 /* Legacy values are also mapped at their source, so custom :root rules win. */
 :where(html[data-cra1-theme="website"]) {
@@ -39,6 +44,7 @@
  --title:var(--cui-title); --border:var(--cui-line); --input:var(--cui-control-edge); --surface:var(--cui-surface); --accent:var(--cui-accent); --accent-foreground:var(--cui-ink); --ring:var(--cui-focus);
 }
 :where(html[data-cra1-theme]) {
+ --radius:var(--cui-radius-control); --radius-small:var(--cui-radius-small); --radius-control:var(--cui-radius-control); --radius-popover:var(--cui-radius-popover); --radius-card:var(--cui-radius-card);
  --night:var(--cui-night); --night-raised:var(--cui-night-raised); --night-ink:var(--cui-night-ink); --night-body:var(--cui-night-body); --night-muted:var(--cui-night-muted); --night-line:var(--cui-night-line); --night-brand:var(--cui-highlight); --night-btn-ink:var(--cui-white);
  --shadow-card:var(--cui-shadow-card); --shadow-card-hover:var(--cui-shadow-pop); --shadow-pop:var(--cui-shadow-pop); --primary-soft:var(--cui-tint); --primary-gradient:var(--cui-button-gradient);
  --sidebar:var(--cui-surface); --sidebar-foreground:var(--cui-ink); --sidebar-primary:var(--cui-ink); --sidebar-accent:var(--cui-selected); --sidebar-accent-foreground:var(--cui-ink); --sidebar-border:var(--cui-line); --sidebar-ring:var(--cui-focus);

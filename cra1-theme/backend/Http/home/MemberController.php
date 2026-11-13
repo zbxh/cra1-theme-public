@@ -15,6 +15,7 @@ final class MemberController
     public function saveAvatar(\think\Request $request) { return $this->run('saveAvatar', $request); }
     public function uploadAvatar(\think\Request $request) { return $this->run('uploadAvatar', $request); }
     public function products(\think\Request $request) { return $this->run('products', $request); }
+    public function search(\think\Request $request) { return $this->run('search', $request); }
     public function field(\think\Request $request) { return $this->run('field', $request); }
     public function disks(\think\Request $request) { return $this->run('disks', $request); }
     public function flow(\think\Request $request) { return $this->run('flow', $request); }

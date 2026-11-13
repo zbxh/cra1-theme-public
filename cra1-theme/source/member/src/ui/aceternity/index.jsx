@@ -1,4 +1,4 @@
-import { memo, useCallback, useRef, useState, useEffect } from 'react'
+import { memo, useState, useEffect } from 'react'
 import { motion, useMotionValue, useSpring, useReducedMotion } from 'framer-motion'
 import { cn } from '../utils'
 
@@ -8,91 +8,15 @@ import { cn } from '../utils'
  * hover 不做按钮上浮、动效只碰 transform/opacity、reduced-motion 降级）。
  */
 
-/**
- * SpotlightCard：鼠标跟随径向光斑卡（aceternity spotlight 的浅色版）。
- * mousemove 把光标写进 CSS 变量 --sx/--sy，光斑层用 radial-gradient 跟随；
- * 离开时光斑淡出。光斑是独立绝对定位层，不触碰 cra1-shell.css 的白底覆盖。
- */
+/** Server information cards stay still while their controls are in use. */
 export function SpotlightCard({ className, children, as: Tag = 'div', ...props }) {
-  const ref = useRef(null)
-  const [on, setOn] = useState(false)
-
-  const onMove = useCallback((e) => {
-    const el = ref.current
-    if (!el) return
-    const r = el.getBoundingClientRect()
-    el.style.setProperty('--sx', `${e.clientX - r.left}px`)
-    el.style.setProperty('--sy', `${e.clientY - r.top}px`)
-  }, [])
-
   return (
     <Tag
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseEnter={() => setOn(true)}
-      onMouseLeave={() => setOn(false)}
-      className={cn('group/spot relative overflow-hidden rounded-lg border border-line bg-surface', className)}
+      className={cn('cui-card relative overflow-hidden rounded-lg', className)}
       {...props}
     >
-      {/* 聚光灯光斑：仅 hover 存在；尺寸足够大以覆盖边缘 */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 transition-opacity duration-300"
-        style={{
-          opacity: on ? 1 : 0,
-          background:
-            'radial-gradient(340px circle at var(--sx, 50%) var(--sy, 50%), color-mix(in srgb,var(--cui-titanium) 8.0%,transparent), transparent 65%)',
-        }}
-      />
-      {/* 光斑处的边框提亮（aceternity 的 border spotlight） */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-lg transition-opacity duration-300"
-        style={{
-          opacity: on ? 1 : 0,
-          background:
-            'radial-gradient(220px circle at var(--sx, 50%) var(--sy, 50%), color-mix(in srgb,var(--cui-titanium) 25.0%,transparent), transparent 60%)',
-          maskImage: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          maskComposite: 'exclude',
-          WebkitMaskImage: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          padding: '1px',
-        }}
-      />
       {children}
     </Tag>
-  )
-}
-
-/**
- * BorderBeam：conic-gradient 流光沿 1px 边框旋转（aceternity animated border 的浅色版）。
- * 放进 relative overflow-hidden 的容器内使用；两层错相形成彗尾。
- */
-export function BorderBeam({ size = 64, duration = 6, delay = 0, reverse }) {
-  const reduce = useReducedMotion()
-  if (reduce) return null
-  return (
-    <>
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-[inherit] border border-transparent"
-        style={{
-          maskImage: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          maskComposite: 'exclude',
-          WebkitMaskImage: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-        }}
-      >
-        <motion.span
-          className="absolute inset-0"
-          style={{
-            background: `conic-gradient(from ${reverse ? '180deg' : '0deg'}, transparent 0%, color-mix(in srgb,var(--cui-titanium) 0.0%,transparent) 0.02%, color-mix(in srgb,var(--cui-titanium) 85.0%,transparent) 0.12%, color-mix(in srgb,var(--cui-steel) 50.0%,transparent) 0.18%, transparent 28%)`,
-            animation: `beam-spin ${duration}s linear infinite`,
-            animationDelay: `${delay}s`,
-          }}
-        />
-      </span>
-    </>
   )
 }
 

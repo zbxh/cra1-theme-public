@@ -29,10 +29,10 @@ export function StatCard({ label, value, badge, hint, sub, icon: Icon, tone = 'b
   /* 进度条槽位（华为云安全评估式）：bar = { percent: 0-100, tone } */
   const barEl = bar && (
     <div className="px-5 pb-4">
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-line/70">
+      <div className="h-1.5 w-full overflow-hidden rounded-xs bg-line/70">
         <div
           className={cn(
-            'h-full rounded-full transition-[width] duration-300',
+            'h-full rounded-xs transition-[width] duration-300',
             bar.tone === 'warning' ? 'bg-warning' : bar.tone === 'danger' ? 'bg-danger' : 'bg-brand'
           )}
           style={{ width: `${Math.max(0, Math.min(100, Number(bar.percent) || 0))}%` }}
@@ -74,7 +74,7 @@ export function StatCard({ label, value, badge, hint, sub, icon: Icon, tone = 'b
 
   if (href) {
     return (
-      <a href={href} className={cn('group relative block overflow-visible rounded-2xl', CLICKABLE, className)}>
+      <a href={href} data-cui-interactive="card" className={cn('group relative block overflow-visible rounded-lg', CLICKABLE, className)}>
         {body}
       </a>
     )
@@ -84,14 +84,15 @@ export function StatCard({ label, value, badge, hint, sub, icon: Icon, tone = 'b
       <button
         type="button"
         onClick={onClick}
-        className={cn('relative block w-full overflow-visible rounded-2xl text-left', CLICKABLE, className)}
+        data-cui-interactive="card"
+        className={cn('relative block w-full overflow-visible rounded-lg text-left', CLICKABLE, className)}
       >
         {body}
       </button>
     )
   }
   return (
-    <Card glow className={cn('relative overflow-hidden', className)}>
+    <Card className={cn('relative overflow-hidden', className)}>
       {body}
     </Card>
   )

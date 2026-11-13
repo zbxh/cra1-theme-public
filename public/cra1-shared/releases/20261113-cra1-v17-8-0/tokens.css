@@ -1,0 +1,64 @@
+/* Generated from public/cra1-shared/src. Edit the source and rebuild. */
+/* CRA1 Mist neutrals with titanium actions and restrained champagne accents. */
+:root {
+ --cui-mist-50:#f9fbfb; --cui-mist-100:#f1f3f3; --cui-mist-200:#e3e7e8; --cui-mist-300:#d0d6d8;
+ --cui-mist-400:#9ca8ab; --cui-mist-500:#67787c; --cui-mist-600:#4b585b; --cui-mist-700:#394447;
+ --cui-mist-800:#22292b; --cui-mist-900:#161b1d; --cui-mist-950:#090b0c;
+ --cui-titanium:#35383c; --cui-silver:#61656b; --cui-graphite:#4b525a; --cui-steel:#94a3b3; --cui-highlight:#c4cfda;
+ --cui-gold:#8b683b; --cui-champagne:#c5a777; --cui-champagne-light:#e5d2b0; --cui-white:#fff;
+ --cui-accent-text:var(--cui-ink); --cui-subtle-text:var(--cui-muted);
+ --cui-brand:var(--cui-titanium); --cui-brand-hover:color-mix(in srgb,var(--cui-titanium) 85%,#2b2f34);
+ --cui-page:var(--cui-mist-50); --cui-title:var(--cui-mist-900); --cui-ink:var(--cui-mist-800);
+ --cui-body:var(--cui-mist-700); --cui-muted:var(--cui-mist-600); --cui-surface:var(--cui-white); --cui-field:var(--cui-white);
+ --cui-accent:var(--cui-mist-100); --cui-hover:var(--cui-mist-100); --cui-selected:var(--cui-mist-100);
+ --cui-selection-mark:var(--cui-mist-600); --cui-focus:var(--cui-mist-600); --cui-line:var(--cui-mist-300);
+ --cui-control-edge:color-mix(in srgb,var(--cui-mist-400) 50%,var(--cui-mist-500));
+ --cui-edge:var(--cui-mist-200); --cui-tint:var(--cui-selected);
+ --cui-night:var(--cui-mist-900); --cui-night-raised:var(--cui-mist-800); --cui-night-ink:var(--cui-mist-50);
+ --cui-night-body:var(--cui-mist-200); --cui-night-muted:var(--cui-mist-400); --cui-night-focus:var(--cui-mist-400);
+ --cui-night-line:color-mix(in srgb,var(--cui-mist-300) 24%,var(--cui-night));
+ --cui-success:#06734f; --cui-warning:#a94e08; --cui-danger:#b42318;
+ --cui-font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",Arial,sans-serif;
+ --cui-button-gradient:linear-gradient(128deg,color-mix(in srgb,var(--cui-silver) 72%,var(--cui-titanium)) -15%,var(--cui-titanium) 55%,var(--cui-graphite) 100%);
+ --cui-button-highlight:linear-gradient(160deg,color-mix(in srgb,var(--cui-champagne-light) 12%,transparent),transparent 55%);
+ --cui-button-ink:var(--cui-white); --cui-halo-a:var(--cui-steel); --cui-halo-b:var(--cui-champagne); --cui-halo-strength:12%; --cui-hover-depth:12%;
+ --cui-hover-edge:var(--cui-control-edge);
+ --cui-card-background:var(--cui-surface);
+ --cui-shadow-card:0 2px 4px color-mix(in srgb,var(--cui-night) 4%,transparent),0 12px 28px -16px color-mix(in srgb,var(--cui-night) 16%,transparent);
+ --cui-shadow-pop:0 8px 18px -8px color-mix(in srgb,var(--cui-night) 14%,transparent),0 24px 48px -20px color-mix(in srgb,var(--cui-night) 20%,transparent);
+ --cui-height-control:40px; --cui-height-compact:36px; --cui-height-touch:44px;
+ --cui-radius-small:2px; --cui-radius-control:4px; --cui-radius-popover:6px; --cui-radius-card:8px;
+ --cui-radius-sm:var(--cui-radius-small); --cui-radius-hero:var(--cui-radius-card);
+ --cui-space-1:4px; --cui-space-2:8px; --cui-space-3:12px; --cui-space-4:16px; --cui-space-6:24px;
+ --cui-effect-line:1px; --cui-effect-spectrum:#e54c53 0%,#a5d75d 25%,#5c9bec 50%,#63c6df 75%,#a66be6 100%;
+ --cui-duration-fast:150ms; --cui-duration-base:200ms; --cui-duration-out:120ms; --cui-ease-out:cubic-bezier(.23,1,.32,1); --cui-ease-inout:cubic-bezier(.77,0,.175,1);
+}
+/* Legacy values are also mapped at their source, so custom :root rules win. */
+:where(html[data-cra1-theme="website"]) {
+ --brand:var(--cui-brand); --brand-hover:var(--cui-brand-hover); --ink:var(--cui-ink); --body:var(--cui-body); --muted:var(--cui-muted);
+ --page:var(--cui-page); --title:var(--cui-title); --focus:var(--cui-focus);
+ --surface:var(--cui-surface); --surface-alt:var(--cui-accent); --line:var(--cui-line);
+}
+:where(html[data-cra1-theme="member"],html[data-cra1-theme="cart"]) {
+ --primary:var(--cui-brand); --primary-hover:var(--cui-brand-hover); --primary-foreground:var(--cui-white);
+ --background:var(--cui-page); --foreground:var(--cui-ink); --ink:var(--cui-ink); --body:var(--cui-body); --muted:var(--cui-accent); --muted-foreground:var(--cui-muted);
+ --title:var(--cui-title); --border:var(--cui-line); --input:var(--cui-control-edge); --surface:var(--cui-surface); --accent:var(--cui-accent); --accent-foreground:var(--cui-ink); --ring:var(--cui-focus);
+}
+:where(html[data-cra1-theme]) {
+ --radius:var(--cui-radius-control); --radius-small:var(--cui-radius-small); --radius-control:var(--cui-radius-control); --radius-popover:var(--cui-radius-popover); --radius-card:var(--cui-radius-card);
+ --night:var(--cui-night); --night-raised:var(--cui-night-raised); --night-ink:var(--cui-night-ink); --night-body:var(--cui-night-body); --night-muted:var(--cui-night-muted); --night-line:var(--cui-night-line); --night-brand:var(--cui-highlight); --night-btn-ink:var(--cui-white);
+ --shadow-card:var(--cui-shadow-card); --shadow-card-hover:var(--cui-shadow-pop); --shadow-pop:var(--cui-shadow-pop); --primary-soft:var(--cui-tint); --primary-gradient:var(--cui-button-gradient);
+ --sidebar:var(--cui-surface); --sidebar-foreground:var(--cui-ink); --sidebar-primary:var(--cui-ink); --sidebar-accent:var(--cui-selected); --sidebar-accent-foreground:var(--cui-ink); --sidebar-border:var(--cui-line); --sidebar-ring:var(--cui-focus);
+}
+.cui-dark,.cui-card--featured {
+ --cui-brand:var(--cui-highlight); --cui-brand-hover:var(--cui-night-ink); --cui-ink:var(--cui-night-ink); --cui-body:var(--cui-night-body); --cui-muted:var(--cui-night-muted); --cui-surface:var(--cui-night); --cui-accent:var(--cui-night-raised); --cui-line:var(--cui-night-line);
+ --cui-page:var(--cui-night); --cui-title:var(--cui-night-ink); --cui-field:var(--cui-night-raised);
+ --cui-hover:var(--cui-night-raised); --cui-selected:var(--cui-night-raised); --cui-focus:var(--cui-night-focus); --cui-selection-mark:var(--cui-night-focus);
+ --cui-accent-text:var(--cui-night-ink); --cui-subtle-text:var(--cui-night-muted);
+ --cui-control-edge:var(--cui-mist-500); --cui-edge:var(--cui-night-line); --cui-tint:var(--cui-night-raised); --cui-hover-depth:20%; color:var(--cui-body);
+}
+.cui-card--featured {
+ --cui-halo-a:var(--cui-champagne); --cui-halo-b:var(--cui-champagne); --cui-halo-strength:16%; --cui-hover-edge:color-mix(in srgb,var(--cui-champagne) 48%,var(--cui-night));
+ --cui-card-background:radial-gradient(ellipse at 100% 0%,color-mix(in srgb,var(--cui-champagne) 10%,transparent),transparent 65%),var(--cui-night);
+}
+@media (max-width:767px),(pointer:coarse) { :root { --cui-height-control:44px; } }

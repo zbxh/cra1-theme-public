@@ -1,4 +1,4 @@
-import { Children, Fragment, forwardRef, isValidElement } from 'react'
+import { Children, Fragment, forwardRef, isValidElement, useCallback, useEffect, useRef, useState } from 'react'
 import * as SelectPrimitive from '@radix-ui/react-select'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from './utils'
@@ -34,7 +34,32 @@ export const Select = forwardRef(function Select({
 }, ref) {
   const groups = optionsOf(children)
   const options = groups.flatMap((entry) => entry.items || [entry])
-  const initial = defaultValue ?? options[0]?.value ?? ''
+  const initial = String(defaultValue ?? options.find((entry) => !entry.disabled)?.value ?? '')
+  const [localValue, setLocalValue] = useState(initial)
+  const [invalid, setInvalid] = useState(false)
+  const selectedValue = value === undefined ? localValue : String(value ?? '')
+  const trigger = useRef(null)
+  const native = useRef(null)
+  const setTrigger = useCallback((node) => {
+    trigger.current = node
+    if (typeof ref === 'function') ref(node)
+    else if (ref) ref.current = node
+  }, [ref])
+  useEffect(() => {
+    const owner = native.current?.form || trigger.current?.form
+    const reset = () => {
+      if (value === undefined) setLocalValue(initial)
+      setInvalid(false)
+    }
+    owner?.addEventListener('reset', reset)
+    return () => owner?.removeEventListener('reset', reset)
+  }, [initial, value, form])
+  const emitRaw = (next) => {
+    setLocalValue(next)
+    setInvalid(false)
+    const target = { value: next, name }
+    onChange?.({ target, currentTarget: target, type: 'change' })
+  }
   const option = (entry) => (
     <SelectPrimitive.Item key={entry.value} value={encode(entry.value)} disabled={entry.disabled}
       textValue={entry.text} className="cui-menu-item cui-select-option">
@@ -43,14 +68,20 @@ export const Select = forwardRef(function Select({
     </SelectPrimitive.Item>
   )
   return (
-    <SelectPrimitive.Root value={value === undefined ? undefined : encode(value)}
-      defaultValue={encode(initial)} disabled={disabled} required={required} name={name} form={form}
-      onValueChange={(next) => {
-        const target = { value: next.slice('option:'.length), name }
-        onChange?.({ target, currentTarget: target, type: 'change' })
-      }}>
-      <SelectPrimitive.Trigger ref={ref} className={cn('cui-input cui-select-trigger',
-        size === 'sm' && 'cui-select-trigger--compact', className)} {...props}>
+    <SelectPrimitive.Root value={encode(selectedValue)} disabled={disabled}
+      onValueChange={(next) => emitRaw(next.slice('option:'.length))}>
+      {/* Keep Radix's private option encoding out of native form submission and
+          preserve the browser's empty/required validation and reset behavior. */}
+      {(name || required) && <select ref={native} aria-hidden="true" tabIndex={-1}
+        className="cui-select-native" name={name} form={form} value={selectedValue}
+        disabled={disabled} required={required} onChange={(event) => emitRaw(event.target.value)}
+        onInvalid={(event) => { event.preventDefault(); setInvalid(true); trigger.current?.focus() }}>
+        {options.map((entry) => <option key={entry.value} value={entry.value} disabled={entry.disabled}>{entry.text}</option>)}
+      </select>}
+      <SelectPrimitive.Trigger ref={setTrigger} form={form} aria-required={required || undefined}
+        className={cn('cui-input cui-select-trigger',
+          size === 'sm' && 'cui-select-trigger--compact', className)} {...props}
+        aria-invalid={props['aria-invalid'] ?? (invalid || undefined)}>
         <SelectPrimitive.Value placeholder={placeholder}>{valueLabel}</SelectPrimitive.Value>
         <SelectPrimitive.Icon className="cui-select-trigger__arrow"><ChevronDown aria-hidden="true" /></SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>

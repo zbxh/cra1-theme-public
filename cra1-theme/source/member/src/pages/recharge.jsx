@@ -184,13 +184,13 @@ export default function RechargePage() {
                                     'disabled:cursor-not-allowed disabled:opacity-40',
                                     active
                                       ? 'border-brand bg-brand/5 shadow-[0_0_0_1px_var(--brand)]'
-                                      : 'border-line bg-surface hover:border-brand/60'
+                                      : 'border-line bg-surface'
                                   )}>
                             <span className={cn('text-lg font-semibold tabular-nums', active ? 'text-brand' : 'text-ink')}>
                               {formatMoney(v)}
                             </span>
                             {active && (
-                              <span className="absolute right-1.5 top-1.5 flex size-4.5 items-center justify-center rounded-full bg-brand text-white"
+                              <span className="absolute right-1.5 top-1.5 flex size-4.5 items-center justify-center rounded-xs bg-brand text-white"
                                     aria-hidden="true">
                                 <Check className="size-3" strokeWidth={3} />
                               </span>
@@ -232,7 +232,7 @@ export default function RechargePage() {
                                       'disabled:cursor-not-allowed disabled:opacity-40',
                                       active
                                         ? 'border-brand bg-brand/5 shadow-[0_0_0_1px_var(--brand)]'
-                                        : 'border-line bg-surface hover:border-brand/60'
+                                        : 'border-line bg-surface'
                                     )}>
                               <span className={cn(
                                 'flex size-9 shrink-0 items-center justify-center rounded-lg',

@@ -89,8 +89,8 @@
             <div v-if="commonData.cart_instruction == 1 && commonData.cart_instruction_content" class="cart-des"
               v-html="commonData.cart_instruction_content">
             </div>
-            <div class="main-title" v-else>{{ pageTitle || lang.new_goods }}</div>
-            <div class="main-subtitle" v-if="pageSubtitle">{{ pageSubtitle }}</div>
+            <div class="main-title" data-cui-reveal v-else>{{ pageTitle || lang.new_goods }}</div>
+            <div class="main-subtitle" data-cui-reveal v-if="pageSubtitle">{{ pageSubtitle }}</div>
             <div class="main-content-box" :class="{'has-rail': isNormal && first_group_list.length && railState === 'bridged'}">
               <div class="cl-shop">
                 <div class="cl-shop-main">

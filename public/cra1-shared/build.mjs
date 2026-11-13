@@ -28,14 +28,14 @@ function components(css) {
 }
 const member=new URL('../../cra1-theme/source/member/',import.meta.url)
 const hash=createRequire(new URL('package.json',member))('esbuild').buildSync({entryPoints:[new URL('src/lib/checkout-hash.js',member).pathname],bundle:true,format:'iife',write:false,minify:true,legalComments:'inline'}).outputFiles[0].text
-const modules = ['errors.js', 'request.js', 'runtime.js', 'i18n.js', 'payments.js', 'checkout.js', 'security.js', 'ui.js', 'notification-session.js', 'announcements.js', 'notification-center.js', 'avatar.js', 'header-search.js', 'header-actions.js', 'ambient.js', 'business-icons.js', 'icon-style.js', 'motion.js']
+const modules = ['errors.js', 'request.js', 'runtime.js', 'i18n.js', 'payments.js', 'checkout.js', 'security.js', 'ui.js', 'notification-session.js', 'announcements.js', 'notification-center.js', 'avatar.js', 'search-match.js', 'member-search-pages.js', 'header-search.js', 'header-actions.js', 'ambient.js', 'business-icons.js', 'icon-style.js', 'motion.js', 'ui-effects.js']
 fs.writeFileSync(path.join(output, 'cra1-shared.js'), banner + modules.map(file=>file==='i18n.js'?read(file).replace('__CRA1_TRANSLATIONS__',read('translations.json')):file==='checkout.js'?hash+'\n'+read(file):read(file)).join('\n') + '\n' + read('context.js') + '\n' + read('session.js') + '\n' + read('styles.js').replace('__CRA1_LEGACY_CLASSES__',JSON.stringify(JSON.parse(read('aliases.json')))))
 fs.writeFileSync(path.join(output, 'announcements-preview.js'), banner + read('ui.js') + '\n' + read('announcements.js'))
 // Native fallback templates keep their business UI and need only this small guard.
 fs.writeFileSync(path.join(output, 'member-session.js'), banner + read('errors.js') + '\n' + read('request.js') + '\n' + read('context.js') + '\n' + read('session.js'))
 // Standalone third-party carts keep installed V10 business scripts, Axios,
 // jQuery, rem scaling and component loading. Only navigation uses this bundle.
-const navigationModules = ['errors.js', 'request.js', 'context.js', 'runtime.js', 'ui.js', 'notification-session.js', 'announcements.js', 'avatar.js', 'header-search.js', 'header-actions.js', 'icon-style.js', 'native-cart-context.js']
+const navigationModules = ['errors.js', 'request.js', 'context.js', 'runtime.js', 'ui.js', 'notification-session.js', 'announcements.js', 'avatar.js', 'search-match.js', 'member-search-pages.js', 'header-search.js', 'header-actions.js', 'icon-style.js', 'ui-effects.js', 'native-cart-context.js']
 fs.writeFileSync(path.join(output, 'native-cart-navigation.js'), banner + navigationModules.map(read).join('\n'))
 // Derive the shell from the same maintained navigation styles, never the
 // member/module layout overrides. Filter each selector, including mixed rules.
@@ -73,11 +73,13 @@ const navigationRoots = ':where(.cra1-header,.cra1-aside,.cra1-notices-host,.cra
 fs.writeFileSync(path.join(output, 'native-cart-navigation.css'), banner + read('tokens.css') + '\n' + navigationShell.toString() + '\n'
   + navigationCss(read('components.css'), navigationRoots) + '\n'
   + ['announcements.css', 'header-search.css', 'user-panel.css', 'header-support.css', 'header-actions.css'].map(file => navigationCss(read(file))).join('\n') + '\n'
-  + read('native-cart.css'))
+  + read('native-cart.css') + '\n' + read('ui-effects.css'))
 const componentCss = read('components.css')
 // The independent admin login needs the palette without front-end components.
 fs.writeFileSync(path.join(output, 'tokens.css'), banner + read('tokens.css'))
-fs.writeFileSync(path.join(output, 'cra1-shared.css'), banner + components(read('tokens.css')) + '\n' + components(componentCss) + '\n' + ['security.css', 'announcements.css', 'header-search.css', 'user-panel.css', 'header-support.css', 'adapters.css', 'nav-auth.css', 'business-icons.css', 'motion.css', 'header-actions.css'].map(read).join('\n'))
+fs.writeFileSync(path.join(output, 'ui-effects.css'), banner + read('ui-effects.css'))
+fs.writeFileSync(path.join(output, 'ui-effects.js'), banner + read('ui-effects.js'))
+fs.writeFileSync(path.join(output, 'cra1-shared.css'), banner + components(read('tokens.css')) + '\n' + components(componentCss) + '\n' + ['security.css', 'announcements.css', 'header-search.css', 'user-panel.css', 'header-support.css', 'adapters.css', 'nav-auth.css', 'business-icons.css', 'motion.css', 'header-actions.css', 'ui-effects.css'].map(read).join('\n'))
 fs.writeFileSync(path.join(output, 'v10-axios.js'), banner + read('v10-axios.js'))
 // Legacy compatibility files and releases remain immutable. New templates load
 // the bundle above; preserving the old URIs also protects the fixed preview.

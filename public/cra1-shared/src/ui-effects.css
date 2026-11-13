@@ -1,0 +1,76 @@
+/* Decorative components only. This file can also be loaded by the independent
+   admin and installer with tokens.css, without a frontend reset or layout. */
+:where(html[data-cra1-theme],html[data-cra1-ui]) :is(.cui-rainbow,.cui-edge-host) { position:relative; }
+:is(html[data-cra1-theme],html[data-cra1-ui]) .cui-rainbow:where(.cui-button,.btn-aurora,.cra1-header__login):not(:where([data-cui-effects="none"],[data-cui-effects="none"] *,.cra1-upanel__tag--console)) {
+ --cui-button-face:var(--cui-button-gradient);
+ --cui-button-spectrum:#e54c53 0%,#a5d75d 20%,#5c9bec 40%,#63c6df 60%,#a66be6 80%,#e54c53 100%;
+ isolation:isolate; overflow:visible; border-width:var(--cui-effect-line,1px); border-style:solid; border-color:var(--cui-control-edge);border-bottom-color:transparent;
+ background-image:var(--cui-button-face),linear-gradient(90deg,var(--cui-button-spectrum));
+ background-size:100% 100%,200% var(--cui-effect-line,1px);background-position:0 0,0 100%;background-repeat:no-repeat,repeat-x;
+ background-clip:padding-box,border-box; background-origin:border-box;
+ animation:cui-button-pan 2s linear infinite; animation-play-state:var(--cui-effect-play,running);
+}
+:is(html[data-cra1-theme],html[data-cra1-ui]) .cui-rainbow:where(.cui-button--outline):not(:where([data-cui-effects="none"],[data-cui-effects="none"] *,.cra1-upanel__tag--console)) {
+ --cui-button-face:linear-gradient(var(--cui-field),var(--cui-field));
+}
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-button-glow {
+ display:none; position:absolute; left:50%; bottom:-20%; width:60%; height:20%; transform:translateX(-50%);
+ background:linear-gradient(90deg,var(--cui-button-spectrum)); background-size:200% 100%;background-repeat:repeat-x; filter:blur(12px); opacity:.42;
+ z-index:-1; pointer-events:none; animation:cui-chroma-pan 2s linear infinite; animation-play-state:var(--cui-effect-play,running);
+}
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-rainbow:not(:where([data-cui-effects="none"],[data-cui-effects="none"] *,.cra1-upanel__tag--console)) > .cui-button-glow { display:block; }
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-edge-card.cui-edge-host {--cui-beam-size:64px;--cui-beam-radius:var(--cui-radius-card,8px);--cui-beam-duration:7s;border-radius:var(--cui-radius-card,8px);}
+/* A masked moving patch paints only a short 1px section of the perimeter. The
+   element is independent from ::after, used by compact controls' touch area. */
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-edge-segment {
+ display:none; position:absolute; inset:0; padding:var(--cui-effect-line,1px); border-radius:inherit; overflow:hidden;
+ -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; z-index:2;
+}
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-edge-segment::after {
+ content:""; position:absolute; top:0; left:0; width:var(--cui-beam-size,26px); height:var(--cui-beam-size,26px);
+ background:linear-gradient(90deg,#22b4e7,#8b5cf6 48%,#ec4899 82%,#eab66b);
+ -webkit-mask:radial-gradient(closest-side,#000 28%,#000b 55%,transparent 100%); mask:radial-gradient(closest-side,#000 28%,#000b 55%,transparent 100%);
+ offset-path:rect(0px auto auto 0px round var(--cui-beam-radius,4px)); offset-anchor:50% 50%; offset-rotate:auto; offset-distance:0%;
+ animation:cui-edge-trace var(--cui-beam-duration,4s) linear infinite; animation-delay:var(--cui-beam-delay,0s); animation-direction:var(--cui-beam-direction,normal); animation-play-state:var(--cui-effect-play,running);
+}
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-edge-card.cui-edge-active:not(:where([data-cui-effects="none"],[data-cui-effects="none"] *)) > .cui-edge-segment { display:block; }
+/* Framework-rendered legacy spans stay inert inside actions, even if an old
+   selected-state class remains. Buttons never acquire a perimeter animation. */
+:where(html[data-cra1-theme],html[data-cra1-ui]) :is(button,[role="button"],[role="tab"],[role="option"],[role="menuitem"],.cui-button,.cui-choice,.cui-tabs__trigger,.cui-select-option,.admin-menu-select__option,.cui-menu-item,.el-select-dropdown__item,.cra1-primary-item,.cra1-nav-l2,.cra1-nav-l3,.cra1-nav-recent,.el-tabs__item,.el-radio-button__inner,.el-checkbox-button__inner) .cui-edge-segment {display:none!important;}
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-ripple-clip { position:absolute; inset:0; border-radius:inherit; overflow:hidden; pointer-events:none; z-index:3; }
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-ripple { position:absolute; background:radial-gradient(closest-side,#4b585b24 96%,transparent); transform:scale(0); pointer-events:none; }
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-rainbow:not(.cui-button--outline) .cui-ripple { background:radial-gradient(closest-side,#ffffff40 96%,transparent); }
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-pointer-card { --cui-pointer-x:50%; --cui-pointer-y:20%; transition:border-color 180ms ease,box-shadow 200ms ease,translate 200ms var(--cui-ease-out); }
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-pointer-card::after { background:radial-gradient(260px circle at var(--cui-pointer-x) var(--cui-pointer-y),color-mix(in srgb,var(--cui-mist-400) 11%,transparent),transparent 70%); }
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+ :where(html[data-cra1-theme],html[data-cra1-ui]) .cui-pointer-card.cui-pointer-active { translate:0 -3px; box-shadow:var(--cui-shadow-pop); }
+}
+:where(html[data-cra1-theme],html[data-cra1-ui]) .cui-effect-offscreen,
+html[data-cui-effects-paused] { --cui-effect-play:paused; }
+@keyframes cui-chroma-pan { to { background-position:200% 0; } }
+@keyframes cui-button-pan { to { background-position:0 0,200% 100%; } }
+@keyframes cui-edge-trace { to { offset-distance:100%; } }
+/* Form fields keep their own DOM, picker, focus and validation contracts. Only
+   a short transparent-border background segment moves while the field hovers;
+   explicit dropdown triggers are fields even when rendered as buttons. */
+@property --cui-field-edge-angle { syntax:"<angle>"; initial-value:0deg; inherits:false; }
+@keyframes cui-field-edge-trace { to { --cui-field-edge-angle:360deg; } }
+@supports (background:conic-gradient(from 0deg,transparent,#22b4e7,transparent)) {
+ @media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  :is(html[data-cra1-theme],html[data-cra1-ui]) :is(.cui-input,.cui-select-trigger,.cui-date-trigger,.admin-menu-select,.cra1-ta-msel__trigger,.node-region-trigger,.el-input__inner,.el-textarea__inner):where(:hover:not(:focus,:focus-visible,:focus-within,:disabled,:user-invalid,[aria-invalid="true"],[aria-disabled="true"],[aria-busy="true"],[data-disabled],[data-state="open"],.is-disabled,.is-loading,.is-error,.is-success,.cui-input--success):not(:is(.is-error,.is-disabled,.is-loading,.is-success,.is-focus,.is-open,[aria-busy="true"]) *)):not(:where([data-cui-effects="none"],[data-cui-effects="none"] *)) {
+   border-color:transparent;
+   background-image:linear-gradient(var(--cui-field-edge-face,var(--cui-field)),var(--cui-field-edge-face,var(--cui-field))),conic-gradient(from var(--cui-field-edge-angle,0deg),transparent 0deg 294deg,#22b4e7 303deg,#8b5cf6 317deg,#ec4899 330deg,#eab66b 342deg,transparent 352deg 360deg),linear-gradient(var(--cui-control-edge),var(--cui-control-edge));
+   background-origin:border-box;background-clip:padding-box,border-box,border-box;background-repeat:no-repeat;
+   animation:cui-field-edge-trace 5s linear infinite;animation-play-state:var(--cui-effect-play,running);
+  }
+ }
+}
+@supports not ((offset-path:rect(0px auto auto 0px round 4px)) and (mask-composite:exclude)) {
+ :where(html[data-cra1-theme],html[data-cra1-ui]) .cui-edge-card.cui-edge-active > .cui-edge-segment { display:none; }
+}
+@media (prefers-reduced-motion:reduce) {
+ :where(html[data-cra1-theme],html[data-cra1-ui]) :is(.cui-rainbow,.cui-button-glow,.cui-edge-segment::after) { animation:none!important; }
+ :where(html[data-cra1-theme],html[data-cra1-ui]) .cui-edge-segment { display:none!important; }
+ :where(html[data-cra1-theme],html[data-cra1-ui]) .cui-pointer-card { translate:none; transition:none; }
+}

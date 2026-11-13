@@ -5,6 +5,16 @@
 (function () {
   'use strict';
 
+  // Optional article services follow the existing public capability projection.
+  // A missing projection is an unread state, rather than permission to query.
+  function articleAvailability(endpoint) {
+    var capability = { '/news': 'news', '/announcement': 'announcement', '/help': 'help' }[endpoint];
+    if (!capability) return null;
+    var features = (window.__CRA1_RUNTIME__ || {}).features || {};
+    var value = features[capability];
+    return value === true || value === 1 ? true : value === false || value === 0 ? false : null;
+  }
+
   document.addEventListener('alpine:init', function () {
     // Use the native domain service's category URL and supported suffixes.
     Alpine.data('domainRegistration', function () {
@@ -456,7 +466,7 @@
           var self = this;
           this._root = this.$el;
           this._onResize = function () {
-            if (window.innerWidth >= 1024 && self.$store.ui.menuOpen) self.$store.ui.closeMenu();
+            if (window.innerWidth >= 1024 && document.documentElement.dataset.cra1NavOverflow !== 'true' && self.$store.ui.menuOpen) self.$store.ui.closeMenu();
           };
           window.addEventListener('resize', this._onResize);
           this.$watch('$store.ui.menuOpen', function (open) {
@@ -992,6 +1002,44 @@
       var auth=Alpine.store('auth');
       if(auth.user&&String(auth.user.id)===String(e.detail.id))auth.check();
     });
+    Alpine.data('siteHeader', function () {
+      return {
+        searchOpen: false,
+        init: function () {
+          var self = this, header = this.$el, frame = null, destroyed = false;
+          var row = header.querySelector('.cra1-site-header__row'), brand = header.querySelector('.cra1-site-header__brand');
+          var nav = header.querySelector('.cra1-primary-nav'), actions = header.querySelector('.cra1-site-header__actions');
+          function measure() {
+            frame = null;
+            if (destroyed || !row) return;
+            header.classList.remove('is-slogan-collapsed', 'is-nav-overflow');
+            var overflow = false;
+            if (window.innerWidth >= 1024) {
+              function crowded() { return row.scrollWidth > row.clientWidth + 1 || (brand && brand.scrollWidth > brand.clientWidth + 1); }
+              if (crowded()) header.classList.add('is-slogan-collapsed');
+              overflow = crowded();
+              header.classList.toggle('is-nav-overflow', overflow);
+            }
+            document.documentElement.dataset.cra1NavOverflow = String(overflow);
+            if (window.innerWidth >= 1024 && !overflow && self.$store.ui.menuOpen) self.$store.ui.closeMenu();
+          }
+          this._measureHeader = function () { if (!destroyed && frame === null) frame = requestAnimationFrame(measure); };
+          this._headerResize = new ResizeObserver(this._measureHeader);
+          [row, brand, nav, actions].filter(Boolean).forEach(function (node) { self._headerResize.observe(node); });
+          this._headerMutation = new MutationObserver(this._measureHeader);
+          this._headerMutation.observe(header, { childList: true, subtree: true, characterData: true });
+          window.addEventListener('resize', this._measureHeader);
+          this._destroyHeader = function () {
+            destroyed = true; if (frame !== null) cancelAnimationFrame(frame);
+            self._headerResize.disconnect(); self._headerMutation.disconnect();
+            window.removeEventListener('resize', self._measureHeader);
+            delete document.documentElement.dataset.cra1NavOverflow;
+          };
+          this.$nextTick(this._measureHeader);
+        },
+        destroy: function () { if (this._destroyHeader) this._destroyHeader(); }
+      };
+    });
     Alpine.data('searchBox', function () {
       return {
         _component:null,
@@ -1003,8 +1051,17 @@
           this.$nextTick(function () {
             self._component = CRA1Shared.HeaderSearch.mount(self.$el, {
               idPrefix: 'cra1-site-search',
+              context: 'website',
               copy: { placeholder: self.$el.dataset.placeholder, searching: self.$el.dataset.searching, noresult: self.$el.dataset.noresult },
-              getSearchOptions: function () { return { includeHosts: self.$store.auth.loggedIn, context: 'website' }; },
+              getSearchOptions: function () {
+                var includeHosts = self.$store.auth.loggedIn;
+                var features = (window.__CRA1_RUNTIME__ || {}).features || {};
+                return {
+                  includeHosts: includeHosts,
+                  context: 'website',
+                  sources: CRA1Shared.HeaderSearch.pluginSources({ includeHosts: includeHosts, capabilities: features, plugins: [] })
+                };
+              },
               beforeOpen: function () { self.$store.ui.closeMenu(); },
               onOpenChange: function (open) { self.open = open; self.$dispatch('cra1-site-search', { open: open }); }
             });
@@ -1122,7 +1179,15 @@
             var request = self[requestKey] = (self[requestKey] || 0) + 1;
             self[loading] = true;
             self[key + 'Failed'] = false;
-            API.get(key === 'notices' ? '/announcement' : '/news', { page: 1, limit: 6 })
+            var endpoint = key === 'notices' ? '/announcement' : '/news';
+            var available = articleAvailability(endpoint);
+            if (available !== true) {
+              self[key] = [];
+              self[key + 'Failed'] = available === null;
+              self[loading] = false;
+              return;
+            }
+            API.get(endpoint, { page: 1, limit: 6 })
               .then(function (data) { if (request === self[requestKey]) self[key] = self.pickList(data).slice(0, 6); })
               .catch(function () { if (request === self[requestKey]) self[key + 'Failed'] = true; })
               .then(function () { if (request === self[requestKey]) self[loading] = false; });
@@ -1288,6 +1353,14 @@
           var request = this._request = (this._request || 0) + 1;
           this.loading = true;
           this.loadFailed = false;
+          var available = articleAvailability(this.endpoint);
+          if (available !== true) {
+            this.items = [];
+            this.total = 0;
+            this.loadFailed = available === null;
+            this.loading = false;
+            return;
+          }
           var params = { page: this.page, limit: this.limit };
           Object.keys(this.extraParams).forEach(function (k) {
             if (self.extraParams[k]) params[k] = self.extraParams[k];
@@ -1363,6 +1436,13 @@
           this.item = null;
           this.previous = null;
           this.next = null;
+          var available = articleAvailability(endpoint);
+          if (available !== true) {
+            this.notFound = available === false;
+            this.loadFailed = available === null;
+            this.loading = false;
+            return;
+          }
           this.detailSuffix = detailSuffix ? '-' + detailSuffix : '-详情';
           try {
             var cfg = (window.__PAGE_DATA__ && window.__PAGE_DATA__.config) || {};
@@ -1479,6 +1559,12 @@
         load: function () {
           var self = this, keyword = this.keyword.trim(), request = this._request = (this._request || 0) + 1;
           this.loading = true; this.loadFailed = false;
+          var available = articleAvailability('/help');
+          if (available !== true) {
+            this.groups = []; this.activeGroup = ''; this.searchedKeyword = keyword;
+            this.loadFailed = available === null; this.loading = false;
+            return;
+          }
           API.get('/help', keyword ? {keywords:keyword} : {})
             .then(function (data) {
               if (request !== self._request) return;
@@ -2004,33 +2090,6 @@
     });
   }
 
-  /* ================= 光标跟随光斑（参考腾讯云 hero 按钮 / 阿里云 secondary-action） =================
-     只做一件事：把指针位置写进 --mx / --my 两个自定义属性。
-     光斑本身是 CSS 的 radial-gradient + opacity 过渡，因此动画仍在合成器上跑，
-     不引入任何动效库（§7.5.3）；JS 每帧只写两个字符串，开销可忽略。
-
-     用事件委托挂在 document 上（而非给每个 .spotlight-hover 单独绑定）：
-     页面里这类按钮有几十个，且部分由 x-for 动态渲染，
-     逐个绑定既要做 MutationObserver，又容易在重渲染后丢绑定。
-     pointerover/pointermove 只在命中 .spotlight-hover 时才计算，代价与命中数成正比。
-
-     reduced-motion 下不绑定：光斑是纯装饰，没有它交互依然完整。 */
-  function setupSpotlightHover() {
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-    document.addEventListener(
-      'pointermove',
-      function (e) {
-        var el = e.target && e.target.closest ? e.target.closest('.spotlight-hover') : null;
-        if (!el) return;
-        var r = el.getBoundingClientRect();
-        el.style.setProperty('--mx', (e.clientX - r.left).toFixed(1) + 'px');
-        el.style.setProperty('--my', (e.clientY - r.top).toFixed(1) + 'px');
-      },
-      { passive: true }
-    );
-  }
-
   /* ================= 列表重渲染入场 =================
      问题：分组筛选、分页翻页、搜索出结果时，Alpine 的 x-for 会**销毁并重建**节点，
      新节点一插进 DOM 就是终态（opacity:1 / transform:none），
@@ -2065,5 +2124,4 @@
   /* 暴露给 Alpine 组件与内联表达式使用 */
   window.cra1AnimateListIn = animateListIn;
 
-  document.addEventListener('alpine:initialized', setupSpotlightHover);
 })();

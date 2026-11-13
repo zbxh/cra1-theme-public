@@ -148,7 +148,7 @@ test('native flat activity responses keep their contract only on the known produ
 function websiteFixture(get) {
  const components={},listeners={}
  const document={title:'详情',addEventListener:(name,fn)=>{listeners[name]=fn}}
- const window={location:{search:'?id=9',pathname:'/news-details.html'},matchMedia:()=>({matches:true}),addEventListener(){}}
+ const window={location:{search:'?id=9',pathname:'/news-details.html'},matchMedia:()=>({matches:true}),addEventListener(){},__CRA1_RUNTIME__:{features:{news:true,announcement:true,help:true}}}
  const env={document,window,API:{get},Alpine:{data:(name,factory)=>{components[name]=factory},store(){}},setTimeout,clearTimeout,setInterval,clearInterval,URLSearchParams}
  vm.runInNewContext(source('public/cra1-shared/theme-sources/website/app.js'),env);listeners['alpine:init']()
  window.cra1AnimateListIn=()=>{}

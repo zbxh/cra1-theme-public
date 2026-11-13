@@ -13,7 +13,7 @@ import { cn } from './utils'
 export function Avatar({ className, style, ...props }) {
   return (
     <AvatarPrimitive.Root
-      className={cn('relative flex size-8 shrink-0 overflow-hidden rounded-lg', className)}
+      className={cn('relative flex size-8 shrink-0 overflow-hidden rounded-full', className)}
       style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', ...style }}
       {...props}
     />
@@ -27,7 +27,7 @@ export function AvatarImage({ className, ...props }) {
 export function AvatarFallback({ className, ...props }) {
   return (
     <AvatarPrimitive.Fallback
-      className={cn('flex size-full items-center justify-center rounded-lg bg-brand text-[13px] font-semibold text-white', className)}
+      className={cn('flex size-full items-center justify-center rounded-full bg-brand text-[13px] font-semibold text-white', className)}
       style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       {...props}
     />

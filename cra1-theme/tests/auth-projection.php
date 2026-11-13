@@ -14,6 +14,8 @@ $p=CRA1ThemeRuntime::project(['captcha_client_security_verify'=>1,'first_login_t
 authCheck($p['auth']['captcha']['security_verify']===true,'native security CAPTCHA policy supplied');
 authCheck($p['common']['captcha_client_security_verify']===1,'legacy security CAPTCHA policy supplied');
 authCheck($p['auth']['qr']['preferred']===true&&$p['auth']['providers'][0]['name']==='FutureSocial','QR does not exclude dynamic providers');
+$logos=CRA1ThemeRuntime::project(['system_logo'=>'/system-light.png','official_website_logo'=>'/website-dark.svg'],[],'login');
+authCheck($logos['common']['official_website_logo']==='/website-dark.svg' && $logos['common']['system_logo']==='/system-light.png','public auth presentation retains both independent brand assets');
 $off=CRA1ThemeRuntime::project([],[],'login');
 authCheck(empty($off['auth']['qr'])&&empty($off['auth']['providers'])&&empty($off['auth']['captcha']['security_verify']),'disabled capabilities absent');
 echo json_encode(['status'=>'passed','checks'=>$checks,'production_writes'=>0]),PHP_EOL;

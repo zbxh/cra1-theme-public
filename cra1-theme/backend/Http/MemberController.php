@@ -11,7 +11,8 @@ final class MemberController
         if ((int)$request->client_id <= 0 || $request->is_api || !preg_match('/^Bearer\s+\S+$/i', (string)$request->header('authorization'))) {
             return json(['status'=>401,'msg'=>'登录已失效，请重新登录'],401);
         }
-        if (!\CRA1\Theme\Context::memberActive()) return json(['status'=>404,'msg'=>'功能不存在'],404);
+        $active = $action === 'search' ? \CRA1\Theme\Context::active() : \CRA1\Theme\Context::memberActive();
+        if (!$active) return json(['status'=>404,'msg'=>'功能不存在'],404);
         // Native Bearer authentication determines access. The PHP origin may
         // differ from the public browser origin behind a proxy.
         try {
@@ -33,6 +34,12 @@ final class MemberController
                         else { $file = $store->upload($_FILES['file']??[], 'avatar', $self); $data = ['attachment_id'=>(int)$file['id'],'url'=>$file['url'],'width'=>512,'height'=>512]; }
                     }
                     $result = ['status'=>200,'msg'=>'已完成','data'=>$data];
+                    break;
+                case 'search':
+                    if (!NativeAuthorization::allows('app\\home\\controller\\HostController::homeHostList')) return $this->denied();
+                    $keywords = $request->param('keywords', '');
+                    if (!is_string($keywords)) throw new \InvalidArgumentException('请输入搜索关键词');
+                    $result = \CRA1\Theme\Compatibility\MemberSearch::search($keywords);
                     break;
                 case 'products':
                     if (!NativeAuthorization::allows('app\\home\\controller\\HostController::homeHostList')) return $this->denied();

@@ -8,6 +8,7 @@
   var entries=Object.entries(definitions[theme==='website'?'website':'system']);
   var business=root.CRA1Shared.BusinessIcons;
   var motion=root.CRA1Shared.Motion;
+  var effects=root.CRA1Shared.UIEffects;
   var selector=entries.map(function(entry){return entry[1];}).join(',')+(business?','+business.selector:'');
   var owned=new WeakMap();
   function nativeModule(element){
@@ -40,6 +41,7 @@
     if(node.nodeType===1)apply(node);
     node.querySelectorAll(selector).forEach(apply);
     if(motion)motion.scan(node);
+    if(effects)effects.scan(node);
   }
   var observer=new MutationObserver(function(records){
     var pending=new Set();
@@ -56,16 +58,18 @@
       scan(node);
     });
     if(motion)motion.update(records);
+    if(effects)effects.update(records);
   });
   // Avoid repeatedly walking the parser's incomplete subtrees. Existing theme
   // markup already declares cui classes for above-the-fold content; the legacy
   // pass runs before deferred framework page modules and async plugin content.
   function start(){
-    observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeOldValue:true,attributeFilter:['class','data-cra1-icon-label','data-cui-icon-style','title','aria-selected']});
+    observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeOldValue:true,attributeFilter:['class','data-cra1-icon-label','data-cui-icon-style','title','aria-selected','aria-pressed','aria-disabled','aria-busy','aria-invalid','disabled','data-disabled','data-selected','data-state','data-cui-edge','data-cui-interactive','data-cui-effects']});
+    if(effects)effects.start({managed:true});
     if(motion)motion.start();
     scan(document);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
-  root.CRA1Shared.Styles={refresh:scan,disconnect:function(){observer.disconnect();if(motion)motion.destroy();}};
+  root.CRA1Shared.Styles={refresh:scan,disconnect:function(){observer.disconnect();if(motion)motion.destroy();if(effects)effects.destroy();}};
 })(window);

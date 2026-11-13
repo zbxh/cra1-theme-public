@@ -1,6 +1,6 @@
 import { cn } from './utils'
 
-/** Badge：状态标签（胶囊形，浅底主色字，对齐主题 7.4） */
+/** Badge：紧凑状态标签，浅底语义色。 */
 const tones = {
   default: 'bg-brand/8 text-brand border-brand/15',
   success: 'bg-success/8 text-success border-success/15',
@@ -15,7 +15,7 @@ export function Badge({ tone = 'default', className, ...props }) {
       className={cn(
         // whitespace-nowrap：Badge 常置于受宽度约束的表格单元格内，
         // 缺少它时中文标签会被逐字换行（「入站」竖排成两行）。
-        'inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium leading-5',
+        'inline-flex items-center gap-1 whitespace-nowrap rounded-small border px-2.5 py-0.5 text-xs font-medium leading-5',
         tones[tone] || tones.default,
         className
       )}

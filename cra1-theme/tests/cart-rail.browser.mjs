@@ -9,7 +9,7 @@ if(!origin||!out)throw Error('Set a guest theme origin and external evidence dir
 fs.mkdirSync(out,{recursive:true});
 const release=stage?JSON.parse(fs.readFileSync(path.join(stage,'release.json'))).release:'';
 const products=[501,502,503,504,505,506,507].map((id,i)=>({id,module:id===503?'vendor_custom':id===507?'mf_dcim':[502,504,505].includes(id)?'idcsmart_common':'mf_cloud',name:['云产品','通用周期产品','第三方产品','免费产品','一次性产品','延迟购买栏模块','DCIM 产品'][i],price:'12.00',cycle:'月',description:'<p>隔离示例配置</p>',product_group_id:301,product_group_id_first:300,hidden:0,stock_control:0}));
-const report={status:'running',checks:[],errors:[],blocked:[],console:[]},browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+const report={status:'running',checks:[],errors:[],blocked:[],console:[],mockedQuotes:[]},browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const check=(ok,label)=>{assert.ok(ok,label);report.checks.push(label);fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(report,null,2))};
 let page;
 const json=(route,data)=>route.fulfill({json:{status:200,msg:'操作成功',data}});
@@ -23,7 +23,7 @@ function moduleContent(id,mobile){
  return styles+'<div class="template fixture-module '+(native?'third-party-module':(mobile?(id===507?'m-dcim-m':'m-cloud-m'):''))+'" data-id="'+id+'">'+body+conditional+'</div><script src="/fixture/cart-rail-module.js"></scr'+'ipt>';
 }
 function moduleScript(){
- return '(()=>{const id=Number(document.getElementsByClassName("template")[0].dataset.id),common=[502,504,505].includes(id),native=id===503;const data=common?{custom_cycles:[],curCycle:0,pay_type:id===504?"free":id===505?"onetime":"recurring_prepayment",orderData:{qty:1},basicInfo:{allow_qty:1},totalPrice:id===504?0:id===505?99:12,original_price:12,dataLoading:false,bought:0}:{cycleList:[],params:{duration_id:""},qty:1,calcTotalPrice:0,totalPrice:0,loadingPrice:false,preview:[],bought:0};data.fixtureChoice="a";data.fixtureVisible=false;const methods=native?{}:common?{addCart(){this.bought++},buyNow(){this.bought++},changeConfig(){},changeCycle(c,i){this.curCycle=i}}:{handlerCart(){this.bought++},submitOrder(){this.bought++},changeCart(){this.bought++},changeDuration(){},changQty(){}};window.fixtureVM=new Vue({el:document.getElementsByClassName("template")[0],data,methods});})();';
+ return '(()=>{const id=Number(document.getElementsByClassName("template")[0].dataset.id),common=[502,504,505].includes(id),native=id===503;const data=common?{custom_cycles:[],curCycle:0,pay_type:id===504?"free":id===505?"onetime":"recurring_prepayment",orderData:{qty:1},basicInfo:{allow_qty:1},totalPrice:id===504?0:id===505?99:12,original_price:12,dataLoading:false,bought:0}:{cycleList:[],params:{duration_id:""},qty:1,calcTotalPrice:0,totalPrice:0,loadingPrice:false,preview:[],bought:0};data.fixtureChoice="a";data.fixtureVisible=false;const methods=native?{}:common?{addCart(){this.bought++},buyNow(){this.bought++},async changeConfig(){const r=await Axios.post("/product/"+id+"/config_option",{qty:this.orderData.qty});this.totalPrice=r.data.data.price_total},changeCycle(c,i){this.curCycle=i;return this.changeConfig()}}:{handlerCart(){this.bought++},submitOrder(){this.bought++},changeCart(){this.bought++},changeDuration(){},changQty(){}};window.fixtureVM=new Vue({el:document.getElementsByClassName("template")[0],data,methods,watch:common?{custom_cycles(){if(this.custom_cycles.length)this.changeConfig()}}:{},mounted(){if(common&&this.pay_type!=="recurring_prepayment")this.changeConfig()}});})();';
 }
 try{
  for(const width of (process.env.CRA1_RAIL_TEST_WIDTHS||'1440,1025,1024,900,768,390,360,320').split(',').map(Number)){
@@ -37,6 +37,12 @@ try{
 
    if(p==='/cra1-shared/snapshot.php')return json(route,{content:{goodslist:{config_panel:{default_open:true},default_selection:{product_id:0}}}});
    if(p==='/cra1-shared/announcements.php')return json(route,{items:[]});
+   // Integrated common products become ready only after their native quote
+   // method finishes. Complete that contract locally, never at the test site.
+   if(req.method()==='POST'&&/^\/console\/v1\/product\/(502|504|505)\/config_option$/.test(p)){
+    const id=Number(p.split('/')[4]);report.mockedQuotes.push({path:p,body:req.postDataJSON()});
+    return json(route,{price_total:id===504?0:id===505?99:12,price:id===504?0:id===505?99:12});
+   }
    if(!['GET','HEAD','OPTIONS'].includes(req.method())){report.blocked.push({path:p,method:req.method()});return route.fulfill({json:{status:400,msg:'隔离测试不提交业务操作'}})}
    // The official fallback header owns these reads as well as the product template.
    if(p==='/console/v1/common')return json(route,{website_name:'隔离演示',currency_prefix:'¥',currency_suffix:'',cart_change_product:0,custom_fields:{before_settle:0},lang_home_open:0});

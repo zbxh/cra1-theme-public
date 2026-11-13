@@ -33,7 +33,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid var(--cui-edge);
-  border-radius: 0.03rem;
+  border-radius: var(--cui-radius-card);
   border-collapse: collapse;
 }
 .goods-table thead {
@@ -134,7 +134,7 @@
   background: var(--cui-accent);
   height: 0.32rem;
   min-width: 0.6rem;
-  border-radius: 0.03rem;
+  border-radius: var(--cui-radius-control);
   font-size: 0.14rem;
   font-weight: 400;
   color: var(--color-primary);
@@ -181,7 +181,7 @@
   width: 2.04rem;
   height: 0.46rem;
   background: var(--color-primary);
-  border-radius: 0.04rem;
+  border-radius: var(--cui-radius-control);
   font-size: 0.16rem;
   font-weight: 500;
   color: #ffffff;
@@ -273,7 +273,7 @@
     width: 2.04rem;
     height: 0.46rem;
     background: var(--color-primary);
-    border-radius: 0.04rem;
+    border-radius: var(--cui-radius-control);
     font-size: 0.16rem;
     font-weight: 500;
     color: #ffffff;

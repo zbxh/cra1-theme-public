@@ -17,7 +17,7 @@ export function DueCell({ dueTime }) {
     return (
       <span className="inline-flex flex-col">
         <span className="font-medium text-danger">{formatDate(dueTime)}</span>
-        <span className="mt-0.5 inline-flex w-fit items-center rounded-full border border-danger/15 bg-danger/8 px-1.5 py-px text-[11px] font-medium text-danger">
+        <span className="mt-0.5 inline-flex w-fit items-center rounded-xs border border-danger/15 bg-danger/8 px-1.5 py-px text-[11px] font-medium text-danger">
           已逾期
         </span>
       </span>
@@ -27,7 +27,7 @@ export function DueCell({ dueTime }) {
     return (
       <span className="inline-flex flex-col">
         <span className="text-muted-foreground">{formatDate(dueTime)}</span>
-        <span className="mt-0.5 inline-flex w-fit items-center rounded-full border border-warning/15 bg-warning/8 px-1.5 py-px text-[11px] font-medium text-warning">
+        <span className="mt-0.5 inline-flex w-fit items-center rounded-xs border border-warning/15 bg-warning/8 px-1.5 py-px text-[11px] font-medium text-warning">
           {diffDays === 0 ? '今天到期' : `${diffDays} 天后到期`}
         </span>
       </span>

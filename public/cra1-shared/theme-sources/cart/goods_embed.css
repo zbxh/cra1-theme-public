@@ -58,7 +58,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) body.cra1-cart-embed
   align-items: center;
   height: 22px;
   border-left: 3px solid var(--primary);
-  border-radius: 2px;
+  border-radius: var(--cui-radius-control);
   padding-left: 10px;
   font-size: 15px;
   font-weight: 600;
@@ -79,7 +79,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) body.cra1-cart-embed
   padding: 0 22px;
   margin-right: 10px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--cui-radius-control);
   background: var(--background);
   box-sizing: border-box;
   font-size: 14px;
@@ -88,7 +88,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) body.cra1-cart-embed
               border-color var(--duration-fast) ease,
               background-color var(--duration-fast) ease;
 }
-.cart-embed:not([data-cra1-native-module]) .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item:hover { color: var(--primary); border-color: color-mix(in srgb,var(--cui-titanium) 45.0%,transparent); }
+.cart-embed:not([data-cra1-native-module]) .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item:hover { color: var(--primary); border-color: var(--border); }
 .cart-embed:not([data-cra1-native-module]) .top-tab > .el-tabs__header .el-tabs__nav > .el-tabs__item.is-active {
   color: var(--cui-ink);
   border-color: var(--cui-selection-mark);
@@ -122,7 +122,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) body.cra1-cart-embed
   display: inline-block !important;
   width: 3px !important;
   height: 16px !important;
-  border-radius: 2px;
+  border-radius: var(--cui-radius-card);
   margin-right: 10px !important;
   background: var(--primary) !important;
 }
@@ -485,7 +485,7 @@ html:not([data-cra1-native-module]) body.rail-fallback .f-order { display: block
   /* ---- 表单项整行卡片：浅底圆角卡 + label 置顶（v7 已置顶，这里加卡片观感） ---- */
   .cart-embed:not([data-cra1-native-module]) .el-form-item {
     background: var(--muted, var(--cui-page)) !important;
-    border-radius: 10px;
+    border-radius: var(--cui-radius-card);
     padding: 10px 12px 14px !important;
   }
 
@@ -497,7 +497,7 @@ html:not([data-cra1-native-module]) body.rail-fallback .f-order { display: block
 
   .cart-embed:not([data-cra1-native-module]) .el-form-item__content {
     background: var(--background, #fff);
-    border-radius: 8px;
+    border-radius: var(--cui-radius-card);
   }
 
   /* el-form-item 内直接是控件集合（非裸 input）时内容区保持透明，控件自带底色 */
@@ -523,7 +523,7 @@ html:not([data-cra1-native-module]) body.rail-fallback .f-order { display: block
   .el-select-dropdown {
     max-width: 100% !important;
     min-width: 0 !important;
-    border-radius: 10px !important;
+    border-radius: var(--cui-radius-card) !important;
     box-sizing: border-box;
   }
   .el-select-dropdown .el-scrollbar__wrap { max-height: 220px !important; }
@@ -595,7 +595,7 @@ html:not([data-cra1-native-module]) body.rail-fallback .f-order { display: block
 
 /* 购物车弹窗（桥接检测 .cartDialog 并自动关闭） */
 .cart-embed:not([data-cra1-native-module]) .cartDialog {
-  border-radius: 14px;
+  border-radius: var(--cui-radius-card);
   overflow: hidden;
 }
 

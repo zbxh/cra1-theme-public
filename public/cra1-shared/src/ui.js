@@ -5,6 +5,7 @@
   if (shared.UI) return;
   var doc = root.document;
   var sequence = 0;
+  var openPanels = new Map();
   var icons = {
     up: '<path d="m7 14 5-5 5 5"></path>',
     down: '<path d="m7 10 5 5 5-5"></path>',
@@ -45,7 +46,10 @@
       trigger.setAttribute('aria-expanded', String(open));
       host.classList.toggle('is-open', open);
       if (options.manageVisibility !== false) panel.hidden = !open;
-      if (open) root.dispatchEvent(new CustomEvent('cra1:popover-open', { detail: { id: id, group: group } }));
+      if (open) {
+        openPanels.set(group, { id: id, panel: panel });
+        root.dispatchEvent(new CustomEvent('cra1:popover-open', { detail: { id: id, group: group } }));
+      } else if (openPanels.get(group) && openPanels.get(group).id === id) openPanels.delete(group);
       if (options.onOpenChange) options.onOpenChange(open);
       if (!open && restoreFocus) focus(trigger);
     }
@@ -53,7 +57,7 @@
       setOpen(true);
       root.setTimeout(function () {
         if (!open || destroyed) return;
-        var first = Array.from(panel.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex="0"]')).find(function (item) { return item.getClientRects().length && !item.closest('[hidden]'); });
+        var first = options.initialFocus || Array.from(panel.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex="0"]')).find(function (item) { return item.getClientRects().length && !item.closest('[hidden]'); });
         focus(first);
       }, 0);
     }
@@ -71,7 +75,16 @@
       focusTimer = root.setTimeout(function () { if (open && !host.contains(doc.activeElement)) setOpen(false); }, 0);
     }
     function onOther(event) { if (open && event.detail && event.detail.group === group && event.detail.id !== id) setOpen(false); }
-    function onEnter(event) { if (options.hover && event.pointerType === 'mouse') setOpen(true); }
+    function onEnter(event) {
+      if (!options.hover || event.pointerType !== 'mouse') return;
+      // A late header layout change can move a hover trigger under the mouse.
+      // Do not let it interrupt editing in another panel in this group; click
+      // and keyboard activation still perform an explicit panel switch.
+      var current = openPanels.get(group), active = doc.activeElement;
+      if (current && current.id !== id && current.panel.contains(active) && active &&
+          (active.matches('input, textarea, select') || active.isContentEditable)) return;
+      setOpen(true);
+    }
     function onLeave(event) {
       if (!options.hover || event.pointerType !== 'mouse') return;
       var active = doc.activeElement;

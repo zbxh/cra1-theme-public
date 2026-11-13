@@ -4,11 +4,11 @@
 
 **为智简魔方 V10 打造统一的官网、会员中心与购物车体验**
 
-钛灰银与香槟金配色 · 桌面与手机适配 · 独立可视化主题后台
+Mist 中性色与钛灰按钮 · 桌面与手机适配 · 独立可视化主题后台
 
-[![Release](https://img.shields.io/badge/Release-v17.7.0%20beta-b49b76?style=flat-square)](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.7.0) [![V10](https://img.shields.io/badge/V10-10.7.4-475569?style=flat-square)](docs/installation.md) [![PHP](https://img.shields.io/badge/PHP-7.4-777BB4?style=flat-square)](docs/installation.md) [![License](https://img.shields.io/badge/License-Source%20Available-64748b?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/badge/Release-v17.8.0%20beta-b49b76?style=flat-square)](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.8.0) [![V10](https://img.shields.io/badge/V10-10.7.4-475569?style=flat-square)](docs/installation.md) [![PHP](https://img.shields.io/badge/PHP-7.4-777BB4?style=flat-square)](docs/installation.md) [![License](https://img.shields.io/badge/License-Source%20Available-64748b?style=flat-square)](LICENSE)
 
-**[下载主题](https://github.com/zbxh/cra1-theme-public/releases/download/v17.7.0/CRA1-theme-v17.7.0-install.zip) · [在线演示](https://cra1.coorw.com/) · [主题后台](https://cra1.coorw.com/testadmin/) · [安装教程](docs/installation.md) · [使用文档](docs/usage.md)**
+**[下载主题](https://github.com/zbxh/cra1-theme-public/releases/download/v17.8.0/CRA1-theme-v17.8.0-install.zip) · [在线演示](https://cra1.coorw.com/) · [主题后台](https://cra1.coorw.com/testadmin/) · [安装教程](docs/installation.md) · [使用文档](docs/usage.md)**
 
 [功能亮点](#功能亮点) · [演示账号](#在线演示) · [界面预览](#界面预览) · [快速开始](#快速开始) · [交流与反馈](#交流与反馈)
 
@@ -27,10 +27,12 @@
 - **🌐 官网展示**：配置首页、产品介绍、解决方案、资讯文档与企业页面，统一管理头部、页脚和客服入口。
 - **👤 会员中心**：展示产品、账单、工单和账户入口，定制首页、登录注册页与多级侧栏菜单。
 - **🛒 购物车**：统一商品浏览、配置选择、购物车与结算页面的视觉，承接已适配模块的原生订购流程。
-- **🎨 可视化编辑**：使用中文表单修改图片、文案、图标与链接，对支持的区块调整显隐和顺序。
+- **🔎 全站搜索**：搜索商品、新闻、公告与文档；登录后可查找有权访问的管理页面、标签、主机标识和 IP，支持空格与大小写差异匹配。
+- **🎨 统一组件**：采用 Mist 中性色、分级圆角和细线交互动效，统一按钮、下拉、弹窗与卡片，支持减少动态效果。
+- **✏️ 可视化编辑**：使用中文表单修改图片、文案、图标与链接，对支持的区块调整显隐和顺序。
 - **🧭 菜单与导航**：导入系统导航，配置三级菜单、关联商品、图标和排序，按启用插件匹配功能入口。
 - **📣 页面通知**：统一管理三个主题的通知，设置显示页面、有效时间、优先级与关闭规则。
-- **💾 配置与更新**：导入导出主题配置与菜单，预览差异、保留历史；上传完整安装包更新并保留已有设置。
+- **💾 配置与更新**：导入导出主题配置与菜单，预览差异、保留历史；检查 GitHub 新版本或上传完整安装包更新，保留已有设置。
 - **📱 多端适配**：适配桌面与手机布局，提供独立页面内容、自定义 CSS / JavaScript 和编辑预览。
 
 ## 在线演示
@@ -44,13 +46,15 @@
 
 ## 界面预览
 
-点击图片查看大图。会员中心、侧栏、控制面板与通知截图使用主题实际组件和示例数据。
+点击图片查看大图。以下为当前主题界面，会员资料、服务器地址等信息已隐藏或使用示例数据。
 
 | 会员中心 | 主题后台 |
 | :---: | :---: |
 | [![会员中心首页](docs/images/preview-member.png)](docs/images/preview-member.png) | [![主题后台](docs/images/preview-admin.png)](docs/images/preview-admin.png) |
 | **服务器控制面板** | **侧边栏导航** |
 | [![服务器控制面板](docs/images/preview-server-panel.png)](docs/images/preview-server-panel.png) | [![侧边栏导航](docs/images/preview-sidebar.png)](docs/images/preview-sidebar.png) |
+| **商品选配** | **桌面搜索** |
+| [![商品选配](docs/images/preview-cart.png)](docs/images/preview-cart.png) | [![桌面搜索](docs/images/preview-search.png)](docs/images/preview-search.png) |
 
 <details>
 <summary>查看更多：登录、注册与通知页面</summary>
@@ -67,9 +71,9 @@
 
 ### 1. 下载与环境
 
-GitHub 当前提供 **[v17.7.0 测试版](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.7.0)**，安装包已包含运行资源，无需安装 Node.js 或自行编译。
+GitHub 当前提供 **[v17.8.0 测试版](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.8.0)**，安装包已包含运行资源，无需安装 Node.js 或自行编译。
 
-**[下载主题安装包](https://github.com/zbxh/cra1-theme-public/releases/download/v17.7.0/CRA1-theme-v17.7.0-install.zip)** · [查看更新日志](https://github.com/zbxh/cra1-theme-public/releases)
+**[下载主题安装包](https://github.com/zbxh/cra1-theme-public/releases/download/v17.8.0/CRA1-theme-v17.8.0-install.zip)** · [查看更新日志](https://github.com/zbxh/cra1-theme-public/releases)
 
 | 项目 | 当前测试基准 |
 | --- | --- |
@@ -88,11 +92,13 @@ HTTP 网站使用 `http://` 打开同一安装入口。详细目录与图文步�
 
 ### 3. 已有主题更新
 
-进入主题后台 **“主题管理 → 安装与更新”**，直接上传同一份完整安装 ZIP，无需解压；检查通过后点击 **“确认覆盖更新”**，完成后刷新页面。配置、账号、密钥、图片、草稿和页面独立内容会保留。
+进入主题后台 **“主题管理 → 安装与更新”**，可先点击 **“检查最新版本”**，查看更新内容后确认在线更新；查看测试版时勾选“包含测试版”。
+
+也可直接上传同一份完整安装 ZIP，无需解压；检查通过后点击 **“确认覆盖更新”**，完成后刷新页面。配置、账号、密钥、图片、草稿和页面独立内容会保留。
 
 浏览器上传受限或后台暂时不可用时，可按[安装教程](docs/installation.md#05-已有主题如何更新)使用服务器本地导入或备用解压覆盖流程。
 
-GitHub 自动生成的 **Source code** 压缩包供源码开发使用，安装请选择上面的 `CRA1-theme-v17.7.0-install.zip`。首次安装与覆盖更新使用同一份安装包。
+GitHub 自动生成的 **Source code** 压缩包供源码开发使用，安装请选择上面的 `CRA1-theme-v17.8.0-install.zip`。首次安装与覆盖更新使用同一份安装包。
 
 ## 交流与反馈
 

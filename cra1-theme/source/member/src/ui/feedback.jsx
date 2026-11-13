@@ -45,7 +45,7 @@ export function Alert({ tone = 'info', className, children, ...props }) {
 /** 空态：列表/异步区无数据时使用（不得留白） */
 export function EmptyState({ icon: Icon, title = '暂无数据', description, action, className }) {
   return (
-    <div className={cn('flex flex-col items-center justify-center px-6 py-14 text-center', className)}>
+    <div data-cui-reveal className={cn('flex flex-col items-center justify-center px-6 py-14 text-center', className)}>
       {Icon && <Icon className="mb-3 size-8 text-muted/60" aria-hidden="true" />}
       <p className="text-sm font-medium text-body">{title}</p>
       {description && <p className="mt-1 max-w-sm text-xs leading-5 text-muted">{description}</p>}

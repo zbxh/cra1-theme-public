@@ -20,7 +20,7 @@ import { PageHeader, Card, CardContent, CardHeader as CHeader, CardTitle as CTit
 import { Button } from '../../ui/button'
 import { Badge, Alert, EmptyState, Skeleton } from '../../ui/feedback'
 import {
-  BentoGrid, BentoCell, SpotlightCard, BorderBeam, HeroGridBg, PulseDot, NumberTicker,
+  BentoGrid, BentoCell, SpotlightCard, HeroGridBg, PulseDot, NumberTicker,
 } from '../../ui/aceternity'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -47,7 +47,7 @@ import { releaseTimeText } from './auto-release-time'
  *
  * 全 React 原生，替换旧「注入 mf_cloud/product_detail.html (Vue2)」的方案。
  * 布局 = aceternity bento（浅色改良）× 阿里云 ECS 概览的信息架构：
- *   英雄区(状态/电源/IP/配置) → 到期续费(流光边框) → 实时占用/监控/流量 →
+ *   英雄区(状态/电源/IP/配置) → 到期续费 → 实时占用/监控/流量 →
  *   网络/磁盘/备份快照 → 操作/属性/日志。
  * 仅对本站 mf_cloud / mf_dcim 产品生效；其他模块由外层回退到 ModuleView。
  */
@@ -432,7 +432,7 @@ export default function ServerPanel({ hostId, onFallback, initialDetected = null
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone={hStatus.tone}>{hStatus.label}</Badge>
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-alt px-2.5 py-0.5 text-xs text-body">
+                    <span className="inline-flex items-center gap-1.5 rounded-xs border border-line bg-surface-alt px-2.5 py-0.5 text-xs text-body">
                       <PulseDot tone={pState.tone} />
                       {pState.label}
                       {/* 上游 desc 仅在过渡/异常态展示（运行/关机态的 desc 常与语义重复） */}
@@ -455,12 +455,12 @@ export default function ServerPanel({ hostId, onFallback, initialDetected = null
                       </span>
                     ) : null}
                     {cloud?.line?.name ? (
-                      <span className="rounded-full border border-line bg-surface-alt px-2 py-0.5 text-xs text-body">
+                      <span className="rounded-xs border border-line bg-surface-alt px-2 py-0.5 text-xs text-body">
                         {cloud.line.name}
                       </span>
                     ) : null}
                     {cloud?.network_type === 'vpc' ? (
-                      <span className="rounded-full border border-line bg-surface-alt px-2 py-0.5 text-xs text-body">VPC 网络</span>
+                      <span className="rounded-xs border border-line bg-surface-alt px-2 py-0.5 text-xs text-body">VPC 网络</span>
                     ) : null}
                   </div>
 
@@ -515,7 +515,7 @@ export default function ServerPanel({ hostId, onFallback, initialDetected = null
                     <>
                       {/* 行1：VNC 控制台 + 登录信息（用户要求同行） */}
                       <div className="grid grid-cols-2 gap-2">
-                        <Button permission="action:control" size="sm" onClick={openVnc} disabled={busy}>
+                        <Button permission="action:control" size="sm" data-cui-effects="none" onClick={openVnc} disabled={busy}>
                           <MonitorPlay className="size-4" />
                           VNC 控制台
                         </Button>
@@ -537,11 +537,10 @@ export default function ServerPanel({ hostId, onFallback, initialDetected = null
           </SpotlightCard>
         </BentoCell>
 
-        {/* ---------------- 到期 / 续费（流光边框） ---------------- */}
+        {/* ---------------- 到期 / 续费 ---------------- */}
         <BentoCell colSpan="lg:col-span-4">
           <SpotlightCard className="h-full">
             <div className="relative p-5">
-              <BorderBeam size={72} duration={7} />
               <div className="relative">
                 <div className="flex items-center justify-between">
                   <p className="text-[13px] font-medium text-body">
@@ -781,9 +780,9 @@ function UsageCard({ real, module, host, cloud, setDlg, caps, error, onRetry }) 
           <NumberTicker value={val} decimals={0} suffix="%" />
         </span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-surface-alt">
+      <div className="h-2 overflow-hidden rounded-xs bg-surface-alt">
         <div
-          className="h-full rounded-full transition-[width] duration-500"
+          className="h-full rounded-xs transition-[width] duration-500"
           style={{ width: `${val}%`, background: `linear-gradient(90deg, ${color}, ${color}bb)` }}
         />
       </div>
@@ -878,7 +877,7 @@ function TrafficCard({ flow, curve, module, onBuy, error, curveError, onRetry })
         </CTitle>
         <div className="flex items-center gap-2">
           {flow?.flow_packet?.leave_size ? (
-            <span className="whitespace-nowrap rounded-full border border-line bg-surface-alt px-2 py-0.5 text-xs text-body">
+            <span className="whitespace-nowrap rounded-xs border border-line bg-surface-alt px-2 py-0.5 text-xs text-body">
               临时流量包剩余：{flow.flow_packet.leave_size} GB
             </span>
           ) : null}
@@ -904,9 +903,9 @@ function TrafficCard({ flow, curve, module, onBuy, error, curveError, onRetry })
               </p>
             </div>
             {!unlimited ? (
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-alt">
+              <div className="mt-2 h-1.5 overflow-hidden rounded-xs bg-surface-alt">
                 <div
-                  className={cn('h-full rounded-full transition-[width] duration-500', pct > 90 ? 'bg-danger' : 'bg-brand')}
+                  className={cn('h-full rounded-xs transition-[width] duration-500', pct > 90 ? 'bg-danger' : 'bg-brand')}
                   style={{ width: `${pct}%` }}
                 />
               </div>

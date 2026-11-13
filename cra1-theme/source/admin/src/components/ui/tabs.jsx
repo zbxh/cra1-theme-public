@@ -21,11 +21,11 @@ export function TabsList({ className, ...props }) {
   )
 }
 
-export function TabsTrigger({ className, ...props }) {
+export function TabsTrigger({ className, children, ...props }) {
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        'inline-flex h-8 items-center rounded-md px-3 text-[13px] font-medium text-body',
+        'cui-tabs__trigger inline-flex h-9 items-center rounded-control px-3 text-[13px] font-medium text-body',
         'transition-[background-color,color] duration-150',
         'hover:bg-surface-alt hover:text-ink',
         'data-[state=active]:bg-surface-alt data-[state=active]:text-ink data-[state=active]:shadow-[inset_0_-2px_0_var(--cui-selection-mark)]',
@@ -33,7 +33,7 @@ export function TabsTrigger({ className, ...props }) {
         className
       )}
       {...props}
-    />
+    >{children}</TabsPrimitive.Trigger>
   )
 }
 

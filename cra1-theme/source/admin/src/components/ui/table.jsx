@@ -3,7 +3,7 @@ import { cn } from './utils'
 /** Table：shadcn 风格表格（吸顶表头 + 斑马纹可选 + 横向滚动容器） */
 export function Table({ className, wrapperClassName, ...props }) {
   return (
-    <div className={cn('w-full overflow-x-auto rounded-xl border border-line bg-surface', wrapperClassName)}>
+    <div className={cn('w-full overflow-x-auto rounded-card border border-line bg-surface', wrapperClassName)}>
       <table className={cn('w-full caption-bottom text-sm', className)} {...props} />
     </div>
   )

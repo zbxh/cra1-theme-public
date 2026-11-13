@@ -171,7 +171,7 @@ export default function WithdrawalPage() {
             ].map(([n, label], i) => (
               <li key={n} className="flex items-center gap-2">
                 {i > 0 && <ArrowRight className="size-3.5 text-line" aria-hidden="true" />}
-                <span className="flex size-5 items-center justify-center rounded-full bg-brand/10 text-[11px] font-semibold text-brand">{n}</span>
+                <span className="flex size-5 items-center justify-center rounded-xs bg-brand/10 text-[11px] font-semibold text-brand">{n}</span>
                 <span>{label}</span>
               </li>
             ))}

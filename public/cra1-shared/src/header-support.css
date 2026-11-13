@@ -20,14 +20,15 @@ html[data-cra1-theme] .cra1-header-search > .cra1-header__icon-btn:hover {
   position: absolute; top: calc(100% + 17px); right: 0; z-index: 55;
   width: 256px; max-width: calc(100vw - 24px);
   max-height: calc(100dvh - 88px); overflow-y: auto; overscroll-behavior: contain;
-  border: 1px solid var(--line, var(--cui-edge)); border-radius: 8px;
+  border: 1px solid var(--line, var(--cui-edge)); border-radius: var(--cui-radius-popover);
   background: #fff; box-shadow: 0 12px 36px color-mix(in srgb,var(--cui-night) 12%,transparent);
 }
 /* 填满图标与面板之间的空隙，鼠标移入面板时保持展开。 */
 .cra1-header-support::after { content: ''; position: absolute; top: 100%; right: 0; width: 30px; height: 18px; }
 .cra1-header-support__section { padding: 14px; }
 .cra1-header-support__section + .cra1-header-support__section { border-top: 1px solid var(--line, var(--cui-edge)); }
-.cra1-header-support__title { margin: 0; padding: 0 8px 7px; color: var(--muted, var(--cui-muted)); font-size: 12px; line-height: 20px; }
+/* --muted is a background token in the member/cart themes. */
+.cra1-header-support__title { margin: 0; padding: 0 8px 7px; color: var(--cui-muted); font-size: 12px; line-height: 20px; }
 .cra1-header-support__item {
   display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 7px 8px;
   width: 100%; border: 0; border-radius: 4px; background: transparent;

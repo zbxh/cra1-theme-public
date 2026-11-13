@@ -706,7 +706,7 @@ function CardsField({ field, config, setField }) {
               key={it.key}
               type="button"
               onClick={() => setEditing({ itemKey: it.key, values })}
-              className="rounded-lg border border-line bg-surface px-3 py-2.5 text-left transition-colors duration-150 hover:border-brand/40 hover:bg-brand/4"
+              className="rounded-lg border border-line bg-surface px-3 py-2.5 text-left transition-colors duration-150 hover:bg-brand/4"
             >
               <span className="block truncate text-[13px] font-medium text-ink">{title}</span>
               <span className="mt-0.5 block truncate text-xs text-muted-foreground">{desc}</span>

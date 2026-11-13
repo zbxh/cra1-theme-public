@@ -22,7 +22,7 @@
                 <!-- tab-underline：激活项底部 scaleX 指示条（origin-left 展开，方向无关的最低成本方案），
                      与边框高亮叠加但不冲突——边框表达选中、指示条表达"刚切换到" -->
                 <button type="button" role="tab" class="tab-underline relative shrink-0 whitespace-nowrap border border-line px-4 py-3 text-left text-sm transition-colors duration-150 lg:w-full lg:whitespace-normal"
-                        :class="active === {$sd} ? 'border-brand/40 bg-brand/5 text-gradient-active' : 'bg-white text-body hover:border-brand/25'"
+                        :class="active === {$sd} ? 'border-brand/40 bg-brand/5 text-gradient-active' : 'bg-white text-body'"
                         :aria-selected="active === {$sd} ? 'true' : 'false'"
                         @click="active = {$sd}">{$sdr['icon_tile']|default=''|raw}{$sdr['name']}</button>
                 {/foreach}

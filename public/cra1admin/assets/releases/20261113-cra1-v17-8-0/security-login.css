@@ -1,0 +1,46 @@
+/* Independent management login uses palette and light effects only. */
+:where(:root) { --cui-font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;--cui-page:#f9fbfb;--cui-surface:#fff;--cui-field:#fff;--cui-accent:#f1f3f3;--cui-ink:#22292b;--cui-title:#161b1d;--cui-body:#394447;--cui-muted:#4b585b;--cui-line:#d0d6d8;--cui-edge:#e3e7e8;--cui-control-edge:#829094;--cui-focus:#4b585b;--cui-white:#fff;--cui-night:#161b1d;--cui-titanium:#35383c;--cui-gold:#8b683b;--cui-danger:#b42318;--cui-success:#06734f;--cui-button-gradient:linear-gradient(125deg,#565b60,#35383c 56%,#4b525a);--cui-button-highlight:linear-gradient(0deg,transparent,transparent);--cui-shadow-pop:0 12px 36px -12px #161b1d35; }
+/* Independent login: palette only, no front-end component stylesheet. */
+:root { font-family:var(--cui-font); color:var(--cui-ink); background:var(--cui-page); font-synthesis:none; }
+* { box-sizing:border-box; }
+body { margin:0; }
+button,input { font:inherit; }
+[hidden] { display:none!important; }
+.auth-shell { min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:36px 20px; background:radial-gradient(ellipse at 18% 8%,var(--cui-accent),transparent 55%),var(--cui-page); }
+.auth-brand { display:flex; align-items:center; gap:10px; font-size:15px; font-weight:600; margin-bottom:25px; }
+.auth-brand span { font-size:10px; letter-spacing:-.3px; display:grid; place-items:center; width:34px; height:34px; border-radius:var(--cui-radius-control,4px); background:transparent; color:inherit; border:0; box-shadow:none; }
+.auth-card { width:min(100%,420px); padding:32px; border:1px solid var(--cui-line); border-radius:var(--cui-radius-card,8px); background:var(--cui-surface); box-shadow:var(--cui-shadow-pop); }
+h1 { color:var(--cui-title); font-size:23px; letter-spacing:-.6px; margin:9px 0; }
+.auth-kicker { font-size:12px; color:var(--cui-gold); margin:0; }
+header>p:last-child,.auth-hint { font-size:13px; color:var(--cui-muted); line-height:1.7; }
+header { margin-bottom:24px; }
+label { display:block; font-size:13px; font-weight:500; margin-bottom:18px; }
+input { display:block; width:100%; height:40px; margin-top:7px; padding:0 12px; border:1px solid var(--cui-control-edge); background:var(--cui-field); border-radius:var(--cui-radius-control,4px); color:var(--cui-ink); outline:none; }
+input:focus { border-color:var(--cui-focus); box-shadow:0 0 0 3px color-mix(in srgb,var(--cui-focus) 12%,transparent); }
+input:focus-visible,button:focus-visible { outline:2px solid var(--cui-focus); outline-offset:3px; }
+.auth-submit { width:100%; height:40px; color:var(--cui-white); background:var(--cui-button-highlight),var(--cui-button-gradient); border:1px solid var(--cui-titanium); border-radius:var(--cui-radius-control,4px); box-shadow:inset 0 1px 0 #ffffff30,0 2px 6px color-mix(in srgb,var(--cui-night) 10%,transparent); cursor:pointer; transition:box-shadow .16s,border-color .16s; }
+.auth-submit:hover:not(:disabled) { border-color:var(--cui-focus); box-shadow:inset 0 1px 0 #ffffff42,0 3px 10px color-mix(in srgb,var(--cui-night) 16%,transparent); }
+.auth-submit:disabled { opacity:.6; cursor:wait; }
+.auth-back { width:100%; border:0; background:none; padding:14px 0 0; color:var(--cui-body); cursor:pointer; }
+.auth-back:disabled { opacity:.55; cursor:default; }
+footer { border-top:1px solid var(--cui-edge); padding-top:18px; margin-top:25px; font-size:11px; color:var(--cui-muted); line-height:1.7; }
+.test-notice { font-size:11px; color:var(--cui-muted); margin-top:20px; }
+#authErr,#recoveryErr { font-size:13px; color:var(--cui-danger); background:color-mix(in srgb,var(--cui-danger) 5%,var(--cui-surface)); border-radius:var(--cui-radius-card,8px); padding:11px; line-height:1.6; }
+#recoveryMessage { font-size:13px; color:var(--cui-success); background:color-mix(in srgb,var(--cui-success) 5%,var(--cui-surface)); border-radius:var(--cui-radius-card,8px); padding:11px; line-height:1.7; }
+.captcha-line { display:flex; align-items:center; gap:10px; }
+.captcha-line button { border:0; background:none; padding:0; margin-top:7px; cursor:pointer; }
+.captcha-line img { width:140px; height:44px; border-radius:var(--cui-radius-card,8px); }
+.captcha-line input { min-width:0; }
+fieldset { border:0; padding:0; margin:0; min-width:0; }
+@media(max-width:480px) { .auth-card { padding:26px 22px; border-radius:var(--cui-radius-card,8px); } .auth-shell { padding:22px 18px; } }
+@media(pointer:coarse),(max-width:767px) { .auth-submit,.auth-back,input { min-height:44px; } }
+@media(prefers-reduced-motion:reduce) { .auth-submit { transition:none; } }
+
+.auth-submit.cui-button { --cui-button-face:var(--cui-button-gradient); border-radius:var(--cui-radius-control,4px); }
+.auth-submit.cui-button:disabled { background:var(--cui-button-gradient); border-color:var(--cui-titanium); }
+.auth-card { animation:cra1-auth-enter 200ms cubic-bezier(.23,1,.32,1); }
+@keyframes cra1-auth-enter { from { opacity:0;translate:0 6px; } to { opacity:1;translate:0 0; } }
+@media(prefers-reduced-motion:reduce) { .auth-card { animation:none; } }
+
+.auth-submit.cui-rainbow { background-image:var(--cui-button-face),var(--cui-button-mask),linear-gradient(90deg,var(--cui-effect-spectrum)); background-size:200% 100%; background-clip:padding-box,border-box,border-box; background-origin:border-box; border-color:transparent; }
+.auth-submit.cui-rainbow:hover:not(:disabled) { border-color:transparent; }

@@ -139,9 +139,9 @@ function OverviewPanel({ onNavigateTab }) {
             <p className="mt-1 text-[22px] font-semibold tabular-nums leading-7 tracking-tight text-ink">
               {scoreKnown ? `${score}/4` : '—'}
             </p>
-            <div className="mt-2 h-1.5 w-24 overflow-hidden rounded-full bg-line/70" aria-hidden="true">
+            <div className="mt-2 h-1.5 w-24 overflow-hidden rounded-xs bg-line/70" aria-hidden="true">
               <div
-                className={cn('h-full rounded-full', score >= 3 ? 'bg-success' : 'bg-warning')}
+                className={cn('h-full rounded-xs', score >= 3 ? 'bg-success' : 'bg-warning')}
                 style={{ width: `${scoreKnown ? (score / 4) * 100 : 0}%` }}
               />
             </div>

@@ -1,11 +1,13 @@
 import { cn } from './utils'
 
-/** Shared exterior carries the preview glow; the inner element clips content.
+/** Featured cards opt into hover decoration; the inner element clips content.
  * Layout and business props stay on the original outer component. */
 export function Card({ className, glow, variant = 'default', children, ...props }) {
   const outside = (className || '').split(/\s+/).filter(x => !['overflow-hidden', 'overflow-clip'].includes(x)).join(' ')
   return (
-    <div className={cn('cui-card relative', variant === 'featured' && 'cui-card--featured', outside)} {...props}>
+    <div className={cn('cui-card relative', variant === 'featured' && 'cui-card--featured', outside)}
+      data-cui-edge={variant === 'featured' ? 'hover' : undefined} {...props}>
+      {variant === 'featured' ? <span className="cui-edge-segment" aria-hidden="true" /> : null}
       <div className="cui-card__clip">
         {glow ? <span className="cui-card__glow" aria-hidden="true" /> : null}
         {children}
@@ -38,7 +40,7 @@ export function CardFooter({ className, ...props }) {
 /** 页面标题区（每个页面顶部统一使用） */
 export function PageHeader({ title, description, actions, className }) {
   return (
-    <div className={cn('flex flex-wrap items-start justify-between gap-3', className)}>
+    <div data-cui-reveal className={cn('flex flex-wrap items-start justify-between gap-3', className)}>
       <div className="min-w-0">
         <h1 className="text-lg font-semibold tracking-tight text-title">{title}</h1>
         {description && <p className="mt-0.5 text-[13px] text-muted-foreground">{description}</p>}

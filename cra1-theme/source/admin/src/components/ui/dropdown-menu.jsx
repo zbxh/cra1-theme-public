@@ -13,9 +13,10 @@ export function DropdownMenuContent({ className, sideOffset = 4, ...props }) {
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
+        data-cra1-ui="admin"
         sideOffset={sideOffset}
         className={cn(
-          'z-[120] min-w-[180px] overflow-hidden rounded-lg border border-line bg-surface p-1',
+          'admin-dropdown z-[120] min-w-[180px] overflow-hidden rounded-popover border border-line bg-surface p-1',
           'shadow-[0_4px_6px_-1px_rgba(0,0,0,0.08),0_2px_4px_-2px_rgba(0,0,0,0.06)]',
           'data-[state=open]:animate-[cra1-pop-in_150ms_cubic-bezier(0.23,1,0.32,1)]',
           className
@@ -30,7 +31,7 @@ export function DropdownMenuItem({ className, inset, variant = 'default', ...pro
   return (
     <DropdownMenuPrimitive.Item
       className={cn(
-        'relative flex cursor-pointer select-none items-center gap-2 rounded-md px-2 h-8 text-[13px] outline-none',
+        'admin-dropdown-item relative flex cursor-pointer select-none items-center gap-2 rounded-control px-2 min-h-9 text-[13px] outline-none',
         'transition-colors duration-150 focus:bg-surface-alt',
         'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         variant === 'destructive' && 'text-danger focus:bg-danger/8',

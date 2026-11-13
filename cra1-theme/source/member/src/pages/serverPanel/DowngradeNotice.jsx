@@ -52,7 +52,7 @@ export function DowngradeNotice({ readSeconds, className }) {
       <div className="flex items-center gap-2 bg-danger px-3 py-2 text-white">
         <AlertTriangle className="size-4 shrink-0" aria-hidden="true" />
         <span className="text-sm font-bold tracking-wide">降级不退款</span>
-        <span className="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-medium">
+        <span className="ml-auto rounded-xs bg-white/20 px-2 py-0.5 text-[11px] font-medium">
           {locked ? `请阅读 ${readSeconds}s` : '已确认'}
         </span>
       </div>

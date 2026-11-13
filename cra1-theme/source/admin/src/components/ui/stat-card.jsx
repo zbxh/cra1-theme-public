@@ -10,10 +10,10 @@ const ICON_TONES = {
   muted: 'bg-muted-bg text-muted-foreground',
 }
 
-/* 可点击统计卡的交互层：阿里云工作台式——描边转主色 + 阴影浮起 */
+/* 可点击统计卡保留中性边框，悬停沿边光由共用交互层处理。 */
 const CLICKABLE = cn(
   'transition-all duration-150 cursor-pointer',
-  'hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:border-brand/40',
+  'hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]',
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus'
 )
 
@@ -30,10 +30,10 @@ export function StatCard({ label, value, badge, hint, sub, icon: Icon, tone = 'b
   /* 进度条槽位（华为云安全评估式）：bar = { percent: 0-100, tone } */
   const barEl = bar && (
     <div className="px-5 pb-4">
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-line/70">
+      <div className="h-1.5 w-full overflow-hidden rounded-control bg-line/70">
         <div
           className={cn(
-            'h-full rounded-full transition-[width] duration-300',
+            'h-full rounded-control transition-[width] duration-300',
             bar.tone === 'warning' ? 'bg-warning' : bar.tone === 'danger' ? 'bg-danger' : 'bg-brand'
           )}
           style={{ width: `${Math.max(0, Math.min(100, Number(bar.percent) || 0))}%` }}
@@ -75,7 +75,7 @@ export function StatCard({ label, value, badge, hint, sub, icon: Icon, tone = 'b
 
   if (href) {
     return (
-      <a href={href} className={cn('group relative block overflow-hidden rounded-lg', CLICKABLE, className)}>
+      <a href={href} data-cui-edge="hover" data-cui-interactive="card" className={cn('group relative block overflow-hidden rounded-lg', CLICKABLE, className)}>
         {body}
       </a>
     )

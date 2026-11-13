@@ -1,8 +1,9 @@
 import { forwardRef, useId, useRef, useLayoutEffect } from 'react'
 import { cn } from './utils'
+import { MenuSelect } from './select'
 
 const base =
-  'flex h-10 w-full rounded-lg border border-input bg-surface px-3 py-2 text-sm text-ink ' +
+  'flex h-10 w-full rounded-control border border-input bg-surface px-3 py-2 text-sm text-ink ' +
   'placeholder:text-muted transition-[border-color,box-shadow] duration-150 ' +
   'focus-visible:outline-none focus-visible:border-focus focus-visible:ring-[3px] focus-visible:ring-focus/15 ' +
   'disabled:cursor-not-allowed disabled:bg-surface-alt disabled:text-muted ' +
@@ -24,8 +25,12 @@ export const Textarea = forwardRef(function Textarea({ className, rows = 4, ...p
 })
 
 export const Select = forwardRef(function Select({ className, children, ...props }, ref) {
+  // Preserve the native listbox/multiple contract where it is explicitly used.
+  if (!props.multiple && !(Number(props.size) > 1)) {
+    return <MenuSelect ref={ref} className={className} {...props}>{children}</MenuSelect>
+  }
   return (
-    <select ref={ref} className={cn(base, 'cursor-pointer pr-8', className)} {...props}>
+    <select ref={ref} className={cn(base, 'admin-native-select cursor-pointer pr-8', className)} {...props}>
       {children}
     </select>
   )

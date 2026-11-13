@@ -20,7 +20,7 @@ export default function SwitchControl({
       disabled={disabled}
       onClick={() => onCheckedChange?.(!checked)}
       className={cn(
-        'relative inline-flex shrink-0 items-center justify-center rounded-full border-0 bg-transparent p-0',
+        'relative inline-flex shrink-0 items-center justify-center rounded-control border-0 bg-transparent p-0',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
         'disabled:pointer-events-none disabled:opacity-50',
         small ? 'h-6 w-10' : 'h-7 w-12',
@@ -32,7 +32,7 @@ export default function SwitchControl({
         data-switch-track
         aria-hidden="true"
         className={cn(
-          'pointer-events-none relative inline-flex shrink-0 rounded-full transition-colors duration-150',
+          'pointer-events-none relative inline-flex shrink-0 rounded-control transition-colors duration-150',
           small ? 'h-5 w-9' : 'h-6 w-11',
           checked ? 'bg-brand' : 'bg-line',
         )}
@@ -40,7 +40,7 @@ export default function SwitchControl({
         <span
           data-switch-thumb
           className={cn(
-            'pointer-events-none absolute left-0.5 top-0.5 rounded-full bg-white shadow transition-transform duration-150',
+            'pointer-events-none absolute left-0.5 top-0.5 rounded-control bg-white shadow transition-transform duration-150',
             small ? 'size-4' : 'size-5',
             checked && (small ? 'translate-x-4' : 'translate-x-5'),
           )}

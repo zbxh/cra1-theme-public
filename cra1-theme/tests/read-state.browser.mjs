@@ -33,7 +33,7 @@ const server = http.createServer(async (req, res) => {
     later(res,response,fixture.noticeDelay);return
   }
   if (url.pathname.endsWith('/announcements.php')) {later(res,{status:200,data:{items:fixture.bar?[{...notice,expires_in:fixture.longExpiry?60*86400:fixture.shortExpiry||null}]:[],interval:300,refresh_after:30}});return}
-  if (url.pathname === '/console/v1/host') {later(res,{status:200,data:{list:[{id:1,name:'主机标识示例',product_name:'会员产品示例'}]}},fixture.searchDelay);return}
+  if (url.pathname === '/console/v1/cra1-theme/member/search') {later(res,{status:200,data:{list:[{id:1,name:'主机标识示例',product_name:'会员产品示例',status:'Active',billing_cycle:'onetime',is_delete:0}],count:1,overview:{server_time:1794398400,renewal_enabled:false}}},fixture.searchDelay);return}
   if (url.pathname === '/console/v1/product') {later(res,{status:200,data:{list:[{id:4,name:url.searchParams.get('keywords')+' 公开商品示例'}]}});return}
   if (url.pathname === '/console/v1/announcement/type') {fixture.categoryReads++;later(res,fixture.categoryFail?{status:503,msg:'SQLSTATE /www/private.php token=fixture-secret'}:{status:200,data:{list:[{id:2,name:'服务维护'}]}},fixture.categoryDelay);return}
   if (url.pathname === '/console/v1/announcement') {
@@ -112,7 +112,7 @@ try {
   fixture={searchDelay:180}
   ;({page,context}=await fresh('/search.html',true))
   await page.evaluate(()=>searchComponent.open());input=page.getByRole('combobox')
-  const reading=page.waitForRequest(request=>new URL(request.url()).pathname==='/console/v1/host')
+  const reading=page.waitForRequest(request=>new URL(request.url()).pathname==='/console/v1/cra1-theme/member/search')
   await input.fill('待返回');await reading
   await page.evaluate(()=>localStorage.setItem('jwt','changed-fixture-member'))
   await page.waitForTimeout(240)

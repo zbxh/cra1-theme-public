@@ -14,7 +14,7 @@ const assets={
  '/shell.css':path.join(root,'public/cra1-shared/theme-sources/member/cra1-shell.css'),
  '/header.js':path.join(root,'public/clientarea/template/pc/cra1/components/topMenu/topMenu.js'),
 }
-const scripts=['ui.js','header-search.js','announcements.js','header-actions.js']
+const scripts=['ui.js','search-match.js','header-search.js','announcements.js','header-actions.js']
 const styles=['tokens.css','header-search.css','announcements.css','user-panel.css','header-support.css','header-actions.css']
 const fixture=`
 window.__CRA1_RUNTIME__={features:{client_care:true,ssh:true},links:{client_care:'/plugin/91/message.htm'}};

@@ -16,6 +16,10 @@ html[data-cra1-theme="member"] .cui-select-trigger--compact { height: 36px; min-
 html[data-cra1-theme="member"] :is(.cui-select-trigger,.cui-date-trigger):focus-visible { border-color: var(--cui-focus); outline: 2px solid var(--cui-focus); outline-offset: 2px; }
 html[data-cra1-theme="member"] :is(.cui-select-trigger,.cui-date-trigger):disabled { cursor: not-allowed; }
 html[data-cra1-theme="member"] .cui-date-trigger [data-placeholder] { color: var(--cui-muted); }
+html[data-cra1-theme="member"] .cui-select-native {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  border: 0; clip: rect(0,0,0,0); clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
 html[data-cra1-theme="member"] .cui-select-content {
   z-index: 150; min-width: var(--radix-select-trigger-width);
   max-width: min(520px,calc(100vw - 24px)); max-height: min(360px,var(--radix-select-content-available-height));
@@ -25,7 +29,7 @@ html[data-cra1-theme="member"] .cui-select-content {
 html[data-cra1-theme="member"] .cui-select-viewport { padding: 0; }
 html[data-cra1-theme="member"] .cui-menu-item {
   position: relative; display: flex; align-items: center; gap: 8px; min-height: 36px;
-  padding: 8px 10px; border-radius: 8px; border: 0; outline: none;
+  padding: 8px 10px; border-radius: var(--cui-radius-control); border: 0; outline: none;
   color: var(--cui-ink); font: 400 13px/20px var(--cui-font);
   cursor: pointer; user-select: none; transition: background 120ms ease;
 }
@@ -58,7 +62,7 @@ html[data-cra1-theme="member"] .cui-choice[data-selected="true"] {
 html[data-cra1-theme="member"] .cui-choice:focus-visible { outline: 2px solid var(--cui-focus); outline-offset: 2px; }
 html[data-cra1-theme="member"] .cui-choice:disabled { opacity: .55; color: var(--cui-muted); background: var(--cui-accent); border-color: var(--cui-edge); cursor: not-allowed; box-shadow: none; }
 html[data-cra1-theme="member"] .cui-choice--page { min-width: 36px; padding-inline: 10px; }
-html[data-cra1-theme="member"] .cui-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px; border: 1px solid var(--cui-control-edge); border-radius: 8px; font: 400 14px/20px var(--cui-font); cursor: pointer; }
+html[data-cra1-theme="member"] .cui-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px; border: 1px solid var(--cui-control-edge); border-radius: var(--cui-radius-control); font: 400 14px/20px var(--cui-font); cursor: pointer; }
 html[data-cra1-theme="member"] .cui-date-popover {
   display: flex; flex-direction: column;
   z-index: 140; width: min(360px,calc(100vw - 24px)); max-height: var(--radix-popover-content-available-height);
@@ -72,7 +76,7 @@ html[data-cra1-theme="member"] .cui-calendar-row { display: grid; grid-template-
 html[data-cra1-theme="member"] .cui-calendar [role="columnheader"] { padding: 6px 0; text-align: center; color: var(--cui-muted); font: 400 12px/20px var(--cui-font); }
 html[data-cra1-theme="member"] .cui-calendar [role="gridcell"] {
   display: flex; align-items: center; justify-content: center; min-height: 36px; padding: 0; margin: 0;
-  border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--cui-ink);
+  border: 1px solid transparent; border-radius: var(--cui-radius-control); background: transparent; color: var(--cui-ink);
   font: 400 13px/20px var(--cui-font); cursor: pointer;
 }
 html[data-cra1-theme="member"] .cui-calendar [data-outside] { color: var(--cui-muted); }
@@ -90,7 +94,6 @@ html[data-cra1-theme="member"] .cui-chart-tooltip__row { display: flex; align-it
 html[data-cra1-theme="member"] .cui-chart-tooltip__row strong { margin-left: auto; font-weight: 500; }
 html[data-cra1-theme="member"] .cui-chart-tooltip__dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
 @media (hover:hover) and (pointer:fine) {
-  html[data-cra1-theme="member"] .cui-choice:hover:not(:disabled) { border-color: var(--cui-gold); }
   html[data-cra1-theme="member"] .cui-calendar [role="gridcell"]:hover:not([aria-selected="true"]) { background: var(--cui-tint); }
 }
 @media (max-width:767px),(pointer:coarse) {

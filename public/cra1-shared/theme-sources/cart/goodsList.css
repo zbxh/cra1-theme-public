@@ -4,7 +4,7 @@
 }
 .cart-des {
   padding: 0.1rem;
-  border-radius: 0.03rem;
+  border-radius: var(--cui-radius-card);
   border: 1px solid var(--cui-edge);
   box-sizing: border-box;
   overflow-y: auto;
@@ -17,7 +17,7 @@
   box-sizing: border-box;
   padding-bottom: 0.1rem;
   width: 100%;
-  border-radius: 0.03rem;
+  border-radius: var(--cui-radius-card);
 }
 .search-box {
   display: flex;
@@ -42,7 +42,7 @@
   width: 0.8rem;
   height: 0.46rem;
   background: var(--color-primary);
-  border-radius: 0.03rem;
+  border-radius: var(--cui-radius-control);
   border: none;
   font-size: 0.16rem;
   color: color-mix(in srgb,var(--cui-white) 90%,transparent);
@@ -53,7 +53,7 @@
   color: var(--color-danger);
   background: rgba(220, 45, 45, 0.1);
   margin-top: 0.24rem;
-  border-radius: 0.04rem;
+  border-radius: var(--cui-radius-card);
 }
 .shopping-box {
   box-sizing: border-box;
@@ -83,7 +83,7 @@
   padding: 0 0.08rem;
   color: #fff;
   font-size: 14px;
-  border-radius: 0px 0px 0px 8px;
+  border-radius: 0 0 0 var(--cui-radius-card);
 }
 .shopping-item .goods-name {
   margin-top: 0.18rem;
@@ -138,7 +138,7 @@
   color: var(--color-primary);
   background: rgba(57, 124, 252, 0.1);
   padding: 0.03rem 0.08rem;
-  border-radius: 2px;
+  border-radius: var(--cui-radius-card);
 }
 .shopping-item .goods-tag {
   box-sizing: border-box;
@@ -306,7 +306,7 @@
   padding: 0.3rem 0.23rem 0.3rem 0.46rem;
   background: var(--cui-surface);
   box-shadow: 0rem 0.05rem 0.1rem 0.01rem color-mix(in srgb,var(--cui-night) 10%,transparent);
-  border-radius: 0.03rem 0.03rem 0.03rem 0.03rem;
+  border-radius: var(--cui-radius-card) var(--cui-radius-card) var(--cui-radius-card) var(--cui-radius-card);
 }
 .domain-box .domain-search .suffix-list .suffix-item {
   margin-right: 0.16rem;
@@ -337,7 +337,7 @@
   color: #8692b0;
   font-size: 0.14rem;
   padding: 0.16rem;
-  border-radius: 0.04rem;
+  border-radius: var(--cui-radius-card);
   border: 0.01rem solid var(--cui-edge);
 }
 .domain-box .batch-search-box .batch-tips .input-batch .el-textarea__inner {
@@ -391,7 +391,7 @@
 }
 .domain-box .domain-content .domain-left .domain-one .fillter-list {
   margin-top: 0.24rem;
-  border-radius: 8px;
+  border-radius: var(--cui-radius-card);
   box-sizing: border-box;
   border: 1px solid var(--cui-edge);
   padding: 0.24rem;
@@ -409,7 +409,7 @@
   font-size: 0.14rem;
   color: var(--cui-ink);
   cursor: pointer;
-  border-radius: 0.04rem;
+  border-radius: var(--cui-radius-card);
 }
 .domain-box .domain-content .domain-left .domain-one .fillter-list .fillter-item:hover {
   background: rgba(0, 88, 255, 0.08);
@@ -426,7 +426,7 @@
   align-items: center;
   flex-direction: column;
   height: 93%;
-  border-radius: 8px;
+  border-radius: var(--cui-radius-card);
   border: 0.01rem solid var(--cui-edge);
 }
 .domain-box .domain-content .domain-left .domain-one .start-search img {
@@ -443,7 +443,7 @@
   margin-top: 0.24rem;
   background: #ffffff;
   border: 1px solid var(--cui-edge);
-  border-radius: 8px;
+  border-radius: var(--cui-radius-card);
   flex: 1;
   overflow-y: auto;
 }
@@ -477,7 +477,7 @@
   margin-right: 0.25rem;
   font-size: 0.14rem;
   color: #8692b0;
-  border-radius: 0.16rem 0.16rem 0.16rem 0.16rem;
+  border-radius: var(--cui-radius-card) var(--cui-radius-card) var(--cui-radius-card) var(--cui-radius-card);
   background: var(--cui-page);
 }
 .domain-box .domain-content .domain-left .domain-one .domain-list .domain-item .item-right .whois-box {
@@ -522,7 +522,7 @@
   height: 100%;
   background: #ffffff;
   border: 0.01rem solid var(--cui-edge);
-  border-radius: 0.08rem;
+  border-radius: var(--cui-radius-card);
 }
 .domain-box .domain-content .domain-left .batch-box .batch-main .batch-search img {
   width: 0.58rem;
@@ -542,7 +542,7 @@
   margin-top: 0.24rem;
   background: #ffffff;
   border: 0.01rem solid var(--cui-edge);
-  border-radius: 0.08rem 0.08rem 0 0;
+  border-radius: var(--cui-radius-card) var(--cui-radius-card) 0 0;
   border-bottom: none;
   max-height: 5rem;
   overflow-y: auto;
@@ -584,7 +584,7 @@
   margin-right: 0.25rem;
   font-size: 0.14rem;
   color: #8692b0;
-  border-radius: 0.16rem 0.16rem 0.16rem 0.16rem;
+  border-radius: var(--cui-radius-card) var(--cui-radius-card) var(--cui-radius-card) var(--cui-radius-card);
   background: var(--cui-page);
 }
 .domain-box .domain-content .domain-left .batch-box .batch-main .batch-item .item-right .whois-box {
@@ -614,7 +614,7 @@
 }
 .domain-box .domain-content .domain-left .batch-box .batch-main .batch-item .item-right .add-btn {
   margin-left: 0.4rem;
-  border-radius: 0.04rem;
+  border-radius: var(--cui-radius-control);
 }
 .domain-box .domain-content .domain-left .batch-box .batch-main .all-check {
   display: flex;
@@ -628,7 +628,7 @@
   font-size: 0.14rem;
   border: 0.01rem solid var(--cui-edge);
   border-top: none;
-  border-radius: 0 0 0.08rem 0.08rem;
+  border-radius: 0 0 var(--cui-radius-card) var(--cui-radius-card);
 }
 .domain-box .domain-content .domain-left .batch-box .batch-main .all-check .el-button {
   font-size: 0.14rem;
@@ -650,7 +650,7 @@
   margin-top: 0.24rem;
   display: flex;
   flex-wrap: wrap;
-  border-radius: 0.08rem;
+  border-radius: var(--cui-radius-card);
   border: 0.01rem solid var(--cui-edge);
 }
 .domain-box .domain-content .domain-left .batch-box .unavail-list .unavail-item {
@@ -712,7 +712,7 @@
   box-sizing: border-box;
   margin-top: 0.24rem;
   height: 5.3rem;
-  border-radius: 8px;
+  border-radius: var(--cui-radius-card);
   border: 0.01rem solid var(--cui-edge);
   background: #ffffff;
   overflow-y: auto;
@@ -777,7 +777,7 @@
 .domain-box .domain-content .domain-right .car-list .car-item .car-year .el-select {
   width: 0.96rem;
   height: 0.36rem;
-  border-radius: 0.04rem;
+  border-radius: var(--cui-radius-card);
 }
 .domain-box .domain-content .domain-right .car-list .car-item .car-price {
   font-size: 0.14rem;
@@ -899,7 +899,7 @@
 .up-dialog .dia-foter .cancel-btn {
   min-width: 1.12rem;
   border: none;
-  border-radius: 0.03rem 0.03rem 0.03rem 0.03rem;
+  border-radius: var(--cui-radius-control) var(--cui-radius-control) var(--cui-radius-control) var(--cui-radius-control);
   font-size: 0.16rem;
 }
 .up-dialog .dia-foter .confim-btn {
@@ -931,7 +931,7 @@
 .ssl-box {
   padding: 20px;
   background: #fff;
-  border-radius: 4px;
+  border-radius: var(--cui-radius-card);
   min-height: 600px;
 }
 .ssl-box .ssl-filter {
@@ -983,7 +983,7 @@
 .ssl-box .ssl-content .ssl-right {
   width: 320px;
   background: var(--cui-page);
-  border-radius: 4px;
+  border-radius: var(--cui-radius-card);
   position: sticky;
   top: 0.2rem;
   height: calc(100vh - 300px);
@@ -1005,7 +1005,7 @@
 .ssl-box .ssl-content .ssl-right .right-footer {
   padding: 0.2rem;
   border-top: 1px solid var(--cui-edge);
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 var(--cui-radius-card) var(--cui-radius-card);
   position: relative;
 }
 .ssl-box .ssl-content .ssl-right .right-footer .config-info-link {
