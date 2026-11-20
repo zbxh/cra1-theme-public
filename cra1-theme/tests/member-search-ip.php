@@ -160,6 +160,47 @@ namespace {
         $after=count(array_filter(State::$hooks,static function(array $call):bool{return $call[0]==='host_search_where_query_append';}));
         check($after-$before===$nativeRestrictionCalls, 'IP extension does not interpret LIKE wildcard or escape character '.json_encode($keyword).' as an IP fragment');
     }
+
+    // Exercise the actual native ORM search, not a duplicate implementation
+    // of the theme's normalization or its final account projection.
+    \think\facade\Db::name('host')->whereIn('id',[201,204,205,206])->update(['name'=>'CRA1-DEMO-ACTIVE']);
+    foreach (['ＣＲＡ１-DEMO-ACTIVE','CRA1－DEMO－ACTIVE','CRA1 - DEMO - ACTIVE','C R A 1-DEMO-ACTIVE',"Ｃ　ＲＡ１ － DEMO -ACTIVE","CRA1\u{200B}-DEMO-ACTIVE"] as $keyword) {
+        $before=count(State::$hooks);
+        $rows=$search($keyword);
+        $nativeCalls=array_values(array_filter(array_slice(State::$hooks,$before),static function(array $call):bool{return $call[0]==='before_search_host';}));
+        check($ids($rows)===[201], 'Literal normalization recalls the actual owned active host through native search: '.json_encode($keyword));
+        check($nativeCalls[0][1]===$keyword && count($nativeCalls)<=3, 'Original native hooks run first and normalization stays within three queries: '.json_encode($keyword));
+    }
+    // Native database collation still determines case sensitivity; both
+    // uppercase and lowercase identifiers must retain their literal case.
+    \think\facade\Db::name('host')->where('id',201)->update(['name'=>'cra1-demo-active']);
+    check($ids($search('cra1 - demo - active'))===[201], 'Lowercase spaced identifiers reach the same actual native search contract');
+    \think\facade\Db::name('host')->where('id',201)->update(['name'=>'CRA1-DEMO-ACTIVE']);
+    State::$visible=[202,204,205];
+    check($search('ＣＲＡ１-DEMO-ACTIVE')===[], 'Normalized host queries cannot search unassigned, foreign or deleted services');
+    State::$visible=null;
+    State::$blocked=[201];
+    check($ids($search('ＣＲＡ１-DEMO-ACTIVE'))===($nativeRestrictionCalls ? [] : [201]), 'Normalized native queries preserve the plugin restriction hooks available in the official version');
+    State::$blocked=[];
+    foreach (['１９２．０．２．１０','198 . 51 . 100 . 9','２００１ ： ｄｂ８ ：： ２２'] as $keyword) {
+        $rows=$search($keyword);
+        check($ids($rows)===[202] && isset($rows[0]['match_ip']), 'Width and delimiter spacing normalize without removing IPv4 or IPv6 identity symbols: '.json_encode($keyword));
+    }
+    check($search('198511009')===[], 'A symbol-free number cannot manufacture a match to a dotted IP address');
+    foreach (['ＣＲＡ１％ - ACTIVE','ＣＲＡ１＿ - ACTIVE','ＣＲＡ１＼ - ACTIVE'] as $keyword) {
+        $before=count(State::$hooks);
+        check($search($keyword)===[], 'Full-width native wildcard syntax cannot expand into an unrestricted host match');
+        $nativeCalls=array_values(array_filter(array_slice(State::$hooks,$before),static function(array $call):bool{return $call[0]==='before_search_host';}));
+        check(array_column($nativeCalls,1)===[$keyword], 'Wildcard normalization preserves exactly one original native query: '.json_encode($keyword));
+    }
+    foreach (['０',"　\u{00A0}\t","\u{200B}"] as $keyword) {
+        $before=count(State::$hooks);
+        check($search($keyword)===[] && count(State::$hooks)===$before, 'Normalized blank and zero queries never invoke native inventory lookup');
+    }
+    State::$actor=0;
+    $before=count(State::$hooks);
+    check($search('ＣＲＡ１-DEMO-ACTIVE')===[] && count(State::$hooks)===$before, 'Normalization cannot enable a guest search');
+    State::$actor=42;
     $routes=(string)file_get_contents(dirname(__DIR__).'/backend/Http/Routes.php');
     $controller=(string)file_get_contents(dirname(__DIR__).'/backend/Http/MemberController.php');
     check(strpos($routes,"['GET','member/search','search']")!==false && strpos($routes,"middleware('app\\\\http\\\\middleware\\\\CheckHome')")!==false, 'The member search route remains behind the V10 login middleware');

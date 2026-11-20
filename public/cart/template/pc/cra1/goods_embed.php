@@ -36,5 +36,5 @@
   <script src="{:cra1_theme_asset_url('cart', '20261012-cart-entry-v1/js/goods.js', '/cart/template/pc/cra1/releases/20261012-cart-entry-v1/js/goods.js')}"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/pagination/pagination.js"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/discountCode/discountCode.js"></script>
-  <script src="/{$template_catalog}/template/{$themes}/components/eventCode/eventCode.js"></script>
+  <script src="/{$template_catalog}/template/{$themes}/components/cra1EventCode/eventCode.js"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/customGoods/customGoods.js"></script>

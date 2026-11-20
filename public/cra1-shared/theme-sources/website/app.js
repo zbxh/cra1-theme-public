@@ -1498,6 +1498,16 @@
           if (!content || !this.item || content.dataset.preparedId === String(this.item.id)) return;
           content.dataset.preparedId = this.item.id;
           content.querySelectorAll('p').forEach(function (p) { if (!p.textContent.trim() && !p.querySelector('img,iframe,video,code,table')) p.classList.add('reading-blank'); });
+          // Keep wide author tables readable without expanding the whole page.
+          // A wrapper preserves native table semantics and column relationships.
+          content.querySelectorAll('table').forEach(function (table) {
+            if (table.parentElement.classList.contains('reading-table-scroll')) return;
+            var scroll = document.createElement('div'); scroll.className = 'reading-table-scroll';
+            scroll.tabIndex = 0; scroll.setAttribute('role', 'region');
+            var caption = table.querySelector('caption');
+            scroll.setAttribute('aria-label', caption && caption.textContent.trim() ? caption.textContent.trim() : '文章表格，可横向滚动');
+            table.before(scroll); scroll.appendChild(table);
+          });
           var headings = Array.from(content.querySelectorAll('h1,h2,h3,h4')).filter(function (heading) { return heading.textContent.trim(); });
           var prior = article.querySelector('.reading-toc'); if (prior) prior.remove();
           if (headings.length >= 3 && content.textContent.length >= 600) {

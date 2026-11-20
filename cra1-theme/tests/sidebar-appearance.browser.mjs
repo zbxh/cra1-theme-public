@@ -27,7 +27,7 @@ const snap = (configured) => ({
     { id: 'pending', name: '待开通', url: 'productList.htm?status=Pending' },
   ] }] }],
 })
-async function fixture({ configured = 0, preference, delayed = false, denied = false, failed = false } = {}) {
+async function fixture({ configured = 0, preference, delayed = false, denied = false, failed = false, theme = 'member' } = {}) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' })
   if (denied) await context.addInitScript(() => Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('Storage unavailable', 'SecurityError') } }))
   else if (preference !== undefined) await context.addInitScript(value => localStorage.setItem('cra1_aside_collapsed', value), preference)
@@ -41,7 +41,7 @@ async function fixture({ configured = 0, preference, delayed = false, denied = f
       await wait
       return route.fulfill({ status: failed ? 503 : 200, contentType: 'application/json', body: JSON.stringify({ status: 200, data: snap(configured) }) })
     }
-    return route.fulfill({ contentType: 'text/html', body: '<!doctype html><html><meta charset="UTF-8"><title>菜单演示</title><button id="toggle" onclick="window.dispatchEvent(new Event(\'cra1:toggle-aside\'))">打开主导航</button><div id="root"><aside-menu ref="nav" /></div></html>' })
+    return route.fulfill({ contentType: 'text/html', body: `<!doctype html><html data-cra1-theme="${theme}"><meta charset="UTF-8"><title>菜单演示</title><button id="toggle" class="cra1-header__menu-btn" onclick="window.dispatchEvent(new Event('cra1:toggle-aside'))">打开主导航</button><div id="root"><aside-menu ref="nav" /></div></html>` })
   })
   async function mount(entry = '/productList.htm') {
     await page.goto('http://theme.invalid' + entry)
@@ -82,6 +82,31 @@ try {
     check(await f.width() === expected, 'saved preference is respected or ignored if invalid: ' + preference)
     await f.context.close()
   }
+  const desktop = await fixture()
+  const pull = desktop.page.getByRole('button', { name: '点击打开菜单', exact: true })
+  const navigation = desktop.page.getByRole('complementary', { name: '会员中心导航' })
+  await desktop.page.waitForFunction(() => nav.loading === false)
+  check(await pull.locator('.cra1-menu-pull__caption > span').evaluateAll(chars => {
+    const tops = chars.map(char => char.getBoundingClientRect().top)
+    return tops.length === 6 && tops.every((top, index) => index === 0 || top - tops[index - 1] >= 15)
+  }), 'vertical caption has six distinct lines')
+  await pull.focus()
+  await desktop.page.keyboard.press('Enter')
+  check(await navigation.evaluate(el => el.classList.contains('is-open') && document.activeElement === el), 'desktop pull opens the same navigation and hands off keyboard focus')
+  check(await pull.count() === 0, 'desktop pull is absent while navigation is open')
+  await desktop.page.keyboard.press('Escape')
+  check(await pull.evaluate(el => el === document.activeElement), 'Escape restores focus to the desktop pull')
+  await pull.click()
+  await desktop.page.mouse.click(1300, 500)
+  check(await pull.evaluate(el => el === document.activeElement), 'overlay closes navigation and restores focus to the pull')
+  await desktop.page.setViewportSize({ width: 1024, height: 1000 })
+  await desktop.page.waitForFunction(() => nav.isNarrow)
+  check(await pull.count() === 0, 'drawer layout keeps only the header opener')
+  await desktop.context.close()
+  const cart = await fixture({ theme: 'cart' })
+  check(await cart.page.locator('.cra1-menu-pull').count() === 0, 'shared cart navigation has no member pull')
+  await cart.context.close()
+
   const f = await fixture({ delayed: true })
   await f.page.getByRole('button', { name: '打开主导航' }).click()
   check(await f.width() === 860, 'opening before snapshot finishes is full')

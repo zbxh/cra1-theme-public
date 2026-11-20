@@ -30,11 +30,11 @@ if(preg_match('~^/cra1-shared/releases/[a-z0-9-]+$~D',$uiBase))foreach(['tokens.
 <label>管理密码<input name="password" type="password" minlength="12" maxlength="128" required autocomplete="new-password"></label>
 <label>确认密码<input name="confirm" type="password" minlength="12" maxlength="128" required autocomplete="new-password"></label>
 <p id="setup-status" role="status" aria-live="polite" tabindex="-1" hidden></p>
-<button type="submit" id="install" class="cui-button" disabled><span class="cui-button-glow" aria-hidden="true"></span>完成安装</button></form>
+<button type="submit" id="install" class="cui-button" data-cui-button-glow="primary" disabled><span class="cui-button-glow" aria-hidden="true"></span>完成安装</button></form>
 <section id="maintenance" hidden><h2 id="maintenance-title">完成主题更新</h2><p id="maintenance-summary"></p>
 <div id="update-options" hidden><p>更新会保留原后台地址、账号、配置、菜单、图片和草稿。请先备份网站；此入口无法还原解压前已被覆盖的文件。</p>
 <label class="backup-confirm"><input type="checkbox" id="backup-confirmed">我已备份网站，可以完成更新</label></div>
-<button type="button" id="update" class="cui-button" disabled><span class="cui-button-glow" aria-hidden="true"></span>完成更新</button><p id="update-status" role="status" aria-live="polite" tabindex="-1" hidden></p>
+<button type="button" id="update" class="cui-button" data-cui-button-glow="primary" disabled><span class="cui-button-glow" aria-hidden="true"></span>完成更新</button><p id="update-status" role="status" aria-live="polite" tabindex="-1" hidden></p>
 <a id="existing-admin-link">登录原主题后台</a></section>
 <section id="update-success" hidden><h2>更新完成</h2><p>原后台地址、账号、配置和主题启用状态已保留。请刷新前台和主题后台页面。</p><a id="updated-admin-link">登录主题后台</a></section>
 <section id="success" hidden><h2>安装成功</h2><p>请保存以下信息，密码仅在本次流程显示。点击“登录主题后台”，输入下方账号和密码，先配置官网、会员中心和购物车的内容。</p><dl id="credentials"></dl><a id="admin-link">登录主题后台</a><button type="button" id="hide-password">隐藏密码</button><p>配置完成后，再到 V10 系统后台的主题设置中手动选择需要启用的主题。安装不会自动切换当前网站。</p></section>

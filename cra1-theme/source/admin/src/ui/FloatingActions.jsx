@@ -132,7 +132,7 @@ export function FloatingActions({
               <RotateCcw className="size-3.5" />{resetLabel}
             </Button>
           )}
-          <Button size="sm" disabled={saving} onClick={onSave}>
+          <Button data-cui-button-glow="primary" size="sm" disabled={saving} onClick={onSave}>
             <Save className="size-3.5" />{saving ? '保存中…' : saveLabel}
           </Button>
         </div>

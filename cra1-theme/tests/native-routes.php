@@ -24,7 +24,7 @@ namespace {
         if(!$reflection->isPublic()||$reflection->isStatic()||$reflection->getNumberOfRequiredParameters()!==1)throw new RuntimeException('Registered native action missing');$checks++;
         if(strpos($path,'console/v1/cra1-theme/')!==0||!in_array($method,['GET','POST','PUT','DELETE'],true))throw new RuntimeException('Native route escaped its scope');$checks++;
     }
-    if(count(NativeRouteFixture::$routes)!==11)throw new RuntimeException('Native route coverage changed');$checks++;
+    if(count(NativeRouteFixture::$routes)!==12)throw new RuntimeException('Native route coverage changed');$checks++;
     $pipes=[];$process=proc_open([PHP_BINARY,__FILE__,'search-only'],[1=>['pipe','w'],2=>['pipe','w']],$pipes);
     $out=stream_get_contents($pipes[1]);$error=stream_get_contents($pipes[2]);fclose($pipes[1]);fclose($pipes[2]);
     if(proc_close($process)!==0||$out!=='search-only passed')throw new RuntimeException('Website-only route isolation failed: '.$error);$checks++;

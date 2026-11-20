@@ -703,7 +703,7 @@ const payDialog = {
             </template>
           </div>
           <div class="pay-footer-right">
-            <el-button type="primary" @click="handleOk" v-loading="doPayLoading"
+            <el-button type="primary" data-cui-button-glow="primary" @click="handleOk" v-loading="doPayLoading"
               :disabled="doPayLoading || diaInitIng || !zfData.gateway || getWayLoading || priceLoading || (balance * 1 < zfData.amount *1) && zfData.gateway !== 'CreditLimit'"
               v-if="!isShowPay || zfData.gateway === 'CreditLimit'">{{lang.pay_text9}}
             </el-button>

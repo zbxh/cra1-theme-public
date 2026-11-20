@@ -176,12 +176,25 @@
   移动端（≤1024px）抽屉一次只显示一栏：一级列表 ⇄ 面板（返回键切换）。
 -->
 <div class="cra1-aside-wrap" style="display:contents">
+  <button v-if="isStandaloneMember && menuPullEnabled && !isNarrow && !navOpen" ref="menuPull"
+          type="button" class="cra1-menu-pull" aria-controls="cra1-member-navigation"
+          aria-label="点击打开菜单" aria-expanded="false" @click="openFromPull">
+    <span class="cra1-menu-pull__caption" aria-hidden="true">
+      <span v-for="character in '点击打开菜单'" :key="character">{{ character }}</span>
+    </span>
+    <svg class="cra1-menu-pull__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="m9 6 6 6-6 6"></path>
+    </svg>
+  </button>
   <!-- 遮罩：顶栏不被盖住（top=header-h 由 CSS 控制），点击关闭 -->
   <div class="cra1-aside__overlay"
        :class="{ 'is-open': navOpen, 'is-desktop': !isNarrow }"
-       @click="closeMobile"></div>
+       @click="closeMobile(openedFromPull)"></div>
 
-  <aside class="cra1-aside" :class="{ 'is-open': navOpen, 'is-collapsed': collapsed, 'is-mobile-detail': mobileDetail }" aria-label="会员中心导航">
+  <aside ref="navigation" :id="isStandaloneMember ? 'cra1-member-navigation' : null"
+         :tabindex="isStandaloneMember ? -1 : null"
+         class="cra1-aside" :class="{ 'is-open': navOpen, 'is-collapsed': collapsed, 'is-mobile-detail': mobileDetail }" aria-label="会员中心导航">
     <!-- 左栏：一级入口 -->
     <nav class="cra1-aside__rail-col" aria-label="主导航">
       <template v-for="p in primaryNav">
@@ -221,7 +234,7 @@
           <span class="cra1-aside__panel-title-main">{{ activePrimaryName }}</span>
           <span class="cra1-aside__panel-title-sub">选择需要的功能</span>
         </div>
-        <button type="button" class="cra1-aside__panel-close" aria-label="关闭导航" @click="closeMobile"></button>
+        <button type="button" class="cra1-aside__panel-close" aria-label="关闭导航" @click="closeMobile(openedFromPull)"></button>
       </div>
 
       <div class="cra1-aside__panel-body">
@@ -302,7 +315,9 @@
         brandName: '',
         commonData: {},
         activeId: String(this.menuActiveId || ''),
-        navOpen: false,          // 主导航显隐（默认关闭，顶栏图标唤出）
+        navOpen: false,          // 主导航默认关闭
+        openedFromPull: false,
+        menuPullEnabled: false, // Wait for the setting before rendering the desktop entry.
         menuSource: '',          // 'member' = 独立快照，'system' = 系统导航
         snapshotAppearance: {},
         navShape: 2,             // 快照树形态：3 = 一级分组树（分组→菜单→页面），2 = 旧两级
@@ -326,6 +341,9 @@
       /** 是否窄屏（≤1024px，与 CSS 断点一致）：决定遮罩层级与滚动锁行为 */
       isNarrow() {
         return this.viewportW <= 1024
+      },
+      isStandaloneMember() {
+        return global.self === global.top && document.documentElement.getAttribute('data-cra1-theme') === 'member'
       },
       brandUrl() {
         return this.commonData.clientarea_logo_url || '/home.htm'
@@ -474,9 +492,7 @@
       this.restoreCollapsePreference()
       // 收藏功能已下线：清掉遗留的本地数据，避免误导
       try { localStorage.removeItem('cra1_user_favorites') } catch (e) {}
-      // v20：手机端二级菜单折叠档位（后台 appearance.aside_mobile_expand）
-      // 快照为异步加载：先同步取（二次渲染已就绪），未就绪则等 loadMemberSidebar 后应用
-      this.applyMobileExpandTier()
+      this.applyNavigationPreferences()
       // React 内容页（产品详情/订单详情等）拿到数据后会广播真实页面名，
       // 这里监听并回填本页记录 —— productdetail.htm 这类「同一地址不同内容」
       // 的页面才能在最近访问里显示具体产品标识而非通用标题
@@ -581,7 +597,15 @@
         try { localStorage.setItem('cra1_aside_collapsed', this.collapsed ? '1' : '0') } catch (e) {}
         // 折叠时收起移动面板态（展开状态保留，展开按钮时原样恢复）
       },
+      openFromPull() {
+        this.onToggleAside()
+        this.openedFromPull = true
+        this.$nextTick(() => {
+          if (this.navOpen && this.openedFromPull) this.$refs.navigation.focus()
+        })
+      },
       onToggleAside() {
+        this.openedFromPull = false
         this.navOpen = !this.navOpen
         // 移动端抽屉打开时锁定页面滚动；桌面浮层不锁滚动，避免影响阅读
         document.documentElement.style.overflow =
@@ -592,28 +616,30 @@
           this.syncPrimaryFromLocation()
         }
       },
-      closeMobile() {
+      closeMobile(restoreFocus = false) {
+        const openedFromPull = this.openedFromPull
+        this.openedFromPull = false
         this.navOpen = false
         this.mobileDetail = false
         document.documentElement.style.overflow = ''
         // v20：记住关闭抽屉时展开的二级分组（下次打开恢复）
         try { localStorage.setItem('cra1_aside_open_groups', JSON.stringify(this.mobileOpenGroups)) } catch (e) {}
+        if (restoreFocus) {
+          this.$nextTick(() => {
+            if (this.navOpen) return
+            const opener = (openedFromPull && this.$refs.menuPull) || document.querySelector('.cra1-header__menu-btn')
+            if (opener) opener.focus()
+          })
+        }
       },
-      /** Esc 关闭面板/抽屉，并把焦点交回触发按钮（移动端菜单按钮） */
       onResize() {
         this.viewportW = global.innerWidth
         // 跨断点时收起导航：桌面浮层与移动抽屉的层级/滚动锁不同，
         // 保持展开会出现「看不见却锁着滚动」的错乱。
-        if (this.navOpen) this.closeMobile()
+        if (this.navOpen) this.closeMobile(this.openedFromPull)
       },
       onKeydown(e) {
-        if (e.key !== 'Escape') return
-        // 收起主导航，并把焦点交回顶栏的切换按钮
-        if (this.navOpen) {
-          this.closeMobile()
-          var btn = document.querySelector('.cra1-header__menu-btn')
-          if (btn && btn.focus) btn.focus()
-        }
+        if (e.key === 'Escape' && this.navOpen) this.closeMobile(true)
       },
       /**
        * 左栏切换一级入口：右栏面板随之切换，默认展开含当前页的二级
@@ -910,10 +936,10 @@
         try { global.dispatchEvent(new CustomEvent('cra1:recent-visits', { detail: state })) } catch (e) {}
       },
       /** 读取本地记录（展示时再按后台策略裁剪） */
-      /** v20：应用手机端二级菜单折叠档位（快照异步就绪后兜底应用） */
-      applyMobileExpandTier() {
+      applyNavigationPreferences() {
         var self = this
         var apply = function (snap) {
+          self.menuPullEnabled = Number((snap || {}).nav_pull_enabled ?? 1) !== 0
           var ap = (snap || {}).appearance || {}
           var tier = ['one', 'all', 'none'].indexOf(ap.aside_mobile_expand) !== -1 ? ap.aside_mobile_expand : 'one'
           var changed = tier !== self.asideMobileExpand
@@ -922,7 +948,7 @@
           if (changed && !self.navOpen) self.initMobileGroups()
         }
         if (global.__CRA1_MEMBER_SNAPSHOT__) { apply(global.__CRA1_MEMBER_SNAPSHOT__); return }
-        this.loadMemberSidebar().then(apply).catch(function () {})
+        this.loadMemberSidebar().then(apply, function () { apply(null) })
       },
       /** v20：手机端二级分组折叠 —— 按档位初始化展开集合 */
       initMobileGroups() {

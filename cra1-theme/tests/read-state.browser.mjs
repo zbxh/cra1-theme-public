@@ -13,7 +13,7 @@ const { chromium } = await import(process.env.CRA1_PLAYWRIGHT_MODULE)
 fs.mkdirSync(out, {recursive: true, mode: 0o700})
 const read = relative => fs.readFileSync(path.join(root, relative), 'utf8')
 const shared = stage ? path.join(stage, 'public/cra1-shared/releases', JSON.parse(fs.readFileSync(path.join(stage, 'release.json'))).release) : null
-const bundle = shared ? fs.readFileSync(path.join(shared, 'cra1-shared.js')) : ['errors', 'request', 'ui', 'notification-session', 'announcements', 'notification-center', 'header-search'].map(name => read('public/cra1-shared/src/' + name + '.js')).join('\n')
+const bundle = shared ? fs.readFileSync(path.join(shared, 'cra1-shared.js')) : ['errors', 'request', 'ui', 'notification-session', 'announcements', 'notification-center', 'search-match', 'header-search'].map(name => read('public/cra1-shared/src/' + name + '.js')).join('\n')
 const css = shared ? fs.readFileSync(path.join(shared, 'cra1-shared.css')) : ['tokens', 'components', 'announcements', 'header-search', 'adapters'].map(name => read('public/cra1-shared/src/' + name + '.css')).join('\n')
 const plugin = shared ? fs.readFileSync(path.join(stage, 'public/clientarea/template/pc/cra1/releases', path.basename(shared), 'js/plugin-pages.js')) : read('public/clientarea/template/pc/cra1/js/plugin-pages.js')
 const notice = {id:'one',revision:1,title:'服务安排示例',label:'服务通知',summary:'通知内容示例',detail:'<p>示例通知正文。</p>',action:'detail',action_label:'查看详情',dismissible:true,dismiss_for:'revision',expires_in:null}
@@ -62,12 +62,12 @@ try {
   fixture={noticeFail:true}
   let {page,context}=await fresh('/notifications.html')
   const search=page.getByRole('searchbox',{name:'搜索通知'})
-  await page.getByText('页面错误，请刷新重试',{exact:true}).waitFor();check(await page.getByRole('button',{name:/重试|重新加载/}).count()===0,'notification failure has no retry control')
+  await page.getByText('通知暂时无法加载，请重试。',{exact:true}).waitFor();check(await page.getByRole('button',{name:'重新加载',exact:true}).isVisible(),'notification read failure offers a local retry')
   await search.fill('服务')
-  check((await page.locator('.cra1-notification-center__message').first().textContent()).includes('页面错误，请刷新重试'),'typing after notification failure preserves unavailable state')
+  check((await page.locator('.cra1-notification-center__message').first().textContent()).includes('通知暂时无法加载'),'typing after notification failure preserves unavailable state')
   check(!(await page.content()).includes('fixture-secret'),'notification failure hides private diagnostics')
   fixture.noticeFail=false;fixture.noticeDelay=350
-  await page.reload();await search.fill('维护')
+  await page.getByRole('button',{name:'重新加载',exact:true}).click();await search.fill('维护')
   check((await page.locator('.cra1-notification-center__message').first().textContent()).includes('正在加载'),'typing during notification refresh preserves loading state')
   await search.fill('');await page.locator('.cra1-notification-center__entry').first().waitFor()
   check(await page.locator('.cra1-notification-center__entry').count()===1,'notification refresh recovers content')
@@ -93,6 +93,7 @@ try {
 
   fixture={}
   ;({page,context}=await fresh('/search.html',true))
+  await page.setViewportSize({width:390,height:844})
   await page.getByRole('button',{name:'搜索产品与文章',exact:true}).click()
   let input=page.getByRole('combobox')
   await input.fill('示例');await page.getByRole('option').filter({hasText:'会员产品示例'}).waitFor()

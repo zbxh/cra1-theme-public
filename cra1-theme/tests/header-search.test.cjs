@@ -65,10 +65,14 @@ test('search sends trimmed keywords without turning special characters into URL 
   const f = fixture(empty)
   await f.api.search({ keywords: '  云 & a?b=1 + #  ', sources: [product] })
   assert.equal(f.calls[0].url.searchParams.get('keywords'), '云 & a?b=1 + #')
-  assert.equal(f.calls[0].url.searchParams.has('b'), false)
-  assert.equal(f.calls[0].options.method, 'GET')
+  assert.equal(f.calls[1].url.searchParams.get('keywords'), '云&a?b=1+#')
+  for (const call of f.calls) {
+    assert.equal(call.url.searchParams.has('b'), false)
+    assert.equal(call.options.method, 'GET')
+  }
+  const requested = f.calls.length
   await f.api.search({ keywords: '  ', sources: [product] })
-  assert.equal(f.calls.length, 1)
+  assert.equal(f.calls.length, requested)
 })
 
 test('zero keywords do not become an unfiltered native product search', async () => {

@@ -373,13 +373,14 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
 
 .cart-page:not([data-cra1-native-module]) .cl-rail-preview-name {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .cart-page:not([data-cra1-native-module]) .cl-rail-preview-price {
   flex-shrink: 0;
+  max-width: 45%;
+  overflow-wrap: anywhere;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
@@ -2862,7 +2863,7 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-price-p
 html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-price-popover .price-item>div{box-sizing:border-box;width:120px;height:auto;min-height:40px;padding:8px;display:block;text-align:center;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
 html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-price-popover .price-item:not(:first-child) :is(.price-new,.price-renew){font-size:18px!important;font-variant-numeric:tabular-nums}
 html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-year-options .el-select-dropdown__item{font-size:14px!important;min-height:44px;height:auto;line-height:44px}
-html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog{width:520px!important;max-width:calc(100vw - 24px);box-sizing:border-box}
+html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog{width:520px!important;max-width:calc(100vw - 24px);max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);margin-top:16px!important;margin-bottom:16px!important;overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box}
 html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog .el-dialog__body{padding:24px!important}
 html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog .dia-title{font-size:18px!important;line-height:1.5}
 html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cra1-domain-upload-dialog :is(.up-tips,.file-name,.file-btn,.el-button){font-size:14px!important;line-height:1.5}

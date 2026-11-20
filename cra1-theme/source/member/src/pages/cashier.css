@@ -4,11 +4,11 @@
 .cra1-checkout-steps [aria-current]{color:var(--cp-ink);font-weight:600}
 .cra1-cashier-layout{display:grid;grid-template-columns:minmax(0,1fr) 336px;gap:22px;align-items:start}
 .cra1-cashier-main{min-width:0;display:grid;gap:16px}
-.cra1-checkout-page .cra1-cashier-surface,.cra1-cashier-summary,.cra1-cashier-state{min-width:0;border:1px solid var(--cp-edge);border-radius:var(--cui-radius-card);background:linear-gradient(135deg,#fff 55%,var(--cui-page));box-shadow:inset 0 1px 0 #fff,0 5px 22px color-mix(in srgb,var(--cui-night) 2.745%,transparent);overflow-wrap:anywhere}
+.cra1-checkout-page .cra1-cashier-surface,.cra1-cashier-summary,.cra1-cashier-state{min-width:0;border:1px solid transparent;border-radius:var(--cui-radius-card);background:var(--cra1-member-card,var(--cui-surface));box-shadow:var(--cra1-member-shadow,var(--cui-shadow-card));overflow-wrap:anywhere}
 .cra1-checkout-page .cra1-cashier-surface{padding:24px;font-size:14px;line-height:1.55}
 .cra1-cashier-surface .pay-title{display:flex;align-items:center;justify-content:space-between;padding:0 0 18px;border-bottom:1px solid var(--cui-edge);font-size:16px;font-weight:600}
 .cra1-cashier-surface .pay-content{padding-top:18px;min-width:0}
-.cra1-cashier-surface .pay-order-top{display:flex;justify-content:space-between;gap:18px;margin-bottom:20px;padding:16px;border:1px solid var(--cui-edge);border-radius:var(--cui-radius-card);background:linear-gradient(120deg,var(--cui-page),var(--cui-surface))}
+.cra1-cashier-surface .pay-order-top{display:flex;justify-content:space-between;gap:18px;margin-bottom:20px;padding:16px;border:1px solid transparent;border-radius:var(--cui-radius-card);background:var(--cra1-member-card-inner,var(--cui-surface))}
 .cra1-cashier-surface .pay-order-top-left{display:flex;align-items:center;gap:10px;min-width:0}
 .cra1-cashier-surface .pay-order-icon{font-size:26px;color:var(--cui-muted)}
 .cra1-cashier-surface .pay-order-tip-text{font-size:12px;color:var(--cui-muted)}

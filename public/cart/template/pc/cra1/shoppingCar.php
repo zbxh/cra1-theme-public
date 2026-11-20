@@ -28,8 +28,17 @@
               </el-input>
             </div>
             <div class="goods-box" v-loading="listLoding">
-              <div v-if="listError" class="cui-alert cui-alert--error cra1-cart-read-error" role="alert"><p>页面错误，请刷新重试</p></div>
+              <div v-if="listError" class="cui-alert cui-alert--error cra1-cart-read-error" role="alert">
+                <p>{{listError}}</p>
+                <el-button size="small" @click="getCartList" :loading="listLoding">重新加载</el-button>
+              </div>
               <template v-else-if="showList.length !== 0 || listLoding">
+              <div v-if="!listLoding && nowList.length === 0" class="cl-empty-box cl-filter-empty" role="status">
+                <el-empty description="没有找到匹配的商品">
+                  <p class="cl-empty-desc">换个关键词试试，或清空搜索查看全部商品。</p>
+                  <el-button @click="searchVal = ''; searchValChange('')">清空搜索</el-button>
+                </el-empty>
+              </div>
               <div class="goods-item cl-pc-cart">
                 <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
                   <div v-for="item in nowList" :key="item.position" class="shopping-goods" v-loading="item.isLoading">
@@ -147,14 +156,12 @@
                             </td>
                           </tr>
                           <tr v-else>
-                            <td></td>
-                            <td class="no-goods-td">
-                              <span class="no-goods-tips" :class="{'cra1-cart-read-error-text': !!item.priceError}">{{item.priceError ? '页面错误，请刷新重试' : lang.shoppingCar_no_goods_tip}}</span>
+                            <td colspan="4" class="no-goods-td">
+                              <span class="no-goods-tips" :class="{'cra1-cart-read-error-text': !!item.priceError}">{{item.priceError ? '暂时无法读取商品配置和价格，请重试。' : lang.shoppingCar_no_goods_tip}}</span>
+                              <el-button v-if="item.priceError" size="small" @click="getConfigOption(item)" :loading="item.priceLoading">重试</el-button>
                               <el-button v-if="!item.priceError" class="buy-again-btn"
                                 @click="goGoods(item)">{{lang.shoppingCar_buy_again}}</el-button>
                             </td>
-                            <td></td>
-                            <td></td>
                             <td class="delete-btn">
                               <i class="el-icon-delete" @click="handelDeleteGoods(item)"></i>
                             </td>
@@ -256,7 +263,8 @@
 
                     <template v-else>
                       <div class="cl-m-cart-invalid">
-                        <span class="no-goods-tips" :class="{'cra1-cart-read-error-text': !!item.priceError}">{{item.priceError ? '页面错误，请刷新重试' : lang.shoppingCar_no_goods_tip}}</span>
+                        <span class="no-goods-tips" :class="{'cra1-cart-read-error-text': !!item.priceError}">{{item.priceError ? '暂时无法读取商品配置和价格，请重试。' : lang.shoppingCar_no_goods_tip}}</span>
+                        <el-button v-if="item.priceError" size="small" @click="getConfigOption(item)" :loading="item.priceLoading">重试</el-button>
                         <el-button v-if="!item.priceError" class="buy-again-btn" @click="goGoods(item)">{{lang.shoppingCar_buy_again}}</el-button>
                         <i class="el-icon-delete cl-m-cart-del" @click="handelDeleteGoods(item)"></i>
                       </div>
@@ -307,7 +315,7 @@
             <div class="footer-right">
               <p>{{lang.shoppingCar_tip_text3}}：<span
                   class="total-price">{{commonData.currency_prefix}}{{totalPrice | filterMoney}}{{commonData.currency_suffix}}</span></p>
-              <el-button type="primary" class="buy-btn" @click="goSettle"
+              <el-button type="primary" class="buy-btn" data-cui-button-glow="primary" @click="goSettle"
                 :loading="settleLoading" :disabled="checkoutBlocked">{{lang.shoppingCar_buy_text}}</el-button>
             </div>
           </div>
@@ -319,6 +327,6 @@
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/shopping.js"></script>
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/product.js"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/discountCode/discountCode.js"></script>
-  <script src="/{$template_catalog}/template/{$themes}/components/eventCode/eventCode.js"></script>
+  <script src="/{$template_catalog}/template/{$themes}/components/cra1EventCode/eventCode.js"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261013-security-snapshot-v1/js/cart-config.js', '/cart/template/pc/cra1/releases/20261013-security-snapshot-v1/js/cart-config.js')}"></script>
 <script src="{:cra1_theme_asset_url('cart', '20261012-cart-entry-v1/js/shoppingCar.js', '/cart/template/pc/cra1/releases/20261012-cart-entry-v1/js/shoppingCar.js')}"></script>

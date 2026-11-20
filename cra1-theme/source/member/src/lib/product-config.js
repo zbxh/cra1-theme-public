@@ -97,5 +97,5 @@ export async function loadCategoryHosts(get, params, category) {
     if (!products.length) return { list: [], count: 0 }
     products.forEach((id, i) => { base[`product_id[${i}]`] = id })
   }
-  return (await get('/host', base)).data || {}
+  return (await get('/cra1-theme/member/product-list', base)).data || {}
 }

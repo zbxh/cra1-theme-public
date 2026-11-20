@@ -41,7 +41,7 @@ export default function WorkspaceFrame({ domain, scopeId, editorId, title, saveD
   if (w.error || !w.data) return <Alert tone="error"><p>{w.error || '未读取到配置内容，请重新读取'}</p><Button variant="outline" className="mt-3" onClick={()=>w.reload().catch(()=>{})}>重新读取</Button></Alert>
   return <section className="workspace-frame">
     <div className="workspace-savebar"><div className="min-w-0"><p className="truncate text-sm font-medium">{title || w.data.scope.label}</p><p className="text-xs text-muted-foreground">{w.dirty ? '有未保存修改' : '已保存'} · {saveDescription||(editorId?'保存本配置页的全部修改':'只保存此处修改')}</p></div>
-      <div className="flex flex-wrap gap-2">{editorId&&<DraftPreview workspace={w} editorId={editorId}/>}<Button variant="outline" disabled={w.saving || !w.dirty} onClick={w.revert}><RotateCcw className="size-4" />撤销当前页修改</Button><Button disabled={w.saving || !w.dirty || !!w.remote} onClick={w.save}><Save className="size-4" />{w.saving ? '保存中…' : `保存${title || w.data.scope.label}`}</Button></div>
+      <div className="flex flex-wrap gap-2">{editorId&&<DraftPreview workspace={w} editorId={editorId}/>}<Button variant="outline" disabled={w.saving || !w.dirty} onClick={w.revert}><RotateCcw className="size-4" />撤销当前页修改</Button><Button data-cui-button-glow="primary" disabled={w.saving || !w.dirty || !!w.remote} onClick={w.save}><Save className="size-4" />{w.saving ? '保存中…' : `保存${title || w.data.scope.label}`}</Button></div>
     </div>
     {w.saveError && <Alert tone="error">{w.saveError}</Alert>}
     {w.savedMessage && <Alert tone={w.data.snapshot_ok === false || w.data.seo_ok === false || w.data.audit_ok === false ? 'warning' : 'success'}>{w.savedMessage}</Alert>}

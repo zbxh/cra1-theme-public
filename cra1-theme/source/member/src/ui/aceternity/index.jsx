@@ -12,7 +12,7 @@ import { cn } from '../utils'
 export function SpotlightCard({ className, children, as: Tag = 'div', ...props }) {
   return (
     <Tag
-      className={cn('cui-card relative overflow-hidden rounded-lg', className)}
+      className={cn('cui-card cui-member-card relative overflow-hidden rounded-lg', className)}
       {...props}
     >
       {children}

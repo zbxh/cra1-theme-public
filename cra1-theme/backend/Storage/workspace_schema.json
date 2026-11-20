@@ -59874,6 +59874,7 @@
         "version": "scalar",
         "imported_at": "scalar",
         "shape": "scalar",
+        "pull_enabled": "scalar",
         "nodes": {
           "$list": {
             "$ref": "menuNode"

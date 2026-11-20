@@ -25,7 +25,7 @@ window.buttonClicks=0
 let revision=0
 window.renderAuth=(runtime)=>{
  window.__CRA1_RUNTIME__=runtime
- root.render(<RegisterAuthLayout key={++revision} kind="login"><Button id="vnc" data-cui-effects="none" onClick={()=>window.buttonClicks++}>VNC 控制台</Button><Button id="ordinary">普通操作</Button></RegisterAuthLayout>)
+ root.render(<RegisterAuthLayout key={++revision} kind="login"><Button id="vnc" data-cui-effects="none" onClick={()=>window.buttonClicks++}>VNC 控制台</Button><Button id="ordinary" data-cui-button-glow="primary">保存设置</Button><Button id="auxiliary">刷新</Button><Button id="auxiliary-outline" variant="outline">取消</Button><Button id="disabled-primary" data-cui-button-glow="primary" disabled>保存</Button><Button id="danger-primary" data-cui-button-glow="primary" variant="danger">删除</Button></RegisterAuthLayout>)
 }
 `
 const built = await build({
@@ -53,7 +53,9 @@ try {
   check(await page.locator('#vnc').getAttribute('data-cui-effects') === 'none' && await page.locator('#vnc .cui-button-glow').count() === 0, 'VNC remains an ordinary button without new decoration')
   await page.locator('#vnc').click()
   check(await page.evaluate(() => window.buttonClicks) === 1, 'VNC opt-out preserves its single business click')
-  check(await page.locator('#ordinary .cui-button-glow').count() === 1, 'normal primary buttons retain the shared decorative consumer')
+  check(await page.locator('#ordinary .cui-button-glow').count() === 1, 'explicitly selected primary buttons retain the shared decorative consumer')
+
+  check(await page.locator('#auxiliary .cui-button-glow,#auxiliary-outline .cui-button-glow,#disabled-primary .cui-button-glow,#danger-primary .cui-button-glow').count() === 0, 'member auxiliary, outline, disabled and danger buttons do not render framework glow')
 
   const css = fs.readFileSync(path.join(root,'public/cra1-shared/src/user-panel.css'),'utf8')
   await page.setContent(`<style>${css}</style><div id="account"></div>`)

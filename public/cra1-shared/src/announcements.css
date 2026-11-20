@@ -77,6 +77,9 @@ html[data-cra1-theme] .cra1-notices-host[hidden],html[data-cra1-theme] .cra1-not
 .cra1-notification-center__search { width:360px; max-width:100%; min-width:0; height:40px; padding:0 12px; border:1px solid var(--cui-control-edge); border-radius:var(--cui-radius-control); background:var(--cui-field); color:var(--cui-ink); font:inherit; font-size:14px; }
 .cra1-notification-center__search:focus-visible { outline:2px solid var(--cui-focus); outline-offset:2px; }
 .cra1-notification-center__total,.cra1-notification-center__message { color:var(--cui-body); font-size:13px; }
+.cra1-notification-center__feedback { display:flex; min-height:180px; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:24px 16px; box-sizing:border-box; text-align:center; overflow-wrap:anywhere; }
+.cra1-notification-center__feedback.is-inline { min-height:0; flex-direction:row; flex-wrap:wrap; justify-content:space-between; margin-bottom:18px; padding:12px 16px; border:1px solid var(--cui-edge); border-radius:var(--cui-radius-card); background:var(--cui-surface); text-align:left; }
+.cra1-notification-center__feedback .cra1-notification-center__message { min-width:0; margin:0; }
 .cra1-notification-center__layout { display:grid; grid-template-columns:280px minmax(0,1fr); gap:24px; align-items:start; }
 .cra1-notification-center__layout[hidden],.cra1-notification-center__actions[hidden],[data-cra1-notification-center] [hidden] { display:none!important; }
 .cra1-notification-center__list { max-height:620px; overflow:auto; display:grid; gap:8px; padding:3px; overscroll-behavior:contain; }
@@ -93,6 +96,7 @@ html[data-cra1-theme] .cra1-notices-host[hidden],html[data-cra1-theme] .cra1-not
 .cra1-notification-center__article a { color:#80632f; text-decoration:underline; }
 .cra1-notification-center__article img { max-width:100%; height:auto; }
 .cra1-notification-center__article table { display:block; max-width:100%; overflow:auto; }
+.cra1-notification-center__article pre,.cra1-notice-reader article pre { max-width:100%; overflow:auto; overscroll-behavior:contain; }
 .cra1-notification-center__article blockquote { margin:12px 0; padding:8px 14px; border-left:2px solid #c9b78e; background:var(--cui-page); }
 .cra1-notification-center__actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:28px; padding-top:14px; border-top:1px solid var(--cui-edge); }
 @media (hover:hover) and (pointer:fine) {

@@ -3639,5 +3639,15 @@
       "verification": "pending",
       "impact": "复用本站安装的原生文件，V10 升级后随原生实现变化，不作为敏感操作校验条件"
     }
+  ],
+  "theme_adaptations": [
+    {
+      "path": "public/clientarea/template/pc/cra1/components/cra1EventCode/eventCode.js",
+      "upstream": "public/clientarea/template/pc/default/components/eventCode/eventCode.js",
+      "upstream_sha256": "a8132c5d9fdb56fa756361022c733e4d99f0e6c6570c261f27b56ff4a52eddc0",
+      "purpose": "Theme-owned optional activity read fallback; preserve native promotion, quote and submit contracts.",
+      "release_path": "public/clientarea/template/pc/cra1/releases/{release}/components/cra1EventCode/eventCode.js",
+      "mobile": "public/clientarea/template/mobile/cra1 references the same PC theme tree."
+    }
   ]
 }

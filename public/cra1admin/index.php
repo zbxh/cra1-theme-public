@@ -2016,6 +2016,9 @@ if (strpos($r,'api.')===0) {
             if (array_key_exists('recent', $body)) {
                 $patch['recent'] = is_array($body['recent']) ? $body['recent'] : [];
             }
+            if (array_key_exists('pull_enabled', $body)) {
+                $patch['pull_enabled'] = $body['pull_enabled'];
+            }
             $res = $member->save(['sidebar' => $patch], $operator, (int) ($body['version'] ?? 0));
             audit('member.sidebar.save', $res['status'] === 200 ? 'ok' : 'fail', 'nodes=' . count($nodes));
             json_out($res);

@@ -728,6 +728,94 @@
   }
 })(window)
 
+/* Route clipboard images and the keyboard picker through the native ticket uploader. */
+;(function (root) {
+  if (!/\/(?:addTicket|ticketDetails)\.htm$/.test(root.location.pathname)) return
+
+  var pageSelector = '.template.add-ticket, .template.ticket-details'
+  var inputSelector = '.upload-btn .el-upload__input[type="file"]'
+
+  function visible(element) {
+    return element && element.getClientRects().length > 0 &&
+      root.getComputedStyle(element).visibility === 'visible'
+  }
+
+  function activeUploader(textarea) {
+    if (!textarea.matches?.('.msg-input textarea:not(:disabled):not([readonly])') || !visible(textarea)) return
+    var page = textarea.closest(pageSelector)
+    if (!page || Array.from(document.querySelectorAll('.el-dialog__wrapper')).some(visible)) return
+    var state = page.__vue__ && page.__vue__.cra1TicketState
+    if (state && state !== 'ready') return
+    var composer = textarea.closest(page.classList.contains('add-ticket') ? '.main-form' : '.card')
+    var input = composer && composer.querySelector(inputSelector)
+    var button = input?.closest('.el-upload')?.querySelector('button')
+    if (visible(button) && !input.disabled && !button.disabled && button.getAttribute('aria-disabled') !== 'true') return input
+  }
+
+  document.addEventListener('paste', function (event) {
+    if (event.defaultPrevented || !event.clipboardData || typeof root.DataTransfer !== 'function') return
+    var input = activeUploader(event.target)
+    if (!input) return
+
+    var clipboard = event.clipboardData
+    var images = Array.from(clipboard.files || []).filter(function (file) { return /^image\//i.test(file.type) })
+    if (!images.length) {
+      images = Array.from(clipboard.items || []).filter(function (item) {
+        return item.kind === 'file' && /^image\//i.test(item.type)
+      }).map(function (item) { return item.getAsFile() }).filter(Boolean)
+    }
+    if (!images.length) return
+
+    // On browsers without a writable FileList, leave the plugin's own paste handler available.
+    try {
+      var transfer = new root.DataTransfer()
+      var files = input.multiple ? images : images.slice(0, 1)
+      files.forEach(function (file) {
+        if (!/\.[a-z0-9]+$/i.test(file.name)) {
+          var extension = file.type.split('/')[1]?.split(/[+;]/)[0] || 'png'
+          file = new root.File([file], '截图-' + Date.now() + '.' + extension.replace(/^jpeg$/i, 'jpg'), { type: file.type })
+        }
+        transfer.items.add(file)
+      })
+      input.files = transfer.files
+      if (!input.files.length) return
+    } catch (_) { return }
+
+    // The standard plugin also handles image paste. Let just the native upload queue run.
+    event.stopImmediatePropagation()
+    if (!clipboard.getData('text/plain')) event.preventDefault()
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+  }, true)
+
+  document.addEventListener('keydown', function (event) {
+    if (event.defaultPrevented || event.isComposing || event.repeat || event.altKey ||
+        event.ctrlKey === event.metaKey || !event.shiftKey ||
+        !(event.key === '.' || event.key === '>' || event.code === 'Period')) return
+    var input = activeUploader(event.target)
+    if (!input) return
+    event.preventDefault()
+    input.click()
+  })
+
+  if (typeof root.MutationObserver !== 'function') return
+  function addHint() {
+    var page = document.querySelector(pageSelector)
+    var input = page && page.querySelector(inputSelector)
+    var trigger = input && input.closest('.el-upload')
+    if (!trigger || trigger.parentElement.querySelector('.cra1-ticket-attachment-hint')) return
+    var hint = document.createElement('p')
+    hint.className = 'cra1-ticket-attachment-hint'
+    hint.innerHTML = '<span>Ctrl / ⌘ + V 粘贴图片</span><span>Ctrl / ⌘ + Shift + . 选择文件</span>'
+    trigger.after(hint)
+  }
+  function start() {
+    addHint()
+    new root.MutationObserver(addHint).observe(document.body, { childList: true, subtree: true })
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true })
+  else start()
+})(window)
+
 /* Mobile cards share the native view-model and its actions. Unknown table extensions stay native. */
 ;(function(root){
   if(!/\/plugin\/\d+\/ticket\.htm$/.test(root.location.pathname)||typeof MutationObserver==='undefined')return

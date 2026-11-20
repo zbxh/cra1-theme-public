@@ -18,7 +18,7 @@
 
             <p class="mt-4 max-w-2xl leading-7 text-body">{$data.cra1.page_hero_desc}</p>
             <div class="mt-8 flex flex-wrap gap-4">
-                {if ( cra1_content_value($data.cra1, 'page_hero_btn1_url', '/cart/goodsList.htm') != '' ) }<a href="{:cra1_content_value($data.cra1, 'page_hero_btn1_url', '/cart/goodsList.htm')}" class="btn-gradient btn cui-button cui-button--primary">{:cra1_content_value($data.cra1, 'page_hero_btn1_text', '立即上云')}<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a>{/if}
+                {if ( cra1_content_value($data.cra1, 'page_hero_btn1_url', '/cart/goodsList.htm') != '' ) }<a href="{:cra1_content_value($data.cra1, 'page_hero_btn1_url', '/cart/goodsList.htm')}" class="btn-gradient btn cui-button cui-button--primary" data-cui-button-glow="primary">{:cra1_content_value($data.cra1, 'page_hero_btn1_text', '立即上云')}<span class="cui-arrow" data-cui-arrow aria-hidden="true">→</span></a>{/if}
                 {if ( cra1_content_value($data.cra1, 'page_hero_btn2_url', '/contact.html') != '' ) }<a href="{:cra1_content_value($data.cra1, 'page_hero_btn2_url', '/contact.html')}" class="btn btn-outline btn-primary cui-button cui-button--outline">{:cra1_content_value($data.cra1, 'page_hero_btn2_text', '咨询方案')}<span class="cui-arrow" data-cui-arrow aria-hidden="true">↗</span></a>{/if}
             </div>
         </div>{$data.cra1.page_hero_art|default=''|raw}</div></div>

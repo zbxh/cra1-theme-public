@@ -10,25 +10,30 @@ final class MemberSearch
     public static function search(string $keywords): array
     {
         $keywords = trim($keywords);
+        $queries = self::queryVariants($keywords);
         $visible = NativeAuthorization::visibleHostIds();
         // Native globalSearch treats the literal "0" as empty. Passing it to
         // searchHost directly would otherwise remove its keyword constraint.
-        if ($keywords === '' || $keywords === '0' || $visible === []) return self::result([]);
+        if (!$queries || $visible === []) return self::result([]);
 
-        $matches = (new \app\common\model\HostModel())->searchHost($keywords);
-        if (!isset($matches['list']) || !is_array($matches['list'])) throw new \RuntimeException('Invalid native search response');
         $ordered = [];
-        foreach ($matches['list'] as $match) {
-            if (!is_array($match)) continue;
-            $value = $match['id'] ?? null;
-            if (!is_scalar($value) || !ctype_digit((string)$value) || (int)$value <= 0) continue;
-            $id = (int)$value;
-            if ($visible !== null && !in_array($id, $visible, true)) continue;
-            if (!isset($ordered[$id])) $ordered[$id] = ['product_name'=>$match['product_name']??''];
+        foreach ($queries as $query) {
+            $matches = (new \app\common\model\HostModel())->searchHost($query);
+            if (!isset($matches['list']) || !is_array($matches['list'])) throw new \RuntimeException('Invalid native search response');
+            foreach ($matches['list'] as $match) {
+                if (!is_array($match)) continue;
+                $value = $match['id'] ?? null;
+                if (!is_scalar($value) || !ctype_digit((string)$value) || (int)$value <= 0) continue;
+                $id = (int)$value;
+                if ($visible !== null && !in_array($id, $visible, true)) continue;
+                if (!isset($ordered[$id])) $ordered[$id] = ['product_name'=>$match['product_name']??''];
+            }
         }
-        foreach (self::ipMatches($keywords, $visible) as $id => $match) {
-            if (!isset($ordered[$id])) $ordered[$id] = $match;
-            $ordered[$id]['match_ip'] = $match['match_ip'];
+        foreach ($queries as $query) {
+            foreach (self::ipMatches($query, $visible) as $id => $match) {
+                if (!isset($ordered[$id])) $ordered[$id] = $match;
+                $ordered[$id]['match_ip'] = $match['match_ip'];
+            }
         }
         if (!$ordered) return self::result([]);
 
@@ -48,6 +53,29 @@ final class MemberSearch
             $list[] = $row;
         }
         return self::result($list);
+    }
+
+    /** Original native hooks run first; at most two literal alternatives follow. */
+    private static function queryVariants(string $keywords): array
+    {
+        if ($keywords === '' || $keywords === '0') return [];
+        $normalized = is_callable(['\Normalizer', 'normalize']) ? \Normalizer::normalize($keywords, \Normalizer::FORM_KC) : $keywords;
+        if (!is_string($normalized)) $normalized = $keywords;
+        // intl is optional. mbstring is already part of V10's runtime: use it
+        // to cover all full-width ASCII without adding a new PHP extension.
+        $normalized = preg_replace_callback('/[\x{FF01}-\x{FF5E}]/u', static function(array $match): string {
+            return chr(mb_ord($match[0], 'UTF-8') - 0xFEE0);
+        }, $normalized);
+        if ($normalized === null) return [$keywords];
+        $normalized = preg_replace('/[\x{180E}\x{200B}-\x{200D}\x{2060}\x{FEFF}]/u', '', $normalized);
+        $normalized = trim((string)preg_replace('/[\s\p{Z}]+/u', ' ', $normalized));
+        $normalized = (string)preg_replace('/\s*([.:-])\s*/u', '$1', $normalized);
+        if ($normalized === '' || $normalized === '0') return [];
+        // Do not turn supplied LIKE syntax (including its full-width form)
+        // into broader alternatives. No theme-generated wildcard is added.
+        if (strpbrk($keywords.$normalized, "%_\\") !== false) return [$keywords];
+        $compact = (string)preg_replace('/\s+/u', '', $normalized);
+        return array_values(array_unique([$keywords, $normalized, $compact]));
     }
 
     /** Read only the V10 HostIpModel index; module credentials are never queried. */

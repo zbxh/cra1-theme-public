@@ -3,6 +3,7 @@ import { useRef } from 'react'
 import { X } from 'lucide-react'
 import { cn } from './utils'
 import { Button } from './button'
+import { useViewportFrame } from './viewport-frame'
 
 /**
  * Dialog（基于 Radix）
@@ -13,8 +14,9 @@ export const Dialog = DialogPrimitive.Root
 export const DialogTrigger = DialogPrimitive.Trigger
 export const DialogClose = DialogPrimitive.Close
 
-export function DialogContent({ className, children, onOpenAutoFocus, onCloseAutoFocus, onEscapeKeyDown, ...props }) {
+export function DialogContent({ className, children, style, onOpenAutoFocus, onCloseAutoFocus, onEscapeKeyDown, ...props }) {
   const focusOrigin = useRef(null)
+  const viewport = useViewportFrame()
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay
@@ -31,6 +33,8 @@ export function DialogContent({ className, children, onOpenAutoFocus, onCloseAut
         )}
       />
       <DialogPrimitive.Content
+        ref={viewport.ref}
+        style={{ ...viewport.frame, ...style }}
         data-cra1-ui="admin"
         onEscapeKeyDown={(event) => {
           // Radix listens on document before the native picker receives Esc.
@@ -41,7 +45,7 @@ export function DialogContent({ className, children, onOpenAutoFocus, onCloseAut
         onOpenAutoFocus={(event) => { focusOrigin.current = document.activeElement; onOpenAutoFocus?.(event) }}
         onCloseAutoFocus={(event) => { onCloseAutoFocus?.(event); if (!event.defaultPrevented && focusOrigin.current?.isConnected) { event.preventDefault(); focusOrigin.current.focus() } }}
         className={cn(
-          'fixed left-1/2 top-1/2 z-[101] w-[min(92vw,480px)] -translate-x-1/2 -translate-y-1/2',
+          'cra1-admin-dialog fixed left-1/2 top-1/2 z-[101] w-[min(92vw,480px)] -translate-x-1/2 -translate-y-1/2',
           'max-h-[88vh] overflow-y-auto rounded-card border border-line bg-surface p-5',
           'shadow-[0_2px_5px_rgba(22,32,51,0.06),0_24px_48px_rgba(22,32,51,0.16)]',
           'data-[state=open]:animate-[cra1-dialog-in_200ms_cubic-bezier(0.23,1,0.32,1)]',
@@ -66,7 +70,7 @@ export function DialogContent({ className, children, onOpenAutoFocus, onCloseAut
 }
 
 export function DialogHeader({ className, ...props }) {
-  return <div className={cn('mb-4 pr-8', className)} {...props} />
+  return <div className={cn('cra1-admin-dialog-header mb-4 min-w-0 pr-8', className)} {...props} />
 }
 
 export function DialogTitle({ className, ...props }) {
@@ -85,7 +89,7 @@ export function DialogDescription({ className, ...props }) {
 }
 
 export function DialogFooter({ className, ...props }) {
-  return <div className={cn('mt-5 flex justify-end gap-2', className)} {...props} />
+  return <div className={cn('cra1-admin-dialog-footer mt-5 flex min-w-0 flex-wrap justify-end gap-2', className)} {...props} />
 }
 
 /** 确认弹窗（替代原生 confirm()，语义与焦点管理更完整） */

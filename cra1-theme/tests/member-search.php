@@ -8,6 +8,7 @@ namespace CRA1MemberSearchFixture {
         public static $visible = null;
         public static $hosts = [];
         public static $native = ['list'=>[]];
+        public static $nativeByKeyword = [];
         public static $nativeFailure = false;
         public static $databaseFailure = false;
         public static $calls = [];
@@ -17,6 +18,7 @@ namespace CRA1MemberSearchFixture {
             self::$visible = null;
             self::$hosts = [];
             self::$native = ['list'=>[]];
+            self::$nativeByKeyword = [];
             self::$nativeFailure = self::$databaseFailure = false;
             self::$calls = [];
         }
@@ -129,7 +131,7 @@ namespace app\common\model {
         {
             \CRA1MemberSearchFixture\State::$calls[]=['searchHost',$keywords];
             if (\CRA1MemberSearchFixture\State::$nativeFailure) throw new \RuntimeException('Fixture native search failed');
-            return \CRA1MemberSearchFixture\State::$native;
+            return \CRA1MemberSearchFixture\State::$nativeByKeyword[$keywords] ?? \CRA1MemberSearchFixture\State::$native;
         }
     }
 }
@@ -175,7 +177,7 @@ namespace {
     $rows=$payload['data']['list']??[];
     check(array_column($rows,'id')===[4,2],'Native matches retain order while duplicate, foreign, deleted and unassigned hosts are removed');
     check(array_column($rows,'product_name')===['Translated cloud','Translated server'],'Native translated product names survive lifecycle enrichment');
-    check(calls('searchHost')===[['searchHost','云 + & <测试>']],'Keywords and special characters reach native search unchanged');
+    check(calls('searchHost')[0]===['searchHost','云 + & <测试>'],'Original keywords and special characters reach native search before literal alternatives');
     check(!isset($rows[0]['match_ip']),'Native plugin payloads cannot inject an unchecked matched IP hint');
     check(calls('get_client_id') && calls('get_client_id')[0][1]===true,'Host ownership uses the parent owner identity while assignment uses the native subaccount projection');
     check(count(calls('augment'))===1 && isset($payload['data']['overview']['server_time']),'The lifecycle projection receives the filtered result and supplies its overview');
@@ -199,6 +201,45 @@ namespace {
     prepare();
     $payload=MemberSearch::search('0');
     check(($payload['data']['list']??null)===[] && calls('searchHost')===[] && calls('select')===[],'The zero keyword follows native global search and cannot become an unfiltered inventory query');
+
+    foreach (["　\u{00A0}\t",'０',"\u{200B}"] as $keyword) {
+        prepare();
+        $payload=MemberSearch::search($keyword);
+        check(($payload['data']['list']??null)===[] && calls('searchHost')===[] && calls('select')===[],'Normalized blank or zero cannot trigger an unfiltered native query: '.json_encode($keyword));
+    }
+
+    foreach ([
+        'ＣＲＡ１-DEMO-ACTIVE'=>['ＣＲＡ１-DEMO-ACTIVE','CRA1-DEMO-ACTIVE'],
+        'CRA1－DEMO－ACTIVE'=>['CRA1－DEMO－ACTIVE','CRA1-DEMO-ACTIVE'],
+        'cra1 - demo - active'=>['cra1 - demo - active','cra1-demo-active'],
+        'C R A 1-DEMO-ACTIVE'=>['C R A 1-DEMO-ACTIVE','CRA1-DEMO-ACTIVE'],
+        "Ｃ　ＲＡ１ － DEMO -ACTIVE"=>["Ｃ　ＲＡ１ － DEMO -ACTIVE",'C RA1-DEMO-ACTIVE','CRA1-DEMO-ACTIVE'],
+        "CRA1\u{200B}-DEMO-ACTIVE"=>["CRA1\u{200B}-DEMO-ACTIVE",'CRA1-DEMO-ACTIVE'],
+    ] as $keyword=>$queries) {
+        prepare();
+        State::$native=['list'=>[]];
+        State::$nativeByKeyword[end($queries)]=['list'=>[['id'=>2,'product_name'=>'Normalized service']]];
+        $payload=MemberSearch::search($keyword);
+        check(array_column(calls('searchHost'),1)===$queries,'Host identifiers preserve symbols and use only bounded literal native variants: '.json_encode($keyword));
+        check(array_column($payload['data']['list'],'id')===[2] && count(calls('select'))===1,'A normalized native match is projected once through the owned-host read: '.json_encode($keyword));
+    }
+
+    prepare();
+    State::$visible=[2,4,5,6];
+    State::$native=['list'=>[['id'=>4,'product_name'=>'Original title']]];
+    State::$nativeByKeyword['CRA1-DEMO-ACTIVE']=['list'=>[
+        ['id'=>4,'product_name'=>'Normalized duplicate'],['id'=>2,'product_name'=>'Normalized service'],
+        ['id'=>5],['id'=>6],['id'=>7],
+    ]];
+    $payload=MemberSearch::search('ＣＲＡ１-DEMO-ACTIVE');
+    check(array_column($payload['data']['list'],'id')===[4,2] && $payload['data']['list'][0]['product_name']==='Original title','Original results retain priority and normalized alternatives cannot bypass ownership, deletion or subaccount restrictions');
+    check(count(calls('augment'))===1,'All native variants share one lifecycle projection');
+
+    foreach ([' CRA1% - ACTIVE','CRA1_ - ACTIVE','CRA1\\ - ACTIVE','ＣＲＡ１％ - ACTIVE','ＣＲＡ１＿ - ACTIVE','ＣＲＡ１＼ - ACTIVE'] as $keyword) {
+        prepare();
+        MemberSearch::search($keyword);
+        check(calls('searchHost')===[['searchHost',trim($keyword)]],'Wildcard and escape syntax keeps exactly one untouched native query: '.json_encode($keyword));
+    }
 
     prepare();
     State::$native=['list'=>[]];

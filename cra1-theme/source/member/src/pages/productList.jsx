@@ -13,13 +13,17 @@ import ProductQuickActions from './product-quick-actions'
 import { CopyText } from '../ui/copy-text'
 import { productActionRequest } from '../lib/product-action-client'
 
-const TABS = [
+const DEFAULT_TAB = 'current'
+const STANDARD_TABS = [
+  { value: DEFAULT_TAB, label: '当前产品' },
   { value: 'using', label: '使用中' },
   { value: 'expiring', label: '即将到期' },
   { value: 'overdue', label: '已逾期' },
-  { value: 'deleted', label: '已删除' },
+  { value: 'all', label: '全部产品' },
 ]
+const TABS = [...STANDARD_TABS, { value: 'deleted', label: '已删除' }]
 const TAB_VALUES = TABS.map(t => t.value)
+const VISIBLE_TAB_VALUES = STANDARD_TABS.map(t => t.value)
 const readCategoryKey = () => new URLSearchParams(location.search).get('cloud_menu') || new URLSearchParams(location.search).get('m') || 'all'
 
 function useProductIntro(menuUuid) {
@@ -36,12 +40,13 @@ function useProductIntro(menuUuid) {
   return intro
 }
 
-function hostStatus(host, tab) {
+function hostStatus(host) {
+  const now = Number(host.list_server_time) * 1000 || Date.now()
   const due = Number(host.due_time) * 1000
-  const recurring = !['free', 'onetime', 'on_demand', '免费', '一次性', '按需'].includes(host.billing_cycle)
-  if (host.status === 'Active' && recurring && due > 0 && due <= Date.now()) return { label: '已逾期', tone: 'danger' }
-  const threshold = Number(host.renewal_first_day_time) * 1000
-  if (host.status === 'Active' && recurring && due > Date.now() && (tab === 'expiring' || threshold > 0 && due - Date.now() <= threshold)) return { label: '即将到期', tone: 'warning' }
+  const recurring = !['free', 'onetime', 'on_demand', '免费', '一次性', '按需', ''].includes(host.billing_cycle_code ?? host.billing_cycle)
+  const renewalWindowEnd = Number(host.renewal_window_end) * 1000
+  if (host.status === 'Active' && recurring && due > 0 && due <= now) return { label: '已逾期', tone: 'danger' }
+  if (host.status === 'Active' && recurring && due > now && due <= renewalWindowEnd) return { label: '即将到期', tone: 'warning' }
   return ({
     Active: { label: '已开通', tone: 'success' },
     Unpaid: { label: '未付款', tone: 'warning' },
@@ -50,13 +55,13 @@ function hostStatus(host, tab) {
     Deleted: { label: '已删除', tone: 'muted' },
     Failed: { label: '开通失败', tone: 'danger' },
     Grace: { label: '宽限期', tone: 'warning' },
-    Keep: { label: '保留中', tone: 'warning' },
+    Keep: { label: '保留期', tone: 'warning' },
   })[host.status] || { label: host.status || '状态待同步', tone: 'muted' }
 }
 
-function HostCard({ host, fields, tab, onOperation }) {
+function HostCard({ host, fields, onOperation }) {
   const pointer = useRef(null)
-  const summary = host.card_summary || {}, state = hostStatus(host, tab), network = productNetwork(host)
+  const summary = host.card_summary || {}, state = hostStatus(host), network = productNetwork(host)
   const title = hostCardTitle(host, fields), imageName = summary.imageName || host.image_name || ''
   const area = summary.dataCenter || host.data_center || ''
   const shortArea = area.split(/\s*[·-]\s*/).filter(Boolean).slice(-2).filter((v, i, a) => i === 0 || v !== a[i - 1]).join(' · ')
@@ -151,7 +156,9 @@ function HostCard({ host, fields, tab, onOperation }) {
 }
 
 export default function ProductListPage() {
-  const [tab, setTab] = usePageTab('using', TAB_VALUES)
+  const showDeleted = Number(window.__CRA1_RUNTIME__?.features?.show_deleted_products) === 1
+  const tabs = showDeleted ? TABS : STANDARD_TABS
+  const [tab, setTab] = usePageTab(DEFAULT_TAB, showDeleted ? TAB_VALUES : VISIBLE_TAB_VALUES)
   const [categories, setCategories] = useState(null), [categoryKey, setCategoryKey] = useState(readCategoryKey)
   const [overviewAliases, setOverviewAliases] = useState([])
   const [search, setSearch] = useState(''), [keywords, setKeywords] = useState('')
@@ -184,20 +191,22 @@ export default function ProductListPage() {
   const missingCategory = categories !== null && !isOverview && !activeCategory
 
   useEffect(() => {
-    const timer = setTimeout(() => { setKeywords(search.trim()); setPage(1) }, 250)
+    const term = search.trim()
+    if (term === keywords) return
+    const timer = setTimeout(() => { setKeywords(term); setPage(1) }, 250)
     return () => clearTimeout(timer)
-  }, [search])
+  }, [search, keywords])
 
   useEffect(() => {
     if (categories === null) return
     const controller = new AbortController()
     const read = (path, params) => api(path, { params, signal: controller.signal, timeout: 12000 })
     setCounts(null)
-    Promise.all(TABS.map(t => loadCategoryHosts(read, { tab: t.value, page: 1, limit: 1 }, category).then(data => [t.value, Number(data.count)])))
+    Promise.all(tabs.map(t => loadCategoryHosts(read, { tab: t.value, page: 1, limit: 1 }, category).then(data => [t.value, Number(data.count)])))
       .then(values => { if (!controller.signal.aborted && values.every(([, n]) => Number.isFinite(n))) setCounts(Object.fromEntries(values)) })
       .catch(() => {})
     return () => controller.abort()
-  }, [categories, category, refresh])
+  }, [categories, category, refresh, tabs])
 
   useEffect(() => {
     if (categories === null) return
@@ -231,7 +240,7 @@ export default function ProductListPage() {
     window.history.pushState({}, '', url)
   }
   const changeTab = value => { setTab(value); setPage(1) }
-  const reset = () => { setSearch(''); setKeywords(''); changeCategory('all'); setTab('using') }
+  const reset = () => { setSearch(''); setKeywords(''); changeCategory('all'); setTab(DEFAULT_TAB) }
   const pages = Math.max(1, Math.ceil(total / limit)), start = (page - 1) * limit
   const hasSummaryFailure = rows.some(h => h.card_summary_failed)
   const onHostOperation = ({ id, detail, power, host: updatedHost }) => setRows(current => current.map(host => String(host.id) === String(id)
@@ -240,8 +249,8 @@ export default function ProductListPage() {
 
   return (
     <div className="cra1-products">
-      <PageHeader title={intro?.title || activeCategory?.name || '我的产品'} description={intro?.description || (activeCategory ? '查看与管理该分类下的产品与服务' : '查看与管理已开通的产品与服务')}
-        actions={counts && <span className="cra1-products__head-count">使用中 <strong>{counts.using}</strong> 个产品</span>} />
+      <PageHeader title={intro?.title || activeCategory?.name || '我的产品'} description={intro?.description || (activeCategory ? '查看与管理该分类下的产品与服务' : '查看与管理已订购的产品与服务')}
+        actions={counts && <span className="cra1-products__head-count">当前产品 <strong>{counts[DEFAULT_TAB]}</strong> 个</span>} />
       {intro?.html && <Card><CardContent className="cra1-rich-text p-4 text-[13px] leading-6 text-body" dangerouslySetInnerHTML={{ __html: intro.html }} /></Card>}
       {categoryError && <Alert tone="warning">{categoryError}</Alert>}
       {missingCategory && !categoryError && <Alert tone="warning">该导航已不存在，请重新选择产品分类。</Alert>}
@@ -256,9 +265,9 @@ export default function ProductListPage() {
         <div className="cra1-products__filter-row">
           <span className="cra1-products__filter-label">产品状态</span>
           <div className="cra1-products__statuses" role="group" aria-label="产品状态">
-            {TABS.map(t => <button key={t.value} type="button" className="cra1-products__status" data-status={t.value} aria-pressed={tab === t.value} onClick={() => changeTab(t.value)}>{t.label}{counts && <small>{counts[t.value]}</small>}</button>)}
+            {tabs.map(t => <button key={t.value} type="button" className="cra1-products__status" data-status={t.value} aria-pressed={tab === t.value} onClick={() => changeTab(t.value)}>{t.label}{counts && <small>{counts[t.value]}</small>}</button>)}
           </div>
-          <label className="cra1-products__search"><Search aria-hidden="true" /><input type="search" aria-label="搜索产品" value={search} onChange={e => setSearch(e.target.value)} placeholder="搜索名称、标识或 IP" /></label>
+          <label className="cra1-products__search"><Search aria-hidden="true" /><input type="search" aria-label="搜索产品" value={search} onChange={e => setSearch(e.target.value)} placeholder="搜索产品、配置、地区或备注" /></label>
         </div>
       </section>
       <div className="cra1-products__list-head">
@@ -268,8 +277,8 @@ export default function ProductListPage() {
       {hasSummaryFailure && !loading && !error && <p className="cra1-products__sync-note" role="status">页面错误，请刷新重试</p>}
       {error ? <Alert tone="error"><span>页面错误，请刷新重试</span></Alert>
         : loading ? <div className="cra1-products__grid" aria-label="产品加载中" aria-busy="true">{Array.from({ length: limit }).map((_, i) => <Skeleton key={i} className="h-[220px] rounded-2xl" />)}</div>
-          : rows.length === 0 ? <div className="cra1-products__empty"><EmptyState icon={Package} title={keywords ? '没有符合条件的产品' : tab === 'deleted' ? '没有已删除的产品' : '暂无产品'} description={keywords ? '尝试其他名称、产品标识或 IP。' : tab === 'deleted' ? '此分类下没有已删除的产品。' : '当前分类及状态下没有产品。'} action={<div className="cra1-products__empty-actions"><Button size="sm" variant="outline" onClick={reset}>清除筛选</Button>{!keywords && tab !== 'deleted' && <Button size="sm" onClick={() => { window.location.href = '/cart/goodsList.htm' }}>浏览产品</Button>}</div>} /></div>
-            : <div className="cra1-products__grid" role="list" aria-label="产品卡片">{rows.map(h => <HostCard key={h.id} host={h} fields={fields} tab={tab} onOperation={onHostOperation} />)}</div>}
+          : rows.length === 0 ? <div className="cra1-products__empty"><EmptyState icon={Package} title={keywords ? '没有符合条件的产品' : tab === 'deleted' ? '没有已删除的产品' : '暂无产品'} description={keywords ? '试试名称、IP、客户备注，或“Ubuntu 香港 100Mbps”。' : tab === 'deleted' ? '此分类下没有已删除的产品。' : '当前分类及状态下没有产品。'} action={<div className="cra1-products__empty-actions"><Button size="sm" variant="outline" onClick={reset}>清除筛选</Button>{!keywords && tab !== 'deleted' && <Button size="sm" onClick={() => { window.location.href = '/cart/goodsList.htm' }}>浏览产品</Button>}</div>} /></div>
+            : <div className="cra1-products__grid" role="list" aria-label="产品卡片">{rows.map(h => <HostCard key={h.id} host={h} fields={fields} onOperation={onHostOperation} />)}</div>}
       {!error && <footer className="cra1-products__pagination" aria-label="产品列表分页">
         <p className="cra1-products__range" aria-live="polite">{loading ? '正在读取产品…' : total > 0 ? `显示 ${start + 1}–${Math.min(start + limit, total)} 条，共 ${total} 条` : '共 0 条'}</p>
         <div className="cra1-products__page-tools">

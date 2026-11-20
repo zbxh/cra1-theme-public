@@ -27,6 +27,7 @@ footer { border-top:1px solid var(--cui-edge); padding-top:18px; margin-top:25px
 .test-notice { font-size:11px; color:var(--cui-muted); margin-top:20px; }
 #authErr,#recoveryErr { font-size:13px; color:var(--cui-danger); background:color-mix(in srgb,var(--cui-danger) 5%,var(--cui-surface)); border-radius:var(--cui-radius-card,8px); padding:11px; line-height:1.6; }
 #recoveryMessage { font-size:13px; color:var(--cui-success); background:color-mix(in srgb,var(--cui-success) 5%,var(--cui-surface)); border-radius:var(--cui-radius-card,8px); padding:11px; line-height:1.7; }
+#authErr,#recoveryErr,#recoveryMessage,.auth-hint { overflow-wrap:anywhere; }
 .captcha-line { display:flex; align-items:center; gap:10px; }
 .captcha-line button { border:0; background:none; padding:0; margin-top:7px; cursor:pointer; }
 .captcha-line img { width:140px; height:44px; border-radius:var(--cui-radius-card,8px); }

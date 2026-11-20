@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { get, put, post, commonData } from '../lib'
 import { profilePatch, validateFields, safeReturn } from '../compat'
+import { optionalPluginUnavailable } from '../optional-plugin'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/card'
 import { Field, Input, Select, Textarea } from '../ui/input'
 import { Button } from '../ui/button'
@@ -13,22 +14,33 @@ export default function ProfileEditor({ account, onSaved }) {
   const [form,setForm]=useState(()=>({...profilePatch(account),notes:account.client_notes ?? account.notes ?? ''}))
   const [fields,setFields]=useState([]),[values,setValues]=useState({}),[countries,setCountries]=useState([])
   const [ready,setReady]=useState(!runtime.client_custom_fields),[error,setError]=useState(''),[saving,setSaving]=useState(false)
+  const [customFieldsAvailable,setCustomFieldsAvailable]=useState(!!runtime.client_custom_fields),[fieldError,setFieldError]=useState(''),[fieldAttempt,retryFields]=useState(0)
   const beforeSettle=new URLSearchParams(location.search).has('complete_checkout')
   const restrictions=commonData().prohibit_user_information_changes || []
   const set=key=>e=>setForm(f=>({...f,[key]:e.target.value}))
   useEffect(()=>{get('/country').then(r=>setCountries(r.data?.list || [])).catch(()=>{})},[])
   useEffect(()=>{
     if(!runtime.client_custom_fields)return
-    let alive=true;setReady(false)
-    get('/client_custom_field_value').then(r=>{if(!alive)return;const list=r.data?.list || [];setFields(list);setValues(Object.fromEntries(list.map(f=>[f.id,f.value ?? ''])));setReady(true)}).catch(e=>{if(alive)setError(e.message)})
+    let alive=true;setReady(false);setFieldError('')
+    get('/client_custom_field_value').then(r=>{
+      if(!alive)return
+      const list=r.data?.list
+      if(!Array.isArray(list))throw new Error('补充资料返回无效')
+      setFields(list);setValues(Object.fromEntries(list.map(f=>[f.id,f.value ?? ''])));setCustomFieldsAvailable(true);setReady(true)
+    }).catch(error=>{
+      if(!alive)return
+      if(optionalPluginUnavailable(error)){
+        setFields([]);setValues({});setCustomFieldsAvailable(false);setReady(true)
+      }else setFieldError('补充资料暂时无法读取，请重试')
+    })
     return()=>{alive=false}
-  },[account.id])
+  },[account.id,runtime.client_custom_fields,fieldAttempt])
   async function submit(e){
     e.preventDefault();if(lock.current||!ready)return
     const validation=validateFields(fields,values,beforeSettle);if(validation)return setError(validation)
     lock.current=true;setSaving(true);setError('')
     try{
-      await put('/account',profilePatch(account,form,runtime.client_custom_fields?values:undefined))
+      await put('/account',profilePatch(account,form,customFieldsAvailable?values:undefined))
       if(form.language){localStorage.setItem('lang',form.language);sessionStorage.setItem('brow_lang',form.language)}
       toast('资料已保存','success');onSaved?.()
       if(beforeSettle){const target=safeReturn(sessionStorage.getItem('cra1:checkout-return'),'/cart/settlement.htm');sessionStorage.removeItem('cra1:checkout-return');location.href=target}
@@ -36,7 +48,7 @@ export default function ProfileEditor({ account, onSaved }) {
   }
   return <div className="space-y-4"><form onSubmit={submit} className="space-y-4">
     {error&&<Alert tone="error">{error}</Alert>}
-    <Card><CardHeader><CardTitle>基本资料</CardTitle></CardHeader><CardContent><fieldset disabled={saving||!ready} className="grid gap-4 sm:grid-cols-2">
+    <Card><CardHeader><CardTitle>基本资料</CardTitle></CardHeader><CardContent><fieldset disabled={saving} className="grid gap-4 sm:grid-cols-2">
       <Field label="用户名" htmlFor="profile-name"><Input id="profile-name" value={form.username||''} onChange={set('username')} maxLength={20}/></Field>
       <Field label="公司" htmlFor="profile-company"><Input id="profile-company" value={form.company||''} onChange={set('company')} maxLength={255}/></Field>
       <Field label="邮箱" htmlFor="profile-email" hint={<a href="/account.htm?tab=security">前往安全设置修改</a>}><Input id="profile-email" value={account.email||''} disabled/></Field>
@@ -46,9 +58,11 @@ export default function ProfileEditor({ account, onSaved }) {
       {runtime.locale?.choices?.length>0&&<Field label="显示语言" htmlFor="profile-language"><Select id="profile-language" value={form.language} onChange={set('language')}>{runtime.locale.choices.map(l=><option key={l.display_lang} value={l.display_lang}>{l.display_name || l.name || l.display_lang}</option>)}</Select></Field>}
       <Field label="备注" htmlFor="profile-notes"><Textarea id="profile-notes" value={form.notes||''} onChange={set('notes')} maxLength={1000}/></Field>
     </fieldset>
+    {fieldError&&<Alert tone="error" className="mt-4"><p>{fieldError}</p><Button className="mt-2" variant="outline" disabled={saving} onClick={()=>retryFields(n=>n+1)}>重新加载补充资料</Button></Alert>}
+    {!ready&&!fieldError&&<p role="status" className="mt-4 text-sm text-muted">正在读取补充资料…</p>}
     {fields.length>0&&<fieldset disabled={saving} className="mt-4"><CustomFields fields={fields} values={values} onChange={setValues} disabled={saving} restricted={restrictions} beforeSettle={beforeSettle}/></fieldset>}
     </CardContent></Card>
-    <Card><CardHeader><CardTitle>通知偏好</CardTitle></CardHeader><CardContent><fieldset disabled={saving||!ready} className="grid gap-4 sm:grid-cols-2"><Field label="接收通知" htmlFor="notice-open"><Select id="notice-open" value={form.notice_open} onChange={set('notice_open')}><option value="1">接收通知</option><option value="0">关闭通知</option></Select></Field><Field label="通知方式" htmlFor="notice-method"><Select id="notice-method" value={form.notice_method} onChange={set('notice_method')} disabled={Number(form.notice_open)!==1}><option value="all">邮件和短信</option><option value="email">邮件</option><option value="sms">短信</option></Select></Field></fieldset></CardContent><CardFooter><Button type="submit" disabled={saving||!ready}>{saving?'保存中…':'保存资料'}</Button></CardFooter></Card>
+    <Card><CardHeader><CardTitle>通知偏好</CardTitle></CardHeader><CardContent><fieldset disabled={saving} className="grid gap-4 sm:grid-cols-2"><Field label="接收通知" htmlFor="notice-open"><Select id="notice-open" value={form.notice_open} onChange={set('notice_open')}><option value="1">接收通知</option><option value="0">关闭通知</option></Select></Field><Field label="通知方式" htmlFor="notice-method"><Select id="notice-method" value={form.notice_method} onChange={set('notice_method')} disabled={Number(form.notice_open)!==1}><option value="all">邮件和短信</option><option value="email">邮件</option><option value="sms">短信</option></Select></Field></fieldset></CardContent><CardFooter><Button type="submit" disabled={saving||!ready}>{saving?'保存中…':'保存资料'}</Button></CardFooter></Card>
   </form><ReminderSettings account={account}/></div>
 }
 function ReminderSettings({account}){

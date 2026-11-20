@@ -44,7 +44,11 @@ const Button = forwardRef(function Button(
       {...props}
     >
       {children}
-      {props['data-cui-effects'] !== 'none' && (!variant || variant === 'default' || variant === 'outline') && size !== 'icon'
+      {props['data-cui-button-glow'] === 'primary' && props['data-cui-effects'] !== 'none'
+        && !props.disabled && props['aria-disabled'] !== true && props['aria-disabled'] !== 'true'
+        && props['aria-busy'] !== true && props['aria-busy'] !== 'true'
+        && props['aria-invalid'] !== true && props['aria-invalid'] !== 'true' && props['data-disabled'] == null
+        && (!variant || variant === 'default' || variant === 'outline') && size !== 'icon'
         ? <span className="cui-button-glow" aria-hidden="true" /> : null}
     </button>
   )

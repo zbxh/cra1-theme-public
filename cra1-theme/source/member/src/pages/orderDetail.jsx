@@ -32,7 +32,7 @@ export default function OrderDetailPage() {
         <div><p className="text-xs text-muted-foreground">状态</p><p className="mt-2"><Badge tone={st[1]}>{st[0]}</Badge></p></div>
         <div><p className="text-xs text-muted-foreground">类型</p><p className="mt-2 text-sm">{orderTypeText(order.type)}</p></div>
         <div><p className="text-xs text-muted-foreground">创建时间</p><p className="mt-2 text-sm">{formatDateTime(order.create_time)}</p></div>
-        {actionable&&can('Pay::pay')&&<Button className="ml-auto" onClick={openCashier}><CreditCard className="size-4"/>{order.status==='Unpaid'?'前往收银台':order.status==='WaitReview'?'查看付款进度':'上传付款凭证'}</Button>}
+        {actionable&&can('Pay::pay')&&<Button data-cui-button-glow="primary" className="ml-auto" onClick={openCashier}><CreditCard className="size-4"/>{order.status==='Unpaid'?'前往收银台':order.status==='WaitReview'?'查看付款进度':'上传付款凭证'}</Button>}
       </CardContent></Card>
       {order.review_fail_reason&&<Alert tone="error">凭证未通过审核：{order.review_fail_reason}</Alert>}
       <Card><CardHeader><CardTitle>订单信息</CardTitle></CardHeader><CardContent>

@@ -1,34 +1,49 @@
 import * as SheetPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
+import { createContext, useCallback, useContext, useRef, useState } from 'react'
 import { cn } from './utils'
+import { useDialogViewport } from './use-dialog-viewport'
 
 /**
  * Sheet（shadcn 规范）：侧边抽屉，基于 Radix Dialog
  * 可访问性由 Radix 保证：焦点陷阱、焦点归还、Escape 关闭、aria-modal。
  */
-export const Sheet = SheetPrimitive.Root
+const SheetOpen = createContext(false)
+export function Sheet({ open, defaultOpen = false, onOpenChange, ...props }) {
+  const [localOpen, setLocalOpen] = useState(defaultOpen)
+  const isOpen = open === undefined ? localOpen : open
+  return <SheetOpen.Provider value={isOpen}><SheetPrimitive.Root {...props} open={isOpen} onOpenChange={next => {
+    if (open === undefined) setLocalOpen(next)
+    onOpenChange?.(next)
+  }} /></SheetOpen.Provider>
+}
 export const SheetTrigger = SheetPrimitive.Trigger
 export const SheetClose = SheetPrimitive.Close
 
-export function SheetContent({ className, children, side = 'left', ...props }) {
+export function SheetContent({ className, children, side = 'left', style, ref, ...props }) {
+  const contentRef = useRef(null)
+  const setContentRef = useCallback(node => { contentRef.current = node; if (typeof ref === 'function') return ref(node); if (ref) ref.current = node }, [ref])
+  const viewportStyle = useDialogViewport(useContext(SheetOpen), contentRef)
   return (
     <SheetPrimitive.Portal>
       <SheetPrimitive.Overlay
         className={cn(
           'cui-dialog-overlay fixed inset-0 z-[100]',
           'data-[state=open]:animate-[cra1-fade-in_180ms_ease-out]',
-          'data-[state=closed]:animate-[cra1-fade-out_140ms_ease-out]'
+          'data-[state=closed]:animate-[cra1-fade-out_140ms_ease-out] data-[state=closed]:hidden'
         )}
       />
       <SheetPrimitive.Content
+        ref={setContentRef}
         className={cn(
-          'cui-sheet fixed inset-y-0 z-[101] flex h-full w-[280px] flex-col bg-surface',
+          'cui-sheet cui-member-sheet fixed z-[101] flex w-[280px] flex-col bg-surface',
           'data-[state=open]:transition-transform data-[state=open]:duration-200 data-[state=open]:ease-out',
           side === 'left'
             ? 'left-0 border-r border-line data-[state=closed]:-translate-x-full data-[state=open]:translate-x-0'
             : 'right-0 border-l border-line data-[state=closed]:translate-x-full data-[state=open]:translate-x-0',
           className
         )}
+        style={{ ...viewportStyle, ...style }}
         {...props}
       >
         {children}

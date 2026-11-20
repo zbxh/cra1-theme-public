@@ -1,8 +1,9 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { createContext, useContext, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { cn } from './utils'
 import { Button } from './button'
+import { useDialogViewport } from './use-dialog-viewport'
 
 /**
  * Dialog（基于 Radix）
@@ -18,7 +19,7 @@ export function Dialog({ open, defaultOpen = false, onOpenChange, ...props }) {
   // Capture the opening transition before React commits any autoFocus inputs or
   // removes the selected menu item. Keep the target during the close lifecycle.
   if (focus.open !== isOpen) setFocus({ open: isOpen, target: isOpen ? currentOrigin() : focus.target })
-  return <DialogFocusOrigin.Provider value={focus.target}>
+  return <DialogFocusOrigin.Provider value={{ target: focus.target, open: isOpen }}>
     <DialogPrimitive.Root {...props} open={isOpen} onOpenChange={(next) => {
       if (open === undefined) setLocalOpen(next)
       onOpenChange?.(next)
@@ -39,8 +40,11 @@ function focusOrigin(element) {
       .find(trigger => trigger.getAttribute('aria-controls') === menu.id) || null
 }
 
-export function DialogContent({ className, children, onOpenAutoFocus, onCloseAutoFocus, ...props }) {
-  const openingTarget = useContext(DialogFocusOrigin)
+export function DialogContent({ className, children, onOpenAutoFocus, onCloseAutoFocus, style, ref, ...props }) {
+  const { target: openingTarget, open } = useContext(DialogFocusOrigin) || {}
+  const contentRef = useRef(null)
+  const setContentRef = useCallback(node => { contentRef.current = node; if (typeof ref === 'function') return ref(node); if (ref) ref.current = node }, [ref])
+  const viewportStyle = useDialogViewport(open, contentRef)
   const returnFocus = useRef(typeof document === 'undefined' ? null : focusOrigin(document.activeElement))
   return (
     <DialogPrimitive.Portal>
@@ -58,12 +62,14 @@ export function DialogContent({ className, children, onOpenAutoFocus, onCloseAut
         )}
       />
       <DialogPrimitive.Content
+        ref={setContentRef}
         className={cn(
-          'fixed left-1/2 top-1/2 z-[101] w-[min(92vw,480px)] -translate-x-1/2 -translate-y-1/2',
-          'cui-dialog max-h-[88vh] overflow-y-auto p-5',
+          'fixed left-1/2 z-[101] w-[min(92vw,480px)] -translate-x-1/2 -translate-y-1/2',
+          'cui-dialog cui-member-dialog overflow-y-auto p-5',
           'data-[state=open]:animate-[cra1-dialog-in_200ms_cubic-bezier(0.23,1,0.32,1)]',
           className
         )}
+        style={{ ...viewportStyle, ...style }}
         {...props}
         onOpenAutoFocus={(event) => {
           // Always-mounted, controlled dialogs need a fresh origin on each open.
@@ -102,7 +108,7 @@ export function DialogContent({ className, children, onOpenAutoFocus, onCloseAut
 }
 
 export function DialogHeader({ className, ...props }) {
-  return <div className={cn('mb-4 pr-8', className)} {...props} />
+  return <div className={cn('cui-member-dialog-header mb-4 pr-10', className)} {...props} />
 }
 
 export function DialogTitle({ className, ...props }) {

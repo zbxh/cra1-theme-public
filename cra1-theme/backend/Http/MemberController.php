@@ -52,6 +52,10 @@ final class MemberController
                     $payload = $visible === [] ? ['status'=>200,'data'=>[]] : (new \app\common\model\HostModel())->homeHostList($params);
                     $result = \CRA1\Theme\Compatibility\HomeProducts::augment($payload);
                     break;
+                case 'productList':
+                    if (!NativeAuthorization::allows('app\\home\\controller\\HostController::list')) return $this->denied();
+                    $result = ['status'=>200,'data'=>(new \CRA1\Theme\Compatibility\ProductList())->read($request->param())];
+                    break;
                 case 'field':
                     if (!NativeAuthorization::allows('app\\home\\controller\\HostController::index')) return $this->denied();
                     if (!NativeAuthorization::group('clientarea_auth_control_reinstall_rescue_reset_set_mount')) return $this->denied();

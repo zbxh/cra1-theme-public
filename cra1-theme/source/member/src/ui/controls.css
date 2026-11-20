@@ -88,6 +88,27 @@ html[data-cra1-theme="member"] .cui-date-summary { margin: 8px 0 0; color: var(-
 html[data-cra1-theme="member"] .cui-date-footer { display: flex; flex: none; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--cui-line); }
 html[data-cra1-theme="member"] .cui-dialog-close { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; min-height: 32px; }
 html[data-cra1-theme="member"] .cui-dialog-footer { flex-wrap: wrap; }
+/* Long names and IPv6 addresses wrap within their own component; tables keep
+   their horizontal scroll and number columns instead of widening the page. */
+html[data-cra1-theme="member"] :is(.cui-page-header-copy,.cui-member-feedback,.cui-member-dialog) { min-width: 0; overflow-wrap: anywhere; }
+html[data-cra1-theme="member"] .cui-page-header-copy { flex: 1 1 220px; }
+html[data-cra1-theme="member"] .cui-page-header-actions { max-width: 100%; }
+html[data-cra1-theme="member"] :is(.cui-data-table,.cui-data-table-toolbar,.cui-data-table-actions) { min-width: 0; max-width: 100%; }
+html[data-cra1-theme="member"] .cui-data-table-search { flex: 1 1 200px; }
+html[data-cra1-theme="member"] .cui-data-table-error { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; overflow-wrap: anywhere; }
+html[data-cra1-theme="member"] .cui-data-table-error p { flex: 1 1 200px; }
+html[data-cra1-theme="member"] .cui-data-table-empty { border-radius: 0 0 var(--cui-radius-card) var(--cui-radius-card); overflow-wrap: anywhere; }
+html[data-cra1-theme="member"] .cui-access-state { display: flex; min-height: 180px; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; }
+html[data-cra1-theme="member"] .cui-member-dialog {
+  top: var(--cui-visible-middle,50%); max-height: 88vh;
+  max-height: min(88vh,calc(var(--cui-visible-height,100dvh) - 24px));
+  overscroll-behavior: contain; scroll-padding-block: 20px;
+}
+html[data-cra1-theme="member"] .cui-member-sheet {
+  top: var(--cui-visible-top,0px); height: 100vh;
+  height: var(--cui-visible-height,100dvh); max-width: calc(100vw - 24px);
+  overflow-y: auto; overscroll-behavior: contain;
+}
 html[data-cra1-theme="member"] .cui-chart-tooltip { padding: 10px 12px; min-width: 120px; font: 400 12px/20px var(--cui-font); }
 html[data-cra1-theme="member"] .cui-chart-tooltip__label { margin: 0 0 4px; color: var(--cui-muted); }
 html[data-cra1-theme="member"] .cui-chart-tooltip__row { display: flex; align-items: center; gap: 8px; color: var(--cui-ink); }
@@ -102,8 +123,13 @@ html[data-cra1-theme="member"] .cui-chart-tooltip__dot { width: 6px; height: 6px
   html[data-cra1-theme="member"] .cui-date-navigation { grid-template-columns: 44px minmax(0,1fr) minmax(0,1fr) 44px; }
   html[data-cra1-theme="member"] :is(.cui-date-navigation .cui-button--icon,.cui-dialog-close) { width: 44px; height: 44px; min-height: 44px; }
   html[data-cra1-theme="member"] .cui-date-navigation .cui-select-trigger { padding-inline: 6px; font-size: 13px; }
+  html[data-cra1-theme="member"] .cui-card__header { padding: 16px; }
+  html[data-cra1-theme="member"] :is(.cui-card__content,.cui-card__footer) { padding-inline: 16px; padding-bottom: 16px; }
+  html[data-cra1-theme="member"] .cui-dialog-footer > .cui-button { flex: 1 1 auto; min-height: 44px; white-space: normal; }
+  html[data-cra1-theme="member"] .cui-data-table-pager > div { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
 }
 @media (prefers-reduced-motion:reduce) {
   html[data-cra1-theme="member"] :is(.cui-choice,.cui-menu-item) { transition: none; }
+  html[data-cra1-theme="member"] :is(.cui-member-dialog,.cui-member-sheet,.cui-dialog-overlay) { animation: none !important; transition: none !important; }
 }
 .cra1-payment-logo{width:28px!important;height:28px!important;object-fit:contain;flex-shrink:0;filter:none!important;max-width:28px}

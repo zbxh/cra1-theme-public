@@ -184,7 +184,7 @@ export default function WebsiteTheme({
               <RotateCcw className="size-3.5" />还原本项
             </Button>
             <Button variant="outline" size="sm" onClick={() => setConfirmReset(true)}>恢复默认</Button>
-            <Button size="sm" onClick={saveCurrent} disabled={saving}>
+            <Button data-cui-button-glow="primary" size="sm" onClick={saveCurrent} disabled={saving}>
               <Save className="size-3.5" />{saving ? '保存中…' : '保存本项'}
             </Button>
           </div>

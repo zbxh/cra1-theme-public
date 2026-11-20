@@ -11,7 +11,7 @@ test('language names and explicit empty field lists retain the menu contract', (
 })
 test('navigation association filters products without narrowing a shared module', async () => {
   let params
-  const result = await loadCategoryHosts(async (path, p) => { assert.equal(path, '/host'); params = p; return { data: { list: [{id:1}], count:1 } } },
+  const result = await loadCategoryHosts(async (path, p) => { assert.equal(path, '/cra1-theme/member/product-list'); params = p; return { data: { list: [{id:1}], count:1 } } },
     { tab:'using', page:2, limit:6, keywords:'abc' }, { product_id:[4,'5',4], module:['same_module'], res_module:['other'], selectedModule:'wrong' })
   assert.equal(result.count,1)
   assert.deepEqual(params,{tab:'using',page:2,limit:6,keywords:'abc',orderby:'id',sort:'desc','product_id[0]':4,'product_id[1]':5})

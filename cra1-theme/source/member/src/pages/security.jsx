@@ -378,6 +378,7 @@ function ApiKeyPanel() {
             rows={rows}
             loading={loading}
             error={error}
+            onRetry={load}
             actions={createApi === 1 && (
               <Button permission="Api::create" size="sm" onClick={() => { setCreating(true); setNewName('') }}>
                 <Plus className="size-3.5" />创建密钥
@@ -604,6 +605,7 @@ function SshPanel() {
             rows={rows}
             loading={loading}
             error={error}
+            onRetry={load}
             actions={<Button size="sm" onClick={() => setEditing({ name: '', public_key: '' })}>
               <Plus className="size-3.5" />添加密钥
             </Button>}

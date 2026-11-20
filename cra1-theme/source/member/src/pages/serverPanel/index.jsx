@@ -559,7 +559,7 @@ export default function ServerPanel({ hostId, onFallback, initialDetected = null
                       : `剩余 ${due} 天`}
                 </p>
 
-                <div className="mt-4 flex items-end justify-between gap-3 rounded-lg border border-line bg-surface-alt px-3 py-2.5">
+                <div className="cui-member-card-inner mt-4 flex items-end justify-between gap-3 border px-3 py-2.5">
                   <div>
                     <p className="text-xs text-muted-foreground">续费金额 / {host.billing_cycle_name || host.billing_cycle || '周期'}</p>
                     <p className="mt-0.5 text-lg font-semibold text-ink tabular-nums">

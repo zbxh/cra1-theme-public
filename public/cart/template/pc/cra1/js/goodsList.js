@@ -1417,8 +1417,8 @@
             });
             if (this.isShowFull) {
               list.forEach((item) => {
-                eventPromotion({ id: item.id }).then((res) => {
-                  item.activeList = res.data.list;
+                Promise.resolve().then(() => eventPromotion({ id: item.id })).then((res) => {
+                  item.activeList = Array.isArray(res?.data?.list) ? res.data.list : [];
                 }).catch(() => { item.activeList = []; });
               });
             }

@@ -181,7 +181,7 @@ export default function SeoManager({ registerDirty, onNavigate }) {
                 <RotateCcw className="size-3.5" />撤销
               </Button>
             )}
-            <Button size="sm" onClick={save} disabled={saving || !dirtyKeys.has(activeKey)}>
+            <Button data-cui-button-glow="primary" size="sm" onClick={save} disabled={saving || !dirtyKeys.has(activeKey)}>
               <Save className="size-3.5" />{saving ? '保存中…' : '保存本页'}
             </Button>
           </div>

@@ -331,7 +331,7 @@ export default function PageModuleManager({ registerDirty, onSaved, config, orig
             <Button variant="outline" size="sm" onClick={() => setConfirmReset(true)} disabled={saving}>
               恢复默认
             </Button>
-            <Button size="sm" onClick={save} disabled={saving || (!dirtySortKeys.has(current.sortKey) && fieldDirtyCount === 0)}>
+            <Button data-cui-button-glow="primary" size="sm" onClick={save} disabled={saving || (!dirtySortKeys.has(current.sortKey) && fieldDirtyCount === 0)}>
               <Save className="size-3.5" />{saving ? '保存中…' : '保存'}
             </Button>
           </div>

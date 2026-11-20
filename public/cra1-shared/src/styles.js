@@ -64,7 +64,7 @@
   // markup already declares cui classes for above-the-fold content; the legacy
   // pass runs before deferred framework page modules and async plugin content.
   function start(){
-    observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeOldValue:true,attributeFilter:['class','data-cra1-icon-label','data-cui-icon-style','title','aria-selected','aria-pressed','aria-disabled','aria-busy','aria-invalid','disabled','data-disabled','data-selected','data-state','data-cui-edge','data-cui-interactive','data-cui-effects']});
+    observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeOldValue:true,attributeFilter:['class','data-cra1-icon-label','data-cui-icon-style','title','aria-selected','aria-pressed','aria-disabled','aria-busy','aria-invalid','disabled','data-disabled','data-selected','data-state','data-cui-edge','data-cui-interactive','data-cui-effects','data-cui-button-glow']});
     if(effects)effects.start({managed:true});
     if(motion)motion.start();
     scan(document);

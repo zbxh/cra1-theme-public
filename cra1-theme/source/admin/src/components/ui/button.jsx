@@ -41,7 +41,12 @@ const Button = forwardRef(function Button(
   const ordinary = size !== 'icon' && ['default', 'outline'].includes(variant)
   const classes = cn(buttonVariants({ variant, size }), ordinary && 'cui-button',
     variant === 'outline' && ordinary && 'cui-button--outline', variant === 'danger' && 'cui-button--danger', className)
-  const glow = ordinary && <span className="cui-button-glow" aria-hidden="true" />
+  const effectProps = asChild && isValidElement(children) ? { ...children.props, ...props } : props
+  const glow = ordinary && effectProps['data-cui-button-glow'] === 'primary' && effectProps['data-cui-effects'] !== 'none'
+    && !disabled && !effectProps.disabled && effectProps['aria-disabled'] !== true && effectProps['aria-disabled'] !== 'true'
+    && effectProps['aria-busy'] !== true && effectProps['aria-busy'] !== 'true'
+    && effectProps['aria-invalid'] !== true && effectProps['aria-invalid'] !== 'true' && effectProps['data-disabled'] == null
+    && <span className="cui-button-glow" aria-hidden="true" />
   if (asChild && isValidElement(children)) {
     const child = Children.only(children)
     return cloneElement(child, {

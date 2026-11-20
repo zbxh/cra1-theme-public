@@ -43,7 +43,8 @@
   function resetStage(proof){
     $('#resetStartFields').hidden=proof;$('#resetStartFields').disabled=proof;
     $('#resetProofFields').hidden=!proof;$('#resetProofFields').disabled=!proof;
-    $('#recoverySubmit').textContent=proof?'验证并重置密码':'发送验证码';$('#resetResend').hidden=!proof;
+    $('#recoverySubmit').textContent=proof?'验证并重置密码':'发送验证码';
+    if(proof)$('#recoverySubmit').setAttribute('data-cui-button-glow','primary');else $('#recoverySubmit').removeAttribute('data-cui-button-glow');$('#resetResend').hidden=!proof;
   }
   $('#forgotPassword').onclick=async()=>{
     if(busy)return;passwordMode();form.hidden=true;reset.hidden=false;reset.reset();resetChallenge='';resetDone=false;

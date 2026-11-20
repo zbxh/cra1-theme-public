@@ -94,13 +94,13 @@ export default function AccountPage() {
                 {account?.phone ? `+${account.phone_code} ${account.phone}` : '未绑定手机号'}
               </p>
             </div>
-            <a href="/finance.htm" data-cui-edge="hover"
-               className="mt-4 w-full rounded-lg border border-line px-4 py-2.5 transition-colors duration-150">
+            <a href="/finance.htm"
+               className="cui-member-tile mt-4 w-full rounded-lg border px-4 py-2.5">
               <p className="text-xs text-muted-foreground">余额</p>
               <p className="mt-0.5 text-lg font-semibold tabular-nums text-ink">{formatMoney(account?.credit)}</p>
             </a>
-            <a href="/security.htm" data-cui-edge="hover"
-               className="mt-2 w-full rounded-lg border border-line px-4 py-2.5 text-[13px] text-body transition-colors duration-150 hover:text-brand">
+            <a href="/security.htm"
+               className="cui-member-tile mt-2 w-full rounded-lg border px-4 py-2.5 text-[13px] text-body hover:text-brand">
               安全中心 · 管理密钥
             </a>
           </CardContent>
@@ -471,6 +471,7 @@ function CreditPanel() {
   const [error, setError] = useState('')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+  const [attempt, setAttempt] = useState(0)
   const limit = 10
 
   useEffect(() => {
@@ -480,7 +481,7 @@ function CreditPanel() {
       .then((res) => { setRows(res.data?.list || []); setTotal(res.data?.count || 0) })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
-  }, [page])
+  }, [page, attempt])
 
   const columns = [
     { key: 'create_time', title: '时间', width: 160,
@@ -507,6 +508,7 @@ function CreditPanel() {
           rows={rows}
           loading={loading}
           error={error}
+          onRetry={() => setAttempt(n => n + 1)}
           page={page}
           total={total}
           limit={limit}

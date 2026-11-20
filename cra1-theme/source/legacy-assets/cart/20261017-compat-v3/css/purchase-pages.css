@@ -4,7 +4,16 @@
 .cart-page:is(.cra1-confirm-page,.cra1-basket-page) .shopping-goods{border:1px solid var(--purchase-edge)!important;border-radius:var(--cui-radius-card)!important;background:linear-gradient(125deg,#fff,var(--cui-page))!important;box-shadow:inset 0 1px 0 #fff,0 3px 14px color-mix(in srgb,var(--cui-night) 2.353%,transparent);margin-bottom:18px!important;overflow:hidden;transition:border-color .2s,box-shadow .2s}
 .cart-page:is(.cra1-confirm-page,.cra1-basket-page) .table-name{padding:16px 20px!important;border-bottom:1px solid var(--cui-edge);background:linear-gradient(110deg,var(--cui-page),var(--cui-page));gap:16px}
 .cart-page:is(.cra1-confirm-page,.cra1-basket-page) .goods-name{font-size:14px!important;font-weight:600!important;line-height:1.6;overflow-wrap:anywhere;white-space:normal}
+.cart-page.cra1-basket-page :is(.table-name,.cl-m-cart-head) .el-checkbox{display:flex;align-items:baseline;flex:1;min-width:0;white-space:normal}
+.cart-page.cra1-basket-page :is(.table-name,.cl-m-cart-head) .el-checkbox__input{flex:none}
+.cart-page.cra1-basket-page :is(.table-name,.cl-m-cart-head) .el-checkbox__label{min-width:0;white-space:normal;overflow-wrap:anywhere}
+.cart-page.cra1-basket-page .table-name .edit-goods{flex:none}
 .cart-page:is(.cra1-confirm-page,.cra1-basket-page) .table-content{margin:0!important;padding:0!important}
+.cart-page.cra1-basket-page .no-goods-td{display:table-cell;width:auto;padding:20px!important;text-align:left!important;white-space:normal}
+.cart-page.cra1-basket-page .no-goods-td .no-goods-tips{display:block;margin:0 0 12px;font-size:13px;line-height:1.7;white-space:normal;overflow-wrap:anywhere}
+.cart-page.cra1-basket-page .cl-m-cart-invalid .no-goods-tips{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.7}
+.cart-page.cra1-basket-page .cl-filter-empty{padding:24px 16px}
+.cart-page.cra1-basket-page .cl-filter-empty .cl-empty-desc{margin-bottom:14px;line-height:1.7}
 .cart-page:is(.cra1-confirm-page,.cra1-basket-page) .goods-table{width:100%!important;table-layout:fixed!important;border-collapse:collapse}
 .cart-page:is(.cra1-confirm-page,.cra1-basket-page) .goods-table th{padding:10px 14px!important;color:var(--cui-muted)!important;background:var(--cui-page)!important;font-size:11px!important;font-weight:400!important;border-bottom:1px solid var(--cui-edge)}
 .cart-page:is(.cra1-confirm-page,.cra1-basket-page) .goods-table td{padding:18px 14px!important;vertical-align:top;font-size:13px!important;overflow-wrap:anywhere}

@@ -75,7 +75,7 @@ const server=http.createServer(async(req,res)=>{
   if(route==='/ticket/department')return json(res,{list:[{id:1,name:'售后服务部'}]})
   if(route==='/ticket/config')return json(res,{ticket_notice_open:1,ticket_notice_description:'提交工单时，请简要说明问题与相关产品，便于我们为您处理。'})
   if(route==='/ticket/7')return json(res,{ticket:{id:7,title:'应用服务部署与使用咨询',ticket_num:'20261023007',status:'等待客服回复',color:'#a68859',name:'售后服务部',type_name:'技术支持',ticket_type_id:1,create_time:1792736400,host_ids:[31],can_operate:1,replies:[{id:2,type:'Admin',admin_name:'技术支持',create_time:1792736450,content:'<p>您好，已经收到您的问题。您可以在产品管理页查看部署说明，如需协助，请继续回复。</p>',attachment:[]},{id:1,type:'Client',client_name:'示例用户',create_time:1792736400,content:'<p>您好，我希望了解这个产品如何上传应用，以及在哪里查看部署结果。</p>',attachment:[{name:'部署说明示例.pdf',url:'/fixture/proof.pdf'}]}]}})
-  if(route==='/host'||route==='/home/host')return json(res,{list:[product],count:1})
+  if(route==='/host'||route==='/home/host'||route==='/cra1-theme/member/product-list')return json(res,{list:[product],count:1})
   if(route==='/theme/host/31'||route==='/host/31')return json(res,{host:product,self_defined_field:[]})
   if(route==='/idcsmart_common/host/31/configoption')return json(res,{host:product,configoptions:[{option_name:'应用环境',suboption_name:'自定义部署'}],chart:[],client_area:[{name:'扩展功能',content:'<p>模块扩展区域示例</p>'}],client_button:{control:[],console:[]},security_group_supported:false,os:{}})
   if(route==='/host/31/renew'||route==='/host/31/renew/auto')return json(res,{host:[],status:0})

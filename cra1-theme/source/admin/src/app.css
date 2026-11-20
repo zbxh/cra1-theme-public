@@ -173,3 +173,33 @@ button:disabled { cursor:not-allowed; }
  :where(html[data-cra1-ui="admin"]) :where([data-admin-button]:not([data-admin-button=link]),.admin-dropdown-item,.cui-tabs__trigger) { min-height:44px; }
 }
 
+/* Portal bounds follow the visible viewport rather than the layout viewport.
+   Its own scroll area keeps fields and the end of a form reachable. */
+.cra1-admin-dialog {
+ top:calc(var(--cra1-admin-visible-top,0px) + var(--cra1-admin-visible-height,100dvh)/2);
+ left:calc(var(--cra1-admin-visible-left,0px) + var(--cra1-admin-visible-width,100vw)/2);
+ max-height:min(88vh,calc(var(--cra1-admin-visible-height,100dvh) - 32px));
+ max-width:calc(var(--cra1-admin-visible-width,100vw) - 32px);
+ overscroll-behavior:contain;
+ scroll-padding-block:20px;
+}
+.cra1-admin-sheet {
+ top:var(--cra1-admin-visible-top,0px); bottom:auto;
+ height:var(--cra1-admin-visible-height,100dvh);
+ max-width:var(--cra1-admin-visible-width,100vw);
+ overflow-y:auto; overscroll-behavior:contain;
+}
+.cra1-admin-sheet[data-side=left] { left:var(--cra1-admin-visible-left,0px); }
+.cra1-admin-sheet[data-side=right] { left:auto; right:calc(100vw - var(--cra1-admin-visible-left,0px) - var(--cra1-admin-visible-width,100vw)); }
+.cra1-admin-dialog :where(form,fieldset), .cra1-admin-dialog-header,
+.admin-card-header :where(h3,p), .admin-card-content :where(label,p),
+[data-page-header] { min-width:0; overflow-wrap:anywhere; }
+.cra1-admin-dialog-footer > :where(button,a) { max-width:100%; white-space:normal; height:auto; min-height:40px; }
+.cra1-admin-sheet > .sidebar-nav { min-height:0; }
+@media(max-width:767px) {
+ .cra1-admin-dialog { scroll-padding-block:16px; }
+ .cra1-admin-dialog-footer > :where(button,a) { min-height:44px; }
+ .nav-item { height:auto; padding-block:8px; }
+ .nav-item > svg,.nav-category-trigger > svg { flex-shrink:0; }
+}
+

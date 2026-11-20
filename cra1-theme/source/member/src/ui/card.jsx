@@ -5,7 +5,7 @@ import { cn } from './utils'
 export function Card({ className, glow, variant = 'default', children, ...props }) {
   const outside = (className || '').split(/\s+/).filter(x => !['overflow-hidden', 'overflow-clip'].includes(x)).join(' ')
   return (
-    <div className={cn('cui-card relative', variant === 'featured' && 'cui-card--featured', outside)}
+    <div className={cn('cui-card cui-member-card relative min-w-0', variant === 'featured' && 'cui-card--featured', outside)}
       data-cui-edge={variant === 'featured' ? 'hover' : undefined} {...props}>
       {variant === 'featured' ? <span className="cui-edge-segment" aria-hidden="true" /> : null}
       <div className="cui-card__clip">
@@ -30,22 +30,24 @@ export function CardDescription({ className, ...props }) {
 }
 
 export function CardContent({ className, ...props }) {
-  return <div className={cn('cui-card__content relative', className)} {...props} />
+  const compact = (className || '').split(/\s+/).includes('p-5')
+  return <div className={cn('cui-card__content relative', compact && 'max-md:p-4', className)} {...props} />
 }
 
 export function CardFooter({ className, ...props }) {
-  return <div className={cn('cui-card__footer relative', className)} {...props} />
+  const compact = (className || '').split(/\s+/).includes('p-5')
+  return <div className={cn('cui-card__footer relative', compact && 'max-md:p-4', className)} {...props} />
 }
 
 /** 页面标题区（每个页面顶部统一使用） */
 export function PageHeader({ title, description, actions, className }) {
   return (
-    <div data-cui-reveal className={cn('flex flex-wrap items-start justify-between gap-3', className)}>
-      <div className="min-w-0">
+    <div data-cui-reveal className={cn('cui-page-header min-w-0 flex flex-wrap items-start justify-between gap-3', className)}>
+      <div className="cui-page-header-copy min-w-0">
         <h1 className="text-lg font-semibold tracking-tight text-title">{title}</h1>
         {description && <p className="mt-0.5 text-[13px] text-muted-foreground">{description}</p>}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && <div className="cui-page-header-actions flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
   )
 }

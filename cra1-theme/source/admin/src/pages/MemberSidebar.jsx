@@ -123,6 +123,8 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
   const [nodes, setNodes] = useScopedState(workspace, 'sidebar.nodes', [])
   const [shape, setShape] = useScopedState(workspace, 'sidebar.shape', 3)
   const [original, setOriginal] = useScopedState(workspace, 'sidebar.nodes', [], true)
+  const [pullEnabled, setPullEnabled] = useScopedState(workspace, 'sidebar.pull_enabled', 1)
+  const [pullOriginal, setPullOriginal] = useScopedState(workspace, 'sidebar.pull_enabled', 1, true)
   const [recent, setRecent] = useScopedState(workspace, 'sidebar.recent', RECENT_DEFAULTS)
   const [recentOriginal, setRecentOriginal] = useScopedState(workspace, 'sidebar.recent', RECENT_DEFAULTS, true)
   const [version, setVersion] = useState(0)
@@ -138,6 +140,8 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
       setNodes(member.sidebar.nodes || [])
       setShape(member.sidebar.shape || 3)
       setOriginal(JSON.parse(JSON.stringify(member.sidebar.nodes || [])))
+      setPullEnabled(member.sidebar.pull_enabled ?? 1)
+      setPullOriginal(member.sidebar.pull_enabled ?? 1)
       // 最近访问设置：服务端保证白名单字段存在；缺省回落默认值
       const r = { ...RECENT_DEFAULTS, ...(member.sidebar.recent || {}) }
       setRecent(r)
@@ -158,8 +162,9 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
 
   const dirty = useMemo(() =>
     JSON.stringify(nodes) !== JSON.stringify(original)
+    || pullEnabled !== pullOriginal
     || JSON.stringify(recent) !== JSON.stringify(recentOriginal),
-  [nodes, original, recent, recentOriginal])
+  [nodes, original, pullEnabled, pullOriginal, recent, recentOriginal])
   const recentDirty = useMemo(() => JSON.stringify(recent) !== JSON.stringify(recentOriginal), [recent, recentOriginal])
   const total = useMemo(() => countTree(nodes), [nodes])
 
@@ -171,7 +176,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
     try {
       // 菜单结构与最近访问设置一起提交（同一份 sidebar 段、同一个乐观锁版本）；
       // 服务端只更新提供的子段，未变更的 nodes 原样回传不产生误伤
-      const r = await memberApi.saveSidebar({ nodes, recent, shape, version })
+      const r = await memberApi.saveSidebar({ nodes, recent, shape, pull_enabled: pullEnabled, version })
       if (r.status === 200) {
         toast(r.msg || '已保存，会员中心前台已生效')
         reload()
@@ -282,6 +287,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
             {dirty && <Badge tone="warning">有未保存修改</Badge>}
             <Button variant="outline" size="sm" onClick={() => {
               setNodes(JSON.parse(JSON.stringify(original)))
+              setPullEnabled(pullOriginal)
               setRecent(JSON.parse(JSON.stringify(recentOriginal)))
             }} disabled={!dirty}>
               <RotateCcw className="size-3.5" />撤销
@@ -292,17 +298,32 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
             <Button variant="outline" size="sm" onClick={addSeparator} disabled={saving}>
               <Minus className="size-3.5" />新增分界线
             </Button>
-            <Button size="sm" onClick={save} disabled={saving || !dirty}>
+            <Button data-cui-button-glow="primary" size="sm" onClick={save} disabled={saving || !dirty}>
               <Save className="size-3.5" />{saving ? '保存中…' : '保存'}
             </Button>
           </div>
         }
       />
 
+      <Card>
+        <CardHeader>
+          <CardTitle>桌面菜单拉帘</CardTitle>
+          <CardDescription id="member-menu-pull-description">在会员中心桌面页面左侧显示「点击打开菜单」入口。关闭后仍可从顶栏打开菜单。</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-line px-4 py-2">
+            <span className="text-sm font-medium">显示菜单拉帘</span>
+            <SwitchControl label="显示菜单拉帘" aria-describedby="member-menu-pull-description"
+              checked={pullEnabled === 1} disabled={saving || workspace?.saving}
+              onCheckedChange={value => setPullEnabled(value ? 1 : 0)} />
+          </div>
+        </CardContent>
+      </Card>
+
       {!total&&<Alert tone="warning">当前菜单为空，前台不会显示业务导航。可在下方导入菜单文件或系统导航，也可手动新增；检查草稿并保存后才会生效。</Alert>}
 
       {workspace && <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={() => setEditing({ ...emptyNode() })}><Plus className="size-4" />新增菜单</Button><Button variant="outline" onClick={addSeparator} disabled={workspace.saving}><Minus className="size-4" />新增分界线</Button></div>}
-      {bootInfo.role!=='operator'&&<Card><CardHeader><CardTitle>菜单导入与导出</CardTitle><CardDescription>可选择一级分组、二级分组、三级页面和最近访问设置；跨站导入后请复核商品关联。</CardDescription></CardHeader><CardContent><MenuTransfer sidebar={{shape,nodes,recent}} disabled={saving||workspace?.saving} onBusy={value=>{setSaving(value);workspace?.setBusy(value)}} onApply={next=>{
+      {bootInfo.role!=='operator'&&<Card><CardHeader><CardTitle>菜单导入与导出</CardTitle><CardDescription>可选择一级分组、二级分组、三级页面和最近访问设置；跨站导入后请复核商品关联。</CardDescription></CardHeader><CardContent><MenuTransfer sidebar={{shape,nodes,recent,pull_enabled:pullEnabled}} disabled={saving||workspace?.saving} onBusy={value=>{setSaving(value);workspace?.setBusy(value)}} onApply={next=>{
         if(workspace){workspace.setBusy(false);workspace.setValues(current=>({...current,sidebar:{...current.sidebar,...next}}))}
         else {setNodes(next.nodes);setShape(next.shape);setRecent(next.recent)}
         toast('已应用到菜单草稿，请检查后保存')

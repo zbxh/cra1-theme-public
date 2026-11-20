@@ -587,7 +587,7 @@ function cra1_theme_derived_config(array $merged): array
         $btnHtmlFor = function ($rows) {
             $html = '';
             foreach ($rows as $bi => $btn) {
-                $html .= '<a href="' . htmlspecialchars($btn['url'] ?: '#') . '" class="btn ' . ($bi === 0 ? 'btn-gradient' : 'btn-outline btn-primary') . '">' . htmlspecialchars($btn['name']) . '<span class="cui-arrow" data-cui-arrow aria-hidden="true">' . ($bi === 0 ? '→' : '↗') . '</span></a>';
+                $html .= '<a href="' . htmlspecialchars($btn['url'] ?: '#') . '"' . ($bi === 0 ? ' data-cui-button-glow="primary"' : '') . ' class="btn ' . ($bi === 0 ? 'btn-gradient' : 'btn-outline btn-primary') . '">' . htmlspecialchars($btn['name']) . '<span class="cui-arrow" data-cui-arrow aria-hidden="true">' . ($bi === 0 ? '→' : '↗') . '</span></a>';
             }
             return $html;
         };
@@ -598,7 +598,7 @@ function cra1_theme_derived_config(array $merged): array
         if ($merged['show_footer_cta'] == 1) {
             $btnHtml = '<div class="flex flex-wrap gap-2">';
             foreach ($merged['footer_cta'] as $bi => $btn) {
-                $btnHtml .= '<a href="' . htmlspecialchars($btn['url'] ?: '/cart/goodsList.htm') . '" class="btn btn-sm ' . ($bi === 0 ? 'btn-gradient' : 'btn-outline') . ' px-4">' . htmlspecialchars($btn['name']) . '<span class="cui-arrow" data-cui-arrow aria-hidden="true">' . ($bi === 0 ? '→' : '↗') . '</span></a>';
+                $btnHtml .= '<a href="' . htmlspecialchars($btn['url'] ?: '/cart/goodsList.htm') . '"' . ($bi === 0 ? ' data-cui-button-glow="primary"' : '') . ' class="btn btn-sm ' . ($bi === 0 ? 'btn-gradient' : 'btn-outline') . ' px-4">' . htmlspecialchars($btn['name']) . '<span class="cui-arrow" data-cui-arrow aria-hidden="true">' . ($bi === 0 ? '→' : '↗') . '</span></a>';
             }
             $merged['footer_cta_html'] = $btnHtml . '</div>';
         }

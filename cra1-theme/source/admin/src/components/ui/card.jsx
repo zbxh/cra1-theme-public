@@ -22,7 +22,7 @@ export function Card({ className, glow, ...props }) {
 }
 
 export function CardHeader({ className, ...props }) {
-  return <div className={cn('relative flex flex-col gap-1.5 p-5', className)} {...props} />
+  return <div className={cn('admin-card-header relative flex min-w-0 flex-col gap-1.5 p-5', className)} {...props} />
 }
 
 /** 卡片头排式（阿里云）：14px/600 标题；如需「查看全部 >」右侧链接，用 CardHeader + flex 行自行组合 */
@@ -35,7 +35,7 @@ export function CardDescription({ className, ...props }) {
 }
 
 export function CardContent({ className, ...props }) {
-  return <div className={cn('relative p-5 pt-0', className)} {...props} />
+  return <div className={cn('admin-card-content relative min-w-0 p-5 pt-0', className)} {...props} />
 }
 
 export function CardFooter({ className, ...props }) {
@@ -47,10 +47,10 @@ export function PageHeader({ title, description, actions, className }) {
   return (
     <div data-page-header className={cn('flex flex-wrap items-start justify-between gap-3', className)}>
       <div className="min-w-0">
-        <h1 className="text-lg font-semibold tracking-tight text-title">{title}</h1>
-        {description && <p className="mt-0.5 text-[13px] text-muted-foreground">{description}</p>}
+        <h1 className="break-words text-lg font-semibold tracking-tight text-title">{title}</h1>
+        {description && <p className="mt-0.5 break-words text-[13px] leading-5 text-muted-foreground">{description}</p>}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && <div className="flex max-w-full flex-wrap items-center gap-2">{actions}</div>}
     </div>
   )
 }

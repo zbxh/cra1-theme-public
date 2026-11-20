@@ -6,9 +6,9 @@
 
 Mist 中性色与钛灰按钮 · 桌面与手机适配 · 独立可视化主题后台
 
-[![Release](https://img.shields.io/badge/Release-v17.8.0%20beta-b49b76?style=flat-square)](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.8.0) [![V10](https://img.shields.io/badge/V10-10.7.4-475569?style=flat-square)](docs/installation.md) [![PHP](https://img.shields.io/badge/PHP-7.4-777BB4?style=flat-square)](docs/installation.md) [![License](https://img.shields.io/badge/License-Source%20Available-64748b?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/badge/Release-v17.8.5%20beta-b49b76?style=flat-square)](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.8.5) [![V10](https://img.shields.io/badge/V10-10.7.4-475569?style=flat-square)](docs/installation.md) [![PHP](https://img.shields.io/badge/PHP-7.4-777BB4?style=flat-square)](docs/installation.md) [![License](https://img.shields.io/badge/License-Source%20Available-64748b?style=flat-square)](LICENSE)
 
-**[下载主题](https://github.com/zbxh/cra1-theme-public/releases/download/v17.8.0/CRA1-theme-v17.8.0-install.zip) · [在线演示](https://cra1.coorw.com/) · [主题后台](https://cra1.coorw.com/testadmin/) · [安装教程](docs/installation.md) · [使用文档](docs/usage.md)**
+**[下载主题](https://github.com/zbxh/cra1-theme-public/releases/download/v17.8.5/CRA1-theme-v17.8.5-install.zip) · [在线演示](https://cra1.coorw.com/) · [主题后台](https://cra1.coorw.com/testadmin/) · [安装教程](docs/installation.md) · [使用文档](docs/usage.md)**
 
 [功能亮点](#功能亮点) · [演示账号](#在线演示) · [界面预览](#界面预览) · [快速开始](#快速开始) · [交流与反馈](#交流与反馈)
 
@@ -25,7 +25,7 @@ Mist 中性色与钛灰按钮 · 桌面与手机适配 · 独立可视化主题�
 ## 功能亮点
 
 - **🌐 官网展示**：配置首页、产品介绍、解决方案、资讯文档与企业页面，统一管理头部、页脚和客服入口。
-- **👤 会员中心**：展示产品、账单、工单和账户入口，定制首页、登录注册页与多级侧栏菜单。
+- **👤 会员中心**：查看当前产品和账单，按配置、地区或备注搜索产品，粘贴图片提交工单；支持桌面侧栏拉帘及多级菜单。
 - **🛒 购物车**：统一商品浏览、配置选择、购物车与结算页面的视觉，承接已适配模块的原生订购流程。
 - **🔎 全站搜索**：搜索商品、新闻、公告与文档；登录后可查找有权访问的管理页面、标签、主机标识和 IP，支持空格与大小写差异匹配。
 - **🎨 统一组件**：采用 Mist 中性色、分级圆角和细线交互动效，统一按钮、下拉、弹窗与卡片，支持减少动态效果。
@@ -56,6 +56,8 @@ Mist 中性色与钛灰按钮 · 桌面与手机适配 · 独立可视化主题�
 | **商品选配** | **桌面搜索** |
 | [![商品选配](docs/images/preview-cart.png)](docs/images/preview-cart.png) | [![桌面搜索](docs/images/preview-search.png)](docs/images/preview-search.png) |
 
+[![产品列表与搜索](docs/images/preview-products.png)](docs/images/preview-products.png)
+
 <details>
 <summary>查看更多：登录、注册与通知页面</summary>
 
@@ -71,9 +73,9 @@ Mist 中性色与钛灰按钮 · 桌面与手机适配 · 独立可视化主题�
 
 ### 1. 下载与环境
 
-GitHub 当前提供 **[v17.8.0 测试版](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.8.0)**，安装包已包含运行资源，无需安装 Node.js 或自行编译。
+GitHub 当前提供 **[v17.8.5 测试版](https://github.com/zbxh/cra1-theme-public/releases/tag/v17.8.5)**，安装包已包含运行资源，无需安装 Node.js 或自行编译。
 
-**[下载主题安装包](https://github.com/zbxh/cra1-theme-public/releases/download/v17.8.0/CRA1-theme-v17.8.0-install.zip)** · [查看更新日志](https://github.com/zbxh/cra1-theme-public/releases)
+**[下载主题安装包](https://github.com/zbxh/cra1-theme-public/releases/download/v17.8.5/CRA1-theme-v17.8.5-install.zip)** · [查看更新日志](https://github.com/zbxh/cra1-theme-public/releases)
 
 | 项目 | 当前测试基准 |
 | --- | --- |
@@ -98,7 +100,7 @@ HTTP 网站使用 `http://` 打开同一安装入口。详细目录与图文步�
 
 浏览器上传受限或后台暂时不可用时，可按[安装教程](docs/installation.md#05-已有主题如何更新)使用服务器本地导入或备用解压覆盖流程。
 
-GitHub 自动生成的 **Source code** 压缩包供源码开发使用，安装请选择上面的 `CRA1-theme-v17.8.0-install.zip`。首次安装与覆盖更新使用同一份安装包。
+GitHub 自动生成的 **Source code** 压缩包供源码开发使用，安装请选择上面的 `CRA1-theme-v17.8.5-install.zip`。首次安装与覆盖更新使用同一份安装包。
 
 ## 交流与反馈
 

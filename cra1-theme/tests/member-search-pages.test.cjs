@@ -54,12 +54,14 @@ test('real account, finance, security and product tabs retain working query valu
   const f = fixture({ runtime: { features: { ssh: true, security_group: true } }, snapshot: { sidebar: [
     { name: '账户中心', children: [{ name: '账户信息', url: 'account.htm' }, { name: '安全中心', url: 'security.htm' }] },
     { name: '财务中心', url: 'finance.htm' }, { id: 'products-a', name: '我的产品', url: 'productList.htm?m=mf_cloud' },
-  ], features: { ssh: true, security_group: true } } })
+  ], features: { ssh: true, security_group: true, show_deleted_products: true } } })
   for (const [query, target] of [
     ['基本资料', '/account.htm?tab=profile'], ['安全设置', '/account.htm?tab=security'],
     ['我的订单', '/finance.htm?tab=orders'], ['交易记录', '/finance.htm?tab=transactions'],
     ['冻结记录', '/finance.htm?tab=freeze'], ['API 密钥', '/security.htm?tab=api'],
     ['SSH 密钥', '/security.htm?tab=ssh'], ['安全组', '/security.htm?tab=group'],
+    ['当前产品', '/productList.htm?m=mf_cloud&cloud_menu=products-a&tab=current'],
+    ['全部产品', '/productList.htm?m=mf_cloud&cloud_menu=products-a&tab=all'],
     ['即将到期', '/productList.htm?m=mf_cloud&cloud_menu=products-a&tab=expiring'],
     ['已逾期', '/productList.htm?m=mf_cloud&cloud_menu=products-a&tab=overdue'],
     ['已删除', '/productList.htm?m=mf_cloud&cloud_menu=products-a&tab=deleted'],
@@ -87,6 +89,15 @@ test('specific-tab menus do not invent other tabs or drop their parameters', asy
   const f = fixture({ snapshot: sidebar({ name: '登录安全', url: 'account.htm?tab=security&section=operate_password' }) })
   assert.equal((await f.api.search('登录安全'))[0].url, '/account.htm?tab=security&section=operate_password')
   assert.equal((await f.api.search('基本资料')).length, 0)
+})
+
+test('the V10 visibility setting controls deleted product results', async () => {
+  const f = fixture({ snapshot: sidebar(
+    { name: '我的产品', url: 'productList.htm' },
+    { name: '已删除', url: 'productList.htm?tab=deleted' },
+  ) })
+  assert.equal((await f.api.search('已删除')).length, 0)
+  assert.equal((await f.api.search('当前产品')).length, 1)
 })
 
 test('subaccount rules and native page grants filter page and tab results', async () => {
@@ -206,7 +217,7 @@ test('indexed tab values are consumed by the actual member React pages', () => {
   const root = path.resolve(__dirname, '../source/member/src/pages')
   for (const [file, values] of Object.entries({
     account: ['profile', 'security', 'credit'], finance: ['orders', 'credit', 'freeze', 'transactions'],
-    security: ['overview', 'api', 'ssh', 'log', 'group'], productList: ['using', 'expiring', 'overdue', 'deleted'],
+    security: ['overview', 'api', 'ssh', 'log', 'group'], productList: ['current', 'using', 'expiring', 'overdue', 'all', 'deleted'],
   })) {
     const text = fs.readFileSync(path.join(root, file + '.jsx'), 'utf8')
     assert.match(text, /usePageTab/)

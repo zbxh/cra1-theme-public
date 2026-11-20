@@ -101,7 +101,34 @@ test('remote variants are bounded, deduplicated and limited to useful normalizat
   assert.deepEqual(plain(match.variants('账户 信息')), ['账户 信息', '账户%信息', '信息%账户'])
   assert.deepEqual(plain(match.variants('foo foo')), ['foo foo', 'foo%foo'])
   for (const query of ['', '   ', '0', '０', '\u200b', 0, null]) assert.deepEqual(plain(match.variants(query)), [])
-  for (const query of ['SSH', '账户', '192.0.2.1', '2001:db8::1', 'srv-01.example', 'ＡＰＩ.example', 'SSH%密钥', 'SSH_密钥', 'SSH\\密钥', 'SSH％密钥', 'SSH＿密钥', 'A & B', 'API?key=1', 'A+B', '#SSH 密钥', 'A ＆ B', 'API / 密钥']) {
+  for (const query of ['SSH', '账户', '192.0.2.1', '2001:db8::1', 'srv-01.example', 'SSH%密钥', 'SSH_密钥', 'SSH\\密钥', 'SSH％密钥', 'SSH＿密钥', 'SSH＼密钥']) {
     assert.deepEqual(plain(match.variants(query)), [query], query)
+  }
+})
+
+test('literal alternatives normalize fullwidth and spacing while keeping identifier punctuation intact', () => {
+  for (const [query, expected] of [
+    ['ＡＰＩ.example', ['ＡＰＩ.example', 'api.example']],
+    ['ＳＳＨ-密钥', ['ＳＳＨ-密钥', 'ssh-密钥']],
+    ['srv - 01.example', ['srv - 01.example', 'srv-01.example']],
+    ['ＳＲＶ　－　０１.example', ['ＳＲＶ　－　０１.example', 'srv - 01.example', 'srv-01.example']],
+    ['２００１：ｄｂ８：：１', ['２００１：ｄｂ８：：１', '2001:db8::1']],
+    ['A & B', ['A & B', 'a & b', 'a&b']],
+    ['API?key=1', ['API?key=1', 'api?key=1']],
+    ['#SSH 密钥', ['#SSH 密钥', '#ssh 密钥', '#ssh密钥']],
+    ['API / 密钥', ['API / 密钥', 'api / 密钥', 'api/密钥']],
+  ]) {
+    const variants = plain(match.variants(query))
+    assert.deepEqual(variants, expected, query)
+    assert.ok(variants.length <= 4)
+    assert.ok(variants.every(value => !value.includes('%')))
+  }
+})
+
+test('invisible text normalization reaches useful word alternatives without changing explicit LIKE syntax', () => {
+  assert.deepEqual(plain(match.variants('SSH\u200b密钥')), ['SSH\u200b密钥', 'ssh密钥', 'ssh%密钥', '密钥%ssh'])
+  assert.deepEqual(plain(match.variants('S\u200bSH')), ['S\u200bSH', 'ssh'])
+  for (const query of ['ＳＲＶ％ ０１', 'ＳＲＶ＿ ０１', 'ＳＲＶ＼ ０１', 'SSH\u200b%密钥']) {
+    assert.deepEqual(plain(match.variants(query)), [query])
   }
 })

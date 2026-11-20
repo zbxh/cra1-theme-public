@@ -93,7 +93,7 @@ export default function MemberAppearance({ member, loading, error, reload, works
             <Button variant="outline" size="sm" onClick={() => setForm({ ...original })}>
               <RotateCcw className="size-3.5" />撤销
             </Button>
-            <Button size="sm" onClick={save} disabled={saving || !dirty.length}>
+            <Button data-cui-button-glow="primary" size="sm" onClick={save} disabled={saving || !dirty.length}>
               <Save className="size-3.5" />{saving ? '保存中…' : '保存'}
             </Button>
           </div>

@@ -74,7 +74,7 @@
           :disabled="railLoading || railAvailability !== 'ready'" @click="railAddCart">
           <i class="el-icon-shopping-cart-2"></i>
         </button>
-        <el-button type="primary" class="cl-rail-buy" :disabled="railLoading || railAvailability !== 'ready'"
+        <el-button type="primary" class="cl-rail-buy" data-cui-button-glow="primary" :disabled="railLoading || railAvailability !== 'ready'"
           @click="railPrimaryAction">{{isEditingCartItem ? '保存修改' : (lang.product_buy_now || '立即购买')}}</el-button>
       </div>
       <p v-if="railAvailability !== 'ready'" class="cl-rail-status" role="status">{{railStatusText}} <el-button v-if="railAvailability === 'error'" type="text" @click="railRetryBridge">重试</el-button></p>
@@ -329,7 +329,7 @@
                         :disabled="railLoading || railAvailability !== 'ready'" @click="railAddCart">
                         <i class="el-icon-shopping-cart-2"></i>
                       </button>
-                      <el-button type="primary" class="cl-rail-buy" :disabled="railLoading || railAvailability !== 'ready'"
+                      <el-button type="primary" class="cl-rail-buy" data-cui-button-glow="primary" :disabled="railLoading || railAvailability !== 'ready'"
                         @click="railPrimaryAction">{{isEditingCartItem ? '保存修改' : (lang.product_buy_now || '立即购买')}}</el-button>
                     </div>
                   </template>
@@ -638,7 +638,7 @@
                           </div>
                         </div>
                         <div class="car-settle">
-                          <el-button type="primary" class="settle-btn"
+                          <el-button type="primary" class="settle-btn" data-cui-button-glow="primary"
                             @click="goBuyDomain">{{lang.template_text130}}</el-button>
                         </div>
                       </div>
@@ -824,7 +824,7 @@
                           </div>
                           <!-- 购买按钮 -->
                           <div class="config-item buy-area">
-                            <el-button type="primary" class="buy-btn" :disabled="disabledJump || !sslQuoteReady || sslLoadingPrice"
+                            <el-button type="primary" class="buy-btn" data-cui-button-glow="primary" :disabled="disabledJump || !sslQuoteReady || sslLoadingPrice"
                               @click="goBuySsl">{{lang.buy_now}}</el-button>
                           </div>
                         </div>
@@ -864,7 +864,7 @@
   <script src="{:cra1_theme_asset_url('native', 'components/payDialog/payDialog.js', '/clientarea/template/pc/cra1/releases/20261017-compat-v3/components/payDialog/payDialog.js')}"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/customGoods/customGoods.js"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/discountCode/discountCode.js"></script>
-  <script src="/{$template_catalog}/template/{$themes}/components/eventCode/eventCode.js"></script>
+  <script src="/{$template_catalog}/template/{$themes}/components/cra1EventCode/eventCode.js"></script>
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/goodsList.js?v={:filemtime(IDCSMART_ROOT . 'public/cart/template/pc/cra1/api/goodsList.js')}"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261013-security-snapshot-v1/js/cart-config.js', '/cart/template/pc/cra1/releases/20261013-security-snapshot-v1/js/cart-config.js')}"></script>
 <script src="{:cra1_theme_asset_url('cart', '20261012-cart-entry-v1/js/module-policy.js', '/cart/template/pc/cra1/releases/20261012-cart-entry-v1/js/module-policy.js')}"></script>

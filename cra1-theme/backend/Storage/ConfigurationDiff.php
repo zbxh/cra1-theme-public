@@ -6,7 +6,7 @@ namespace CRA1\Theme\Storage;
 final class ConfigurationDiff
 {
     private const LABELS=['website'=>'官网','member'=>'会员中心','cart'=>'购物车','notifications'=>'通知',
-        'sidebar'=>'侧栏菜单','nodes'=>'菜单','recent'=>'最近访问','shape'=>'层级','appearance'=>'外观','content'=>'内容',
+        'sidebar'=>'侧栏菜单','nodes'=>'菜单','recent'=>'最近访问','shape'=>'层级','pull_enabled'=>'桌面菜单拉帘','appearance'=>'外观','content'=>'内容',
         'custom_code'=>'自定义代码','custom_css'=>'自定义 CSS','custom_js'=>'自定义 JS','css'=>'CSS','js'=>'JS',
         'enabled'=>'启用','hidden'=>'隐藏','label'=>'名称','title'=>'标题','description'=>'说明','url'=>'链接',
         'icon'=>'图标','order'=>'排序','children'=>'子菜单','items'=>'条目','product_id'=>'关联商品',

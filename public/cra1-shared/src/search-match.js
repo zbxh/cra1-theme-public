@@ -119,14 +119,21 @@
     if (!original || original === '0') return [];
     var result = [original], normalized = normalize(original), compatible = original.normalize('NFKC');
     if (!normalized || normalized === '0') return [];
-    // Only words and whitespace can produce SQL-LIKE alternatives. Keep
-    // identifiers, URLs and user-supplied search syntax as one literal query.
-    if (/[^\p{Letter}\p{Number}\p{Mark}\s]/u.test(original + compatible)) return result;
-    var words = tokens(normalized);
-    if (words.length < 2 && compatible === original) return result;
-    [normalized, words.join('%'), words.slice().reverse().join('%')].forEach(function (value) {
+    // User-supplied LIKE syntax keeps its native meaning, including fullwidth
+    // characters that NFKC would turn into wildcards or an escape character.
+    if (/[%_\\]/.test(original + compatible)) return result;
+    function add(value) {
       if (value && result.indexOf(value) === -1 && result.length < 4) result.push(value);
-    });
+    }
+    // Normalize identifier punctuation without broadening it into LIKE syntax.
+    // A spaced host label can match its compact form while dots, colons and
+    // hyphens remain in place; the untouched native query always runs first.
+    if (/[^\p{Letter}\p{Number}\p{Mark}\s]/u.test(normalized)) {
+      add(normalized); add(compact(normalized)); return result;
+    }
+    var words = tokens(normalized);
+    if (words.length < 2 && compatible.replace(invisible, '').replace(/\s+/g, ' ').trim() === original) return result;
+    [normalized, words.join('%'), words.slice().reverse().join('%')].forEach(add);
     return result;
   }
   shared.SearchMatch = { normalize: normalize, tokens: tokens, score: score, parts: parts, variants: variants };

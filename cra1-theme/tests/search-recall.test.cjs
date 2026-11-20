@@ -48,6 +48,31 @@ test('global public query concurrency never exceeds three across enabled provide
   assert.equal(f.calls.filter(call => call.route === '/help').length, 1)
 })
 
+test('public providers recall normalized literal identifiers and invisible text through their native lists', async () => {
+  for (const source of [product, article('news'), article('announcement')]) {
+    for (const [keywords, title, literalOnly] of [
+      ['ＳＳＨ-密钥', 'SSH-密钥', true],
+      ['ＳＲＶ　－　０１.example', 'srv-01.example', true],
+      ['SSH\u200b密钥', 'SSH 密钥', false],
+    ]) {
+      const f = fixture((route, options) => {
+        // Model the native LIKE query without applying the theme's text folding:
+        // only the optional queries can reach these otherwise missing candidates.
+        const pattern = options.params.keywords.split('%').map(value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*')
+        return { data: { list: new RegExp(pattern, 'i').test(title) ? [
+          { id: 1, name: title, title }, { id: 2, name: '无关结果', title: '无关结果' },
+        ] : [] } }
+      })
+      const result = await f.api.search({ keywords, sources: [source] })
+      assert.deepEqual(plain(result.groups[0].items).map(item => item.key), [source.key + ':1'])
+      assert.equal(f.calls[0].options.params.keywords, keywords)
+      assert.ok(f.calls.length <= 4 && f.calls.length > 1)
+      assert.ok(f.calls.every(call => call.options.params.limit === 18 && call.options.params.page === 1))
+      if (literalOnly) assert.ok(f.calls.every(call => !call.options.params.keywords.includes('%')))
+    }
+  }
+})
+
 test('expanded article alternatives honor the native maximum without truncating the original', async () => {
   const keywords = '中a'.repeat(50)
   const f = fixture(() => ({ data: { list: [] } }))

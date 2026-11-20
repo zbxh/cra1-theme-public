@@ -288,7 +288,7 @@ export default function RechargePage() {
                         </div>
                       </div>
                     </dl>
-                    <Button className="mt-4 w-full" permission="Pay::recharge" disabled={busy || creationUnknown || !!loadError || !!certError || needCert || certChecking || !payAmount || !gateway}
+                    <Button data-cui-button-glow="primary" className="mt-4 w-full" permission="Pay::recharge" disabled={busy || creationUnknown || !!loadError || !!certError || needCert || certChecking || !payAmount || !gateway}
                             onClick={submit}>
                       {busy ? '创建中…' : orderId ? '继续支付当前订单' : (needCert ? '实名认证后可充值' : '立即充值')}
                     </Button>

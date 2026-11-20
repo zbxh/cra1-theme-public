@@ -1,5 +1,5 @@
 /* Account layouts share CRA1 controls and tokens; no vendor stylesheet changes. */
-.cra1-auth-page{--auth-muted:var(--cui-muted,var(--cui-body));min-height:100vh;display:flex;flex-direction:column;color:var(--cui-ink,var(--cui-ink));background:radial-gradient(ellipse at 8% 75%,color-mix(in srgb,var(--cui-mist-200) 38%,transparent),transparent 48%),var(--cui-page);font-family:var(--cui-font);font-size:14px;line-height:1.6}
+.cra1-auth-page{--auth-muted:var(--cui-muted,var(--cui-body));min-height:100vh;display:flex;flex-direction:column;color:var(--cui-ink,var(--cui-ink));font-family:var(--cui-font);font-size:14px;line-height:1.6}
 .cra1-auth-page *{box-sizing:border-box}
 .cra1-auth-header{width:100%;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-shrink:0;min-height:64px}
 .cra1-auth-header-brand{display:flex;align-items:center;gap:16px;min-width:0}
@@ -35,7 +35,7 @@
 .cra1-auth-layer--front svg{width:28px;height:28px}.cra1-auth-layer--front span{width:60px;height:5px;border-radius:var(--cui-radius-card);background:#8c93994d}.cra1-auth-layer--front i{width:5px;height:5px;border-radius:50%;background:#e3c58e;margin-left:auto;box-shadow:0 0 10px #dfc38977}
 .cra1-auth-node{position:absolute;width:7px;height:7px;border-radius:50%;background:#b9a67f;box-shadow:0 0 0 5px #c9b89220}.cra1-auth-node--one{left:28px;top:112px}.cra1-auth-node--two{left:304px;top:55px}
 .cra1-auth-brand-image{display:block;width:100%;max-width:420px;max-height:220px;object-fit:contain;object-position:left center;margin:24px 0}
-.cra1-auth-panel{min-width:0;width:100%;padding:36px 38px 30px;background:var(--cui-surface,#fff);border:1px solid #ffffff;border-radius:var(--cui-radius-card);box-shadow:var(--cui-shadow-pop)}
+.cra1-auth-panel{min-width:0;width:100%;padding:36px 38px 30px;background:var(--cra1-member-card,var(--cui-surface));border:1px solid transparent;border-radius:var(--cui-radius-card);box-shadow:var(--cra1-member-shadow,var(--cui-shadow-pop))}
 .cra1-auth-panel-heading{margin-bottom:26px}.cra1-auth-panel-heading h1{font-size:26px;line-height:1.4;letter-spacing:-.5px;font-weight:650;margin:0 0 8px;overflow-wrap:anywhere}.cra1-auth-panel-heading p{font-size:13px;color:var(--auth-muted);margin:0;overflow-wrap:anywhere}
 .cra1-auth-page--centered .cra1-auth-main{display:flex;justify-content:center}.cra1-auth-page--centered .cra1-auth-panel{max-width:480px}
 .cra1-auth-footer{padding:16px 24px 24px;text-align:center;color:var(--auth-muted);font-size:12px;overflow-wrap:anywhere}

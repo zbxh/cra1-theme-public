@@ -194,6 +194,10 @@ html[data-cra1-theme="website"] main .reading-content { font:16px/1.85 var(--cui
 .reading-content h3 { font-size:18px!important; }
 .reading-content a { color:var(--cui-body)!important; text-decoration:underline; text-underline-offset:3px; }
 .reading-content img { display:block; max-width:100%!important; height:auto!important; margin:12px 0!important; border:1px solid var(--cui-edge); border-radius:var(--cui-radius-card); }
+.reading-content .reading-table-scroll { max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; margin:20px 0; border-radius:var(--cui-radius-control); }
+.reading-content .reading-table-scroll:focus-visible { outline:2px solid var(--cui-focus); outline-offset:3px; }
+.reading-content .reading-table-scroll>table { margin-top:0; margin-bottom:0; }
+.reading-content pre { max-width:100%; box-sizing:border-box; white-space:pre; overflow-x:auto; overflow-wrap:normal; }
 .reading-toc { margin-top:24px; padding:14px 18px; border:1px solid var(--cui-edge); border-radius:var(--cui-radius-card); background:var(--cui-page); font-size:13px; }
 .reading-toc summary { font-weight:600; color:var(--cui-body); cursor:pointer; }
 .reading-toc ol { margin-top:12px; display:grid; gap:6px; }

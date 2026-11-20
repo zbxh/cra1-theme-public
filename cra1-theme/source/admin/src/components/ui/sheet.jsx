@@ -2,6 +2,7 @@ import * as SheetPrimitive from '@radix-ui/react-dialog'
 import { useRef } from 'react'
 import { X } from 'lucide-react'
 import { cn } from './utils'
+import { useViewportFrame } from './viewport-frame'
 
 /**
  * Sheet（shadcn 规范）：侧边抽屉，基于 Radix Dialog
@@ -11,8 +12,9 @@ export const Sheet = SheetPrimitive.Root
 export const SheetTrigger = SheetPrimitive.Trigger
 export const SheetClose = SheetPrimitive.Close
 
-export function SheetContent({ className, children, side = 'left', onOpenAutoFocus, onCloseAutoFocus, ...props }) {
+export function SheetContent({ className, children, style, side = 'left', onOpenAutoFocus, onCloseAutoFocus, ...props }) {
   const focusOrigin = useRef(null)
+  const viewport = useViewportFrame()
   return (
     <SheetPrimitive.Portal>
       <SheetPrimitive.Overlay
@@ -24,12 +26,15 @@ export function SheetContent({ className, children, side = 'left', onOpenAutoFoc
         )}
       />
       <SheetPrimitive.Content
+        ref={viewport.ref}
+        style={{ ...viewport.frame, ...style }}
+        data-side={side}
         data-cra1-ui="admin"
         onOpenAutoFocus={(event) => { focusOrigin.current = document.activeElement; onOpenAutoFocus?.(event) }}
         onCloseAutoFocus={(event) => { onCloseAutoFocus?.(event); if (!event.defaultPrevented && focusOrigin.current?.isConnected) { event.preventDefault(); focusOrigin.current.focus() } }}
         aria-describedby={undefined}
         className={cn(
-          'fixed inset-y-0 z-[101] flex h-full w-[280px] flex-col bg-surface',
+          'cra1-admin-sheet fixed inset-y-0 z-[101] flex h-full w-[280px] flex-col bg-surface',
           'data-[state=open]:transition-transform data-[state=open]:duration-200 data-[state=open]:ease-out',
           side === 'left'
             ? 'left-0 border-r border-line data-[state=closed]:-translate-x-full data-[state=open]:translate-x-0'

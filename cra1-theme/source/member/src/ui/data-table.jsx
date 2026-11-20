@@ -49,11 +49,11 @@ export function DataTable({
   )
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('cui-data-table space-y-4', className)} aria-busy={loading || undefined}>
       {(search !== undefined || filters || actions) && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="cui-data-table-toolbar flex flex-wrap items-center gap-2">
           {search !== undefined && (
-            <div className="relative min-w-[200px] flex-1">
+            <div className="cui-data-table-search relative min-w-0">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
               <Input
                 value={search}
@@ -75,15 +75,18 @@ export function DataTable({
             </div>
           )}
           {filters}
-          {actions && <div className="ml-auto flex items-center gap-2">{actions}</div>}
+          {actions && <div className="cui-data-table-actions ml-auto flex flex-wrap items-center gap-2">{actions}</div>}
         </div>
       )}
 
-      {error && (
-        <div role="alert" className="rounded-lg border border-destructive/20 bg-destructive/5 px-3.5 py-2.5 text-[13px] text-destructive">
-          页面错误，请刷新重试
+      {error && !loading && (
+        <div role="alert" className="cui-data-table-error rounded-lg border border-destructive/20 bg-destructive/5 px-3.5 py-2.5 text-[13px] text-destructive">
+          <p>{rows.length ? '读取失败，当前显示上次加载的记录。' : '暂时无法读取记录，请稍后重试。'}</p>
+          {onRetry && <Button variant="outline" size="sm" onClick={onRetry}>重新加载</Button>}
         </div>
       )}
+
+      {loading && <p className="sr-only" role="status">正在加载记录…</p>}
 
       <div>
       <Table style={{ minWidth: minTableWidth }} wrapperClassName={isEmpty ? 'rounded-b-none border-b-0' : undefined}>
@@ -124,11 +127,11 @@ export function DataTable({
           )}
         </TableBody>
       </Table>
-      {isEmpty && <div role="status" className="rounded-b-2xl border border-t-0 border-line px-4 py-12 text-center text-muted-foreground">{empty || '暂无数据'}</div>}
+      {isEmpty && <div role="status" className={cn('cui-data-table-empty border border-t-0 border-line text-center text-muted-foreground', (!empty || typeof empty === 'string') && 'px-4 py-10')}>{empty || '暂无数据'}</div>}
       </div>
 
       {showPager && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="cui-data-table-pager flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
             {unknownTotal ? `第 ${page} 页` : `共 ${total} 条 · 第 ${page}/${maxPage} 页`}
           </p>

@@ -214,7 +214,7 @@ function HomeQuickbar() {
         <Button permission="addon\\idcsmart_ticket\\controller\\clientarea\\TicketController::create" hidden={!pluginLink('ticket')} variant="outline" size="sm" className={buttonClass} onClick={() => { window.location.href = pluginLink('ticket','addTicket.htm') }}>
           <LifeBuoy className="size-3.5" aria-hidden="true" />提交工单
         </Button>
-        <Button permission="Product::settle" size="sm" className={buttonClass} onClick={() => { window.location.href = '/cart/goodsList.htm' }}>
+        <Button data-cui-button-glow="primary" permission="Product::settle" size="sm" className={buttonClass} onClick={() => { window.location.href = '/cart/goodsList.htm' }}>
           <Package className="size-3.5" aria-hidden="true" />浏览产品
         </Button>
       </div>
@@ -434,7 +434,7 @@ function TodoSection({ cfg, account }) {
               const remain = Math.ceil((h.due_time * 1000 - now) / 86400000)
               const urgent = remain <= 7
               return (
-                <div key={h.id} className="cui-card flex w-[240px] flex-col gap-2 p-3.5">
+                <div key={h.id} className="cui-card cui-member-card-inner cui-member-tile flex w-[240px] flex-col gap-2 p-3.5">
                   <div className="flex items-start justify-between gap-2">
                     <a href={`/productdetail.htm?id=${h.id}`}
                        className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink hover:text-brand hover:underline"
@@ -462,7 +462,7 @@ function TodoSection({ cfg, account }) {
         ) : cat === 'ticket' ? (
           <div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:thin] [&>*]:shrink-0" role="list" aria-label="待回复工单">
             {ticketList.slice(0, maxRows).map((t) => (
-              <div key={t.id} className="cui-card flex w-[260px] flex-col gap-2 p-3.5">
+              <div key={t.id} className="cui-card cui-member-card-inner cui-member-tile flex w-[260px] flex-col gap-2 p-3.5">
                 <a href={pluginLink('ticket','ticketDetails.htm',`id=${t.id}`)}
                    className="min-w-0 truncate text-[13px] font-medium text-ink hover:text-brand hover:underline"
                    title={t.title || `工单 #${t.id}`}>
@@ -482,7 +482,7 @@ function TodoSection({ cfg, account }) {
         ) : cat === 'order' ? (
           <div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:thin] [&>*]:shrink-0" role="list" aria-label="待支付订单">
             {orderList.slice(0, maxRows).map((o) => (
-              <div key={o.id} className="cui-card flex w-[240px] flex-col gap-2 p-3.5">
+              <div key={o.id} className="cui-card cui-member-card-inner cui-member-tile flex w-[240px] flex-col gap-2 p-3.5">
                 <a href={`/orderDetail.htm?id=${o.id}`}
                    className="min-w-0 truncate text-[13px] font-medium text-ink hover:text-brand hover:underline">
                   订单 #{o.id}
@@ -500,7 +500,7 @@ function TodoSection({ cfg, account }) {
         ) : (
           <div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:thin] [&>*]:shrink-0" role="list" aria-label="待读站内信">
             {mailList.slice(0, maxRows).map((m, i) => (
-              <div key={m.id || i} className="cui-card flex w-[260px] flex-col gap-2 p-3.5">
+              <div key={m.id || i} className="cui-card cui-member-card-inner cui-member-tile flex w-[260px] flex-col gap-2 p-3.5">
                 <p className="min-w-0 truncate text-[13px] font-medium text-ink" title={m.subject || m.title || '站内信'}>
                   {m.subject || m.title || '站内信'}
                 </p>
@@ -601,8 +601,7 @@ function BannerRow({ cfg }) {
 /* -------------------------------------------------------------------------- */
 
 function QuickLinks({ items }) {
-  /* 列数按容器宽度自适应（auto-fill），最小列宽取「当前配置里最长标签」
-     实测出来的单元格宽度——文本任何情况下都不压缩、不省略。
+  /* 按最长标签估算最小列宽。窄屏退到单列，过长的标签可换行。
      字宽估算：text-xs(12px) 下 CJK ≈12px/字，拉丁/数字 ≈7px；
      固定开销 = 图标 32 + 图标文字间距 10 + 左右内边距 20 ≈ 62px。 */
   const textW = (s) => [...String(s || '')].reduce(
@@ -617,10 +616,10 @@ function QuickLinks({ items }) {
       </CardHeader>
       <CardContent className="p-3 pt-3">
         <ul
-          className="grid gap-1"
+          className="cui-member-card-inner grid gap-1 p-1"
           role="list"
           aria-label="常用功能"
-          style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${minCell}px, 1fr))` }}
+          style={{ gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${minCell}px), 1fr))` }}
         >
           {items.map((it) => {
             const Icon = QUICK_ICONS[it.icon] || Package
@@ -629,12 +628,12 @@ function QuickLinks({ items }) {
               <li key={it.id}>
                 <a
                   href={url}
-                  className="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2.5 transition-colors duration-150 hover:border-line hover:bg-surface-alt focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                  className="cui-member-tile group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                 >
                   <span className="flex size-8 shrink-0 items-center justify-center rounded-md cui-business-icon cui-business-icon--tile" data-cra1-icon-label={it.label} data-cui-icon-style={it.icon_style ? '1' : undefined} style={iconStyleVars(it.icon_style)}>
                     {it.icon_resolved?.url ? (it.icon_resolved.colorable ? <span className="cui-icon-mask" style={{'--cui-icon-url':`url("${it.icon_resolved.url}")`,width:16,height:16}} aria-hidden="true"/> : <img src={it.icon_resolved.url} width="16" height="16" alt=""/>) : <Icon className="size-4" aria-hidden="true" />}
                   </span>
-                  <span className="whitespace-nowrap text-xs font-medium text-ink">{it.label}</span>
+                  <span className="min-w-0 text-xs font-medium text-ink [overflow-wrap:anywhere]">{it.label}</span>
                 </a>
               </li>
             )
@@ -745,7 +744,7 @@ function HostSection() {
                 : (['free', 'onetime'].includes(h.billing_cycle) || Number(h.due_time) === 0 ? '长期有效' : formatDate(h.due_time))
               return (
                 <div key={h.id}
-                     className="cui-card flex gap-3 p-4">
+                     className="cui-card cui-member-card-inner cui-member-tile flex gap-3 p-4">
                   {/* 左：名称/标识/IP/配置 */}
                   <div className="min-w-0 flex-1">
                     <a href={`/productdetail.htm?id=${h.id}`}

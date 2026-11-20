@@ -206,7 +206,7 @@
 
               </div>
               <div class="btn-box" v-if="showPayBtn">
-                <el-button type="primary" class="buy-btn" @click="goPay"
+                <el-button type="primary" class="buy-btn" data-cui-button-glow="primary" @click="goPay"
                   :disabled="!createdOrderId && !canSettle" :loading="subBtnLoading">{{createdOrderId ? '继续支付当前订单' : lang.settlement_tip3}}</el-button>
                 <div class="check-box">
                   <el-checkbox v-model="checked"></el-checkbox>
@@ -230,6 +230,6 @@
   <!-- =======页面独有======= -->
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/shopping.js"></script>
   <script src="{:cra1_theme_asset_url('native', 'components/payDialog/payDialog.js', '/clientarea/template/pc/cra1/releases/20261017-compat-v3/components/payDialog/payDialog.js')}"></script>
-  <script src="/{$template_catalog}/template/{$themes}/components/eventCode/eventCode.js"></script>
+  <script src="/{$template_catalog}/template/{$themes}/components/cra1EventCode/eventCode.js"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261013-security-snapshot-v1/js/cart-config.js', '/cart/template/pc/cra1/releases/20261013-security-snapshot-v1/js/cart-config.js')}"></script>
 <script src="{:cra1_theme_asset_url('cart', '20261017-compat-v3/js/settlement.js', '/cart/template/pc/cra1/releases/20261017-compat-v3/js/settlement.js')}"></script>

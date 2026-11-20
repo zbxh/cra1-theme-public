@@ -23,8 +23,8 @@ import{Dialog,DialogContent,DialogHeader,DialogTitle}from${JSON.stringify(path.j
 import{DropdownMenu,DropdownMenuTrigger,DropdownMenuContent,DropdownMenuItem}from${JSON.stringify(path.join(ui, 'dropdown-menu.jsx'))};
 import{Tabs,TabsList,TabsTrigger,TabsContent}from${JSON.stringify(path.join(ui, 'tabs.jsx'))};
 import${JSON.stringify(path.join(root, 'public/cra1-shared/src/ui-effects.js'))};
-function App(){const[v,set]=useState(''),[changes,count]=useState(0),[clicks,click]=useState(0),[open,toggle]=useState(false),native=useRef();return <main style={{padding:20,maxWidth:900,margin:'auto'}}>
-<h1>组件交互</h1><div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'20px 0'}}><Button id="primary" onClick={()=>click(x=>x+1)}>保存内容</Button><Button variant="outline" id="outline">查看帮助</Button><Button variant="outline" asChild><a id="link-button" href="#help">访问前台</a></Button><Button variant="danger" id="danger">删除</Button><Button disabled id="disabled">正在保存</Button></div><output id="clicks">{clicks}</output>
+function App(){const[v,set]=useState(''),[changes,count]=useState(0),[clicks,click]=useState(0),[open,toggle]=useState(false),[glowing,setGlow]=useState(true),native=useRef();window.setPrimaryGlow=setGlow;return <main style={{padding:20,maxWidth:900,margin:'auto'}}>
+<h1>组件交互</h1><div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'20px 0'}}><Button id="primary" data-cui-button-glow={glowing?"primary":undefined} onClick={()=>click(x=>x+1)}>保存内容</Button><Button variant="outline" id="outline">查看帮助</Button><Button id="auxiliary">刷新</Button><Button variant="outline" asChild><a data-cui-button-glow="primary" id="link-button" href="#help">访问前台</a></Button><Button variant="danger" id="danger" data-cui-button-glow="primary">删除</Button><Button disabled id="disabled" data-cui-button-glow="primary">正在保存</Button></div><output id="clicks">{clicks}</output>
 <form id="fixture-form" onSubmit={e=>e.preventDefault()}><label htmlFor="fixture-select">文章分类</label><Select id="fixture-select" aria-label="文章分类" name="category" required value={v} onChange={e=>{set(e.target.value);count(n=>n+1)}}><option value="">请选择</option><optgroup label="文章"><option value="news">新闻</option><option value="disabled" disabled>停用分类</option><option value="help">帮助</option></optgroup></Select><output id="changes">{changes}</output><Input aria-label="文章标题" placeholder="输入标题"/><Button type="submit" id="submit">提交</Button></form>
 <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" id="menu-trigger">更多操作</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem id="menu-item">查看内容</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
 <Button variant="outline" id="open-dialog" onClick={()=>toggle(true)}>打开弹窗</Button><Dialog open={open} onOpenChange={toggle}><DialogContent><DialogHeader><DialogTitle>编辑内容</DialogTitle></DialogHeader><Select aria-label="弹窗分类" defaultValue="news"><option value="news">新闻</option><option value="help">帮助</option></Select></DialogContent></Dialog>
@@ -60,6 +60,16 @@ try {
       check(await radius('#fixture-select') === '4px', `${engine}: input radius 4px`)
       check(await page.locator('#danger').evaluate(node => !node.classList.contains('cui-rainbow')), `${engine}: danger has no decorative effect`)
       check(await page.locator('#disabled').evaluate(node => !node.classList.contains('cui-rainbow')), `${engine}: disabled has no decorative effect`)
+      check(await page.locator('#outline,#auxiliary').evaluateAll(nodes => nodes.every(node => !node.classList.contains('cui-rainbow') && !node.querySelector('.cui-button-glow'))), `${engine}: default and outline auxiliary controls remain ordinary`)
+      check(await page.locator('#danger .cui-button-glow,#disabled .cui-button-glow').count() === 0, `${engine}: excluded primary states do not render framework glow`)
+      check(await page.locator('#primary').evaluate(node => { const s=getComputedStyle(node);return s.animationName==='cui-button-pan'&&s.animationDuration==='2s'&&s.animationIterationCount==='infinite' }), `${engine}: explicit primary preserves original continuous animation`)
+      check(await page.locator('#link-button').evaluate(node => node.classList.contains('cui-rainbow')&&node.querySelectorAll('.cui-button-glow').length===1), `${engine}: asChild keeps an explicitly marked primary link without duplicate decoration`)
+      await page.evaluate(() => window.setPrimaryGlow(false))
+      await page.waitForFunction(() => !document.getElementById('primary').classList.contains('cui-rainbow'))
+      check(await page.locator('#primary .cui-button-glow').count() === 0, `${engine}: React rerender removes primary framework decoration`)
+      await page.evaluate(() => window.setPrimaryGlow(true))
+      await page.waitForFunction(() => document.getElementById('primary').classList.contains('cui-rainbow'))
+      check(await page.locator('#primary .cui-button-glow').count() === 1, `${engine}: React rerender restores one primary framework layer`)
       await page.locator('#primary').click()
       check(await page.locator('#clicks').textContent() === '1', `${engine}: business click once`)
       await page.locator('.cui-ripple-clip').waitFor({ state: 'detached', timeout: 3000 })

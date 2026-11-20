@@ -38,6 +38,8 @@ try {
     $a=$w->editorGet('member','sidebar')['data'];$b=$w->editorGet('member','sidebar')['data'];
     check($a['revision']===$b['revision']&&json_encode($a['values'])===json_encode($b['values']),'legacy editor projection has deterministic identities and revisions');
     $sidebar=$a['values']['main']['sidebar'];
+    check($sidebar['pull_enabled']===1 && $store->snapshotProjection($store->read())['nav_pull_enabled']===1,
+        'existing configurations default to the visible desktop menu pull');
     check($sidebar['shape']===3&&$sidebar['nodes'][1]['children'][0]['label']==='原分组'&&$sidebar['nodes'][1]['children'][0]['children'][0]['id']===node(11,'')['id'],'legacy conversion preserves original parents and page IDs');
     check(hash_file('sha256',$file)===$before,'opening the editor does not migrate or overwrite stored data');
     $saved=$w->editorSave('member','sidebar',$a['revisions'],['main'=>['sidebar'=>['nodes'=>$three]]],'fixture');
@@ -45,6 +47,13 @@ try {
     check($store->read()['sidebar']['nodes'][0]['children'][0]['children'][0]['label']==='测试页面','saving preserves every level');
     $conflict=$w->editorSave('member','sidebar',$a['revisions'],['main'=>['sidebar'=>['nodes'=>[]]]],'fixture');
     check($conflict['status']===409&&count($store->read()['sidebar']['nodes'])===1,'stale drafts retain conflict protection');
+    $editor=$w->editorGet('member','sidebar')['data'];
+    $saved=$w->editorSave('member','sidebar',$editor['revisions'],['main'=>['sidebar'=>['pull_enabled'=>0]]],'fixture');
+    check($saved['status']===200 && $store->read()['sidebar']['pull_enabled']===0
+        && $store->snapshotProjection($store->read())['nav_pull_enabled']===0,
+        'the desktop menu pull can be disabled and publishes the saved value');
+    check($store->read()['sidebar']['nodes'][0]['children'][0]['children'][0]['label']==='测试页面',
+        'changing the desktop pull leaves menu entries intact');
     $catalog=['error'=>'','menu'=>[row(1,0,'计算服务',''),row(2,1,'服务器','productList.htm','module'),row(3,0,'账户资料','account.htm','system',12)]];
     $catalog['menu'][1]['product_id']=[24,25];$catalog['menu'][1]['module']=['mf_cloud'];
     check($store->diff($catalog)['removed']===[],'manual groups are never reported as expired system sources');
@@ -59,6 +68,7 @@ try {
     check($duplicateTree['nodes'][0]['children'][0]['children'][1]['source_nav_id']===12&&$duplicateTree['nodes'][0]['children'][1]['source_nav_id']===12,'intentional native page copies remain under their respective parents');
     check($store->proposeImport($duplicates,'merge',['shape'=>3,'nodes'=>$duplicateTree['nodes']])['added']===0,'intentional duplicate sources reimport idempotently');
     $saved=$store->save(['sidebar'=>['shape'=>3,'nodes'=>$tree]],'fixture');$tree=$store->read()['sidebar']['nodes'];
+    check($store->read()['sidebar']['pull_enabled']===0,'menu-only updates preserve the desktop pull preference');
     $tree[0]['label']='商家已改分组';$tree[0]['children'][0]['label']='商家已改分类';
     $moved=$tree[0]['children'][0]['children'][0];$moved['label']='商家已改服务器';$moved['hidden']=1;$moved['url']='productList.htm?mine=1';
     $tree[0]['children'][0]['children']=[];

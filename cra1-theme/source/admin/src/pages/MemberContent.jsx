@@ -182,7 +182,7 @@ export default function MemberContent({ workspace, scope = 'home', block }) {
                     onClick={() => setContent(JSON.parse(JSON.stringify(original)))}>
               <RotateCcw className="size-3.5" />撤销
             </Button>
-            <Button size="sm" onClick={save} disabled={saving || !dirtyCount}>
+            <Button data-cui-button-glow="primary" size="sm" onClick={save} disabled={saving || !dirtyCount}>
               <Save className="size-3.5" />{saving ? '保存中…' : '保存'}
             </Button>
           </div>

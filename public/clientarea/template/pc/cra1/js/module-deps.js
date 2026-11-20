@@ -61,7 +61,7 @@
     countDownButton: 'components/countDownButton/countDownButton.js',
     securityVerification: 'components/securityVerification/securityVerification.js',
     resetAuth: 'components/resetAuth/resetAuth.js',
-    eventCode: 'components/eventCode/eventCode.js',
+    eventCode: 'components/cra1EventCode/eventCode.js',
     customGoods: 'components/customGoods/customGoods.js',
   }
 

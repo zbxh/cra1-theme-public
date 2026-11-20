@@ -113,6 +113,7 @@ final class MemberCenterStore
                 // 新配置与后台编辑器统一采用三级；历史两级配置仍按原规则读取。
                 'shape'      => 3,
                 'nodes'      => [],
+                'pull_enabled' => 1,
                 /*
                  * 最近访问设置（前台一级入口，置于「我的资源」上方）。
                  * 访问记录本身存于会员浏览器本地（localStorage，按会员区分），
@@ -427,6 +428,7 @@ final class MemberCenterStore
             // 树形态：3 = 一级分组树（前台按 分组→菜单→页面 渲染），
             // 2 = 旧两级（前台按 服务分类 面板渲染）。迁移/结构变化时前台自适应。
             'nav_shape' => ((int) ($config['sidebar']['shape'] ?? 2) >= 3) ? 3 : 2,
+            'nav_pull_enabled' => $config['sidebar']['pull_enabled'] ?? 1,
             // 最近访问展示策略（访问记录在前端浏览器本地，这里只下发策略）
             'recent' => CRA1ThemePublicProjection::content($config['sidebar']['recent']),
             // 会员中心内容设置（已过白名单/HTML 清理），前台直接渲染
@@ -554,6 +556,7 @@ final class MemberCenterStore
             'imported_at' => (int) ($sb['imported_at'] ?? 0),
             'shape'       => $shape,
             'nodes'       => $this->normalizeNodes($rawNodes),
+            'pull_enabled' => in_array($sb['pull_enabled'] ?? 1, [0, '0', false], true) ? 0 : 1,
             'recent'      => $this->normalizeRecent(is_array($sb['recent'] ?? null) ? $sb['recent'] : []),
         ];
 

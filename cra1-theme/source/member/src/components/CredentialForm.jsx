@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { api, get, post, encryptPassword } from '../lib'
 import { passwordPayload, safeReturn, validateFields } from '../compat'
+import { optionalPluginUnavailable } from '../optional-plugin'
 import { loginAccount, loginMethods, passwordError, providerLogo } from '../lib/auth-policy'
 import { Button } from '../ui/button'
 import { Field, Input } from '../ui/input'
@@ -38,6 +39,7 @@ export default function CredentialForm({ kind = 'login', association = false }) 
   const [sale,setSale]=useState(() => kind === 'regist' && policy.sales ? (new URLSearchParams(location.search).get('sale_number') || '').slice(0,100) : '')
   const [remember,setRemember]=useState(false)
   const [fieldsReady,setFieldsReady]=useState(kind !== 'regist' || !runtime.client_custom_fields)
+  const [customFieldsAvailable,setCustomFieldsAvailable]=useState(!!runtime.client_custom_fields),[fieldAttempt,retryFields]=useState(0)
   const [qr,setQr]=useState(kind === 'login' && !association && !!policy.qr && (policy.qr.preferred || !methods.length))
   const [agree,setAgree] = useState(false), [done,setDone] = useState(false)
   const [oauthBusy,setOauthBusy] = useState(false), [languageBusy,setLanguageBusy] = useState(false)
@@ -66,7 +68,23 @@ export default function CredentialForm({ kind = 'login', association = false }) 
   }
   useEffect(() => { if (!countdown) return; const timer = setTimeout(() => setCountdown(n => n - 1),1000); return () => clearTimeout(timer) },[countdown])
   useEffect(() => { if (type === 'phone') get('/country').then(r => setCountries(r.data?.list || [])).catch(() => {}) },[type])
-  useEffect(() => { if (kind !== 'regist' || !runtime.client_custom_fields || !methods.length) return; let alive=true; get('/register/custom_field').then(r => {if(alive){setFields(r.data?.list || []);setFieldsReady(true)}}).catch(() => {if(alive)setFieldError('补充资料暂时无法读取，请刷新重试')}); return () => {alive=false} },[kind])
+  useEffect(() => {
+    if (kind !== 'regist' || !runtime.client_custom_fields || !methods.length) return
+    let alive=true
+    setFieldsReady(false);setFieldError('')
+    get('/register/custom_field').then(r => {
+      if(!alive)return
+      const list=r.data?.list
+      if(!Array.isArray(list))throw new Error('补充资料返回无效')
+      setFields(list);setCustomFieldsAvailable(true);setFieldsReady(true)
+    }).catch(error => {
+      if(!alive)return
+      if(optionalPluginUnavailable(error)){
+        setFields([]);setValues({});setCustomFieldsAvailable(false);setFieldsReady(true)
+      }else setFieldError('补充资料暂时无法读取，请重试')
+    })
+    return () => {alive=false}
+  },[kind,runtime.client_custom_fields,methods.length,fieldAttempt])
   const captchaProof = async () => { const p=await captcha.open(); if(!p)throw new Error('请完成图形验证后重试'); return {captcha:p.code,token:p.token} }
   async function sendCode() {
     if (sendLock.current || sending || countdown || busy) return
@@ -102,7 +120,7 @@ export default function CredentialForm({ kind = 'login', association = false }) 
       let body = passwordPayload(type,form), path
       if(loginPage) {path='/login';body={type:mode==='phone-code'?'code':'password',account:account.trim(),phone_code:type==='phone'?form.phone_code:'86',remember_password:remember?'1':'0'};if(mode === 'phone-code')body.code=form.code;else body.password=encryptPassword(form.password)}
       else if(association){path='/oauth/client/bind';body={type,account:form[type].trim(),phone_code:form.phone_code,code:form.code}; const q=new URLSearchParams(location.search);if(q.get('ticket')&&q.get('token')){path='/mp_weixin_notice/qrcode/bind_client';body.ticket=q.get('ticket');body.token=q.get('token')}}
-      else if(kind === 'regist'){path='/register';body.username=form.username;body.customfield={addon_client_custom_field:values};if(sale)body.customfield.sale_number=sale}
+      else if(kind === 'regist'){path='/register';body.username=form.username;body.customfield={};if(customFieldsAvailable)body.customfield.addon_client_custom_field=values;if(sale)body.customfield.sale_number=sale}
       else path='/account/password_reset'
       if(policy.captcha?.[scene] && !Object.keys(proof.current).length && !needCode && !(scene==='login' && policy.captcha_on_failure))Object.assign(body,await captchaProof())
       Object.assign(body,proof.current);proof.current={}
@@ -146,10 +164,12 @@ export default function CredentialForm({ kind = 'login', association = false }) 
     {needCode&&<Field className="mb-0" label="验证码" htmlFor="auth-code" required><div className="flex gap-2"><Input id="auth-code" value={form.code} onChange={set('code')} disabled={busy} autoComplete="one-time-code"/><Button variant="outline" onClick={sendCode} disabled={busy||sending||countdown>0}>{sending?'发送中…':countdown?`${countdown}s`:'获取验证码'}</Button></div></Field>}
     {!association&&!(kind==='login'&&mode==='phone-code')&&<><Field className="mb-0" label={kind==='forget'?'新密码':'密码'} htmlFor="auth-password" required hint={kind!=='login'?(policy.password_rule==='strong'?'使用 8–32 位，包含字母、数字和特殊符号，避免连续或重复字符':'6–32 位'):undefined}><PasswordInput id="auth-password" value={form.password} onChange={set('password')} disabled={busy} autoComplete={kind==='login'?'current-password':'new-password'} placeholder={kind==='login'?'请输入密码':'请设置密码'}/></Field>{kind!=='login'&&<Field className="mb-0" label="确认密码" htmlFor="auth-confirm" required><PasswordInput id="auth-confirm" value={form.re_password} onChange={set('re_password')} disabled={busy} autoComplete="new-password" placeholder="请再次输入密码"/></Field>}</>}
     {kind==='regist'&&policy.sales&&<Field className="mb-0" label="销售人员" htmlFor="register-sale" required={policy.sales.required}>{policy.sales.select?<Select id="register-sale" value={sale} onChange={e=>setSale(e.target.value)} disabled={busy}><option value="">请选择</option>{policy.sales.list.map(s=><option key={s.sale_number} value={s.sale_number}>{s.name}</option>)}</Select>:<Input id="register-sale" value={sale} onChange={e=>setSale(e.target.value)} disabled={busy} placeholder="选填销售编号"/>}</Field>}
+    {fieldError&&<Alert tone="error"><p>{fieldError}</p><Button className="mt-2" variant="outline" disabled={busy} onClick={()=>retryFields(n=>n+1)}>重新加载补充资料</Button></Alert>}
+    {kind==='regist'&&!fieldsReady&&!fieldError&&<p role="status" className="text-sm text-muted">正在读取补充资料…</p>}
     <CustomFields SelectComponent={Select} fieldClassName="mb-0" fields={fields} values={values} onChange={setValues} disabled={busy}/>
     {loginPage&&<div className="auth-options"><label><input type="checkbox" className="cui-checkbox" checked={remember} disabled={busy} onChange={e=>setRemember(e.target.checked)}/>保持登录</label>{policy.reset?.length>0&&<a href="/forget.htm">忘记密码</a>}</div>}
     {(kind==='login'||kind==='regist'||association)&&<label className="auth-agreement flex items-start gap-2"><input id="auth-agreement" type="checkbox" className="cui-checkbox mt-1" checked={agree} onChange={e=>setAgree(e.target.checked)} disabled={busy}/><span>我已阅读并同意 {common.terms_service_url?<a className="underline" href={common.terms_service_url} target="_blank" rel="noopener">服务条款</a>:'服务条款'} 和 {common.terms_privacy_url?<a className="underline" href={common.terms_privacy_url} target="_blank" rel="noopener">隐私政策</a>:'隐私政策'}</span></label>}
-    <Button type="submit" className="auth-submit w-full" disabled={busy||sending||languageBusy||oauthBusy||!!fieldError||!fieldsReady}>{busy?'正在提交…':association?'关联账户':kind==='login'?'登录':kind==='regist'?'注册':'重置密码'}</Button>
+    <Button data-cui-button-glow="primary" type="submit" className="auth-submit w-full" disabled={busy||sending||languageBusy||oauthBusy||!!fieldError||!fieldsReady}>{busy?'正在提交…':association?'关联账户':kind==='login'?'登录':kind==='regist'?'注册':'重置密码'}</Button>
     </form>:!providers.length&&!policy.external?.url&&<Alert tone="info">当前页面暂不可用</Alert>}
     {loginPage&&<><div className="auth-links">{(showQr||!methods.length)&&policy.reset?.length>0&&<a href="/forget.htm">忘记密码</a>}{policy.register?.length>0&&<a href="/regist.htm">还没有账户？ <span className="underline">注册账户</span></a>}</div>{providers.length>0&&<div className="auth-providers"><div className="auth-providers-label">其他登录方式</div><div className="auth-provider-grid">{providers.map(p=><Button key={p.name} className="gap-2" variant="outline" disabled={busy||sending||languageBusy||oauthBusy} onClick={()=>authorize(p)}>{providerLogo(p,location.origin)&&<img src={providerLogo(p,location.origin)} alt="" className="h-5 w-5 shrink-0 object-contain" onError={e=>{e.currentTarget.hidden=true}}/>}{p.title || '第三方'}登录</Button>)}</div></div>}</>}
     {policy.external?.url&&<a className="block text-center text-sm underline" href={policy.external.url} target={policy.external.blank?'_blank':undefined} rel="noopener noreferrer">{policy.external.text || '其他登录方式'}</a>}

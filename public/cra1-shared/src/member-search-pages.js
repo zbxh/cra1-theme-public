@@ -8,7 +8,7 @@
     'account.htm': [['profile', '基本资料'], ['security', '安全设置'], ['credit', '余额记录']],
     'finance.htm': [['orders', '我的订单'], ['credit', '余额记录'], ['freeze', '冻结记录'], ['transactions', '交易记录']],
     'security.htm': [['overview', '安全概览'], ['api', 'API 密钥'], ['ssh', 'SSH 密钥'], ['log', '操作日志'], ['group', '安全组']],
-    'productList.htm': [['using', '使用中'], ['expiring', '即将到期'], ['overdue', '已逾期'], ['deleted', '已删除']],
+    'productList.htm': [['current', '当前产品'], ['using', '使用中'], ['expiring', '即将到期'], ['overdue', '已逾期'], ['all', '全部产品'], ['deleted', '已删除']],
   };
   function token() { return shared.Request && shared.Request.getToken ? shared.Request.getToken() : ''; }
   function invalidate() { generation++; cached = null; pending = null; session = ''; }
@@ -62,6 +62,7 @@
       if (plugin && !options.projected && !(options.pluginIds && options.pluginIds.has(plugin[1]))) return false;
       if (file === 'recharge.htm' && !enabled(features.recharge_open)) return false;
       if (file === 'withdrawal.htm' && !enabled(features.withdraw_open)) return false;
+      if (file === 'productList.htm' && tab === 'deleted' && !enabled(features.show_deleted_products)) return false;
       if ((file === 'security_ssh.htm' || (file === 'security.htm' && tab === 'ssh')) && !enabled(features.ssh)) return false;
       if ((file === 'security_group.htm' || file === 'group_rules.htm' || (file === 'security.htm' && tab === 'group')) && !enabled(features.security_group)) return false;
       return shared.Access && shared.Access.canUrl(href(url));

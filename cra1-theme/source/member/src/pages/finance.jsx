@@ -299,6 +299,7 @@ function OrderPanel({ refreshKey, onRefresh }) {
         rows={rows}
         loading={loading}
         error={error}
+        onRetry={onRefresh}
         search={keywords}
         onSearchChange={setKeywords}
         searchPlaceholder="搜索订单号"
@@ -354,6 +355,7 @@ function CreditPanel({ refreshKey }) {
   const [error, setError] = useState('')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+  const [attempt, setAttempt] = useState(0)
   const limit = 10
 
   useEffect(() => {
@@ -365,7 +367,7 @@ function CreditPanel({ refreshKey }) {
       .catch((e) => { if (active) setError(e.message) })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
-  }, [page, refreshKey])
+  }, [page, refreshKey, attempt])
 
   const columns = [
     { key: 'create_time', title: '时间', width: 150,
@@ -387,7 +389,7 @@ function CreditPanel({ refreshKey }) {
   return (
     <Card>
       <CardContent className="p-5">
-        <DataTable columns={columns} rows={rows} loading={loading} error={error}
+        <DataTable columns={columns} rows={rows} loading={loading} error={error} onRetry={() => setAttempt(n => n + 1)}
                    page={page} total={total} limit={limit} onPageChange={setPage}
                    empty={
                      <EmptyState
