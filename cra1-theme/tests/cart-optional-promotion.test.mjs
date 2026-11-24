@@ -83,7 +83,7 @@ test('all explicit cart component entries use the theme-owned fork and mobile sh
   const templates=['goods_iframe','goods_embed','index_iframe','settlement','shoppingCar','goodsList'];
   for(const name of templates){
     const text=read('public/cart/template/pc/cra1/'+name+'.php');
-    assert.ok(text.includes('components/cra1EventCode/eventCode.js'),name);
+    assert.ok(text.includes("cra1_theme_asset_url('native', 'components/cra1EventCode/eventCode.js'"),name+' resolves its own activity component under any member theme');
     assert.ok(!text.includes('components/eventCode/eventCode.js'),name+' does not load the old component');
   }
   assert.match(read('public/clientarea/template/pc/cra1/js/module-deps.js'),/eventCode: 'components\/cra1EventCode\/eventCode.js'/);
@@ -101,9 +101,9 @@ test('optional activity failures, missing API and malformed lists cannot fail th
       this.$mount=()=>this;this.$nextTick=fn=>fn();
     }
     Vue.prototype={};
-    const env={window:{},Vue,lang:{},navigator:{userAgent:'fixture'},document:{getElementsByClassName:()=>[{}]},asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},
+    const env={window:{},Vue,lang:{},navigator:{userAgent:'fixture'},document:{querySelector:()=>({})},asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},
       productGoods:()=>Promise.resolve({data:{data:{list:[{id:4,name:'正常商品',description:''}]}}}),eventPromotion:api};
-    vm.runInNewContext(read('cra1-theme/source/legacy-assets/cart/20261017-compat-v3/js/goodsList.js'),env);env.window.onload();
+    vm.runInNewContext(read('cra1-theme/source/legacy-assets/cart/20261017-compat-v3/js/goodsList.js'),env);
     page.isShowFull=true;page.sanitizeHtml=()=>'';page.applyDescMeta=()=>{};page.needScroll=()=>{};
     await page.getProductGoodList();await settle();
     assert.equal(page.goodsList.length,1);assert.equal(page.goodsList[0].name,'正常商品');assert.equal(page.goodSLoading,false);assert.equal(page.catalogError,'');

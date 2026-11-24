@@ -1,4 +1,5 @@
 import {pluginLink} from '../../lib'
+import ProductTicket from '../product-ticket'
 import {usePaymentReturn} from '../../ui/use-payment-return'
 import AppPresetTasks from './app-presets'
 import HostCustomFields from './custom-fields'
@@ -403,6 +404,7 @@ export default function ServerPanel({ hostId, onFallback, initialDetected = null
             {(host.notes || host.client_notes) ? (
               <span className="hidden text-xs text-muted-foreground sm:inline">备注：{host.notes || host.client_notes}</span>
             ) : null}
+            <ProductTicket hostId={host.id} />
             <Button variant="outline" size="sm" onClick={() => setDlg({ type: 'notes' })}>编辑备注</Button>
           </>
         }

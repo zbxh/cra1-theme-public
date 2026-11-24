@@ -103,6 +103,9 @@ if (!function_exists('cra1_theme_defaults')) {
             'home_products_mobile_limit' => '3',
             'home_products_group'   => '0',
             'nodes_text'            => '',
+            'article_toc_position' => 'right',
+            'article_sidebar_enabled' => '0',
+            'article_sidebar_html' => '',
             'float_enable'          => '1',
             'float_items_text'      => '',
             'hotline'               => '',
@@ -1668,6 +1671,20 @@ if (!function_exists('cra1_parse_shared_text_rows')) {
     }
 }
 
+/** Project the desktop article sidebar for both the public page and its preview. */
+function cra1_article_sidebar_content(array $config): string
+{
+    if ((string) ($config['article_sidebar_enabled'] ?? '0') !== '1') return '';
+    $content = trim((string) ($config['article_sidebar_html'] ?? ''));
+    if ($content === '') return '';
+
+    require_once CRA1_THEME_BACKEND . '/Storage/member_store.php';
+    $sanitizer = new \CRA1\Theme\Storage\MemberCenterStore(CRA1_THEME_ROOT . '/runtime');
+    $html = $sanitizer->sanitizeContentHtml($content);
+    $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    return preg_match('/\S/u', $text) || preg_match('/<(?:img|hr)\b/i', $html) ? $html : '';
+}
+
 // A validated standalone preview consumes the resolvers above, without native
 // hook registration or a native HTTP application/container.
 if(defined('CRA1_THEME_PREVIEW_DISPLAY_ONLY')&&CRA1_THEME_PREVIEW_DISPLAY_ONLY===true)return;
@@ -1878,9 +1895,14 @@ add_hook('web_view_append', function ($param) {
 require_once __DIR__ . '/ThemeCode.php';
 require_once __DIR__ . '/MemberSession.php';
 add_hook('clientarea_view_append', function ($param) {
+    if (method_exists(\CRA1\Theme\Presentation\OfficialCart::class, 'handlesPanel')
+        && \CRA1\Theme\Presentation\OfficialCart::handlesPanel()) return [];
     return ['body' => cra1_member_session_fallback($param)];
 });
 add_hook('clientarea_view_append', function ($param) {
+    if (method_exists(\CRA1\Theme\Presentation\OfficialCart::class, 'handlesPanel')
+        && \CRA1\Theme\Presentation\OfficialCart::handlesPanel()
+        && !\CRA1\Theme\Presentation\OfficialCart::panelUsesCRA1()) return [];
     $themes = cra1_member_shell_theme($param);
     // 仅接管 CRA1 主题（本条钩子对 default 等其它主题同样会被调用）
     if (!\CRA1\Theme\Context::isCRA1($themes)) {
@@ -1953,6 +1975,8 @@ add_hook('clientarea_view_append', function ($param) {
  * 钩子参数 view_html 即当前模板名；未登记的模板保持系统标题不动。
  */
 add_hook('cart_view_append', function ($param) {
+    if (method_exists(\CRA1\Theme\Presentation\OfficialCart::class, 'fullOfficialCart')
+        && \CRA1\Theme\Presentation\OfficialCart::fullOfficialCart()) return [];
     $theme = isset($param['cart_theme']) ? (string) $param['cart_theme'] : '';
     // 仅接管 CRA1 购物车主题（本钩子对其它购物车主题同样会被调用）
     if (!\CRA1\Theme\Context::isCRA1($theme)) {

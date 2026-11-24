@@ -56,6 +56,21 @@ $headerData['page_key']='home';
 $headerData['cra1']['slides']=[['img'=>'/web/cra1/assets/img/banner/banner-hw-1.jpg']];
 $header=packagedRender($headerBase.'/header.html',['data'=>$headerData,'title'=>'验收站点','keywords'=>'','description'=>''],$headerBase,'html');
 packagedCheck(strpos($header,'rel="preload" as="image" type="image/webp" href="/web/cra1/assets/img/banner/banner-hw-1.webp"')!==false,'CRA1-only home data preloads the existing WebP companion');
+$navigation = cra1_resolve_menu(implode("\n", [
+    'Open current|/#pricing', '> Pricing article|/document.html',
+    'Open new|/news.html?a=1&b=2||1', '> News article|/about.html',
+    'Blank group|', '> First page|/about.html',
+    'Hash group|#', '> Second page|/contact.html',
+]), []);
+$renderedNav = packagedRender($headerBase.'/public/header.html', ['data'=>[
+    'cra1'=>['header_support'=>[], 'header_copy'=>[]],
+    'header_nav'=>$navigation,
+]], $headerBase, 'html');
+packagedCheck(preg_match_all('~<a class="(?:nav-link cra1-nav-primary-link|cra1-drawer-top)" href="/#pricing"[^>]*>Open current</a>~', $renderedNav)===2, 'desktop and mobile primary labels preserve same-tab links and anchors');
+packagedCheck(substr_count($renderedNav, 'href="/news.html?a=1&amp;b=2" target="_blank" rel="noopener"')>=2, 'both navigation layouts escape the address and preserve new-tab targets');
+foreach (['Blank group', 'Hash group'] as $label) {
+    packagedCheck(!preg_match('~<a class="(?:nav-link cra1-nav-primary-link|cra1-drawer-top)"[^>]*>'.preg_quote($label, '~').'</a>~', $renderedNav), 'placeholder primary link remains an expand-only group: '.$label);
+}
 $websitePages=cra1_page_module_manifest();
 $websitePages['notifications']=['route'=>'/notifications.html'];
 foreach($websitePages as $key=>$page){
@@ -66,6 +81,18 @@ foreach($websitePages as $key=>$page){
     $html=packagedRender(IDCSMART_ROOT.'public/web/cra1/'.$tplName.'.html',['data'=>$data,'title'=>'Fixture','keywords'=>'','description'=>''],IDCSMART_ROOT.'public/web/cra1','html');
     packagedCheck(strpos($html,'<html')!==false&&strpos($html,'</html>')!==false,'website document '.$key);packagedAssets($html,'website:'.$key);$pages[]='website:'.$key;
     if (empty($page['aliasOf'])) packagedCheck(substr_count($html,'>主题：酷锐A1</a>')===1,'one fixed attribution per website footer '.$key);
+}
+foreach (['document-details', 'document-view', 'news-details', 'announce-details'] as $route) {
+    $readingConfig = array_replace(cra1_theme_config(), [
+        'article_sidebar_enabled'=>'1',
+        'article_sidebar_html'=>'<h3>相关资源</h3><p><a href="/document.html">打开帮助文档</a></p>',
+    ]);
+    $reading = cra1_render_page_modules($route, $readingConfig);
+    packagedCheck(substr_count($reading, 'class="reading-sidebar-extra"')===1, 'one enabled reading sidebar module on '.$route);
+    packagedCheck(strpos($reading,'<h3>相关资源</h3>')!==false && strpos($reading,'href="/document.html"')!==false, 'reading sidebar renders configured markup on '.$route);
+    $readingConfig['article_sidebar_enabled']='0';
+    $reading = cra1_render_page_modules($route, $readingConfig);
+    packagedCheck(strpos($reading,'reading-sidebar-extra')===false, 'disabled reading sidebar emits no custom content on '.$route);
 }
 $data['cra1']['show_footer_bottom']=0;
 $hidden=packagedRender($headerBase.'/footer.html',['data'=>$data],$headerBase,'html');

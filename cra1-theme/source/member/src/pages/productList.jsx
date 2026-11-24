@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowUpDown, ChevronLeft, ChevronRight, Cpu, HardDrive, Layers2, MapPin, MemoryStick, Network, Package, RefreshCw, Search } from 'lucide-react'
+import { ArrowUpDown, ChevronLeft, ChevronRight, Cpu, HardDrive, Layers2, MapPin, MemoryStick, Network, Package, Pin, RefreshCw, Search, ShoppingCart } from 'lucide-react'
 import { PageHeader, Card, CardContent } from '../ui/card'
-import { Button } from '../ui/button'
+import { Button, buttonVariants } from '../ui/button'
 import { Alert, EmptyState, Skeleton } from '../ui/feedback'
 import { Select } from '../ui/select'
 import { api, commonData, formatDate, formatDateTime, memberContentConfig } from '../lib'
 import { usePageTab } from './usePageTab'
-import { completeHostDisplayData, findProductCategory, hostCardTitle, hostDisplayFields, loadCategoryHosts } from '../lib/product-config'
+import { completeHostDisplayData, findProductCategory, hostCardTitle, hostDisplayFields, loadCategoryHosts, productListSources } from '../lib/product-config'
 import { memberProductNavigation } from '../lib/member-navigation'
 import { loadProductCardSummaries, productCardPrice, productCardSpecs, productNetwork, productPageNumbers, productSystemIcon, projectServerCard } from '../lib/product-card-data'
 import ProductQuickActions from './product-quick-actions'
@@ -26,18 +26,16 @@ const TAB_VALUES = TABS.map(t => t.value)
 const VISIBLE_TAB_VALUES = STANDARD_TABS.map(t => t.value)
 const readCategoryKey = () => new URLSearchParams(location.search).get('cloud_menu') || new URLSearchParams(location.search).get('m') || 'all'
 
-function useProductIntro(menuUuid) {
-  const [intro, setIntro] = useState(null)
+function useProductListConfig() {
+  const [config, setConfig] = useState(null)
   useEffect(() => {
     let alive = true
     memberContentConfig().then(cfg => {
-      if (!alive) return
-      const config = cfg?.product_list, override = menuUuid ? config?.overrides?.[menuUuid] : null
-      setIntro(Number(override?.enabled) === 1 ? override : Number(config?.default?.enabled) === 1 ? config.default : null)
-    }).catch(() => { if (alive) setIntro(null) })
+      if (alive) setConfig(cfg?.product_list)
+    }).catch(() => { if (alive) setConfig(null) })
     return () => { alive = false }
-  }, [menuUuid])
-  return intro
+  }, [])
+  return config
 }
 
 function hostStatus(host) {
@@ -59,7 +57,7 @@ function hostStatus(host) {
   })[host.status] || { label: host.status || '状态待同步', tone: 'muted' }
 }
 
-function HostCard({ host, fields, onOperation }) {
+function HostCard({ host, fields, onOperation, ticketEntry, pinsAvailable, pendingPin, onPin }) {
   const pointer = useRef(null)
   const summary = host.card_summary || {}, state = hostStatus(host), network = productNetwork(host)
   const title = hostCardTitle(host, fields), imageName = summary.imageName || host.image_name || ''
@@ -110,6 +108,7 @@ function HostCard({ host, fields, onOperation }) {
       <div className="cra1-product-card__identity">
         <div className="cra1-product-card__heading">
           <div className="cra1-product-card__names">
+            {host.pinned && <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><Pin className="size-3" aria-hidden="true" />已置顶</span>}
             {titleIsIdentifier ? <><CopyText value={host.name} label="主机标识" className="cra1-product-card__title" /><a className="sr-only cra1-product-card__panel-link" href={panelUrl}>进入 {host.name} 控制面板</a></>
               : <a className="cra1-product-card__title cra1-product-card__panel-link" href={panelUrl} title={title} aria-label={`进入 ${title} 控制面板`}>{title}</a>}
             {fields.has('product_name') && fields.has('instance_name') && host.name && <CopyText value={host.name} label="主机标识" className="cra1-product-card__instance" />}
@@ -148,7 +147,8 @@ function HostCard({ host, fields, onOperation }) {
           {price && <p className="cra1-product-card__price"><span className="cra1-product-card__currency">{price.prefix}</span><strong>{price.amount}</strong>{price.suffix && <span className="cra1-product-card__currency">{price.suffix}</span>}{price.cycle && <span className="cra1-product-card__cycle">/ {price.cycle}</span>}</p>}
         </div>
         <div className="cra1-product-card__actions" data-card-interactive>
-          <ProductQuickActions host={host} onChanged={onOperation} />
+          <ProductQuickActions host={host} onChanged={onOperation} ticketEntry={ticketEntry}
+            onPin={pinsAvailable ? () => onPin(host) : undefined} pendingPin={pendingPin} />
         </div>
       </div>
     </article>
@@ -161,17 +161,35 @@ export default function ProductListPage() {
   const [tab, setTab] = usePageTab(DEFAULT_TAB, showDeleted ? TAB_VALUES : VISIBLE_TAB_VALUES)
   const [categories, setCategories] = useState(null), [categoryKey, setCategoryKey] = useState(readCategoryKey)
   const [overviewAliases, setOverviewAliases] = useState([])
+  const [entries, setEntries] = useState(() => new Map())
   const [search, setSearch] = useState(''), [keywords, setKeywords] = useState('')
   const [page, setPage] = useState(1), [limit, setLimit] = useState(6)
   const [rows, setRows] = useState([]), [total, setTotal] = useState(0), [counts, setCounts] = useState(null)
   const [loading, setLoading] = useState(true), [error, setError] = useState(''), [refresh, setRefresh] = useState(0)
   const [categoryError, setCategoryError] = useState('')
+  const [onlyPinned, setOnlyPinned] = useState(false)
+  const [pinsAvailable, setPinsAvailable] = useState(true)
+  const [ticketEntry, setTicketEntry] = useState('')
+  const [pinFeedback, setPinFeedback] = useState(null)
+  const [pendingPin, setPendingPin] = useState(null)
+  const pinRequest = useRef(false)
+  const pinFocus = useRef(null)
+  const filterPinButton = useRef(null)
+
+  useEffect(() => {
+    if (loading || !pinFocus.current) return
+    const id = pinFocus.current
+    pinFocus.current = null
+    if (document.activeElement !== document.body) return
+    const trigger = document.querySelector(`[data-host-id="${id}"] .cra1-product-card__quick`)
+    ;(trigger || filterPinButton.current)?.focus({ preventScroll:true })
+  }, [loading])
 
   useEffect(() => {
     let alive = true
     memberProductNavigation().then(result => {
       if (!alive) return
-      setCategories(result.categories); setOverviewAliases(result.overviewAliases)
+      setCategories(result.categories); setOverviewAliases(result.overviewAliases); setEntries(result.entries)
     }).catch(() => { if (alive) { setCategoryError('导航分类读取失败，请刷新重试。'); setCategories([]) } })
     return () => { alive = false }
   }, [])
@@ -186,7 +204,12 @@ export default function ProductListPage() {
   const isOverview = categoryKey === 'all' || overviewAliases.includes(categoryKey)
   const category = useMemo(() => activeCategory || (isOverview ? null : { product_id: [] }), [activeCategory, isOverview])
   const fields = useMemo(() => hostDisplayFields(category), [category])
-  const intro = useProductIntro(activeCategory?.key || (isOverview && categoryKey !== 'all' ? categoryKey : ''))
+  const config = useProductListConfig()
+  const sources = productListSources(config, entries, categoryKey, tab, activeCategory)
+  const intro = sources.copy
+  const purchase = !categoryError && (categoryKey === 'all' || activeCategory || isOverview)
+    ? sources.purchase
+    : null
   const categoryName = activeCategory?.name || '全部分类', tabName = TABS.find(t => t.value === tab).label
   const missingCategory = categories !== null && !isOverview && !activeCategory
 
@@ -202,21 +225,23 @@ export default function ProductListPage() {
     const controller = new AbortController()
     const read = (path, params) => api(path, { params, signal: controller.signal, timeout: 12000 })
     setCounts(null)
-    Promise.all(tabs.map(t => loadCategoryHosts(read, { tab: t.value, page: 1, limit: 1 }, category).then(data => [t.value, Number(data.count)])))
+    Promise.all(tabs.map(t => loadCategoryHosts(read, { tab: t.value, count_only: 1, only_pinned: onlyPinned ? 1 : 0 }, category).then(data => [t.value, Number(data.count)])))
       .then(values => { if (!controller.signal.aborted && values.every(([, n]) => Number.isFinite(n))) setCounts(Object.fromEntries(values)) })
       .catch(() => {})
     return () => controller.abort()
-  }, [categories, category, refresh, tabs])
+  }, [categories, category, refresh, tabs, onlyPinned])
 
   useEffect(() => {
     if (categories === null) return
     const controller = new AbortController()
     const read = (path, params) => (/^\/(mf_cloud|mf_dcim)\/\d+(?:\/status)?$/.test(path) ? productActionRequest : api)(path, { params, signal: controller.signal, timeout: 12000 })
     setLoading(true); setError('')
-    loadCategoryHosts(read, { tab, page, limit, keywords }, category)
+    loadCategoryHosts(read, { tab, page, limit, keywords, only_pinned: onlyPinned ? 1 : 0, include_actions: 1 }, category)
       .then(async data => {
         if (!Array.isArray(data.list) || !Number.isFinite(Number(data.count))) throw Error('产品数据不完整，请重试')
         if (controller.signal.aborted) return
+        setPinsAvailable(data.pins_available !== false)
+        setTicketEntry(data.ticket_entry || '')
         const maxPage = Math.max(1, Math.ceil(Number(data.count) / limit))
         if (page > maxPage) { setPage(maxPage); return }
         const list = await completeHostDisplayData(read, data.list, category)
@@ -229,7 +254,27 @@ export default function ProductListPage() {
       })
       .catch(err => { if (!controller.signal.aborted) { setError(err.message || '产品读取失败，请重试'); setLoading(false) } })
     return () => controller.abort()
-  }, [categories, category, tab, page, limit, keywords, refresh, fields])
+  }, [categories, category, tab, page, limit, keywords, refresh, fields, onlyPinned])
+
+  async function changePin(host) {
+    if (pinRequest.current) return
+    pinRequest.current = true
+    setPendingPin(host.id)
+    setPinFeedback(null)
+    try {
+      await api('/cra1-theme/member/product-list/' + host.id + '/pin', { method: 'PUT', body: { pinned: !host.pinned } })
+      if (document.activeElement?.closest(`[data-host-id="${host.id}"]`) || document.activeElement === document.body) pinFocus.current = host.id
+      setRows(current => current.map(row => row.id === host.id ? { ...row, pinned: !host.pinned } : row))
+      setPinFeedback({ message: host.pinned ? '已取消置顶' : '已置顶，可在列表前面找到此产品' })
+      setPage(1)
+      setRefresh(value => value + 1)
+    } catch (error) {
+      setPinFeedback({ message: error.data?.msg || '置顶状态暂时无法保存，请重试。', host })
+    } finally {
+      pinRequest.current = false
+      setPendingPin(null)
+    }
+  }
 
   const changeCategory = key => {
     setCategoryKey(key); setPage(1)
@@ -240,7 +285,7 @@ export default function ProductListPage() {
     window.history.pushState({}, '', url)
   }
   const changeTab = value => { setTab(value); setPage(1) }
-  const reset = () => { setSearch(''); setKeywords(''); changeCategory('all'); setTab(DEFAULT_TAB) }
+  const reset = () => { setSearch(''); setKeywords(''); setOnlyPinned(false); changeCategory('all'); setTab(DEFAULT_TAB) }
   const pages = Math.max(1, Math.ceil(total / limit)), start = (page - 1) * limit
   const hasSummaryFailure = rows.some(h => h.card_summary_failed)
   const onHostOperation = ({ id, detail, power, host: updatedHost }) => setRows(current => current.map(host => String(host.id) === String(id)
@@ -249,8 +294,17 @@ export default function ProductListPage() {
 
   return (
     <div className="cra1-products">
-      <PageHeader title={intro?.title || activeCategory?.name || '我的产品'} description={intro?.description || (activeCategory ? '查看与管理该分类下的产品与服务' : '查看与管理已订购的产品与服务')}
-        actions={counts && <span className="cra1-products__head-count">当前产品 <strong>{counts[DEFAULT_TAB]}</strong> 个</span>} />
+      <PageHeader title={sources.title} description={sources.description}
+        className={purchase ? 'cra1-products__header--purchase flex-nowrap items-center gap-2' : undefined}
+        actions={(counts || purchase) && <>
+          {counts && <span className="cra1-products__head-count">当前产品 <strong>{counts[DEFAULT_TAB]}</strong> 个</span>}
+          {purchase && <a className={buttonVariants({ size: 'sm', className: 'cra1-products__purchase' })}
+            href={purchase.url} target={purchase.newTab ? '_blank' : undefined} rel={purchase.newTab ? 'noopener' : undefined}
+            data-cui-button-glow="primary" title={purchase.text}>
+            <ShoppingCart aria-hidden="true" /><span className="cra1-products__purchase-text">{purchase.text}</span>
+            <span className="cui-button-glow" aria-hidden="true" />
+          </a>}
+        </>} />
       {intro?.html && <Card><CardContent className="cra1-rich-text p-4 text-[13px] leading-6 text-body" dangerouslySetInnerHTML={{ __html: intro.html }} /></Card>}
       {categoryError && <Alert tone="warning">{categoryError}</Alert>}
       {missingCategory && !categoryError && <Alert tone="warning">该导航已不存在，请重新选择产品分类。</Alert>}
@@ -268,17 +322,26 @@ export default function ProductListPage() {
             {tabs.map(t => <button key={t.value} type="button" className="cra1-products__status" data-status={t.value} aria-pressed={tab === t.value} onClick={() => changeTab(t.value)}>{t.label}{counts && <small>{counts[t.value]}</small>}</button>)}
           </div>
           <label className="cra1-products__search"><Search aria-hidden="true" /><input type="search" aria-label="搜索产品" value={search} onChange={e => setSearch(e.target.value)} placeholder="搜索产品、配置、地区或备注" /></label>
+          <Button ref={filterPinButton} type="button" size="sm" variant={onlyPinned ? 'secondary' : 'outline'} aria-pressed={onlyPinned}
+            disabled={!pinsAvailable && !onlyPinned} onClick={() => { setOnlyPinned(value => !value); setPage(1) }}>
+            <Pin aria-hidden="true" />只看置顶
+          </Button>
         </div>
       </section>
       <div className="cra1-products__list-head">
         <p aria-live="polite"><strong>{categoryName}</strong><span> / {tabName}{loading ? ' · 加载中…' : error ? ' · 读取失败' : ` · ${total} 个产品`}</span></p>
-        <span className="cra1-products__order">按产品编号从新到旧排列</span>
+        <span className="cra1-products__order">{tab === 'deleted' ? '按产品编号从新到旧排列' : '置顶优先，其余按产品编号从新到旧排列'}</span>
       </div>
+      {!pinsAvailable && <Alert tone="warning">置顶暂时无法读取。<Button size="sm" variant="ghost" onClick={() => setRefresh(value => value + 1)}>重试</Button></Alert>}
+      {pinFeedback && <Alert tone={pinFeedback.host ? 'warning' : 'info'} role={pinFeedback.host ? 'alert' : 'status'}>{pinFeedback.message}
+        {pinFeedback.host && <Button size="sm" variant="ghost" disabled={pendingPin !== null} onClick={() => changePin(pinFeedback.host)}>重试</Button>}
+      </Alert>}
       {hasSummaryFailure && !loading && !error && <p className="cra1-products__sync-note" role="status">页面错误，请刷新重试</p>}
       {error ? <Alert tone="error"><span>页面错误，请刷新重试</span></Alert>
         : loading ? <div className="cra1-products__grid" aria-label="产品加载中" aria-busy="true">{Array.from({ length: limit }).map((_, i) => <Skeleton key={i} className="h-[220px] rounded-2xl" />)}</div>
-          : rows.length === 0 ? <div className="cra1-products__empty"><EmptyState icon={Package} title={keywords ? '没有符合条件的产品' : tab === 'deleted' ? '没有已删除的产品' : '暂无产品'} description={keywords ? '试试名称、IP、客户备注，或“Ubuntu 香港 100Mbps”。' : tab === 'deleted' ? '此分类下没有已删除的产品。' : '当前分类及状态下没有产品。'} action={<div className="cra1-products__empty-actions"><Button size="sm" variant="outline" onClick={reset}>清除筛选</Button>{!keywords && tab !== 'deleted' && <Button size="sm" onClick={() => { window.location.href = '/cart/goodsList.htm' }}>浏览产品</Button>}</div>} /></div>
-            : <div className="cra1-products__grid" role="list" aria-label="产品卡片">{rows.map(h => <HostCard key={h.id} host={h} fields={fields} onOperation={onHostOperation} />)}</div>}
+          : rows.length === 0 ? <div className="cra1-products__empty"><EmptyState icon={Package} title={onlyPinned ? '没有符合条件的置顶产品' : keywords ? '没有符合条件的产品' : tab === 'deleted' ? '没有已删除的产品' : '暂无产品'} description={onlyPinned ? '可取消筛选，或打开产品的更多操作将它置顶。' : keywords ? '试试名称、IP、客户备注，或“Ubuntu 香港 100Mbps”。' : tab === 'deleted' ? '此分类下没有已删除的产品。' : '当前分类及状态下没有产品。'} action={<div className="cra1-products__empty-actions"><Button size="sm" variant="outline" onClick={reset}>清除筛选</Button>{!onlyPinned && !keywords && tab !== 'deleted' && <Button size="sm" onClick={() => { window.location.href = '/cart/goodsList.htm' }}>浏览产品</Button>}</div>} /></div>
+            : <div className="cra1-products__grid" role="list" aria-label="产品卡片">{rows.map(h => <HostCard key={h.id} host={h} fields={fields} onOperation={onHostOperation} ticketEntry={ticketEntry}
+              pinsAvailable={pinsAvailable && h.status !== 'Deleted' && h.status !== 'Cancelled'} pendingPin={pendingPin !== null} onPin={changePin} />)}</div>}
       {!error && <footer className="cra1-products__pagination" aria-label="产品列表分页">
         <p className="cra1-products__range" aria-live="polite">{loading ? '正在读取产品…' : total > 0 ? `显示 ${start + 1}–${Math.min(start + limit, total)} 条，共 ${total} 条` : '共 0 条'}</p>
         <div className="cra1-products__page-tools">

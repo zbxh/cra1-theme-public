@@ -53,18 +53,26 @@ try{
  rejects(static function()use($overlay,$ready){$overlay->apply($ready['confirmation']);},'files changed after check must not apply');
  Files::atomic($site.'/public/web/cra1/page.php',$bytes);Overlay::discard($site,$ready['confirmation']);
  $themeCache=$site.'/runtime/temp/'.str_repeat('a',32).'.php';$nativeCache=$site.'/runtime/temp/'.str_repeat('b',32).'.php';
+ $relativeCache=$site.'/runtime/temp/'.str_repeat('c',32).'.php';
+ $relativeNativeCache=$site.'/runtime/temp/'.str_repeat('d',32).'.php';
+ $relativeHeader='<?php /*'.serialize(['../public/cart/template/pc/cra1/goods_embed.php'=>time()+3600]).'*/ ?>';
  Files::atomic($themeCache,'<?php /*'.serialize([$site.'/public/web/cra1/page.php'=>time()+3600]).'*/ ?>cached old theme');
  Files::atomic($nativeCache,'<?php /*'.serialize([$site.'/public/cart/template/pc/default/page.php'=>time()+3600]).'*/ ?>native cache');
+ Files::atomic($relativeCache,$relativeHeader.'cached old cart');
+ Files::atomic($relativeNativeCache,'<?php /*'.serialize(['../public/cart/template/pc/default/page.php'=>time()+3600]).'*/ ?>native cache');
  $ready=$overlay->prepare();$result=$overlay->apply($ready['confirmation']);
  check($result['updated']&&$result['admin_url']==='/customadmin/index.php','finish uses original administrator entry');
  check(file_get_contents($site.'/public/customadmin/index.php')==='new custom administrator','extracted default administrator files map to current custom address');
- check(!is_file($themeCache)&&is_file($nativeCache),'only CRA1 compiled templates cleared even with future timestamps');
+ check(!is_file($themeCache)&&!is_file($relativeCache)&&is_file($nativeCache)&&is_file($relativeNativeCache),
+    'update clears absolute and relative CRA1 compiled templates, even with future timestamps');
  foreach($protected as$path=>$value)check(file_get_contents($site.'/'.$path)===$value,'data preserved: '.$path);
  $after=hash_file('sha256',$site.'/runtime/cra1_theme/distribution/current.json');
  $again=$overlay->apply($ready['confirmation']);check($again['updated']&&hash_file('sha256',$site.'/runtime/cra1_theme/distribution/current.json')===$after,'duplicate completion is idempotent');
  Overlay::discard($site,$ready['confirmation']);
  check($overlay->prepare()['data']['update_state']==='current','subsequent check recognizes selected package without reinitializing');
+ Files::atomic($relativeCache,$relativeHeader.'cached updated cart');
  $updater=new Updater($site,'customadmin',$context);$updater->rollback($result['history']);
+ check(!is_file($relativeCache)&&is_file($relativeNativeCache),'rollback clears the updated CRA1 template and keeps native cache');
  check(file_get_contents($site.'/public/customadmin/index.php')==='new custom administrator','security entry retained on rollback');
  check(Files::json($site.'/runtime/cra1_theme/distribution/current.json')['release']==='previous-release','rollback returns former pointer');
  $ready=$overlay->prepare();$restored=$overlay->apply($ready['confirmation']);Overlay::discard($site,$ready['confirmation']);
@@ -82,7 +90,7 @@ try{
  $failing=new Updater($failedSite,'customadmin',$context,static function($path,$bytes,$mode){Files::atomic($path,$bytes,$mode);throw new RuntimeException('isolated failure token=PRIVATE-TEST-TOKEN');});
  try{$failing->apply($archive,$ready['confirmation']['sha256']);throw new LogicException('failed transaction must throw');}
  catch(RuntimeException $error){
-  check(strpos($error->getMessage(),'替换主题文件')!==false&&strpos($error->getMessage(),'已恢复')!==false,'failure identifies stage and confirms completed recovery');
+  check($error instanceof CRA1\Theme\Release\UpdateFailure&&$error->phase==='写入主题文件'&&$error->state==='restored','failure identifies stage and confirms completed recovery');
   check(preg_match('/参考编号：[A-F0-9]{12}/u',$error->getMessage())===1,'failure supplies a correlation reference');
   check(strpos($error->getMessage(),'PRIVATE-TEST-TOKEN')===false&&strpos($error->getMessage(),$failedSite)===false,'public failure omits internal errors and sensitive values');
  }

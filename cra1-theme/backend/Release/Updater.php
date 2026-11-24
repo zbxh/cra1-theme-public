@@ -23,17 +23,18 @@ final class Updater
         if(!is_array($blockers))throw new \InvalidArgumentException('更新包检查规则无效');
         $context=($this->contextReader)();
         if(empty($context['database']))$blockers[]=$context['error']??'无法读取系统信息，请确认数据库连接后重试';
-        if(!Inspector::runtimeMatch($doc,$context))$warnings[]='当前系统或模块组合尚未完整验证，可更新主题文件；具体业务能力仍按实际可用性及接口契约检查。';
+        $reviewModules=!Inspector::runtimeMatch($doc,$context);
         // SQL query compatibility belongs to the native business diagnostics;
         // replacing theme files never changes this database setting.
-        if(in_array('ONLY_FULL_GROUP_BY',explode(',',strtoupper((string)($context['database_sql_mode']??''))),true))$warnings[]='当前数据库分组规则可能影响部分 V10 原生产品查询；本次主题更新不修改数据库设置，可在版本与兼容中查看。';
+        if(in_array('ONLY_FULL_GROUP_BY',explode(',',strtoupper((string)($context['database_sql_mode']??''))),true))$warnings[]='如果更新后产品列表加载失败，请检查 V10 数据库的分组设置（ONLY_FULL_GROUP_BY）。';
         $dependencies=[];
         foreach($doc['native_dependencies']??[] as $dependency){
             $row=Inspector::nativeDependency($this->root,$dependency,$doc['integration_profiles']??[]);$dependencies[]=$row;
             // Missing reference targets are still rejected by References::inspect.
             // A changed native hash is a compatibility observation, not permission to overwrite it.
-            if($row['status']!=='pass')$warnings['native-contract']='部分原生依赖尚未确认兼容；本次仅更新主题自有文件，不修改系统或插件。对应功能请在更新后检查。';
+            if($row['status']!=='pass')$reviewModules=true;
         }
+        if($reviewModules)$warnings[]='更新后建议打开一个在售商品，检查选配和报价，再查看已有产品的管理页面。';
         $current=Files::json($this->dir.'/current.json',true);
         if(isset($doc['maintenance'])){
             $base=$doc['maintenance'];
@@ -84,7 +85,7 @@ final class Updater
             $blockers[]=(new \CRA1\Theme\Failure('创建临时文件',$parent.'/待写入的主题文件','Permission denied',strpos($relative,'runtime/')===0?0600:0644))->describe($this->root);
         }
         if(is_file($this->dir.'/pending.json'))$blockers[]='有未完成的更新，请先恢复';
-        return $info+['release_channel'=>$doc['release_channel']??'candidate','files'=>$files,'native_dependencies'=>$dependencies,'blockers'=>$blockers,'warnings'=>array_values($warnings),'can_apply'=>!$blockers,'signature'=>'请核对更新包来源及 SHA-256 校验值'];
+        return $info+['release_channel'=>$doc['release_channel']??'candidate','files'=>$files,'native_dependencies'=>$dependencies,'blockers'=>array_values(array_unique($blockers)),'warnings'=>array_values(array_unique($warnings)),'can_apply'=>!$blockers];
     }
     public static function purpose(string $path): string
     {
@@ -103,9 +104,10 @@ final class Updater
         return strpos($path,'cra1-theme/backend/')===0||strpos($path,'lib/')===0||strpos($path,'public/cra1-install/')===0||
             in_array($path,['public/cra1admin/index.php','public/web/cra1/controller/hooks.php','public/cra1-shared/runtime.php','public/cra1-shared/snapshot.php','public/cra1-shared/compat.php','public/cra1-shared/compatibility.php','public/cra1-shared/assets.php'],true);
     }
-    public function apply(string $archive,string $expectedDigest,?string $expectedPointerDigest=null): array
+    public function apply(string $archive,string $expectedDigest,?string $expectedPointerDigest=null,?OperationProgress $progress=null): array
     {
-        return Files::locked($this->dir.'/update.lock',function()use($archive,$expectedDigest,$expectedPointerDigest){
+        return Files::locked($this->dir.'/update.lock',function()use($archive,$expectedDigest,$expectedPointerDigest,$progress){
+            if($progress)$progress->step('检查安装包');
             if($expectedPointerDigest!==null){
                 Files::noLinks($this->dir.'/current.json');
                 $actual=is_file($this->dir.'/current.json')?hash_file('sha256',$this->dir.'/current.json'):'missing';
@@ -113,11 +115,13 @@ final class Updater
             }
             $check=$this->preflight($archive);
             if(!hash_equals($check['sha256'],$expectedDigest))throw new \RuntimeException('候选包与已确认预检不一致');
-            if(!$check['can_apply'])throw new \RuntimeException('更新检查未通过，请按页面提示处理后重新上传');
+            if(!$check['can_apply'])throw new \RuntimeException(implode('；',array_slice($check['blockers'],0,5)));
             $id=$check['manifest']['release'];$backup=$this->dir.'/history/'.$id.'-'.bin2hex(random_bytes(5));
-            $stage=$this->dir.'/staging/'.bin2hex(random_bytes(16));$prepared=false;$phase='准备更新文件';
+            $stage=$this->dir.'/staging/'.bin2hex(random_bytes(16));$prepared=false;$phase='解包并校验文件';
             try{
+                if($progress)$progress->step($phase);
                 Package::stage($archive,$stage,$check);
+                $phase='备份原主题';if($progress)$progress->step($phase);
                 $previous=Files::json($this->dir.'/current.json',true);
                 $journal=['release'=>$id,'entry'=>$this->entry,'previous'=>$previous,'created_at'=>time(),'backup'=>$backup,'stage'=>$stage,'files'=>[],'references'=>[],'state'=>'prepared'];
                 if(isset($check['manifest']['version']))$journal['version']=$check['manifest']['version'];
@@ -155,7 +159,7 @@ final class Updater
                 }else foreach($references as $path=>$target)if(!file_exists($this->root.'/'.$path)&&!is_link($this->root.'/'.$path))$journal['references'][$path]=$target;
                 Files::putJson($backup.'/journal.json',$journal,0600);
                 Files::putJson($this->dir.'/pending.json',$journal,0600);$prepared=true;
-                $phase='替换主题文件';
+                $phase='写入主题文件';if($progress)$progress->step($phase);
                 foreach($check['manifest']['files'] as $path=>$row){
                     $target=Manifest::destination($this->root,$path,$this->entry);
                     if(!isset($journal['files'][$path])){
@@ -175,19 +179,24 @@ final class Updater
                 $current=['release'=>$id,'manifest'=>$check['manifest'],'security_epoch'=>$check['manifest']['security_epoch']??1,'archive_sha256'=>$expectedDigest,'installed_at'=>time(),'history'=>basename($backup),'previous_release'=>$previous['release']??null];
                 if(isset($check['manifest']['backend_root']))$current['backend_root']=$check['manifest']['backend_root'];
                 // New resource selection becomes visible only after all files are verified.
-                $phase='保存生效版本';Files::putJson($this->dir.'/current.json',$current,0600);
+                $phase='切换生效资源';if($progress)$progress->step($phase);Files::putJson($this->dir.'/current.json',$current,0600);
                 $journal['state']='complete';Files::putJson($backup.'/journal.json',$journal,0600);
-                unlink($this->dir.'/pending.json');$prepared=false;
+                if(!unlink($this->dir.'/pending.json'))throw new \RuntimeException('无法清理更新恢复记录，请检查运行目录权限');
+                $prepared=false;
                 return ['release'=>$id,'history'=>basename($backup),'files'=>count($journal['files']),'preserved'=>['主配置','账号','密钥','媒体','页面覆盖','草稿'],'rollback_available'=>true];
             }catch(\Throwable $e){
                 $reference=$this->reportFailure($e,$phase);
                 $reason=\CRA1\Theme\Diagnostics::reason($e,$this->root);
                 if($prepared){
+                    if($progress)$progress->step('恢复原主题');
                     try{$this->restore($journal,false,false);}
-                    catch(\Throwable $recovery){$this->reportFailure($recovery,'恢复原版本',$reference);throw new \RuntimeException('更新在“'.$phase.'”阶段失败。原因：'.$reason.' 自动恢复也未完成：'.\CRA1\Theme\Diagnostics::reason($recovery,$this->root).' 恢复记录已保留，请重新检查并恢复。参考编号：'.$reference,0,$recovery);}
-                    throw new \RuntimeException('更新在“'.$phase.'”阶段失败。原因：'.$reason.' 主题文件和生效引用已恢复。参考编号：'.$reference,0,$e);
+                    catch(\Throwable $recovery){
+                        $this->reportFailure($recovery,'恢复原版本',$reference);
+                        throw new UpdateFailure($phase,$reason.'；自动恢复失败：'.\CRA1\Theme\Diagnostics::reason($recovery,$this->root),'recovery_required',$recovery,$reference);
+                    }
+                    throw new UpdateFailure($phase,$reason,'restored',$e,$reference);
                 }
-                throw new \RuntimeException('更新在“'.$phase.'”阶段失败。原因：'.$reason.' 尚未切换生效版本。参考编号：'.$reference,0,$e);
+                throw new UpdateFailure($phase,$reason,'unchanged',$e,$reference);
             }finally{try{$this->removeStage($stage);}catch(\Throwable $cleanup){$this->reportFailure($cleanup,'清理更新暂存文件');}}
         });
     }
@@ -251,8 +260,9 @@ final class Updater
             if(isset($current['backend_root']))$previous['backend_root']=$current['backend_root'];
             if(isset($previous['manifest']))foreach($current['manifest']['files']??[] as $path=>$row)if(self::retainedOnRollback($path))$previous['manifest']['files'][$path]=$row;
         }
+        ThemeCache::refresh($this->root,[],$this->entry);
         Files::putJson($this->dir.'/current.json',$previous,0600);
-        if(is_file($this->dir.'/pending.json'))unlink($this->dir.'/pending.json');
+        if(is_file($this->dir.'/pending.json')&&!unlink($this->dir.'/pending.json'))throw new \RuntimeException('无法清理更新恢复记录，请检查运行目录权限');
     }
     private function journalTarget(string $path): string
     {

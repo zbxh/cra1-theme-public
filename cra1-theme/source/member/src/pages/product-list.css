@@ -9,6 +9,9 @@
 .cra1-products svg { width: 16px; height: 16px; flex: none; }
 .cra1-products__head-count { color: var(--cui-muted); font: 400 12px/20px var(--cui-font); }
 .cra1-products__head-count strong { color: var(--cui-ink); font-weight: 500; }
+.cra1-products__header--purchase .cui-page-header-actions { flex: none; }
+.cra1-products .cra1-products__purchase { max-width: min(210px, 48vw); margin-inline-start: 4px; }
+.cra1-products__purchase-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cra1-products__filters { min-width: 0; }
 .cra1-products__filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 15px; }
 .cra1-products__filter-row + .cra1-products__filter-row { border-top: 1px solid var(--cui-line); }
@@ -130,6 +133,7 @@ html[data-cra1-theme="member"] .cra1-products__page-size > .cui-select-trigger {
 .cra1-products__page-gap { color: var(--cui-muted); font: 400 12px/20px var(--cui-font); }
 @container cra1-products (max-width: 819px) { .cra1-products__grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @container cra1-products (max-width: 549px) {
+  .cra1-products .cra1-products__purchase { margin-inline-start: 0; }
   .cra1-products__grid { grid-template-columns: minmax(0,1fr); }
   .cra1-products__filter-row { padding: 10px; gap: 8px; }
   .cra1-products__filter-label { flex-basis: 100%; }
@@ -140,6 +144,7 @@ html[data-cra1-theme="member"] .cra1-products__page-size > .cui-select-trigger {
   .cra1-products__page-tools { width: 100%; justify-content: space-between; }
 }
 @media (max-width:767px),(pointer:coarse) {
+  html[data-cra1-theme="member"] .cra1-products .cra1-products__purchase.cui-button { min-height: 44px; }
   .cra1-products__category, .cra1-products__status, .cra1-products__sync-note button { min-height: 44px; }
   html[data-cra1-theme="member"] .cra1-products :is(.cra1-product-card__remote,.cra1-product-card__renew,.cra1-product-card__quick) { height: 44px; min-height: 44px; }
   .cra1-products .cra1-product-card__quick { min-width: 44px; }

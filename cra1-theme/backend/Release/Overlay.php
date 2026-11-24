@@ -104,7 +104,7 @@ final class Overlay
             self::discard($this->root,['archive'=>basename($archive)]);throw $error;
         }
     }
-    public function apply(array $confirmation): array
+    public function apply(array $confirmation,?OperationProgress $progress=null): array
     {
         $candidate=$this->candidate();
         if(($confirmation['action']??'')!=='update'||($confirmation['entry']??'')!==$this->entry||!hash_equals((string)($confirmation['candidate']??''),$candidate['digest']))throw new \RuntimeException('解压文件已变化，请重新点击“验证并检查”');
@@ -112,7 +112,7 @@ final class Overlay
         if($this->selected($candidate)){$this->verify($candidate,true);return $this->data($candidate,'current')+['updated'=>true];}
         $this->verify($candidate);
         $archive=$this->archive($confirmation);
-        $result=$this->updater()->apply($archive,(string)($confirmation['sha256']??''),(string)($confirmation['pointer']??''));
+        $result=$this->updater()->apply($archive,(string)($confirmation['sha256']??''),(string)($confirmation['pointer']??''),$progress);
         return $this->data($candidate,'complete')+['updated'=>true,'history'=>$result['history']];
     }
     public function recover(array $confirmation): array

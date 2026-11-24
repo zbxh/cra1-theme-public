@@ -5,15 +5,27 @@
   const checkButton=document.getElementById('check'),installButton=document.getElementById('install'),feedback=document.getElementById('setup-status');
   const maintenance=document.getElementById('maintenance'),updateButton=document.getElementById('update'),backup=document.getElementById('backup-confirmed'),updateFeedback=document.getElementById('update-status');
   let busy=false,ready=false,installed=false,confirmation=null,updateState=null;
-  function failure(message,needsCheck=false){return Object.assign(new Error(message),{needsCheck});}
-  async function request(body){
+  function failure(message,needsCheck=false,detail=null){return Object.assign(new Error(message),{needsCheck,detail});}
+  async function request(body,onPhase){
     let token='';
     try{token=localStorage.getItem('backJwt')||'';}catch(_){}
     const headers={'Content-Type':'application/json','X-CSRF-Token':root.dataset.csrf};
     if(token)headers.Authorization='Bearer '+token;
-    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),60000);
+    const operation=Array.from(crypto.getRandomValues(new Uint8Array(16)),byte=>byte.toString(16).padStart(2,'0')).join('');
+    const controller=new AbortController(),pollController=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),body.action==='check'?60000:150000);
+    let phase='',pollTimer,finished=false;
+    async function poll(){
+      try{
+        const response=await fetch('api.php?progress=1',{method:'POST',credentials:'same-origin',signal:pollController.signal,headers:{'X-CRA1-Operation':operation}});
+        const reply=await response.json();
+        if(!finished&&reply.data?.phase&&reply.data.phase!==phase){phase=reply.data.phase;onPhase?.(phase);}
+      }catch(_){}
+      if(!finished)pollTimer=setTimeout(poll,750);
+    }
+    pollTimer=setTimeout(poll,600);
     try{
-      const response=await fetch('api.php',{method:'POST',credentials:'same-origin',signal:controller.signal,headers,body:JSON.stringify(body)});
+      const response=await fetch('api.php',{method:'POST',credentials:'same-origin',signal:controller.signal,headers,body:JSON.stringify({...body,operation})});
       let data;
       try{data=await response.json();}catch(error){
         if(error.name==='AbortError')throw error;
@@ -24,15 +36,20 @@
         const reason=typeof data.msg==='string'&&data.msg?data.msg:
           [401,403].includes(data.status)?'本站已安装主题，请登录 V10 系统超级管理员后完成解压更新，或从原主题后台上传安装包。':
           '操作未完成（HTTP '+response.status+'，状态 '+data.status+'），请重新检测并查看网站错误日志。';
-        throw failure(reason,data.error?.needs_check===true||!response.ok||data.status>=500||[401,403].includes(data.status));
+        throw failure(reason,data.error?.needs_check===true||!response.ok||data.status>=500||[401,403].includes(data.status),data.error);
       }
       if(!data.data||typeof data.data!=='object')throw failure('安装服务返回不完整，请点击“重新检测”确认当前安装状态。',true);
       return data.data;
     }catch(error){
-      if(error.name==='AbortError')throw failure('等待服务超时，请点击“重新检测”确认当前安装或更新状态，勿重复提交。',true);
+      if(error.name==='AbortError')throw failure('等待服务超时，请点击“重新检测”确认当前安装或更新状态，避免重复提交。',true,null);
       if(error.needsCheck!==undefined)throw error;
       throw failure('无法连接安装服务，请检查网络后点击“重新检测”确认当前安装状态。',true);
-    }finally{clearTimeout(timer);}
+    }finally{finished=true;clearTimeout(timer);clearTimeout(pollTimer);pollController.abort();}
+  }
+  function explain(error,lastPhase){
+    const detail=error.detail;
+    if(detail?.state)return [detail.phase+'失败',detail.reason,detail.status_text,detail.next,detail.reference?'参考编号：'+detail.reference:''].filter(Boolean).join('\n');
+    return (lastPhase?'最后确认步骤：'+lastPhase+'\n':'')+error.message;
   }
   function text(tag,value){const node=document.createElement(tag);node.textContent=value;return node;}
   function message(value,state='error'){
@@ -81,7 +98,7 @@
     const environment=document.getElementById('environment');environment.hidden=true;environment.open=false;
     document.getElementById('checks').replaceChildren();
     try{
-      const data=await request({action:'check'}),out=document.getElementById('checks');
+      const data=await request({action:'check'},phase=>{status.textContent='正在'+phase+'…';}),out=document.getElementById('checks');
       if(!Array.isArray(data.checks)||!['install','maintenance'].includes(data.mode))throw failure('检查结果不完整，请点击“重新检测”。',true);
       environment.hidden=false;
       const labels={pass:'通过',warning:'提示',blocked:'请处理',unverified:'待检查'};
@@ -100,7 +117,8 @@
         maintenance.hidden=false;document.getElementById('update-options').hidden=updateState!=='ready'||!confirmation;updateButton.hidden=!confirmation;
         document.getElementById('maintenance-title').textContent=updateState==='current'?'主题已是当前版本':updateState==='interrupted'?'恢复未完成的更新':'完成主题更新';
         document.getElementById('maintenance-summary').textContent=updateState==='current'?'当前安装包已生效，无需重复更新。':updateState==='interrupted'?'恢复本次未完成事务的文件和生效版本后，可重新检查并更新。解压前已覆盖的文件需从网站备份恢复。':`检测到已解压的 ${data.version||'新版'}${data.release_channel==='test'?' 测试版':''}，检查通过后点击“完成更新”。`;
-        status.textContent=updateState==='current'?'已确认当前主题文件和生效版本一致。':confirmation?'检查通过，请在下方继续。':'更新暂不能继续，请处理检查提示后重试。';return;
+        status.textContent=updateState==='current'?'已确认当前主题文件和生效版本一致。':confirmation?'检查通过，请在下方继续。':'本次检查未切换主题。请处理检查提示，再点击“重新检测”。';
+        environment.open=!confirmation&&updateState!=='current';return;
       }
       ready=data.installation_ready===true;
       environment.open=!ready;
@@ -112,8 +130,9 @@
     if(busy||!confirmation||(updateState!=='interrupted'&&!backup.checked))return;
     const action=updateState==='interrupted'?'recover_update':'update';
     lock(true,action);updateFeedback.hidden=false;updateFeedback.dataset.state='pending';updateFeedback.textContent=action==='update'?'正在完成主题更新，请勿关闭页面…':'正在恢复，请稍候…';
+    let lastPhase=action==='update'?'核对已解压的主题文件':'恢复未完成的更新';
     try{
-      const result=await request({action,confirmation,backup_confirmed:backup.checked});
+      const result=await request({action,confirmation,backup_confirmed:backup.checked},phase=>{lastPhase=phase;updateFeedback.textContent='正在'+phase+'…';});
       if(action==='recover_update'){
         if(result.restored!==true)throw failure('恢复结果不完整，请重新检查。',true);
         confirmation=null;updateButton.hidden=true;updateFeedback.textContent='已恢复，请点击“重新检测”后继续更新。';status.textContent=updateFeedback.textContent;return;
@@ -123,7 +142,7 @@
       confirmation=null;maintenance.hidden=true;document.getElementById('update-success').hidden=false;status.textContent='主题更新完成，请刷新页面。';
       document.getElementById('update-success').scrollIntoView({block:'nearest'});
     }catch(error){
-      confirmation=null;status.textContent=error.message;updateFeedback.dataset.state='error';updateFeedback.textContent=error.message+' 请先点击“重新检测”确认状态。';updateFeedback.focus();
+      confirmation=null;status.textContent='操作未完成，处理方法见下方。';updateFeedback.dataset.state='error';updateFeedback.textContent=explain(error,lastPhase);updateFeedback.focus();
     }finally{lock(false);}
   });
   form.addEventListener('submit',async event=>{
@@ -132,8 +151,9 @@
     if(!validate())return;
     const values=Object.fromEntries(new FormData(form));delete values.confirm;
     lock(true,'install');message('正在安装主题后台，请稍候…','pending');status.textContent='正在安装主题后台…';
+    let lastPhase='核对已解压的主题文件';
     try{
-      const result=await request({...values,action:'install'});
+      const result=await request({...values,action:'install'},phase=>{lastPhase=phase;message('正在'+phase+'…','pending');});
       if(!['admin_url','username','password'].every(key=>typeof result[key]==='string'&&result[key]))throw failure('安装结果不完整，请点击“重新检测”确认当前安装状态。',true);
       let adminUrl;
       try{adminUrl=new URL(result.admin_url,location.origin);}catch(_){throw failure('后台地址返回异常，请点击“重新检测”确认当前安装状态。',true);}
@@ -145,7 +165,7 @@
       document.getElementById('success').scrollIntoView({block:'nearest'});
     }catch(error){
       if(error.needsCheck)ready=false;
-      status.textContent=error.message;message(error.message);feedback.focus();
+      status.textContent='安装未完成，处理方法见下方。';message(explain(error,lastPhase));feedback.focus();
     }finally{delete values.password;lock(false);}
   });
   document.getElementById('hide-password').addEventListener('click',()=>{const nodes=document.querySelectorAll('#credentials dd');if(nodes[2])nodes[2].textContent='已隐藏';});

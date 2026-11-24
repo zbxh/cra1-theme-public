@@ -10,6 +10,7 @@ import './attachments.css'
 
 const kindLabel = { theme: '主题图片', avatar: '会员头像', builtin: '系统图片' }
 const pageSize = 36
+const attachmentAddress = url => new URL(url, window.location.href).href
 function visiblePages(page, count, compact = false) {
   if (count <= (compact ? 3 : 7)) return Array.from({ length: count }, (_, i) => i + 1)
   const numbers = new Set([1, page, count])
@@ -116,7 +117,8 @@ export default function Attachments() {
     finally { setBusy(false) }
   }
   function pick(action, f) { setName(f.name); setDialog({ action, file: f }) }
-  async function copy(url) {
+  async function copy(path) {
+    const url = attachmentAddress(path)
     try { await navigator.clipboard.writeText(url); toast('图片地址已复制', 'success') }
     catch { setDialog({ action: 'copy', file: { url } }) }
   }
@@ -171,7 +173,7 @@ export default function Attachments() {
       <DialogHeader><DialogTitle>{({ detail: '附件详情', rename: '修改附件名称', delete: '移入回收站', restore: '恢复附件', copy: '复制图片地址' })[dialog?.action] || '附件'}</DialogTitle><DialogDescription>{dialog?.action === 'delete' ? '文件会停止公开访问，需要时可以从回收站恢复。' : dialog?.action === 'rename' ? '只修改管理名称，原图片地址保持不变。' : '查看附件信息。'}</DialogDescription></DialogHeader>
       {dialog?.action === 'rename' ? <Field label="附件名称" htmlFor="attachment-name"><Input id="attachment-name" maxLength={120} value={name} onChange={e => setName(e.target.value)} /></Field> : dialog?.action === 'detail' ? <div className="attachment-detail">
         {!dialog.file.deleted_at && <img src={dialog.file.url} alt={dialog.file.name} />}
-        <dl><dt>名称</dt><dd>{dialog.file.name}</dd><dt>来源</dt><dd>{kindLabel[dialog.file.kind]}{dialog.file.kind === 'avatar' ? ` · 会员 #${dialog.file.owner_id}` : ''}</dd><dt>大小 / 尺寸</dt><dd>{bytes(dialog.file.bytes)} · {dialog.file.width} × {dialog.file.height}</dd><dt>上传时间</dt><dd>{new Date(dialog.file.created_at * 1000).toLocaleString('zh-CN', { hour12: false })}</dd><dt>使用位置</dt><dd>{dialog.file.references?.join('、') || '未使用'}</dd><dt>地址</dt><dd>{dialog.file.url}</dd></dl>
+        <dl><dt>名称</dt><dd>{dialog.file.name}</dd><dt>来源</dt><dd>{kindLabel[dialog.file.kind]}{dialog.file.kind === 'avatar' ? ` · 会员 #${dialog.file.owner_id}` : ''}</dd><dt>大小 / 尺寸</dt><dd>{bytes(dialog.file.bytes)} · {dialog.file.width} × {dialog.file.height}</dd><dt>上传时间</dt><dd>{new Date(dialog.file.created_at * 1000).toLocaleString('zh-CN', { hour12: false })}</dd><dt>使用位置</dt><dd>{dialog.file.references?.join('、') || '未使用'}</dd><dt>地址</dt><dd>{attachmentAddress(dialog.file.url)}</dd></dl>
       </div> : dialog?.action === 'copy' ? <Input aria-label="图片地址" readOnly value={dialog.file.url} onFocus={e => e.target.select()} /> : <p className="attachment-confirm-name">{dialog?.file.name}</p>}
       <DialogFooter><Button variant="outline" disabled={busy} onClick={() => setDialog(null)}>{['detail', 'copy'].includes(dialog?.action) ? '关闭' : '取消'}</Button>{['rename', 'delete', 'restore'].includes(dialog?.action) && <Button variant={dialog.action === 'delete' ? 'danger' : 'default'} disabled={busy || dialog.action === 'rename' && !name.trim()} onClick={change}>{busy ? '处理中…' : dialog.action === 'delete' ? '移入回收站' : dialog.action === 'restore' ? '确认恢复' : '保存名称'}</Button>}</DialogFooter>
     </DialogContent></Dialog>

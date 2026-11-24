@@ -53,7 +53,11 @@ final class ThemeCache
         if(!is_dir($dir))return [];
         $matches=[];
         $prefixes=[];
-        foreach(['web/cra1','clientarea/template/pc/cra1','clientarea/template/mobile/cra1','home/template/pc/cra1','home/template/mobile/cra1','cart/template/pc/cra1','cart/template/mobile/cra1']as$rel)$prefixes[]=rtrim($root,'/').'/public/'.$rel.'/';
+        foreach(['web/cra1','clientarea/template/pc/cra1','clientarea/template/mobile/cra1','home/template/pc/cra1','home/template/mobile/cra1','cart/template/pc/cra1','cart/template/mobile/cra1']as$rel){
+            // V10's native views can compile paths relative to its public entry point.
+            $prefixes[]='"'.rtrim($root,'/').'/public/'.$rel.'/';
+            $prefixes[]='"../public/'.$rel.'/';
+        }
         $files=new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir,\FilesystemIterator::SKIP_DOTS));
         foreach($files as$file){
             if($file->isLink()||!$file->isFile()||!preg_match('/^[a-f0-9]{32}\.php$/D',$file->getFilename()))continue;

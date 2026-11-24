@@ -102,7 +102,7 @@
       { name: '购物车', url: 'cart/shoppingCar.htm' }
     ],
     'productList.htm': [
-      { name: '全部产品', url: 'productList.htm' },
+      { name: '全部产品', url: 'productList.htm?tab=all' },
       { name: '使用中', url: 'productList.htm?tab=using' },
       { name: '即将到期', url: 'productList.htm?tab=expiring' },
       { name: '已逾期', url: 'productList.htm?tab=overdue' },
@@ -200,21 +200,43 @@
       <template v-for="p in primaryNav">
       <div v-if="p.separator" :key="p.key" class="cra1-primary-separator"
            role="separator" aria-orientation="horizontal" :aria-label="p.name"></div>
-      <button v-else
+      <component v-else
+        :is="p.href ? 'div' : 'button'"
         :key="p.key"
-        type="button"
+        :type="p.href ? null : 'button'"
         class="cra1-primary-item"
-        :class="{ 'is-active': primaryKey === p.key }"
-        :aria-expanded="primaryKey === p.key ? 'true' : 'false'"
-        :title="p.name"
-        @click="selectPrimary(p.key)"
+        :class="{ 'is-active': primaryKey === p.key, 'cra1-primary-item--link': p.href, 'cra1-primary-item--split': p.href && p.hasChildren }"
+        :aria-expanded="p.href ? null : String(primaryExpanded(p))"
+        :title="p.href ? null : p.name"
+        @click="!p.href && selectPrimary(p.key)"
       >
-        <span v-if="p.icon_resolved && p.icon_resolved.url" class="cra1-primary-item__icon cui-business-icon" :data-cui-icon-style="p.icon_style ? '1' : null" :style="iconVars(p.icon_style)" aria-hidden="true"><span v-if="p.icon_resolved.colorable" class="cui-icon-mask" :style="{'--cui-icon-url':'url('+p.icon_resolved.url+')'}"></span><img v-else :src="p.icon_resolved.url" width="20" height="20" alt=""></span><i v-else-if="p.icon" class="iconfont cra1-primary-item__icon" :class="p.icon" :data-cui-icon-style="p.icon_style ? '1' : null" :style="iconVars(p.icon_style)" aria-hidden="true"></i>
-        <span class="cra1-primary-item__label">{{ p.name }}</span>
-        <svg class="cra1-primary-item__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="m9 6 6 6-6 6"></path>
-        </svg>
-      </button>
+        <component
+          :is="p.href ? 'a' : 'span'"
+          class="cra1-primary-item__entry"
+          :href="p.href || null"
+          :target="p.newTab ? '_blank' : null"
+          :rel="p.newTab ? 'noopener' : null"
+          :title="p.href ? p.name : null"
+          :aria-label="p.href ? p.name : null"
+          :aria-current="p.href && isPageActive(p) ? 'page' : null"
+          @click="p.href && openPrimaryLink($event, p)"
+        >
+          <span v-if="p.icon_resolved && p.icon_resolved.url" class="cra1-primary-item__icon cui-business-icon" :data-cui-icon-style="p.icon_style ? '1' : null" :style="iconVars(p.icon_style)" aria-hidden="true"><span v-if="p.icon_resolved.colorable" class="cui-icon-mask" :style="{'--cui-icon-url':'url('+p.icon_resolved.url+')'}"></span><img v-else :src="p.icon_resolved.url" width="20" height="20" alt=""></span><i v-else-if="p.icon" class="iconfont cra1-primary-item__icon" :class="p.icon" :data-cui-icon-style="p.icon_style ? '1' : null" :style="iconVars(p.icon_style)" aria-hidden="true"></i>
+          <span class="cra1-primary-item__label">{{ p.name }}</span>
+        </component>
+        <component
+          v-if="!p.href || p.hasChildren"
+          :is="p.href ? 'button' : 'span'"
+          :class="p.href ? 'cra1-primary-item__toggle' : 'cra1-primary-item__indicator'"
+          :type="p.href ? 'button' : null"
+          :aria-hidden="p.href ? null : 'true'"
+          :aria-expanded="p.href ? String(primaryExpanded(p)) : null"
+          :aria-label="p.href ? '展开' + p.name + '菜单' : null"
+          @click="p.href && selectPrimary(p.key)"
+        >
+          <svg class="cra1-primary-item__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </component>
+      </component>
       </template>
 
       <!-- 加载骨架 -->
@@ -369,10 +391,21 @@
           '我的资源': 'icon-a-7', '产品与服务': 'icon-a-6', '产品管理': 'icon-a-6',
           '财务中心': 'icon-caiwuzhongxin', '账户中心': 'icon-a-13', '服务与支持': 'icon-rengongkefu',
         }
-        var out = (this.menu || []).map(function (n) {
-          return { key: n.id, name: n.name, icon: n.icon || FALLBACK_ICON[n.name] || 'icon-a-6', icon_style:n.icon_style, icon_resolved:n.icon_resolved, separator: !!isMenuSeparator(n) }
-        })
-        return out
+        return (this.menu || []).map(function (n) {
+          var separator = !!isMenuSeparator(n)
+          var url = !separator && !n.primaryLinkBlocked && n.url !== '#' ? this.tagCRA1Menu(n.url, n.id) : ''
+          var href = global.CRA1Shared.Navigation.href(url)
+          if (href && !global.CRA1Shared.Access.canUrl(href)) href = ''
+          var secondReminder = Number(n.second_reminder) === 1 ? 1 : 0
+          var external = /^https?:\/\//i.test(href) && this.isExternal(href)
+          return {
+            key: n.id, name: n.name, icon: n.icon || FALLBACK_ICON[n.name] || 'icon-a-6',
+            icon_style: n.icon_style, icon_resolved: n.icon_resolved, separator: separator,
+            url: url, href: external && secondReminder ? '/transfer.htm?target=' + encodeURIComponent(href) : href,
+            second_reminder: secondReminder, newTab: external && !secondReminder,
+            hasChildren: !separator && this.groupsOfNode(n).length > 0,
+          }
+        }, this)
       },
       /**
        * 我的资源：我的产品 + 后端返回的产品类菜单（module/res_module）
@@ -554,7 +587,8 @@
             pages = grand.map(function (g) {
               return {
                 name: g.name,icon:g.icon,icon_style:g.icon_style,icon_resolved:g.icon_resolved,
-                url: self.tagCRA1Menu(g.url, c.id),
+                url: self.tagCRA1Menu(g.url, g.id || c.id),
+                productParentId: c.id || null,
                 second_reminder: (g.second_reminder === 1 || g.second_reminder === '1') ? 1 : 0,
                 sourceMenuId: g.id || null,
               }
@@ -576,11 +610,7 @@
 
       /** 产品列表链接附加稳定菜单 UUID（不使用会重建的 idcsmart_menu.id） */
       tagCRA1Menu(url, id) {
-        var u = String(url || '')
-        if (id && u.indexOf('productList.htm') === 0) {
-          u += (u.indexOf('?') === -1 ? '?' : '&') + 'cloud_menu=' + id
-        }
-        return u
+        return global.CRA1Shared.Navigation.productListHref(url, id)
       },
       /**
        * 隐藏首屏 loading 遮罩（页面提供，z-index 9999 全屏）。
@@ -645,6 +675,18 @@
        * 左栏切换一级入口：右栏面板随之切换，默认展开含当前页的二级
        * （阿里云式 —— 面板常在，无需「先点一级再点面板」）。
        */
+      primaryExpanded(p) {
+        return this.primaryKey === p.key && (this.isNarrow ? this.mobileDetail : !this.collapsed)
+      },
+      openPrimaryLink(event, p) {
+        if (!global.CRA1Shared.Access.canUrl(p.url)) {
+          event.preventDefault()
+          return
+        }
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+        event.preventDefault()
+        this.goPage({ url: p.url, sourceMenuId: p.key, primaryKey: p.key, second_reminder: p.second_reminder })
+      },
       selectPrimary(key) {
         this.primaryKey = key
         if (global.innerWidth <= 1024) this.mobileDetail = true
@@ -727,10 +769,7 @@
        * （后者在系统保存导航时会整体删除重建）。
        */
       pageFromMenu(n, rootItem, nameOverride) {
-        var url = String((n && n.url) || '')
-        if (url.indexOf('productList.htm') === 0 && n.id) {
-          url += (url.indexOf('?') === -1 ? '?' : '&') + 'cloud_menu=' + n.id
-        }
+        var url = this.tagCRA1Menu(n && n.url, n && n.id)
         return {
           name: nameOverride || (n && n.name) || '',
           url: url,
@@ -751,7 +790,7 @@
         var def = SECONDARY_PAGES[u]
         if (!def) {
           // product.htm?m=xxx 这类带 query 的菜单，按路径回退
-          var path = u.split('?')[0]
+          var path = u.split(/[?#]/)[0].replace(/^\//, '')
           if (path !== u) def = SECONDARY_PAGES[path]
         }
         if (!def) return null
@@ -769,9 +808,8 @@
         var mid = menuItem && menuItem.id
         // 入口本身是产品列表时，其静态标签页（全部产品/使用中/…）同属该入口：
         // 带上入口的稳定 UUID，内容设置即可按入口区分顶部文案
-        var tag = (menuItem && menuItem.id
-                  && String(menuItem.url || '').indexOf('productList.htm') === 0)
-                 ? 'cloud_menu=' + menuItem.id : ''
+        var tag = menuItem && /^\/?productList\.htm(?:[?#]|$)/.test(menuItem.url || '') ? mid : null
+        var self = this
         return def.filter(function (pg) {
           if (feat && feat.ready) {
             if (pg.url === 'security.htm?tab=ssh' && !feat.ssh) return false
@@ -779,13 +817,9 @@
           }
           return !global.CRA1Shared?.Access || global.CRA1Shared.Access.canUrl(pg.url)
         }).map(function (pg) {
-          var pu = pg.url
-          if (tag && pu.indexOf('productList.htm') === 0) {
-            pu += (pu.indexOf('?') === -1 ? '?' : '&') + tag
-          }
           return {
             name: pg.name,
-            url: pu,
+            url: self.tagCRA1Menu(pg.url, tag),
             second_reminder: sr === 1 || sr === '1' ? 1 : 0,
             sourceMenuId: mid || null,
           }
@@ -794,27 +828,30 @@
       /** 三级链接是否命中当前地址（先精确匹配 query，再路径回退） */
       isPageActive(pg) {
         if (!pg || !pg.url) return false
+        var currentProduct = this.productRoute(location.pathname + location.search)
+        var targetProduct = this.productRoute(pg.url)
+        if (currentProduct && targetProduct) {
+          var currentKey = currentProduct.get('cloud_menu') || currentProduct.get('m')
+          var targetKey = targetProduct.get('cloud_menu')
+          var tab = function (params) { return params.get('tab') || 'current' }
+          return (!currentProduct.has('cloud_menu') || !targetKey || currentKey === targetKey || currentKey === String(pg.productParentId)) && tab(currentProduct) === tab(targetProduct)
+        }
         if (location.pathname === '/cart/goodsList.htm' && String(pg.url).split('?')[0] === 'cart/goodsList.htm') {
           var currentCart = new URLSearchParams(location.search)
           var targetCart = new URLSearchParams(String(pg.url).split('?')[1] || '')
           if (targetCart.get('product_id')) return targetCart.get('product_id') === currentCart.get('product_id')
           if (!currentCart.get('product_id') && targetCart.get('spg_id')) return targetCart.get('spg_id') === currentCart.get('spg_id')
         }
-        // 页面链接可能带 cloud_menu=<UUID>（内容设置按它区分不同入口的顶部文案），
-        // 高亮判断必须忽略该参数，否则直接访问 /productList.htm 时同级全部失亮。
-        var strip = function (u) {
-          var parts = String(u).split('?')
-          if (parts.length < 2) return parts[0]
-          var kept = parts[1].split('&').filter(function (p) { return p.indexOf('cloud_menu=') !== 0 })
-          return kept.length ? parts[0] + '?' + kept.join('&') : parts[0]
-        }
         var path = location.pathname.replace(/^\//, '')
-        var all = strip(path + location.search)
-        var target = strip(pg.url)
+        var all = this.stripCRA1Menu(path + location.search)
+        var target = this.stripCRA1Menu(String(pg.url).replace(/^\//, ''))
         if (target === all) return true
         // 无 query 的目标：只有当前也没有 query 时才算命中，避免与同级 ?tab= 冲突
         if (target.indexOf('?') === -1) return target === path && !location.search
         return false
+      },
+      productRoute(url) {
+        return /^\/?productList\.htm(?:[?#]|$)/.test(url) ? new URL(url, location.origin + '/').searchParams : null
       },
       goPage(pg) {
         if (!pg || !pg.url) return
@@ -848,7 +885,7 @@
           })[0]
           var idForStore = (src && src.id) || pg.sourceMenuId
           if (idForStore) localStorage.setItem('frontMenusActiveId', String(idForStore))
-          localStorage.setItem('cra1_nav_primary', this.primaryKey)
+          localStorage.setItem('cra1_nav_primary', pg.primaryKey || this.primaryKey)
         } catch (e) {}
 
         // 跳转前收起导航：新页面默认不显示导航，避免刷新后仍挡着内容
@@ -1138,13 +1175,14 @@
         var language = 'zh-cn'
         try { language = localStorage.getItem('lang') || language } catch (e) {}
         var toItem = function (n) {
+          var href = global.CRA1Shared.Navigation.href(n)
           return {
             id: n.id,
             name: (n.language && n.language[language]) || n.name,
             language: n.language || {},
             select_field: n.select_field || [],
             select_field_set: n.select_field_set || false,
-            url: global.CRA1Shared.Navigation.href(n).replace(/^\//,''),
+            url: href === '/' ? href : href.replace(/^\//,''),
             icon: n.icon || '',
             icon_style:n.icon_style,icon_resolved:n.icon_resolved,
             second_reminder: n.second_reminder || 0,
@@ -1194,7 +1232,7 @@
         var rules = []
         if (feat.ready && !feat.withdraw_open) rules.push(/withdrawal\.htm/i)
         if (feat.ready && !feat.recharge_open) rules.push(/recharge\.htm/i)
-        var walk = function (items) {
+        var walk = function (items, primary) {
           var out = []
           ;(items || []).forEach(function (it) {
             var u = String(it.url || '')
@@ -1203,14 +1241,17 @@
             if (hadChildren) it.child = walk(it.child)
             var permitted = !global.CRA1Shared?.Access || global.CRA1Shared.Access.canUrl(u)
             if (!permitted && !(it.child && it.child.length)) return
-            if (!permitted && it.child && it.child.length) it.url = it.child[0].url || ''
+            if (!permitted && it.child && it.child.length) {
+              if (primary) it.primaryLinkBlocked = true
+              it.url = it.child[0].url || ''
+            }
             if (hadChildren && !it.child.length && (!u || u === '#')) return
             out.push(it)
           })
           return out
         }
         // 三级页表由 SECONDARY_PAGES 渲染：pagesForUrl 里按同一特征位同步剔除
-        return walk(menu)
+        return walk(menu, true)
       },
       /** 回落：系统导航 */
       loadSystemMenu() {
@@ -1300,6 +1341,22 @@
             { key: 'service', list: this.serviceGroups },
           ]
         }
+        var product = this.productRoute(all)
+        var entryId = product && product.get('cloud_menu')
+        if (entryId) {
+          if (this.primaryNav.some(function (p) { return p.key === entryId && p.href && self.isPageActive(p) })) {
+            found = { primary: entryId }
+          }
+          var owner = pools.find(function (pool) {
+            return pool.list.some(function (group) {
+              return [group].concat(group.pages || []).some(function (item) {
+                var query = self.productRoute(item.url)
+                return query && query.get('cloud_menu') === entryId
+              })
+            })
+          })
+          if (!found && owner) found = { primary: owner.key }
+        }
         pools.forEach(function (pool) {
           pool.list.forEach(function (c) {
             if (found) return
@@ -1313,13 +1370,16 @@
             if (!c.pages) return
             c.pages.forEach(function (pg) {
               if (found) return
-              // 链接带 cloud_menu 参数，高亮匹配要忽略它（见 isPageActive）
-              if (self.stripCRA1Menu(pg.url) === self.stripCRA1Menu(all)) {
+              if (product && self.productRoute(pg.url) ? self.isPageActive(pg) : self.stripCRA1Menu(pg.url) === self.stripCRA1Menu(all)) {
                 found = { primary: pool.key }
               }
             })
           })
         })
+        if (!found) {
+          var primaryLink = this.primaryNav.find(function (p) { return p.href && self.isPageActive(p) })
+          if (primaryLink) found = { primary: primaryLink.key }
+        }
         // 商品页会自动补充分组参数，按商品或分类标识定位所属一级订购分类。
         if (/^cart\//.test(path) && !found) {
           var cartParams = new URLSearchParams(location.search)

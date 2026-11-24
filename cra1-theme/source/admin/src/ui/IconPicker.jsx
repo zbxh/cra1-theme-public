@@ -1,6 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { Pencil } from 'lucide-react'
 import { Button } from '@ui/button'
-import { Input, Select } from '@ui/input'
+import { Input, Label, Select } from '@ui/input'
 import { MenuSelect } from '@ui/select'
 import { ICON_PRESETS, customStyle, iconStyleVars } from '@/lib/icon-style'
 import { iconCatalog, iconPage, iconSearch, onlineSearch, onlinePreviews, importIcon, resolveIcon, peekIcon, peekIconCatalog, peekIconPage, uniqueIcons } from '@/lib/icon-client'
@@ -23,7 +24,7 @@ function Colour({ label, value, onChange }) {
   useEffect(() => setRaw(value), [value])
   return <label className="ip-colour"><span>{label}</span><div><input aria-label={label+'取色'} type="color" value={value} onChange={e => onChange(e.target.value)} /><Input aria-label={label} value={raw} maxLength={7} onChange={e => { setRaw(e.target.value); if (/^#[0-9a-f]{6}$/i.test(e.target.value)) onChange(e.target.value.toLowerCase()) }} onBlur={() => setRaw(value)} /></div></label>
 }
-export default function IconPicker({ value = '', onChange, label = '图标', iconStyle = null, context = 'website', defaultKey = '', defaultPreview = '', tile = true, styledSelect = false }) {
+export default function IconPicker({ value = '', onChange, label = '图标', iconStyle = null, context = 'website', defaultKey = '', defaultPreview = '', tile = true, styledSelect = false, compact = false }) {
   const Choice = styledSelect ? MenuSelect : Select
   const dialogRef=useRef(), dialogId=useId(), hadOpen=useRef(false)
   const [current, setCurrent] = useState(() => peekIcon(value, context, defaultKey)), [currentError, setCurrentError] = useState('')
@@ -199,8 +200,27 @@ export default function IconPicker({ value = '', onChange, label = '图标', ico
     setTab(next); dialogRef.current?.querySelector('#'+CSS.escape(tabs[next]))?.focus()
   }
   const canApply = !applying && !manualBusy && (!draftValue || draftValue === value || (selected?.available && (!selected.external || externalLoaded)))
+  const currentName = value ? (preview?.label || value) : '默认图标'
   return <div className="ip-field" data-icon-picker={label}>
-    <div className="ip-field-line"><Preview icon={preview} style={iconStyle} tile={tile} label={label}/><div className="ip-field-copy"><strong title={value || preview?.label}>{preview?.label || (value ? value : '当前位置默认图形')}</strong><small>{currentError || preview?.source || (value ? '正在解析…' : '使用默认图标')}{iconStyle ? ' · 自定义配色' : ''}</small></div><Button ref={trigger} type="button" aria-label={'选择'+label} variant="outline" size="sm" onClick={() => changeOpen(true)}>选择图标</Button></div>
+    {compact ? <>
+      <Label htmlFor={dialogId + '-trigger'}>{label}</Label>
+      <Button
+        ref={trigger}
+        id={dialogId + '-trigger'}
+        type="button"
+        variant="outline"
+        className="ip-field-trigger"
+        aria-label={'选择' + label}
+        aria-describedby={dialogId + '-current'}
+        aria-haspopup="dialog"
+        onClick={() => changeOpen(true)}
+      >
+        <span className="ip-field-trigger-preview" aria-hidden="true"><Preview icon={preview} style={iconStyle} tile={tile} label={label} /></span>
+        <span className="ip-field-trigger-name" id={dialogId + '-current'} title={currentName}>{currentName}</span>
+        <Pencil className="ip-field-trigger-action" aria-hidden="true" />
+      </Button>
+      {currentError && <p className="ip-history-warning" role="status">{currentError}</p>}
+    </> : <div className="ip-field-line"><Preview icon={preview} style={iconStyle} tile={tile} label={label}/><div className="ip-field-copy"><strong title={value || preview?.label}>{preview?.label || (value ? value : '当前位置默认图形')}</strong><small>{currentError || preview?.source || (value ? '正在解析…' : '使用默认图标')}{iconStyle ? ' · 自定义配色' : ''}</small></div><Button ref={trigger} type="button" aria-label={'选择'+label} variant="outline" size="sm" onClick={() => changeOpen(true)}>选择图标</Button></div>}
     {current && value && !current.available && <p className="ip-history-warning">历史图标当前不可用，原值已保留。可以重新选择图标。</p>}
     <dialog ref={dialogRef} className="ip-dialog" aria-labelledby={dialogId+'-title'} aria-describedby={dialogId+'-description'} style={{ width:'min(94vw, 960px)', maxWidth:'none', height:'min(88dvh, 800px)', maxHeight:'88dvh', padding:0 }} onCancel={e=>{e.preventDefault();if(!dialogRef.current?.querySelector('.admin-menu-select__popup'))changeOpen(false)}} onClose={()=>{if(open)changeOpen(false)}} onKeyDownCapture={e=>{if(e.key==='Escape'&&!e.target.closest('.admin-menu-select__popup')){e.preventDefault();e.stopPropagation();changeOpen(false)}}} onClick={e=>{if(e.target===dialogRef.current){const r=dialogRef.current.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)changeOpen(false)}}}>
       {open && <><button type="button" className="ip-close" aria-label="关闭图标设置" onClick={()=>changeOpen(false)}>×</button>

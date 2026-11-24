@@ -36,19 +36,80 @@ export function findProductCategory(categories, key) {
   return categories.find(category => category.key === String(key) || category.aliases?.includes(String(key))) || null
 }
 
-/** Generic list links carry a content-settings id, not a product filter. */
-export function productOverviewAliases(nodes) {
-  const aliases = []
-  const walk = (items, inCategory = false) => {
+/** Track the visible entry separately from the category that supplies its products. */
+export function productListEntries(nodes) {
+  const entries = new Map()
+  const walk = (items, parent = null, inCategory = false) => {
     for (const node of Array.isArray(items) ? items : []) {
       if (Number(node.hidden) === 1) continue
       const owned = inCategory || ['module', 'res_module'].includes(node.type)
-      if (!owned && node.id != null && /^\/?productList\.htm(?:[?#]|$)/i.test(String(node.url || ''))) aliases.push(String(node.id))
-      walk(node.children || node.child, owned)
+      const url = String(node.url || '')
+      let next = parent
+      if (node.id != null && /^\/?productList\.htm(?:[?#]|$)/.test(url)) {
+        const tab = new URLSearchParams(url.split('#', 1)[0].split('?')[1]).get('tab')
+        next = { key: String(node.id), parent: parent?.key, tab, owned, purchaseUrl: node.purchase_url }
+        entries.set(next.key, next)
+      }
+      walk(node.children || node.child, next, owned)
     }
   }
   walk(nodes)
-  return [...new Set(aliases)]
+  return entries
+}
+
+export function productOverviewAliases(nodes, entries = productListEntries(nodes)) {
+  return [...entries.values()].filter(entry => !entry.owned).map(entry => entry.key)
+}
+
+/** Resolve the matching page, including old links that used the parent ID. */
+function productListSelection(entries, key, tab) {
+  const entry = entries.get(key)
+  const parent = entries.get(entry?.parent)
+  const group = parent || entry
+  if (!group || (entry.tab || 'current') === tab) return [entry, group]
+  const matches = [...entries.values()].filter(candidate => candidate.parent === group.key && candidate.tab === tab)
+  return [matches.length === 1 ? matches[0] : null, group]
+}
+
+export function productListCopy(config, entries, key, tab) {
+  return productListSources(config, entries, key, tab).copy
+}
+
+export function productListPurchase(config, entries, key, tab, category) {
+  return productListSources(config, entries, key, tab, category).purchase
+}
+
+export function productListSources(config, entries, key, tab, category) {
+  const [selected, group] = productListSelection(entries, key, tab)
+  const candidates = [
+    ...(selected ? [{ key: selected.key, block: config?.overrides?.[selected.key] }] : []),
+    ...(group && group !== selected ? [{ key: group.key, block: config?.overrides?.[group.key] }] : []),
+    { key: 'default', block: config?.default },
+  ]
+  const copy = candidates.find(({ block }) => Number(block?.enabled) === 1)
+  const purchase = candidates.find(({ block }) => block?.purchase != null)
+  const button = purchase?.block.purchase
+  const url = [
+    { value: button?.url, source: 'button' },
+    { value: selected?.purchaseUrl, source: 'menu' },
+    { value: group?.purchaseUrl, source: 'menu' },
+    { value: category?.purchase_url, source: 'menu' },
+    { value: '/cart/goodsList.htm', source: 'theme' },
+  ].find(({ value }) => value)
+  return {
+    selectedKey: selected?.key || group?.key || null,
+    copy: copy?.block || null,
+    copySource: copy?.key || null,
+    titleSource: copy?.block.title ? copy.key : category ? 'category' : null,
+    descriptionSource: copy?.block.description ? copy.key : null,
+    title: copy?.block.title || category?.name || '我的产品',
+    description: copy?.block.description || (category ? '查看与管理该分类下的产品与服务' : '查看与管理已订购的产品与服务'),
+    purchaseSource: purchase?.key || null,
+    purchaseUrlSource: url.source,
+    purchase: Number(button?.enabled) === 1 ? {
+      url: url.value, text: button.text || '购买产品', newTab: button.target === 'blank',
+    } : null,
+  }
 }
 
 export const DEFAULT_HOST_FIELDS = ['product_name', 'base_info', 'ip', 'notes', 'status', 'due_time', 'os', 'area']

@@ -76,6 +76,14 @@
         </button>
     </div>
     {/if}
+    <div class="reading-mobile-tools" data-reading-mobile-tools>
+        <button type="button" class="reading-tool" data-reading-open aria-label="文章目录" aria-haspopup="dialog" aria-expanded="false" hidden>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1"/></svg>
+        </button>
+        <button type="button" class="reading-tool" data-reading-top aria-label="返回顶部" hidden>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 6-6 6 6M12 8v11"/></svg>
+        </button>
+    </div>
 <script src="/web/cra1/assets/js/api.js?v={:filemtime(IDCSMART_ROOT . 'public/web/cra1/assets/js/api.js')}" defer></script>
 <!-- 头像生成（官网与会员中心共用的唯一实现，见文件头说明） -->
 <script src="{:cra1_theme_asset_url('website', '20261017-compat-v3/app.js', '/web/cra1/releases/20261017-compat-v3/app.js')}" defer></script>

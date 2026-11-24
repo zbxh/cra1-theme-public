@@ -101,6 +101,7 @@
   }
 
   var NATIVE_BINDINGS = Object.assign({}, COMPONENT_PATHS)
+  var VERSIONED_COMPONENTS = ['payDialog', 'eventCode']
   var declaredLoads = {}
   var loaded = {}      // name -> true
   var inflight = {}    // name -> Promise
@@ -110,8 +111,11 @@
     return window.__CRA1_SHARED_BASE__ || '/clientarea/template/pc/default/'
   }
 
-  function loadScript(rel) {
-    var src = /^(?:https?:|\/)/.test(rel) ? rel : rel === 'components/payDialog/payDialog.js' && window.__CRA1_PAYMENT_BASE__ ? window.__CRA1_PAYMENT_BASE__ + '/' + rel : baseUrl() + rel
+  function loadScript(name, rel) {
+    var base = VERSIONED_COMPONENTS.includes(name)
+      ? window.__CRA1_PAYMENT_BASE__ || '/clientarea/template/pc/cra1'
+      : baseUrl()
+    var src = /^(?:https?:|\/)/.test(rel) ? rel : base.replace(/\/$/, '') + '/' + rel
     if (scriptPromises[src]) return scriptPromises[src]
     scriptPromises[src] = new Promise(function (resolve) {
       var s = document.createElement('script')
@@ -173,7 +177,7 @@
     inflight[name] = Promise.all((DEPS[name] || []).map(loadOne)).then(function () {
       var rel = COMPONENT_PATHS[name]
       if (!rel) throw new Error('尚未登记模块组件：'+name)
-      return loadScript(rel).then(function (ok) {
+      return loadScript(name, rel).then(function (ok) {
         if(ok&&(binding(name)||!NATIVE_BINDINGS[name]))loaded[name]=true
         else if(ok){delete inflight[name];throw new Error('模块组件未正确初始化，请刷新页面重试：'+name)}
         else { delete inflight[name]; throw new Error('模块组件加载失败：'+name) }
@@ -245,6 +249,7 @@
     if (!src) return ''
     var url = new URL(src, document.baseURI)
     if (url.origin !== window.location.origin) return ''
+    if (/\/template\/(?:pc|mobile)\/cra1\/(?:releases\/[^/]+\/)?components\/cra1EventCode\/eventCode\.js$/.test(url.pathname)) return 'eventCode'
     var match = /\/clientarea\/template\/(?:pc|mobile)\/[^/]+\/(?:releases\/[^/]+\/)?components\/([^/]+)\/\1\.js$/.exec(url.pathname)
     return match ? match[1] : ''
   }

@@ -52,7 +52,8 @@ async function fixture(width=1440,role='super_admin'){
    if(state.mode==='checksum')return route.fulfill({json:{status:400,msg:'安装包下载校验未通过，请重新检查最新版本后重试'}})
    if(state.mode==='hold')await new Promise(resolve=>state.releaseDownload=resolve)
    data={candidate:'fixture-candidate',version:release.version,release_channel:'test',sha256:'fixture-digest',can_apply:state.mode!=='blocked',files:[],blockers:state.mode==='blocked'?['主题目录未允许 PHP 写入']:[]}
-  }else if(action==='api.release.apply'){assert.deepEqual(body,{candidate:'fixture-candidate',expectedDigest:'fixture-digest'});state.apply++;state.current='v17.6.4';data={updated:true}}
+  }else if(action==='api.release.progress.get'){assert.match(body.operation,/^[0-9a-f]{32}$/);data={phase:'下载安装包'}}
+  else if(action==='api.release.apply'){assert.match(body.operation,/^[0-9a-f]{32}$/);assert.deepEqual({candidate:body.candidate,expectedDigest:body.expectedDigest},{candidate:'fixture-candidate',expectedDigest:'fixture-digest'});state.apply++;state.current='v17.6.4';data={updated:true}}
   else throw Error('Unexpected request '+action)
   return route.fulfill({json:{status:200,data}})
  })
@@ -93,7 +94,7 @@ try{
    state.confirm=true;state.mode='checksum';await page.getByRole('button',{name:'一键更新至 v17.6.4',exact:true}).click();await page.getByText(/安装包下载校验未通过/).waitFor();check(state.apply===0,'failed verification never submits apply')
    state.mode='blocked';await page.getByRole('button',{name:'一键更新至 v17.6.4',exact:true}).click();await page.getByText('主题目录未允许 PHP 写入',{exact:true}).waitFor();check(state.apply===0,'preflight blocker is visible and prevents automatic update')
    check(await page.getByRole('button',{name:'确认覆盖更新',exact:true}).isDisabled(),'blocked package cannot be applied manually')
-   state.mode='hold';const before=state.download;await page.getByRole('button',{name:'一键更新至 v17.6.4',exact:true}).click();await page.getByText('正在从 GitHub 下载安装包，请稍候…',{exact:true}).waitFor()
+   state.mode='hold';const before=state.download;await page.getByRole('button',{name:'一键更新至 v17.6.4',exact:true}).click();await page.getByRole('status').filter({hasText:'下载安装包'}).waitFor()
    await page.waitForFunction(()=>true);for(let i=0;i<50&&!state.releaseDownload;i++)await page.waitForTimeout(10)
    await page.getByRole('button',{name:'一键更新至 v17.6.4',exact:true}).evaluate(button=>button.click());check(state.download===before+1&&state.apply===0,'download state blocks duplicate clicks')
    state.releaseDownload();await page.getByText('更新完成，请刷新页面加载对应资源。',{exact:true}).waitFor();check(state.apply===1,'one confirmed click downloads and applies through ordinary updater once')

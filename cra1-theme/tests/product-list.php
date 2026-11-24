@@ -60,7 +60,7 @@ namespace {
         {
             $comparison = func_num_args() === 2 ? '=' : $operator;
             $value = func_num_args() === 2 ? $operator : $value;
-            $key = self::column($key);
+            $key = self::unqualified($key);
             $this->rows = array_filter($this->rows, static function (array $row) use ($comparison, $key, $value): bool {
                 if ($comparison === '>') return $row[$key] > $value;
                 if ($comparison === '<>') return $row[$key] !== $value;
@@ -70,21 +70,28 @@ namespace {
         }
         public function whereIn(string $key, array $values): self
         {
-            $key = self::column($key);
+            $key = self::unqualified($key);
             $this->rows = array_filter($this->rows, static fn(array $row): bool => in_array($row[$key], $values, true));
             return $this;
         }
-        private static function column(string $key): string { return substr($key, strrpos('.'.$key, '.')); }
+        public function whereNotIn(string $key, array $values): self
+        {
+            $key = self::unqualified($key);
+            $this->rows = array_filter($this->rows, static fn(array $row): bool => !in_array($row[$key], $values, true));
+            return $this;
+        }
+        private static function unqualified(string $key): string { return substr($key, strrpos('.'.$key, '.')); }
         public function alias(string $alias): self { return $this; }
         public function leftJoin(string $table, string $on): self { return $this; }
         public function order(string $key, string $direction): self
         {
-            $key = self::column($key);
+            $key = self::unqualified($key);
             usort($this->rows, static fn(array $a, array $b): int => $a[$key] <=> $b[$key]);
             return $this;
         }
         public function limit(int $limit): self { $this->rows = array_slice($this->rows, 0, $limit); return $this; }
         public function field(string $fields): self { return $this; }
+        public function column(string $field): array { return array_column($this->rows, $field); }
         public function select(): self { return $this; }
         public function toArray(): array { return array_values($this->rows); }
     }
@@ -198,6 +205,23 @@ namespace {
     ProductListFixture::$showDeleted = true;
     $check($ids($read(['tab'=>'deleted'])) === [8] && $ids($read(['tab'=>'all','limit'=>20])) === [8,7,6,5,4,3,2,1], 'Enabling deleted adds that status without exposing cancelled hosts');
     $check($find('历史实例备注', ['tab'=>'deleted']) === [8], 'Search sees deleted products when V10 permits it');
+    $pinned = new ProductList();
+    $pins = [1,4,2,8,10,12];
+    $pinRead = static fn(array $input = []): array => $pinned->read($input, $pins);
+    $sequence = [];
+    foreach ([1,2,3] as $page) {
+        $result = $pinRead(['limit'=>2, 'page'=>$page]);
+        $check($result['count'] === 6, 'Pins preserve filtered totals');
+        $sequence = array_merge($sequence, $ids($result));
+    }
+    $check($sequence === [1,4,2,6,5,3], 'Pins from later pages precede all unpinned rows without gaps or duplicates');
+    $check($ids($pinRead(['only_pinned'=>1,'product_id'=>[2]])) === [4,2], 'Only-pinned filter keeps the current category');
+    $check($pinRead(['only_pinned'=>1,'count_only'=>1]) === ['list'=>[],'count'=>3], 'Status counts respect the only-pinned filter');
+    $check($ids($pinRead(['tab'=>'deleted'])) === [8] && !$pinRead(['tab'=>'deleted'])['list'][0]['pinned'], 'Deleted products do not keep pin badges');
+    $check($ids($pinRead(['keywords'=>'项目','limit'=>2])) === [1,2], 'Pin order matches keyword results');
+    ProductListFixture::$visible = [2,4,8];
+    $check($ids($pinRead(['only_pinned'=>1])) === [4,2], 'Pins outside the current subaccount assignment never appear');
+    ProductListFixture::$visible = null;
     foreach (['using'=>[5,2,1], 'expiring'=>[2], 'overdue'=>[4,3]] as $tab => $expected) {
         $check($ids($read(['tab'=>$tab])) === $expected, 'Legacy tab retains its native scope');
     }
@@ -215,6 +239,37 @@ namespace {
         ]);
     }
     $check($find('第二批唯一备注') === [300], 'Matching includes a later candidate batch before pagination');
+    require dirname(__DIR__).'/backend/Failure.php';
+    require dirname(__DIR__).'/backend/Files.php';
+    require dirname(__DIR__).'/backend/Storage/ProductPins.php';
+    $folder = sys_get_temp_dir().'/cra1-product-pins-'.bin2hex(random_bytes(8));
+    $main = new \CRA1\Theme\Storage\ProductPins($folder,12,12);
+    $sub = new \CRA1\Theme\Storage\ProductPins($folder,12,29);
+    try {
+        $main->set(2,true);
+        ProductListFixture::$visible = [1,4];
+        $sub->set(1,true);
+        $sub->set(4,true);
+        $check($sub->listOrder() === [4,1] && $main->listOrder() === [2], 'Preferences are isolated for parent and child accounts');
+        ProductListFixture::$visible = [1];
+        try { $sub->set(4,true); $denied = false; } catch (InvalidArgumentException $error) { $denied = true; }
+        $check($denied, 'A revoked assignment cannot be pinned');
+        $sub->set(1,false);
+        $check($sub->listOrder() === [] && $main->listOrder() === [2], 'Unpinning cleans invalid entries without changing another preference');
+        ProductListFixture::$visible = null;
+        foreach (range(20,68) as $id) $main->set($id,true);
+        try { $main->set(69,true); $full = false; } catch (InvalidArgumentException $error) { $full = true; }
+        $check($full && count($main->listOrder()) === 50, 'Pin limit preserves saved preferences');
+        $main->set(68,true);
+        $check($main->listOrder()[0] === 68, 'Pin mutations are idempotent');
+    } finally {
+        ProductListFixture::$visible = null;
+        if (is_dir($folder)) {
+            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($files as $file) $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
+            rmdir($folder);
+        }
+    }
     ProductListFixture::$fireHook = false;
     try { $read(); } catch (RuntimeException $error) { $rejected = strpos($error->getMessage(), 'query scope') !== false; }
     $check($rejected ?? false, 'An unscoped native result is discarded');

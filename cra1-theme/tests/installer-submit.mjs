@@ -44,10 +44,14 @@ async function fixture({width=1440,fastTimeout=false,blockedStorage=false,native
   const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:1000}}),page=await context.newPage();
   if(blockedStorage)await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new DOMException('Storage disabled','SecurityError');}}));
   if(nativeToken)await page.addInitScript(()=>localStorage.setItem('backJwt','isolated-native-admin'));
-  if(fastTimeout)await page.addInitScript(()=>{const original=window.setTimeout;window.setTimeout=(fn,ms,...args)=>original(fn,ms===60000?100:ms,...args);});
+  if(fastTimeout)await page.addInitScript(()=>{const original=window.setTimeout;window.setTimeout=(fn,ms,...args)=>original(fn,[60000,150000].includes(ms)?100:ms,...args);});
   page.on('pageerror',error=>errors.push(error.message));
   page.on('console',message=>{if(message.type()==='error')consoles.push(message.text());});
   const state={mode:'success',checkResponse:structuredClone(ready),calls:0,installs:0,updates:0,recoveries:0,release:null};
+  await page.route('**/cra1-install/api.php?progress=1',async route=>{
+    check(/^[a-f0-9]{32}$/.test(route.request().headers()['x-cra1-operation']),'installer progress belongs to a specific request');
+    await route.fulfill({json:{status:200,data:{phase:'写入主题后台和配置'}}});
+  });
   await page.route('**/cra1-install/api.php',async route=>{
     const input=route.request().postDataJSON();state.calls++;
     check(nativeToken?route.request().headers().authorization==='Bearer isolated-native-admin':!route.request().headers().authorization,nativeToken?'optional maintenance authentication forwarded':'fresh installation sends requests without a V10 login');
@@ -113,6 +117,7 @@ try{
   check(await f.page.locator('#setup').getAttribute('aria-busy')==='true','real click exposes the busy state');
   check(await f.page.locator('#install').isDisabled(),'busy button prevents repeated clicks');
   check((await f.page.locator('#setup-status').innerText()).includes('正在安装'),'progress is visible next to submit');
+  await f.page.getByText('正在写入主题后台和配置…',{exact:true}).waitFor();
   await f.page.keyboard.press('Enter');check(f.state.installs===1,'Enter during installation does not duplicate the request');
   f.state.release();await f.page.locator('#success').waitFor({state:'visible'});
   check(await f.page.locator('#check').isDisabled(),'successful install cannot initialize again');

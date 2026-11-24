@@ -14,6 +14,13 @@ body {
   margin: 0;
 }
 
+/* Keep the embedded layout measurable while the module compiles its markup. */
+.cart-embed[aria-busy="true"] .config-box .content {
+  position: relative;
+  overflow: hidden;
+  visibility: hidden;
+}
+
 /* 配置卡透明时，嵌入文档也须透明，才能延续父页的白色卡片背景。 */
 html[data-cra1-theme="cart"]:not([data-cra1-native-module]) body.cra1-cart-embed {
   background: transparent;

@@ -3,18 +3,39 @@
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261011-titanium-v1/css/goodsList.css', '/cart/template/pc/cra1/releases/20261011-titanium-v1/css/goodsList.css')}">
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261012-icon-suite-v1/css/cart-theme.css', '/cart/template/pc/cra1/releases/20261012-icon-suite-v1/css/cart-theme.css')}">
 <script src="{:cra1_theme_asset_url('native', 'js/module-deps.js', '/clientarea/template/pc/cra1/js/module-deps.js')}"></script>
+<style>
+  .cart-page--flat[hidden], #cra1-cart-startup[hidden], #cra1-cart-startup [hidden] { display: none !important; }
+  .cra1-cart-startup { max-width: 480px; margin: 80px auto; padding: 16px; font-size: 14px; line-height: 1.6; text-align: center; }
+  .cra1-cart-startup__retry { display: inline-block; margin-top: 12px; color: var(--cui-ink, #22292b); text-decoration: underline; }
+</style>
 </head>
 
 <body>
-  <!-- mounted之前显示 -->
-  <div id="mainLoading">
-    <div class="ddr ddr1"></div>
-    <div class="ddr ddr2"></div>
-    <div class="ddr ddr3"></div>
-    <div class="ddr ddr4"></div>
-    <div class="ddr ddr5"></div>
+  <div id="cra1-cart-startup" class="cra1-cart-startup">
+    <p role="status">正在加载商品…</p>
+    <a class="cra1-cart-startup__retry" href="" hidden>重新加载</a>
   </div>
-  <div class="template cart-page cart-page--flat">
+  <noscript>
+    <style>#cra1-cart-startup { display: none; }</style>
+    <p class="cra1-cart-startup">请启用 JavaScript 后重新加载商品页面。</p>
+  </noscript>
+  <script>
+    (function () {
+      var status = document.getElementById('cra1-cart-startup');
+      function showRetry() {
+        if (status.hidden) return;
+        status.querySelector('p').textContent = '商品页面暂时无法加载，请重试。';
+        status.querySelector('a').hidden = false;
+      }
+      var timeout = window.setTimeout(showRetry, 12000);
+      document.addEventListener('DOMContentLoaded', function () {
+        window.clearTimeout(timeout);
+        // Let the catalogue's DOMContentLoaded listener finish mounting first.
+        window.setTimeout(showRetry, 0);
+      }, { once: true });
+    })();
+  </script>
+  <div class="template cart-page cart-page--flat" hidden>
     <!-- v8 手机端吸底价格操作栏（≤1024 显示；main-card 外层防 backdrop-filter 劫持 fixed） -->
     <div class="cl-rail-dock" v-if="isNormal && first_group_list.length && selectedProduct && railState === 'bridged'">
       <!-- v17 手机档：时长/数量/优惠码并入底栏 + 配置费用明细下拉（PC 不渲染） -->
@@ -98,11 +119,15 @@
                     <span>{{ catalogError }}</span>
                     <el-button size="small" @click="retryCatalog">重新加载</el-button>
                   </div>
+                  <div v-if="productLinkNotice" class="cui-alert cra1-cart-read-error" role="status">
+                    <span>{{ productLinkNotice }}</span>
+                    <el-button v-if="productLinkRetry" size="small" @click="initData">重试此商品</el-button>
+                  </div>
                   <!-- 顶部横排导航：搜索 + 一级/二级（层级标题读 v10 first/second_navigation，v6 统一蓝条标题样式） -->
-                  <div class="cl-shop-nav" v-if="isNormal && first_group_list.length" role="tablist" :aria-label="navFirstLabel || '商品分组导航'">
-                    <div class="cl-nav-search">
+                  <div class="cl-shop-nav" v-if="(isNormal || productLinkNotice) && first_group_list.length" role="tablist" :aria-label="navFirstLabel || '商品分组导航'">
+                    <div v-if="isNormal" class="cl-nav-search">
                       <el-input :placeholder="lang.goods_search_placeholder" clearable
-                        v-model="goodsParmas.keywords" @keyup.enter.native="searchGoods"></el-input>
+                        v-model="goodsParmas.keywords" @clear="searchGoods" @keyup.enter.native="searchGoods"></el-input>
                       <el-button type="primary" class="cl-nav-search-btn" @click="searchGoods"
                         :loading="searchLoading">{{lang.search}}</el-button>
                     </div>
@@ -342,7 +367,7 @@
                 </div>
               </aside>
                 <!-- 域名展示 -->
-                <template v-if="isDomain">
+                <template v-if="isDomain && !productLinkNotice">
                   <div class="domain-box">
                     <div class="register-type">
                       <span class="reg-ridio" :class="regType === '1' ? 'isActice' : ''"
@@ -646,7 +671,7 @@
                   </div>
                 </template>
                 <!-- SSL展示 -->
-                <template v-else-if="isSsl">
+                <template v-else-if="isSsl && !productLinkNotice">
                   <div class="ssl-box">
                     <!-- 左右布局 -->
                     <div class="ssl-content">
@@ -864,7 +889,7 @@
   <script src="{:cra1_theme_asset_url('native', 'components/payDialog/payDialog.js', '/clientarea/template/pc/cra1/releases/20261017-compat-v3/components/payDialog/payDialog.js')}"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/customGoods/customGoods.js"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/discountCode/discountCode.js"></script>
-  <script src="/{$template_catalog}/template/{$themes}/components/cra1EventCode/eventCode.js"></script>
+  <script src="{:cra1_theme_asset_url('native', 'components/cra1EventCode/eventCode.js', '/clientarea/template/pc/cra1/components/cra1EventCode/eventCode.js')}"></script>
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/goodsList.js?v={:filemtime(IDCSMART_ROOT . 'public/cart/template/pc/cra1/api/goodsList.js')}"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261013-security-snapshot-v1/js/cart-config.js', '/cart/template/pc/cra1/releases/20261013-security-snapshot-v1/js/cart-config.js')}"></script>
 <script src="{:cra1_theme_asset_url('cart', '20261012-cart-entry-v1/js/module-policy.js', '/cart/template/pc/cra1/releases/20261012-cart-entry-v1/js/module-policy.js')}"></script>

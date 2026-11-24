@@ -93,7 +93,8 @@ localStorage.setItem = function (key, newValue) {
         });
       },
       updated() {
-        // // 关闭loading
+        // The embed bridge owns its loading indicator until the module mounts.
+        if (this.isEmbed) return;
         const loading = document.getElementById("mainLoading");
         if (loading) loading.style.display = "none";
         const root = document.getElementsByClassName("goods")[0];

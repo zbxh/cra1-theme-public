@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { productListTree, homeArticleCatalog } from '../src/lib/member-content.js'
+import { productListTree, productCopyFallback, homeArticleCatalog } from '../src/lib/member-content.js'
 
 test('product copy keeps grouping parents, every depth, stable identities and menu order', () => {
   const nodes = [{ id: 'group', label: '产品管理', hidden: 1, children: [
@@ -15,6 +15,10 @@ test('product copy keeps grouping parents, every depth, stable identities and me
   assert.equal(tree[0].children[0].product, true)
   assert.deepEqual(tree[0].children[0].children[0].path, ['产品管理', '我的产品', '使用中'])
   assert.equal(tree[0].children[0].children[0].hidden, true)
+  const child = tree[0].children[0].children[0]
+  assert.equal(productCopyFallback({ overrides: { cloud: { enabled: 1 } } }, child), '继承「我的产品」')
+  assert.equal(productCopyFallback({ default: { enabled: 1 } }, child), '继承全局默认')
+  assert.equal(productCopyFallback({}, child), '使用主题默认文案')
   assert.deepEqual(nodes, before)
 })
 test('similar external URLs and non-list pages cannot become product settings', () => {

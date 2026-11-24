@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 const source = name => fs.readFileSync(new URL('../../public/cra1-shared/src/' + name, import.meta.url), 'utf8')
-function runtime(native) {
+function runtime(nativeAttribute) {
   class Storage {
     values = new Map()
     getItem(key) { return this.values.get(key) ?? null }
@@ -16,7 +16,7 @@ function runtime(native) {
   storage.setItem('common_set_before', JSON.stringify(common))
   const window = {
     Storage, localStorage: storage, location: new URL('https://fixture.invalid/cart/goods.htm?id=501'),
-    document: { documentElement: { hasAttribute: name => native && name === 'data-cra1-native-cart' }, addEventListener() {} },
+    document: { documentElement: { hasAttribute: name => name === nativeAttribute }, addEventListener() {} },
     __CRA1_RUNTIME__: { common: { website_name: 'Projected site', disabled_private_setting: 'omit' }, features: {} },
     CRA1Shared: { Request: { getToken: () => '' } },
   }
@@ -25,7 +25,7 @@ function runtime(native) {
 }
 
 test('native navigation leaves native /common, Storage and plugin fields intact', () => {
-  const { window, storage, original, common } = runtime(true)
+  const { window, storage, original, common } = runtime('data-cra1-native-cart')
   assert.equal(window.Storage.prototype.setItem, original)
   assert.deepEqual(JSON.parse(storage.getItem('common_set_before')), common)
   const updated = { ...common, next_plugin_setting: [1, 2, 3] }
@@ -35,6 +35,12 @@ test('native navigation leaves native /common, Storage and plugin fields intact'
   assert.equal(window.CRA1Shared.Runtime.common().disabled_private_setting, undefined)
   assert.ok(window.CRA1Shared.Access)
   assert.ok(window.CRA1Shared.Navigation.href('/cart/goods.htm?id=501'))
+})
+
+test('native control panels retain plugin settings in the native common cache', () => {
+  const { window, storage, original, common } = runtime('data-cra1-native-panel')
+  assert.equal(window.Storage.prototype.setItem, original)
+  assert.deepEqual(JSON.parse(storage.getItem('common_set_before')), common)
 })
 
 test('ordinary CRA1 pages retain filtered public caches', () => {

@@ -88,7 +88,7 @@ try{
  $previewCatalog=$catalog;$previewCatalog['preview_capabilities']=['plugins'=>['IdcsmartNews'=>345],'features'=>['withdraw_open'=>0,'recharge_open'=>0]];
  $previewer=new MenuTransfer($a,$previewCatalog);$nodes=[['id'=>'root-preview','label'=>'示例分组','source_type'=>'custom','children'=>[['id'=>'first-preview','label'=>'页面一','url'=>'account.htm','source_type'=>'custom'],['id'=>'second-preview','label'=>'页面二','url'=>'account.htm','source_type'=>'custom'],['id'=>'plugin-preview','label'=>'缺失插件','url'=>'plugin/777/source.htm','source_type'=>'custom'],['id'=>'hidden-preview','label'=>'隐藏页面','url'=>'finance.htm','source_type'=>'custom','hidden'=>1]]]];
  $pv=$previewer->preview(['nodes'=>$nodes,'shape'=>3]);check(count($pv['nodes'][0]['children'])===2&&$pv['counts']['hidden']===1,'menu preview reuses live visibility projection for hidden entries and unavailable plugins');
- check(count($pv['issues'])===2,'menu check reports duplicate targets and plugin filtering without modifying the draft');
+ check(count($pv['issues'])===3,'menu check locates both duplicate entries and the filtered plugin without modifying the draft');
  $failedCatalog=$catalog;$failedCatalog['error']='offline';rejects(fn()=>(new MenuTransfer($a,$failedCatalog))->preview(['nodes'=>[]]),'failed catalog is not reported as a passed menu check');
  // Images remain a separate, session-protected download and are never imported through the backend.
  $png=base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j3ioAAAAASUVORK5CYII=');

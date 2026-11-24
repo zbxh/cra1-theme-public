@@ -103,5 +103,21 @@ try{
  $rejected=false;try{$installer->install($input,$passed);}catch(RuntimeException $e){$rejected=true;}check($rejected,'revisit cannot initialize again');
  $leaked=false;$files=new RecursiveIteratorIterator(new RecursiveDirectoryIterator($base.'/success',FilesystemIterator::SKIP_DOTS));foreach($files as$file){if($file->isFile()&&!$file->isLink()&&strpos((string)file_get_contents($file->getPathname()),$input['password'])!==false)$leaked=true;}
  check(!$leaked,'plaintext password never persisted');check((fileperms($base.'/success/config/cra1_theme_security.key')&0777)===0600,'private key permissions');
+ $dir=$base.'/dependencies';$dependencies=fixture($dir);$manifest=$dir.'/cra1-theme/release.json';$release=Files::json($manifest);
+ unlink($manifest);
+ try{$dependencies->install($input,$passed);throw new LogicException('missing manifest accepted');}
+ catch(\CRA1\Theme\Release\InstallerFailure $error){
+  $detail=\CRA1\Theme\Release\InstallerFailure::response($error,'创建主题后台',$dir)['error'];
+  check($detail['phase']==='核对已解压的主题文件'&&strpos($detail['reason'],'重新完整解压')!==false&&$detail['state']==='untouched','missing manifest reports the extraction step and leaves the original theme active');
+ }
+ $nativePath='public/clientarea/template/pc/default/api/example.js';
+ $release['references']=['public/clientarea/template/pc/cra1/api/example.js'=>$nativePath];
+ Files::putJson($manifest,$release);
+ try{$dependencies->install($input,$passed);throw new LogicException('missing native file accepted');}
+ catch(\CRA1\Theme\Release\InstallerFailure $error){
+  $detail=\CRA1\Theme\Release\InstallerFailure::response($error,'创建主题后台',$dir)['error'];
+  check(strpos($detail['reason'],$nativePath)!==false&&strpos($detail['reason'],'核对当前 V10 版本')!==false&&$detail['state']==='untouched','missing native file gives distinct guidance before creating the administrator');
+ }
+ check(!is_file($dir.'/runtime/cra1_theme/security.sqlite')&&!is_file($dir.'/config/cra1_theme_security.key'),'dependency errors never initialize an administrator or key');
  echo json_encode(['status'=>'passed','checks'=>$checks,'production_writes'=>0])."\n";
 }finally{cleanup($base);}

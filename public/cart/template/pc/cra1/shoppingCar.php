@@ -21,11 +21,13 @@
         <el-main>
           <!-- 自己的东西 -->
           <div class="main-card">
-            <div class="main-title" data-cui-reveal>{{lang.shoppingCar_title}}</div>
-            <div class="search-box">
-              <el-input :placeholder="lang.shoppingCar_tip_text" suffix-icon="el-icon-search" @change="searchValChange"
-                v-model="searchVal">
-              </el-input>
+            <div class="cra1-basket-header">
+              <div class="main-title" data-cui-reveal>{{lang.shoppingCar_title}}</div>
+              <div class="search-box">
+                <el-input :placeholder="lang.shoppingCar_tip_text" suffix-icon="el-icon-search" @change="searchValChange"
+                  v-model="searchVal">
+                </el-input>
+              </div>
             </div>
             <div class="goods-box" v-loading="listLoding">
               <div v-if="listError" class="cui-alert cui-alert--error cra1-cart-read-error" role="alert">
@@ -327,6 +329,6 @@
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/shopping.js"></script>
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/product.js"></script>
   <script src="/{$template_catalog}/template/{$themes}/components/discountCode/discountCode.js"></script>
-  <script src="/{$template_catalog}/template/{$themes}/components/cra1EventCode/eventCode.js"></script>
+  <script src="{:cra1_theme_asset_url('native', 'components/cra1EventCode/eventCode.js', '/clientarea/template/pc/cra1/components/cra1EventCode/eventCode.js')}"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261013-security-snapshot-v1/js/cart-config.js', '/cart/template/pc/cra1/releases/20261013-security-snapshot-v1/js/cart-config.js')}"></script>
 <script src="{:cra1_theme_asset_url('cart', '20261012-cart-entry-v1/js/shoppingCar.js', '/cart/template/pc/cra1/releases/20261012-cart-entry-v1/js/shoppingCar.js')}"></script>

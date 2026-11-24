@@ -29,6 +29,35 @@ try {
     check($store->read()['sidebar']['shape']===3,'omitted shape is recovered for an existing three-level tree');
     check($store->snapshotProjection($store->read())['nav_shape']===3,'public projection and editor agree on the three levels');
     check(hash_file('sha256',$file)===$before,'shape recovery never writes the main configuration');
+    $products=$old;
+    $products['sidebar']['nodes']=[node(1,'产品管理','',[node(2,'云服务器','productList.htm',[
+        node(3,'全部产品','/productList.htm#top'), node(4,'全部产品','productList.htm?tab=using&m=legacy'), node(5,'当前产品','productList.htm'),
+    ])])];
+    $key=node(3,'')['id'];
+    $products['content']['product_list']['overrides']=[$key=>['enabled'=>0,'title'=>'保留草稿','description'=>'','html'=>'']];
+    file_put_contents($file,json_encode($products));$before=hash_file('sha256',$file);
+    $stored=$store->read();$projected=$store->snapshotProjection($stored);
+    $links=$projected['sidebar'][0]['children'][0]['children'];
+    check($links[0]['id']===$key && $links[0]['url']==='/productList.htm?tab=all#top','legacy all-products leaf retains ID and now opens the all tab');
+    check($links[1]['url']==='productList.htm?tab=using&m=legacy' && $links[2]['url']==='productList.htm','explicit tabs and other legacy entries are kept');
+    check($stored['content']['product_list']['overrides'][$key]['title']==='保留草稿','disabled heading copy stays in admin storage');
+    check($projected['content']['product_list']['overrides'][$key]===['enabled'=>0],'disabled heading copy is stripped from the public snapshot');
+    check(hash_file('sha256',$file)===$before,'product links are corrected on read without rewriting the saved tree');
+    $products['content']['product_list']['overrides'][$key]['purchase']=['enabled'=>1,'text'=>'立即购买','url'=>'/cart/goodsList.htm?product_id=10','target'=>'blank'];
+    $stored=$store->normalizedPreview($products);
+    $block=$store->snapshotProjection($stored)['content']['product_list']['overrides'][$key];
+    check($block===['enabled'=>0,'purchase'=>['enabled'=>1,'text'=>'立即购买','url'=>'/cart/goodsList.htm?product_id=10','target'=>'blank']],
+        'buying can be enabled without publishing disabled heading copy');
+    foreach (['//example.org/cart','/\\example.org/cart',"java\nscript:alert(1)",'https:///example.org/cart','https://user@example.org/cart','mailto:test@example.org'] as $url) {
+        $products['content']['product_list']['overrides'][$key]['purchase']['url']=$url;
+        check($store->normalizedPreview($products)['content']['product_list']['overrides'][$key]['purchase']['url']==='',
+            'unsafe or invalid purchase URL is discarded during normalization');
+    }
+    $products['content']['product_list']['overrides'][$key]['purchase']=['enabled'=>0,'text'=>'下次恢复','url'=>'https://example.org/cart'];
+    $stored=$store->normalizedPreview($products);
+    check($stored['content']['product_list']['overrides'][$key]['purchase']['url']==='https://example.org/cart' &&
+        $store->snapshotProjection($stored)['content']['product_list']['overrides'][$key]['purchase']===['enabled'=>0],
+        'explicitly disabling a button retains its settings and publishes only its disabled flag');
     check($store->validateTree([node(10,'空一级'),node(11,'另一级','',[node(12,'空二级')])],true)===[],'empty first and second groups can be saved');
     check(count($store->validateTree([node(1,'一级','',[node(2,'二级','',[node(3,'缺链接')])])],true))===1,'a third-level page still requires a link');
     check((bool)$store->validateTree([node(1,'一级','',[node(2,'二级','',[node(3,'三级','home.htm',[node(4,'四级','home.htm')])])])],true),'fourth level remains rejected');

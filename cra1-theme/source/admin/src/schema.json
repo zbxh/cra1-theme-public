@@ -201,6 +201,45 @@
           "hint": "页面右侧竖排悬浮按钮（客服/电话等），图标可选内置键或图标库；返回顶部按钮始终内置。"
         },
         {
+          "key": "site-reading",
+          "label": "文章详情",
+          "fields": [
+            {
+              "key": "article_toc_position",
+              "label": "桌面目录位置",
+              "type": "select",
+              "default": "right",
+              "options": [
+                [
+                  "right",
+                  "右侧（默认）"
+                ],
+                [
+                  "left",
+                  "左侧"
+                ]
+              ],
+              "hint": "适用于文档、新闻和公告详情。手机端通过右下角的文章目录按钮打开。"
+            },
+            {
+              "key": "article_sidebar_enabled",
+              "label": "显示目录下方模块",
+              "type": "switch",
+              "default": "0",
+              "hint": "仅在桌面文章详情页显示。关闭后保留已填写的内容。"
+            },
+            {
+              "key": "article_sidebar_html",
+              "label": "模块内容（HTML）",
+              "type": "textarea",
+              "default": "",
+              "rows": 8,
+              "placeholder": "<h3>相关资源</h3>\n<p><a href=\"/document.html\">查看帮助文档</a></p>",
+              "hint": "可填写文字和 HTML，支持标题、列表、链接和图片。留空时隐藏模块。"
+            }
+          ]
+        },
+        {
           "key": "site-pagehero",
           "label": "页面页首",
           "fields": [

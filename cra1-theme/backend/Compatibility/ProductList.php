@@ -19,12 +19,15 @@ final class ProductList
     private bool $showDeleted;
     private ?array $visible;
     private ?array $matched;
+    private ?array $pinPartition = null;
+    private bool $excludePins = false;
 
-    public function read(array $input): array
+    public function read(array $input, array $pins = []): array
     {
         $tab = $input['tab'] ?? 'current';
         if (!in_array($tab, self::TABS, true)) throw new \InvalidArgumentException('请选择有效的产品状态');
         $this->tab = $tab;
+        $this->pinPartition = null;
         $keywords = $input['keywords'] ?? '';
         if (!is_string($keywords)) throw new \InvalidArgumentException('请输入搜索关键词');
         $this->visible = NativeAuthorization::visibleHostIds();
@@ -61,14 +64,73 @@ final class ProductList
         }
 
         add_hook('host_list_where_query_append', [self::class, 'applyScope']);
+        $only = in_array($input['only_pinned'] ?? null, [1, '1'], true);
+        if (in_array($input['count_only'] ?? null, [1, '1'], true)) {
+            if ($only && (!$pins || $this->tab === 'deleted')) return $empty;
+            if ($only) {
+                $this->pinPartition = $pins;
+                $this->excludePins = false;
+            }
+            return ['list'=>[], 'count'=>(int)$this->native(['page'=>1,'limit'=>1]+$params)['count']];
+        }
+        $data = $this->ordered($params, $this->tab === 'deleted' ? [] : $pins, $only);
+        $data = OperationVerification::redact($data);
+        $data['list'] = $this->appendStatusFields($data['list']);
+        foreach ($data['list'] as &$host) {
+            $host['pinned'] = !in_array($host['status'], ['Deleted','Cancelled'], true) && in_array((int)$host['id'], $pins, true);
+        }
+        unset($host);
+        return $data;
+    }
+
+    private function native(array $params): array
+    {
         $this->applied = false;
         $data = (new HostModel())->hostList($params);
         if (!$this->applied && ((int)($data['count'] ?? 0) > 0 || !empty($data['list']))) {
             throw new \RuntimeException('Native product list did not apply the theme query scope');
         }
-        $data = OperationVerification::redact($data);
-        $data['list'] = $this->appendStatusFields($data['list']);
         return $data;
+    }
+
+    private function ordered(array $params, array $pins, bool $only): array
+    {
+        if (!$pins) return $only ? ['list'=>[], 'count'=>0] : $this->native($params);
+
+        // Keep native filters and counts on both partitions. The tail is still
+        // paged natively; a shifted page can straddle at most two native pages.
+        $this->pinPartition = $pins;
+        $this->excludePins = false;
+        $head = $this->native(['page'=>1, 'limit'=>count($pins)] + $params);
+        $byId = array_column($head['list'], null, 'id');
+        $ordered = [];
+        foreach ($pins as $id) if (isset($byId[$id])) $ordered[] = $byId[$id];
+        $headCount = count($ordered);
+        $limit = $params['limit'];
+        $offset = ($params['page'] - 1) * $limit;
+        $rows = array_slice($ordered, $offset, $limit);
+        if ($only) return ['list'=>$rows, 'count'=>$headCount];
+
+        if (!$headCount) {
+            $this->pinPartition = null;
+            return $this->native($params);
+        }
+        $this->pinPartition = array_column($ordered, 'id');
+        $this->excludePins = true;
+        $tailOffset = max(0, $offset - $headCount);
+        $page = intdiv($tailOffset, $limit) + 1;
+        $skip = $tailOffset % $limit;
+        $needed = $limit - count($rows);
+        $tail = $this->native(['page'=>$needed ? $page : 1, 'limit'=>$needed ? $limit : 1] + $params);
+        if ($needed && $tail['count'] > $tailOffset) {
+            $part = array_slice($tail['list'], $skip, $needed);
+            if (count($part) < $needed && $page * $limit < $tail['count']) {
+                $next = $this->native(['page'=>$page + 1] + $params);
+                $part = array_merge($part, array_slice($next['list'], 0, $needed - count($part)));
+            }
+            $rows = array_merge($rows, $part);
+        }
+        return ['list'=>$rows, 'count'=>$headCount + (int)$tail['count']];
     }
 
     public static function applyScope(array $event): void
@@ -79,6 +141,10 @@ final class ProductList
         $query = $event['query'];
         if ($scope->visible !== null) $query->whereIn('h.id', $scope->visible);
         if ($scope->matched !== null) $query->whereIn('h.id', $scope->matched);
+        if ($scope->pinPartition !== null) {
+            if ($scope->excludePins) $query->whereNotIn('h.id', $scope->pinPartition);
+            else $query->whereIn('h.id', $scope->pinPartition)->whereNotIn('h.status', ['Deleted', 'Cancelled']);
+        }
         if ($scope->tab === 'current') $query->whereIn('h.status', self::CURRENT_STATUSES);
         elseif (!$scope->showDeleted) $query->where('h.status', '<>', 'Deleted');
         $scope->applied = true;

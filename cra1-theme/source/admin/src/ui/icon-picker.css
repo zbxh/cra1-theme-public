@@ -14,6 +14,16 @@
 .ip-field-copy strong,.ip-field-copy small { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .ip-field-copy strong { font-size:13px;font-weight:500; }
 .ip-field-copy small { font-size:11px;color:var(--ip-muted);margin-top:4px; }
+.ip-field-trigger {
+  width:100%;min-width:0;justify-content:flex-start;gap:8px;padding:0 12px;
+  border-color:var(--cui-control-edge);background:var(--cui-field);color:var(--cui-ink);
+  text-align:left;font-size:13px;font-weight:400;
+}
+.ip-field-trigger-preview,.ip-field-trigger-preview .ip-preview-icon { display:grid;place-items:center;flex:none;width:24px;height:24px; }
+.ip-field-trigger-preview .ip-glyph,.ip-field-trigger-preview .ip-glyph>svg { width:20px;height:20px; }
+.ip-field-trigger-name { flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.ip-field-trigger-action { width:15px;height:15px;color:var(--ip-muted); }
+@media(max-width:767px),(pointer:coarse) { .ip-field-trigger { min-height:44px; } }
 .ip-dialog {
   display:flex!important;flex-direction:column;overflow:hidden!important;gap:0!important;
   position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;

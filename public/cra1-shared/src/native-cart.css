@@ -1,14 +1,14 @@
 /* Only presentation changes. Native rem scaling, controls and calculator
    bindings stay intact; unrecognized module structures retain their layout. */
-html[data-cra1-native-cart] body {
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) body {
   margin: 0;
   background: var(--cui-page);
   /* Native theme/index.js sets its own HTML variables; keep the navigation
      and configuration palette local without changing that native script. */
   --color-primary: var(--cui-brand);
 }
-html[data-cra1-native-cart] :is(.cra1-header,.cra1-aside,.cra1-aside__overlay,.cra1-notices-host,.cra1-notice-reader),
-html[data-cra1-native-cart] :is(.cra1-header,.cra1-aside,.cra1-notices-host,.cra1-notice-reader) * {
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) :is(.cra1-header,.cra1-aside,.cra1-aside__overlay,.cra1-notices-host,.cra1-notice-reader),
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) :is(.cra1-header,.cra1-aside,.cra1-notices-host,.cra1-notice-reader) * {
   box-sizing: border-box;
   font-family: var(--cui-font);
 }
@@ -27,9 +27,9 @@ html[data-cra1-native-cart] .goods > .el-container > .el-container > .el-main {
   background: transparent;
   font-family: var(--cui-font);
 }
-html[data-cra1-native-cart] .cra1-header { font-size: 13px; line-height: 1.5; }
-html[data-cra1-native-cart] .cra1-aside { font-size: 13px; line-height: 1.5; }
-html[data-cra1-native-cart] .cra1-notices-host { flex: 0 0 auto; }
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) .cra1-header { font-size: 13px; line-height: 1.5; }
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) .cra1-aside { font-size: 13px; line-height: 1.5; }
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) .cra1-notices-host { flex: 0 0 auto; }
 /* The common native desktop fallback has a fixed sidebar at top:0. Put those
    same nodes in two columns so it cannot cover the header or page notices. */
 html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) {
@@ -85,35 +85,35 @@ html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .
   display: none;
 }
 /* Color and shape only: no sizing, positioning, extra controls or DOM rewriting. */
-html[data-cra1-native-cart] :where(.config-box) .el-input__inner,
-html[data-cra1-native-cart] :where(.config-box) .el-textarea__inner {
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) :where(.config-box) .el-input__inner,
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) :where(.config-box) .el-textarea__inner {
   background-color: var(--cui-field);
   border-color: var(--cui-control-edge);
   border-radius: var(--cui-radius-control);
   color: var(--cui-body);
 }
-html[data-cra1-native-cart] .config-box .el-button { border-radius: var(--cui-radius-control); }
-html[data-cra1-native-cart] .config-box .el-button--primary:not(.is-plain):not(.is-disabled) {
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) .config-box .el-button { border-radius: var(--cui-radius-control); }
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) .config-box .el-button--primary:not(.is-plain):not(.is-disabled) {
   background: var(--cui-button-highlight),var(--cui-button-gradient);
   border-color: var(--cui-brand);
   color: var(--cui-white);
 }
-html[data-cra1-native-cart] .config-box .el-input__inner:focus,
-html[data-cra1-native-cart] .config-box .el-textarea__inner:focus {
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) .config-box .el-input__inner:focus,
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) .config-box .el-textarea__inner:focus {
   border-color: var(--cui-focus);
 }
 /* Only known Element poppers are adapted outside the module subtree. Their
    values, geometry, mounting, selection events and price handlers stay native. */
-html[data-cra1-native-cart] :is(.el-select-dropdown,.el-dropdown-menu,.el-cascader__dropdown,.el-picker-panel,.el-popover) {
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) :is(.el-select-dropdown,.el-dropdown-menu,.el-cascader__dropdown,.el-picker-panel,.el-popover) {
   border-color:var(--cui-control-edge); border-radius:var(--cui-radius-popover); background:var(--cui-surface);
   color:var(--cui-body); box-shadow:var(--cui-shadow-pop);
 }
-html[data-cra1-native-cart] .el-select-dropdown__list {padding:5px;}
-html[data-cra1-native-cart] :is(.el-select-dropdown__item,.el-dropdown-menu__item,.el-cascader-node) {border-radius:var(--cui-radius-control);color:var(--cui-body);}
-html[data-cra1-native-cart] :is(.el-select-dropdown__item.selected,.el-select-dropdown__item.hover,.el-dropdown-menu__item:focus,.el-dropdown-menu__item:hover,.el-cascader-node.in-active-path) {background:var(--cui-selected);color:var(--cui-ink);}
-html[data-cra1-native-cart] :is(.el-select-dropdown__item.is-disabled,.el-dropdown-menu__item.is-disabled,.el-cascader-node.is-disabled) {background:transparent;color:var(--cui-muted);}
-html[data-cra1-native-cart] :is(.el-dialog,.el-message-box) {border-color:var(--cui-control-edge);border-radius:var(--cui-radius-card);background:var(--cui-surface);color:var(--cui-body);box-shadow:var(--cui-shadow-pop);}
-html[data-cra1-native-cart] .config-box :is(button,a,input,textarea):focus-visible {
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) .el-select-dropdown__list {padding:5px;}
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) :is(.el-select-dropdown__item,.el-dropdown-menu__item,.el-cascader-node) {border-radius:var(--cui-radius-control);color:var(--cui-body);}
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) :is(.el-select-dropdown__item.selected,.el-select-dropdown__item.hover,.el-dropdown-menu__item:focus,.el-dropdown-menu__item:hover,.el-cascader-node.in-active-path) {background:var(--cui-selected);color:var(--cui-ink);}
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) :is(.el-select-dropdown__item.is-disabled,.el-dropdown-menu__item.is-disabled,.el-cascader-node.is-disabled) {background:transparent;color:var(--cui-muted);}
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) :is(.el-dialog,.el-message-box) {border-color:var(--cui-control-edge);border-radius:var(--cui-radius-card);background:var(--cui-surface);color:var(--cui-body);box-shadow:var(--cui-shadow-pop);}
+html:is([data-cra1-native-cart],[data-cra1-native-panel]) .config-box :is(button,a,input,textarea):focus-visible {
   outline: 2px solid var(--cui-focus);
   outline-offset: 2px;
 }
@@ -229,3 +229,18 @@ html[data-cra1-native-cart] .config-box .content .f-order:has(> .el-main > .main
 @media (max-width:750px) {
   html[data-cra1-native-cart] .goods > .el-container > .el-container > .el-main { padding-top: 16px; }
 }
+
+/* Keep the official panel layout and scroll behaviour; adapt the outer shell. */
+html[data-cra1-native-panel] .product_detail > .el-container > .el-container {
+  min-width: 0;
+  min-height: 100vh;
+}
+html[data-cra1-native-panel] .product_detail > .el-container > .el-container > .el-main {
+  min-width: 0;
+  margin-top: 0;
+  background: transparent;
+}
+html[data-cra1-native-panel] .cra1-native-panel-support{display:flex;justify-content:flex-end;padding:0 0 12px}
+html[data-cra1-native-panel] .cra1-native-panel-support a{display:inline-flex;align-items:center;padding:0 12px;min-height:36px;box-sizing:border-box;border:1px solid #d0d6d8;border-radius:4px;background:#fff;color:#22292b;font:500 13px/1.4 system-ui,sans-serif;text-decoration:none}
+html[data-cra1-native-panel] .cra1-native-panel-support a:hover{background:#f1f3f3;color:#161b1d}
+html[data-cra1-native-panel] .cra1-native-panel-support a:focus-visible{outline:2px solid #4b585b;outline-offset:2px}

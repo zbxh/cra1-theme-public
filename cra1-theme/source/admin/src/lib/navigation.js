@@ -7,7 +7,7 @@ const common = Object.values(registry.editors).filter(e => e.id.startsWith('comm
 }))
 export const PUBLIC_SETTINGS = {
   website: [
-    { id: 'header', label: '头部' }, { id: 'footer', label: '底部' }, { id: 'float', label: '悬浮工具' },
+    { id: 'header', label: '头部' }, { id: 'footer', label: '底部' }, { id: 'float', label: '悬浮工具' }, { id: 'reading', label: '文章详情' },
     { id: 'common', label: '通用内容', children: common },
     { id: 'seo-default', label: '搜索引擎默认设置' }, { id: 'custom', label: '自定义 CSS / JS' },
   ],
@@ -40,7 +40,7 @@ export function scopeRoute(id, query = '') {
   }
   if (id.startsWith('shared:')) return routeFor('website', 'common:' + id.slice(7), query)
   if (id.startsWith('member:') || id.startsWith('cart:')) { const [domain, key] = id.split(':'); return routeFor(domain, key, query) }
-  const sections = { 'site-support': 'header', 'site-info': 'header', 'site-menu': 'header', 'site-notice': 'header', 'site-footer': 'footer', 'site-float': 'float', 'site-custom': 'custom', 'site:seo': 'seo-default' }
+  const sections = { 'site-support': 'header', 'site-info': 'header', 'site-menu': 'header', 'site-notice': 'header', 'site-footer': 'footer', 'site-float': 'float', 'site-reading': 'reading', 'site-custom': 'custom', 'site:seo': 'seo-default' }
   const params = new URLSearchParams(query)
   if (['site-info', 'site-menu', 'site-notice', 'site-support'].includes(id) && !params.has('section')) params.set('section', id)
   return routeFor('website', sections[id] || 'page:home', params)

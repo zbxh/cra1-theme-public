@@ -91,6 +91,14 @@ test('specific-tab menus do not invent other tabs or drop their parameters', asy
   assert.equal((await f.api.search('基本资料')).length, 0)
 })
 
+test('product search uses the child page identity while preserving legacy parameters and fragments', async () => {
+  const f = fixture({ snapshot: sidebar({ id: 'cloud-parent', type: 'module', name: '云计算', url: 'productList.htm', children: [{
+    id: 'cloud-leaf', name: '云全部产品', url: '/productList.htm?tab=all&m=legacy&cloud_menu=cloud-parent#list',
+  }] }) })
+  const row = (await f.api.search('云全部产品'))[0]
+  assert.equal(row.url, '/productList.htm?tab=all&m=legacy&cloud_menu=cloud-leaf#list')
+})
+
 test('the V10 visibility setting controls deleted product results', async () => {
   const f = fixture({ snapshot: sidebar(
     { name: '我的产品', url: 'productList.htm' },

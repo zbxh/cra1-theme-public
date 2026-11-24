@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, Component } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense, Component } from 'react'
 import { Command } from 'cmdk'
 import { Globe, UsersRound, ShoppingCart, House, LayoutDashboard, PanelLeftClose, PanelLeftOpen, Menu, Search, ChevronRight, ChevronDown, Settings, KeyRound, ScrollText, LogOut, ArrowRight, Image } from 'lucide-react'
 import { Button } from '@ui/button'
@@ -19,6 +19,7 @@ const MemberAuth=lazy(()=>import('./pages/MemberAuth'))
 const VisualWebsite=lazy(()=>import('./pages/VisualWebsite'))
 const CodeEditor=lazy(()=>import('./pages/VisualWebsite').then(m=>({default:m.CodeEditor})))
 import WorkspaceFrame from './components/WorkspaceFrame'
+import EffectiveSources from './components/EffectiveSources'
 import Reauth from './components/Reauth'
 const MemberContent=lazy(()=>import('./pages/MemberContent')),MemberAppearance=lazy(()=>import('./pages/MemberAppearance')),MemberSidebar=lazy(()=>import('./pages/MemberSidebar')),CartContent=lazy(()=>import('./pages/CartContent')),Security=lazy(()=>import('./pages/Security'))
 const leaf=(label,domain,id)=>({label:menuLabel(label),id:routeFor(domain,id),editor:id,domain})
@@ -26,48 +27,83 @@ const publicLeaf=domain=>({label:'公共设置',id:`/${domain}/settings`,domain,
 const pageGroups=['产品','解决方案','资讯与文档','企业与服务','合作与特殊页面']
 const ThemeManagement=lazy(()=>import('./pages/ThemeManagement'))
 export const NAV=[
- {label:'管理台',icon:LayoutDashboard,items:[{label:'总览',id:'/overview'},{label:'通知管理',id:'/notifications'}]},
- {label:'官网主题',icon:Globe,items:[leaf('首页','website','page:home'),publicLeaf('website'),...pageGroups.map(category=>({label:category==='产品'?'产品页面':category,key:'website-'+category,children:Object.entries(registry.pages).filter(([id,p])=>p.category===category).map(([id,p])=>leaf(p.editorLabel,'website','page:'+id))}))]},
- {label:'会员中心',icon:UsersRound,items:['home','products','server','ticket','login','regist'].map(id=>leaf(registry.editors['member:'+id].label,'member',id)).concat([publicLeaf('member')])},
- {label:'购物车',icon:ShoppingCart,items:['goodslist','shoppingcar','settlement','orderresult'].map(id=>leaf(registry.editors['cart:'+id].label,'cart',id)).concat([publicLeaf('cart')])},
- {label:'资源管理',icon:Image,items:[{label:'附件管理',id:'/attachments'}]},
- {label:'后台管理',icon:Settings,items:[{label:'主题管理',id:'/admin/theme'},{label:'我的安全',id:'/admin/me'},{label:'账号管理',id:'/admin/accounts'},{label:'审计日志',id:'/admin/audit'},{label:'后台安全',id:'/admin/settings'}].filter(n=>n.id==='/admin/settings'?bootInfo.role==='super_admin':['/admin/accounts','/admin/theme'].includes(n.id)?bootInfo.role!=='operator':true)},
+ {key:'overview',label:'管理台',icon:LayoutDashboard,items:[{label:'总览',id:'/overview'},{label:'通知管理',id:'/notifications'}]},
+ {key:'website',label:'官网主题',icon:Globe,items:[leaf('首页','website','page:home'),publicLeaf('website'),...pageGroups.map(category=>({label:category==='产品'?'产品页面':category,key:'website-'+category,children:Object.entries(registry.pages).filter(([id,p])=>p.category===category).map(([id,p])=>leaf(p.editorLabel,'website','page:'+id))}))]},
+ {key:'member',label:'会员中心',icon:UsersRound,items:['home','products','server','ticket','login','regist'].map(id=>leaf(registry.editors['member:'+id].label,'member',id)).concat([publicLeaf('member')])},
+ {key:'cart',label:'购物车',icon:ShoppingCart,items:['goodslist','shoppingcar','settlement','orderresult'].map(id=>leaf(registry.editors['cart:'+id].label,'cart',id)).concat([publicLeaf('cart')])},
+ {key:'media',label:'资源管理',icon:Image,items:[{label:'附件管理',id:'/attachments'}]},
+ {key:'admin',label:'后台管理',icon:Settings,items:[{label:'主题管理',id:'/admin/theme'},{label:'我的安全',id:'/admin/me'},{label:'账号管理',id:'/admin/accounts'},{label:'审计日志',id:'/admin/audit'},{label:'后台安全',id:'/admin/settings'}].filter(n=>n.id==='/admin/settings'?bootInfo.role==='super_admin':['/admin/accounts','/admin/theme'].includes(n.id)?bootInfo.role!=='operator':true)},
 ]
+const groupPref=group=>'group:'+group.key
+const navLeaves=nodes=>nodes.flatMap(node=>node.children||[node])
+function savedGroups(){
+ try{
+  const state=JSON.parse(localStorage.getItem('cra1AdminGroups')||'{}')
+  return state&&typeof state==='object'&&!Array.isArray(state)?state:{}
+ }catch{return{}}
+}
 export default function App(){return <WorkspaceProvider><Shell/></WorkspaceProvider>}
 function Shell(){
- const ctx=useWorkspaces(),toast=useToast(),[route,setRoute]=useState(()=>normalizeRoute(window.location.hash||restoredRoute())),[collapsed,setCollapsed]=useState(()=>localStorage.getItem('cra1AdminNavCollapsed')==='1'),[mobile,setMobile]=useState(false),[search,setSearch]=useState(''),[command,setCommand]=useState(false),[query,setQuery]=useState(''),[expanded,setExpanded]=useState(()=>{try{return JSON.parse(localStorage.getItem('cra1AdminGroups')||'{}')}catch{return{}}})
+ const ctx=useWorkspaces(),toast=useToast(),[route,setRoute]=useState(()=>normalizeRoute(window.location.hash||restoredRoute())),[collapsed,setCollapsed]=useState(()=>localStorage.getItem('cra1AdminNavCollapsed')==='1'),[mobile,setMobile]=useState(false),[search,setSearch]=useState(''),[command,setCommand]=useState(false),[query,setQuery]=useState(''),[expanded,setExpanded]=useState(savedGroups)
+ const [searchGroups,setSearchGroups]=useState({})
  const navigate=next=>{next=normalizeRoute(next);window.location.hash=next;setRoute(next);rememberRoute(next);setMobile(false);setCommand(false)}
  useEffect(()=>{if(!window.location.hash||window.location.hash.slice(1)!==route)window.history.replaceState(null,'',window.location.pathname+window.location.search+'#'+route);const changed=()=>{const next=normalizeRoute(window.location.hash);if(window.location.hash.slice(1)!==next)window.history.replaceState(null,'',window.location.pathname+window.location.search+'#'+next);setRoute(next);rememberRoute(next)};window.addEventListener('hashchange',changed);const key=e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();setCommand(v=>!v)}};window.addEventListener('keydown',key);return()=>{window.removeEventListener('hashchange',changed);window.removeEventListener('keydown',key)}},[])
  useEffect(()=>{localStorage.setItem('cra1AdminNavCollapsed',collapsed?'1':'0')},[collapsed])
- useEffect(()=>{localStorage.setItem('cra1AdminGroups',JSON.stringify(expanded))},[expanded])
+ useEffect(()=>{try{localStorage.setItem('cra1AdminGroups',JSON.stringify(expanded))}catch{}},[expanded])
  const dirty=Object.entries(ctx.records).filter(([,r])=>r.values&&!equal(r.values,r.original)),path=route.split('?')[0]
- useEffect(()=>{const current=NAV.flatMap(g=>g.items).find(n=>n.children?.some(x=>path===x.id));if(current)setExpanded(v=>v[current.key]===true?v:{...v,[current.key]:true})},[path])
- const toggle=k=>setExpanded(v=>({...v,[k]:!v[k]}))
+ const previousPath=useRef(path)
+ useEffect(()=>{
+  const group=NAV.find(g=>navLeaves(g.items).some(n=>n.id===path))
+  const category=group?.items.find(n=>n.children?.some(x=>path===x.id))
+  const changed=previousPath.current!==path
+  previousPath.current=path
+  if (!group) return
+  const key=groupPref(group)
+  setExpanded(state=>{
+   const openGroup=changed&&state[key]===false
+   const openCategory=category&&state[category.key]!==true
+   if (!openGroup&&!openCategory) return state
+   return {...state,...(openGroup?{[key]:true}:{}),...(openCategory?{[category.key]:true}:{})}
+  })
+ },[path])
+ const term=search.trim(),draftPaths=new Set(dirty.map(([id])=>scopeRoute(id).split('?')[0]))
+ const toggle=(key,open)=>(term?setSearchGroups:setExpanded)(state=>({...state,[key]:!open}))
  const matches=(node)=>{
-  if(!search||node.label.includes(search)||node.children?.some(matches))return true
+  if(!term||node.label.includes(term)||node.children?.some(matches))return true
   const editors=node.public?publicEditors(node.domain).map(item=>registry.editors[node.domain==='website'?item.id:node.domain+':'+item.id]):[node.editor&&registry.editors[node.domain==='website'?node.editor:node.domain+':'+node.editor]]
-  return editors.filter(Boolean).some(e=>{const fields=e.fields.length?e.fields:Object.values(e.sections).flatMap(s=>registry.scopes[s].fields||[]);return e.label.includes(search)||fields.some(f=>f.label.includes(search)||f.controlLabels?.some(label=>label.includes(search)))||e.modules?.some(m=>m.label.includes(search))})||registry.legacyEntries.some(old=>old.label.includes(search)&&old.destinations.some(d=>scopeRoute(d).split('?')[0]===node.id))
+  return editors.filter(Boolean).some(e=>{const fields=e.fields.length?e.fields:Object.values(e.sections).flatMap(s=>registry.scopes[s].fields||[]);return e.label.includes(term)||fields.some(f=>f.label.includes(term)||f.controlLabels?.some(label=>label.includes(term)))||e.modules?.some(m=>m.label.includes(term))})||registry.legacyEntries.some(old=>old.label.includes(term)&&old.destinations.some(d=>scopeRoute(d).split('?')[0]===node.id))
  }
- const nodeButton=(n)=>{const active=path===n.id,draft=dirty.some(([id])=>scopeRoute(id).split('?')[0]===n.id);return <button key={n.id} type="button" className={`nav-item ${active?'active':''}`} onClick={()=>navigate(n.id)} aria-label={n.label} aria-description={draft?'有未保存修改':undefined} aria-current={active?'page':undefined}><span className="nav-label min-w-0 flex-1 truncate text-left">{n.label}</span>{draft&&<span className="draft-dot" aria-label="有未保存修改"/>}</button>}
- const nav=<>
+ const nodeButton=(n)=>{const active=path===n.id,draft=draftPaths.has(n.id);return <button key={n.id} type="button" className={`nav-item ${active?'active':''}`} onClick={()=>navigate(n.id)} aria-label={n.label} aria-description={draft?'有未保存修改':undefined} aria-current={active?'page':undefined}><span className="nav-label min-w-0 flex-1 truncate text-left">{n.label}</span>{draft&&<span className="draft-dot" aria-label="有未保存修改"/>}</button>}
+ const nav=location=><>
   <div className="sidebar-brand"><span className="brand-mark" aria-label="CRA1">CRA1</span>{!collapsed&&<div><p className="font-semibold">酷锐A1主题</p><p className="text-xs text-muted-foreground">选择页面，直接修改</p></div>}</div>
-  {!collapsed&&<div className="sidebar-search"><Input aria-label="搜索配置入口" placeholder="搜索页面或设置…" value={search} onChange={e=>setSearch(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){setQuery(search);setCommand(true)}}}/></div>}
-  <nav className="sidebar-nav" aria-label="主题配置菜单">{NAV.map(g=><div className="nav-group" key={g.label}>
-   {collapsed?<button type="button" title={g.label} aria-label={g.label} className="theme-nav-icon" onClick={()=>{setCollapsed(false);if(g.items[0].id)navigate(g.items[0].id)}}><g.icon className="size-5"/></button>:<>
-    <div className="theme-nav-label"><g.icon className="size-4"/><span className="nav-label">{g.label}</span></div>
-    <div className="nav-group-items">{g.items.filter(n=>n.domain!=='cart'||!n.public||bootInfo.role==='super_admin').filter(matches).map(n=>{
+  {!collapsed&&<div className="sidebar-search"><Input aria-label="搜索配置入口" placeholder="搜索页面或设置…" value={search} onChange={e=>{setSearch(e.target.value);setSearchGroups({})}} onKeyDown={e=>{if(e.key==='Enter'){setQuery(search);setCommand(true)}}}/></div>}
+  <nav className="sidebar-nav" aria-label="主题配置菜单">{NAV.map(g=>{
+   const key=groupPref(g),control=location+'-nav-group-'+g.key
+   const items=g.items.filter(n=>n.domain!=='cart'||!n.public||bootInfo.role==='super_admin')
+   const groupMatches=!!term&&g.label.includes(term)
+   const visible=groupMatches?items:items.filter(matches)
+   if (!collapsed&&!visible.length) return null
+   const open=(term?searchGroups:expanded)[key]!==false
+   const leaves=navLeaves(items),active=leaves.some(n=>n.id===path),draft=leaves.some(n=>draftPaths.has(n.id))
+   return <div className="nav-group" key={g.key}>
+   {collapsed?<button type="button" title={g.label} aria-label={g.label} className="theme-nav-icon" onClick={()=>{setCollapsed(false);setExpanded(state=>({...state,[key]:true}));navigate(items[0].id)}}><g.icon className="size-5" aria-hidden="true"/></button>:<>
+    <button type="button" className="theme-nav-label" data-active={active&&!open?true:undefined} aria-expanded={open} aria-controls={control} aria-description={!open&&draft?'有未保存修改':undefined} onClick={()=>toggle(key,open)}>
+     <g.icon className="size-4" aria-hidden="true"/><span className="nav-label flex-1">{g.label}</span>{!open&&draft&&<span className="draft-dot" aria-hidden="true"/>}
+     {open?<ChevronDown className="size-3.5" aria-hidden="true"/>:<ChevronRight className="size-3.5" aria-hidden="true"/>}
+    </button>
+    <div id={control} className="nav-group-items" hidden={!open}>{open&&visible.map(n=>{
      if(!n.children)return nodeButton(n)
-     const open=!!search||expanded[n.key]===true||expanded[n.key]===undefined&&n.children.some(x=>path===x.id)
+     const open=term?searchGroups[n.key]!==false:expanded[n.key]??n.children.some(x=>path===x.id)
      return <div className="nav-category" key={n.key}>
-      <button type="button" className="nav-category-trigger" aria-expanded={open} onClick={()=>toggle(n.key)}>
-       {open?<ChevronDown className="size-3.5"/>:<ChevronRight className="size-3.5"/>}<span className="nav-label">{n.label}</span>
-       {n.children.some(x=>dirty.some(([id])=>scopeRoute(id).split('?')[0]===x.id))&&<span className="draft-dot"/>}
+      <button type="button" className="nav-category-trigger" aria-expanded={open} onClick={()=>toggle(n.key,open)}>
+       {open?<ChevronDown className="size-3.5" aria-hidden="true"/>:<ChevronRight className="size-3.5" aria-hidden="true"/>}<span className="nav-label">{n.label}</span>
+       {n.children.some(x=>draftPaths.has(x.id))&&<span className="draft-dot" aria-label="有未保存修改"/>}
       </button>
-      {open&&<div className="nav-category-items">{n.children.filter(matches).map(nodeButton)}</div>}
+      {open&&<div className="nav-category-items">{(groupMatches||n.label.includes(term)?n.children:n.children.filter(matches)).map(nodeButton)}</div>}
      </div>
     })}</div>
    </>}
-  </div>)}</nav>
+  </div>})}</nav>
   <div className="sidebar-footer">{!collapsed&&<span className="flex-1 truncate text-xs text-muted-foreground">{bootInfo.user}</span>}<Button variant="ghost" aria-label="退出登录" onClick={async()=>{if(dirty.length&&!window.confirm('还有未保存的修改，退出会清除草稿。确认退出？'))return;try{const r=await websiteApi.logout();if(r.status!==200)throw new Error(r.msg);ctx.clear();window.location.href='index.php?r=login'}catch(e){toast(e.message,'error')}}}><LogOut className="size-4"/></Button></div>
  </>
  const commands=Object.values(registry.editors).filter(e=>e.id!=='custom'||bootInfo.role==='super_admin').flatMap(e=>{
@@ -79,7 +115,7 @@ function Shell(){
   })]
  }).concat([{label:'通知管理',group:'管理台',id:'/notifications',terms:'通知 公告 轮播 显示位置 开始时间 到期时间 优先级 关闭记忆 顶部信息条'}]).concat(registry.legacyEntries.flatMap(e=>e.destinations.map(s=>({label:e.label,group:'旧入口',id:scopeRoute(s),terms:e.path}))))
 
- return <><Reauth/><div className={`admin-shell ${collapsed?'sidebar-collapsed':''}`}><aside className="admin-sidebar">{nav}</aside><Sheet open={mobile} onOpenChange={setMobile}><SheetContent side="left" className="mobile-sidebar"><SheetHeader><SheetTitle>主题配置</SheetTitle></SheetHeader>{nav}</SheetContent></Sheet><div className="admin-main"><header className="admin-header"><Button className="desktop-only" variant="ghost" aria-label={collapsed?'展开侧栏':'折叠侧栏'} onClick={()=>setCollapsed(!collapsed)}>{collapsed?<PanelLeftOpen className="size-4"/>:<PanelLeftClose className="size-4"/>}</Button><Button className="mobile-only" variant="ghost" aria-label="打开菜单" onClick={()=>{setCollapsed(false);setMobile(true)}}><Menu className="size-4"/></Button><button type="button" className="text-sm text-muted-foreground" onClick={()=>navigate('/overview')}>酷锐A1主题</button><Button variant="ghost" className="ml-auto" onClick={()=>setCommand(true)}><Search className="size-4"/>查找设置</Button></header><main className="admin-content">{bootInfo.must_change&&<Alert tone="warning">请先到“我的安全”修改初始密码。</Alert>}{ctx.persistenceError&&<Alert tone="warning">{ctx.persistenceError}</Alert>}<Boundary key={path}><Suspense fallback={<p role="status">正在加载配置页…</p>}><Content route={route} navigate={navigate}/></Suspense></Boundary></main><footer className="admin-attribution"><a href="https://github.com/zbxh/cra1-theme-public" target="_blank" rel="noopener noreferrer">主题：酷锐A1</a></footer></div><Dialog open={command} onOpenChange={setCommand}><DialogContent><DialogHeader><DialogTitle>查找页面与设置</DialogTitle><DialogDescription>输入中文页面、区块或设置名称。</DialogDescription></DialogHeader><Command label="搜索所有设置"><Command.Input aria-label="搜索所有设置" placeholder="例如：轮播图、联系我们、按钮…" value={query} onValueChange={setQuery}/><Command.List><Command.Empty>没有找到相关设置</Command.Empty>{commands.map((n,i)=><Command.Item key={i} value={`${n.group} ${n.label} ${n.terms} ${i}`} onSelect={()=>navigate(n.id)}>{n.label}<span className="ml-auto text-xs text-muted-foreground">{n.group}</span></Command.Item>)}</Command.List></Command></DialogContent></Dialog></div></>
+ return <><Reauth/><div className={`admin-shell ${collapsed?'sidebar-collapsed':''}`}><aside className="admin-sidebar">{nav('desktop')}</aside><Sheet open={mobile} onOpenChange={setMobile}><SheetContent side="left" className="mobile-sidebar"><SheetHeader><SheetTitle>主题配置</SheetTitle></SheetHeader>{nav('mobile')}</SheetContent></Sheet><div className="admin-main"><header className="admin-header"><Button className="desktop-only" variant="ghost" aria-label={collapsed?'展开侧栏':'折叠侧栏'} onClick={()=>setCollapsed(!collapsed)}>{collapsed?<PanelLeftOpen className="size-4"/>:<PanelLeftClose className="size-4"/>}</Button><Button className="mobile-only" variant="ghost" aria-label="打开菜单" onClick={()=>{setCollapsed(false);setMobile(true)}}><Menu className="size-4"/></Button><button type="button" className="text-sm text-muted-foreground" onClick={()=>navigate('/overview')}>酷锐A1主题</button><Button variant="ghost" className="ml-auto" onClick={()=>setCommand(true)}><Search className="size-4"/>查找设置</Button></header><main className="admin-content">{bootInfo.must_change&&<Alert tone="warning">请先到“我的安全”修改初始密码。</Alert>}{ctx.persistenceError&&<Alert tone="warning">{ctx.persistenceError}</Alert>}<Boundary key={path}><Suspense fallback={<p role="status">正在加载配置页…</p>}><Content route={route} navigate={navigate}/></Suspense></Boundary></main><footer className="admin-attribution"><a href="https://github.com/zbxh/cra1-theme-public" target="_blank" rel="noopener noreferrer">主题：酷锐A1</a></footer></div><Dialog open={command} onOpenChange={setCommand}><DialogContent><DialogHeader><DialogTitle>查找页面与设置</DialogTitle><DialogDescription>输入中文页面、区块或设置名称。</DialogDescription></DialogHeader><Command label="搜索所有设置"><Command.Input aria-label="搜索所有设置" placeholder="例如：轮播图、联系我们、按钮…" value={query} onValueChange={setQuery}/><Command.List><Command.Empty>没有找到相关设置</Command.Empty>{commands.map((n,i)=><Command.Item key={i} value={`${n.group} ${n.label} ${n.terms} ${i}`} onSelect={()=>navigate(n.id)}>{n.label}<span className="ml-auto text-xs text-muted-foreground">{n.group}</span></Command.Item>)}</Command.List></Command></DialogContent></Dialog></div></>
 }
 function Content({route,navigate}){
  const [path,query='']=route.split('?'),bits=path.split('/').filter(Boolean)
@@ -99,7 +135,10 @@ function ThemeEditor({domain,id,query,navigate,embedded=false}){
  const frame=<WorkspaceFrame key={domain+id} domain={domain} editorId={id} title={e.label} saveDescription={embedded?'保存当前设置的全部修改':undefined}>{w=>{
   const child={...w,values:w.values.main,original:w.original.main,data:{...w.data,scope:w.data.scopes.main},setValues:fn=>w.setValues(v=>({...v,main:typeof fn==='function'?fn(v.main):fn}))}
   if(id==='custom')return <CodeEditor code={child.values.custom_code} onChange={v=>child.setValues({...child.values,custom_code:v})}/>
-  return <div className="embedded-editor">{id==='sidebar'?<MemberSidebar workspace={child} member={{...child.values,version:w.data.version}} loading={false} reload={()=>w.reload()}/>:id==='appearance'?<MemberAppearance workspace={child} member={{...child.values,version:w.data.version}} loading={false} reload={()=>w.reload()}/>:<BusinessContent domain={domain} id={id} query={query} navigate={navigate} workspace={child}/>}</div>
+  return <div className="embedded-editor space-y-4">
+    {domain==='cart' && <EffectiveSources domain={domain} id={id} dirty={w.dirty} revision={w.revision} navigate={navigate}/>}
+    {id==='sidebar'?<MemberSidebar workspace={child} member={{...child.values,version:w.data.version}} loading={false} reload={()=>w.reload()} query={query}/>:id==='appearance'?<MemberAppearance workspace={child} member={{...child.values,version:w.data.version}} loading={false} reload={()=>w.reload()}/>:<BusinessContent domain={domain} id={id} query={query} navigate={navigate} workspace={child}/>}
+  </div>
  }}</WorkspaceFrame>
  return embedded?frame:<div className="space-y-5"><div><p className="text-sm text-muted-foreground">{domain==='member'?'会员中心':'购物车'}</p><h1 className="text-2xl font-semibold">{e.label}</h1></div>{frame}</div>
 }
@@ -139,7 +178,7 @@ const BUSINESS_BLOCKS={
 }
 function BusinessContent({domain,id,query,navigate,workspace}){
  const blocks=BUSINESS_BLOCKS[domain+':'+id],key=new URLSearchParams(query).get('module'),selected=blocks?.find(b=>b[0]===key)?.[0]||blocks?.[0][0]
- const content=<div className="embedded-editor">{domain==='cart'?<CartContent workspace={workspace} scope={id} block={selected}/>:['login','regist'].includes(id)?<MemberAuth key={id} workspace={workspace} kind={id}/>:<MemberContent workspace={workspace} scope={id} block={selected}/>}</div>
+ const content=<div className="embedded-editor">{domain==='cart'?<CartContent workspace={workspace} scope={id} block={selected}/>:['login','regist'].includes(id)?<MemberAuth key={id} workspace={workspace} kind={id}/>:<MemberContent workspace={workspace} scope={id} block={selected} navigate={navigate}/>}</div>
  if(!blocks||blocks.length===1)return content
  return <div className="visual-workspace"><aside className="block-picker"><p className="block-picker-heading">选择要修改的部分</p><Select aria-label="选择页面区块" className="mobile-block-picker" value={selected} onChange={e=>navigate(routeFor(domain,id)+'?module='+e.target.value)}>{blocks.map(([k,label])=><option key={k} value={k}>{label}</option>)}</Select><div className="desktop-block-picker">{blocks.map(([k,label])=><button className={'block-choice '+(k===selected?'active':'')} type="button" key={k} onClick={()=>navigate(routeFor(domain,id)+'?module='+k)}>{label}</button>)}</div></aside><div className="min-w-0">{content}</div></div>
 }

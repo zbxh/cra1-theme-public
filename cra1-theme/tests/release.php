@@ -116,7 +116,15 @@ try{
  check(hash_file('sha256',$site.'/runtime/cra1_theme/config.json')===$config,'rollback preserves config');
  $failureZip=$base.'/write-failure.zip';zipFixture($failureZip,['public/web/cra1/example.js'=>'half-change','public/web/cra1/second.js'=>'new']);$attempts=0;
  $failing=new Updater($site,'cra1admin',static function(){return ['database'=>true,'system_version'=>'10.7.4','modules'=>[]];},static function($target,$bytes,$mode)use(&$attempts){if(++$attempts===2)throw new RuntimeException('isolated second write failure');Files::atomic($target,$bytes,$mode);});
- rejects(static function()use($failing,$failureZip){$failing->apply($failureZip,hash_file('sha256',$failureZip));},'write failure unexpectedly completed');
+ $progress=new CRA1\Theme\Release\OperationProgress($site,'fixture-session',str_repeat('1',32));
+ try{$failing->apply($failureZip,hash_file('sha256',$failureZip),null,$progress);throw new RuntimeException('write failure unexpectedly completed');}
+ catch(CRA1\Theme\Release\UpdateFailure $error){
+  $feedback=$error->details();
+  check($feedback['phase']==='写入主题文件'&&$feedback['state']==='restored'&&strpos($feedback['status_text'],'已恢复')!==false,'write failure reports the real phase and verified restore outcome');
+ }
+ check($progress->read()['phase']==='恢复原主题','active progress reflects the actual server recovery phase');
+ check((new CRA1\Theme\Release\OperationProgress($site,'different-session',str_repeat('1',32)))->read()===null,'other sessions cannot read this operation phase');
+ $progress->finish();check($progress->read()===null,'completed operation removes its progress record');
  check($attempts===2&&file_get_contents($site.'/public/web/cra1/example.js')==='before','middle failure restores first written file');
  check(!is_file($site.'/public/web/cra1/second.js')&&!$up->history()['interrupted'],'middle failure restores absent file and clears marker');
  check(hash_file('sha256',$site.'/runtime/cra1_theme/config.json')===$config&&hash_file('sha256',$site.'/app/protected.php')===$protected,'middle failure preserves config and system');

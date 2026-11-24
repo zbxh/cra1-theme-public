@@ -8627,6 +8627,35 @@
         "float_enable"
       ]
     },
+    "site-reading": {
+      "id": "site-reading",
+      "label": "文章详情",
+      "domain": "website",
+      "kind": "site",
+      "fields": [
+        {
+          "key": "article_toc_position",
+          "label": "桌面目录位置",
+          "controlLabels": []
+        },
+        {
+          "key": "article_sidebar_enabled",
+          "label": "显示目录下方模块",
+          "controlLabels": []
+        },
+        {
+          "key": "article_sidebar_html",
+          "label": "模块内容（HTML）",
+          "controlLabels": []
+        }
+      ],
+      "references": [],
+      "keys": [
+        "article_toc_position",
+        "article_sidebar_enabled",
+        "article_sidebar_html"
+      ]
+    },
     "shared:page_hero": {
       "id": "shared:page_hero",
       "label": "页面页首",
@@ -10201,6 +10230,7 @@
     "website/site/site-support": "site-support",
     "website/site/site-menu": "site-menu",
     "website/site/site-float": "site-float",
+    "website/site/site-reading": "site-reading",
     "website/site/site-pagehero": "page:home:content",
     "website/site/site-footer": "site-footer",
     "website/site/site-custom": "site-custom",
@@ -10280,6 +10310,14 @@
       "group": "系统设置",
       "destinations": [
         "site-float"
+      ]
+    },
+    {
+      "path": "website/site/site-reading",
+      "label": "文章详情",
+      "group": "系统设置",
+      "destinations": [
+        "site-reading"
       ]
     },
     {
@@ -19169,6 +19207,16 @@
       },
       "fields": []
     },
+    "reading": {
+      "id": "reading",
+      "domain": "website",
+      "label": "文章详情",
+      "kind": "public",
+      "sections": {
+        "site-reading": "site-reading"
+      },
+      "fields": []
+    },
     "seo-default": {
       "id": "seo-default",
       "domain": "website",
@@ -27369,6 +27417,13 @@
         "via": "field"
       }
     ],
+    "article_toc_position": [
+      {
+        "editor": "reading",
+        "part": "site-reading",
+        "via": "field"
+      }
+    ],
     "seo_site_title_suffix": [
       {
         "editor": "seo-default",
@@ -27591,6 +27646,20 @@
         "editor": "compatibility",
         "part": "历史数据",
         "via": "preserved-only"
+      }
+    ],
+    "article_sidebar_enabled": [
+      {
+        "editor": "reading",
+        "part": "site-reading",
+        "via": "field"
+      }
+    ],
+    "article_sidebar_html": [
+      {
+        "editor": "reading",
+        "part": "site-reading",
+        "via": "field"
       }
     ]
   }

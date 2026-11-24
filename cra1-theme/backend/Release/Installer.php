@@ -43,29 +43,35 @@ final class Installer
     }
 
     /** Initialize the independent administrator and theme data without changing V10 theme selection. */
-    public function install(array $input,array $preflight,?string $origin=null): array
+    public function install(array $input,array $preflight,?string $origin=null,?OperationProgress $progress=null): array
     {
         $ready=$preflight['installation_ready']??(($preflight['counts']['blocked']??1)===0&&($preflight['counts']['unverified']??1)===0);
         if($ready!==true)throw new \RuntimeException('安装检查尚未通过，请按向导提示处理后重试');
+        foreach(['entry','username','password']as$field)if(!is_string($input[$field]??null))throw new \InvalidArgumentException('请完整填写后台地址、账号和密码');
         $phase='创建安装事务';
-        try{return Files::locked($this->root.'/runtime/cra1_theme/install.lock',function()use($input,$origin,&$phase){
+        $state='untouched';
+        try{return Files::locked($this->root.'/runtime/cra1_theme/install.lock',function()use($input,$origin,&$phase,&$state,$progress){
             $phase='读取原有安装资料';
             if($this->state()['mode']!=='install')throw new \RuntimeException('已经安装，禁止重新初始化账号或配置');
-            foreach(['entry','username','password']as$field)if(!is_string($input[$field]??null))throw new \InvalidArgumentException('请完整填写后台地址、账号和密码');
+            $phase='检查填写内容';
             $entry=(string)($input['entry']??'');
             if(!preg_match('/^[a-z][a-z0-9]{5,31}$/D',$entry)||in_array($entry,['console','public','config','upload','plugins','clientarea','cra1-shared','cra1-install'],true))throw new \InvalidArgumentException('后台地址需为 6–32 位小写字母和数字');
-            $phase='设置主题后台目录';
+            $phase='核对已解压的主题文件';if($progress)$progress->step($phase);
             $from=$this->root.'/public/cra1admin';$to=$this->root.'/public/'.$entry;
             Files::noLinks($from);Files::noLinks($to);
-            if(!is_dir($from)||($to!==$from&&file_exists($to)))throw new \RuntimeException('后台目录缺失或目标地址已存在');
+            if(!is_dir($from))throw new \RuntimeException('缺少主题后台目录 public/cra1admin，请重新完整解压安装包到 V10 网站根目录');
+            $manifest=$this->root.'/cra1-theme/release.json';
+            if(!is_file($manifest))throw new \RuntimeException('缺少主题安装清单 cra1-theme/release.json，请重新完整解压安装包到 V10 网站根目录');
+            $release=Files::json($manifest);
+            References::inspect($this->root,$release['references']??[]);
+            $phase='检查填写内容';
+            if($to!==$from&&file_exists($to))throw new \InvalidArgumentException('此后台地址已被占用，请换一个地址');
+            $phase='读取原有安装资料';
             $entryFile=$this->root.'/runtime/cra1_theme/entry.json';$previousEntry=null;
             foreach(['entry','config','member_center','cart_theme']as$name){$path=$this->root.'/runtime/cra1_theme/'.$name.'.json';Files::json($path,true);}
             if(is_file($entryFile))$previousEntry=(string)file_get_contents($entryFile);
             $pointer=$this->root.'/runtime/cra1_theme/distribution/current.json';Files::noLinks($pointer);
             if(file_exists($pointer))throw new \RuntimeException('检测到已有发行指针，禁止覆盖安装记录');
-            $phase='读取主题安装文件';
-            $release=Files::json($this->root.'/cra1-theme/release.json');
-            References::inspect($this->root,$release['references']??[]);
             require_once CRA1_THEME_BACKEND.'/Support/cra1_theme_security.php';
             $phase='设置主题后台账号';
             \CRA1ThemeSecurity::username((string)($input['username']??''));$hash=\CRA1ThemeSecurity::password((string)($input['password']??''));
@@ -75,6 +81,8 @@ final class Installer
             if(!filter_var($canonical,FILTER_VALIDATE_URL)||!in_array($url['scheme']??'',['http','https'],true)||!empty($url['path'])||isset($url['user'])||isset($url['pass'])||isset($url['query'])||isset($url['fragment']))throw new \InvalidArgumentException('无法识别本站地址，请重新打开安装页');
             $created=[$this->root.'/runtime/cra1_theme/security.sqlite',$this->root.'/config/cra1_theme_security.key'];$renamed=false;
             try{
+                $state='recovery_required';
+                if($progress)$progress->step('写入主题后台和配置');
                 $phase='创建主题后台数据库与密钥';
                 \CRA1ThemeSecurity::install($this->root,(string)$input['username'],$hash,['canonical_url'=>$canonical,'force_https'=>false,'http_test'=>false]);
                 $created=[$this->root.'/runtime/cra1_theme/security.sqlite',$this->root.'/config/cra1_theme_security.key'];
@@ -106,7 +114,7 @@ final class Installer
                 $announcementFile=$this->root.'/runtime/cra1_theme/announcements.json';
                 if (!is_file($announcementFile)) $created[]=$announcementFile;
                 Updater::migrateAnnouncements($this->root,$release);
-                $phase='保存主题生效版本';
+                $phase='保存主题资源版本';if($progress)$progress->step($phase);
                 $created[]=$pointer;
                 $current=['release'=>$release['release']??'legacy-install','manifest'=>$release,'security_epoch'=>$release['security_epoch']??1,'installed_at'=>time()];
                 if(isset($release['backend_root']))$current['backend_root']=$release['backend_root'];
@@ -121,11 +129,12 @@ final class Installer
                 unset($security,$media);
                 if($renamed&&!rename($to,$from))throw new \RuntimeException('安装失败，后台目录需通过文件管理器恢复',0,$e);
                 if($previousEntry!==null)Files::atomic($entryFile,$previousEntry,0600);
-                foreach(array_reverse($created)as$file)if(is_file($file)||is_link($file))unlink($file);
-                foreach(['security.sqlite-wal','security.sqlite-shm','install.json']as$file){$path=$this->root.'/runtime/cra1_theme/'.$file;if(is_file($path))unlink($path);}
+                $cleanupOk=true;
+                foreach(array_reverse($created)as$file)if(is_file($file)||is_link($file))$cleanupOk=unlink($file)&&$cleanupOk;
+                foreach(['security.sqlite-wal','security.sqlite-shm','install.json']as$file){$path=$this->root.'/runtime/cra1_theme/'.$file;if(is_file($path))$cleanupOk=unlink($path)&&$cleanupOk;}
+                if($cleanupOk)$state='cleaned';
                 throw $e;
             }
-        });}catch(\InvalidArgumentException $error){throw $error;}
-        catch(\Throwable $error){throw new InstallerFailure($phase,$error);}
+        });}catch(\Throwable $error){throw new InstallerFailure($phase,$error,$state);}
     }
 }

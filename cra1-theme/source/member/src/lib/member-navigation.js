@@ -1,5 +1,5 @@
 import { get, memberSnapshot } from '../lib'
-import { productNavigationCategories, productOverviewAliases } from './product-config'
+import { productNavigationCategories, productListEntries, productOverviewAliases } from './product-config'
 
 /** Use the same navigation and product associations as the member sidebar. */
 export async function memberProductCategories() {
@@ -15,5 +15,6 @@ export async function memberProductNavigation() {
     if (!Array.isArray(response.data?.menu)) throw new Error('导航分类读取失败，请重试')
     nodes = response.data.menu
   }
-  return { categories: productNavigationCategories(nodes, language), overviewAliases: productOverviewAliases(nodes) }
+  const entries = productListEntries(nodes)
+  return { categories: productNavigationCategories(nodes, language), overviewAliases: productOverviewAliases(nodes, entries), entries }
 }

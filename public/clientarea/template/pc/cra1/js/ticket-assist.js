@@ -42,8 +42,86 @@
     })
   }
   /* 实时查询：每次都从 document 取（见文件头「关键约束」） */
-  function liveRoot() { return $('.template.add-ticket') }
+  function liveRoot() { return $('.template.add-ticket, #app.idcsmart-ticket-root, #app.ticket-premium-root') }
   function liveForm() { return $('.main-form') }
+  function premiumTemplate() { return !!$('script[src*="/ticket_premium/"][src*="addTicket"]') }
+
+  var sourceId = new URL(global.location.href).searchParams.get('cra1_host')
+  var prefillNotice
+  var prefillRunning = false
+
+  function ticketVm() {
+    var mobile = $('#template.create-box')
+    var vnode = mobile && mobile._vnode
+    return getVm() || (mobile && mobile.__vue__) || (vnode && vnode.component && vnode.component.proxy)
+  }
+
+  function prefillStatus(message, retry) {
+    var container = liveRoot() || $('.ticket-create') || $('#template.create-box')
+    if (!container) return
+    if (!prefillNotice) {
+      prefillNotice = document.createElement('div')
+      prefillNotice.className = 'cra1-ticket-prefill'
+      prefillNotice.setAttribute('role', 'status')
+    }
+    if (!prefillNotice.isConnected) (liveForm() || $('.ticket-form', container) || container).before(prefillNotice)
+    prefillNotice.textContent = message
+    if (retry) {
+      var button = document.createElement('button')
+      button.type = 'button'
+      button.textContent = '重试关联'
+      button.addEventListener('click', function () { startPrefill(true) }, { once: true })
+      prefillNotice.appendChild(button)
+    }
+  }
+
+  function startPrefill(retry) {
+    if (!/^[1-9]\d{0,14}$/.test(sourceId || '') || prefillRunning) return
+    var request = global.CRA1Shared && global.CRA1Shared.Request
+    if (!request) return
+    prefillRunning = true
+    prefillStatus('正在确认可关联的产品…')
+    function done(message, allowRetry) {
+      prefillRunning = false
+      if (message) prefillStatus(message, allowRetry)
+      else if (prefillNotice) prefillNotice.remove()
+    }
+    request.request('/cra1-theme/member/host/' + sourceId + '/ticket-entry', { timeout:8000, unauthorized:'silent' }).then(function (result) {
+      if (!result.data || !result.data.url) {
+        done('当前产品无法关联。可以在表单中手动选择其他产品。')
+        return
+      }
+      var started = Date.now()
+      var vm = ticketVm()
+      if (retry === true && vm && typeof vm.getHostList === 'function') vm.getHostList()
+      step(started)
+    }).catch(function () { done('暂时无法确认关联产品，可以重试或手动选择。', true) })
+    function step(started) {
+      var vm = ticketVm()
+      if (vm && vm.ticketData && Array.isArray(vm.hostList)) {
+        var selected = vm.ticketData.host_ids
+        if (state.hostSel.length || (Array.isArray(selected) ? selected.length : selected)) {
+          done()
+          return
+        }
+        var host = vm.hostList.find(function (row) { return String(row.id) === sourceId })
+        if (host && host.status !== 'Deleted' && !(vm.hasApp && host.isDue)) {
+          if (state.renderHostSelection) {
+            state.hostSel = [host.id]
+            state.renderHostSelection()
+          } else if (typeof vm.selectHost === 'function') vm.selectHost(host)
+          else vm.ticketData.host_ids = Array.isArray(selected) ? [host.id] : host.id
+          done()
+          return
+        }
+      }
+      if (Date.now() - started < 8000) {
+        global.setTimeout(function () { step(started) }, 150)
+        return
+      }
+      done('当前产品未出现在工单允许关联的列表中，可以手动选择或重新读取。', true)
+    }
+  }
 
   function toast(msg, ok) {
     var el = document.createElement('div')
@@ -229,7 +307,6 @@
     $('.cra1-ta-picked__redo', pathEl).addEventListener('click', function () {
       state.picked = null
       state.stepPath = []
-      state.hostSel = []
       state.stage = 'pick'
       pathEl.remove()
       var extra = $('.cra1-ta-panel__extra', panel)
@@ -432,6 +509,14 @@
     var content = $('.el-form-item__content', hostFormItem)
     if (!content) { state.hostInit = false; return }
 
+    var nativeValue = vm.ticketData.host_ids
+    if (nativeValue && !state.hostSel.length) {
+      var existing = Array.isArray(nativeValue) ? nativeValue : [nativeValue]
+      state.hostSel = vm.hostList.filter(function (host) {
+        return existing.some(function (id) { return String(id) === String(host.id) }) && !(vm.hasApp && host.isDue)
+      }).map(function (host) { return host.id }).slice(0, MAX_HOSTS)
+      vm.ticketData.host_ids = Array.isArray(nativeValue) ? [] : ''
+    }
     var wrap = document.createElement('div')
     wrap.className = 'cra1-ta-hosts'
     wrap.setAttribute('role', 'group')
@@ -580,6 +665,10 @@
     }
 
     var lastLen = -1
+    state.renderHostSelection = function () {
+      renderOptions()
+      renderChips()
+    }
     state.hostGuard = function () {
       if (!wrap.isConnected) insertBeside()
       // 插件 Vue 重渲染会重建单选下拉 → 持续压制（只藏控件，保留行与 label）
@@ -628,18 +717,22 @@
       ev.stopImmediatePropagation()
       ev.preventDefault()
 
+      if (vm.loading || (vm.fileList || []).some(function (file) { return file.status === 'uploading' })) {
+        if (!vm.loading) toast('请等待附件上传完成', false)
+        return
+      }
       if (!(td.title || '').trim()) return toast('请填写工单标题', false)
       if (!Number(td.ticket_type_id)) return toast('请选择工单部门', false)
       if (!(td.content || '').trim()) return toast('请填写问题描述', false)
       if (req && state.hostSel.length === 0) return toast('该问题分类需要先选择关联产品', false)
 
-      var params = {
-        title: td.title,
-        ticket_type_id: Number(td.ticket_type_id),
-        content: td.content,
+      var params = Object.assign({}, td, {
+        content_format: 'text',
         host_ids: state.hostSel.map(Number),
         attachment: Array.isArray(td.attachment) ? td.attachment : [],
-      }
+      })
+      var submitted = false
+      vm.loading = true
       global.CRA1Shared.Request.request('/ticket', {
         method: 'POST',
         unauthorized: 'redirect',
@@ -647,6 +740,7 @@
       })
         .then(function (res) {
           if (res.status === 200 && res.data && res.data.id) {
+            submitted = true
             toast('工单提交成功，正在跳转…')
             setTimeout(function () {
               var target = new URL('ticketDetails.htm', global.location.href)
@@ -659,6 +753,7 @@
           }
         })
         .catch(function (error) { if (error.code !== 'UNAUTHORIZED') toast(error.message || '网络异常，提交失败', false) })
+        .finally(function () { if (!submitted) vm.loading = false })
     }, true)
   }
 
@@ -690,7 +785,7 @@
       state.vm = vm
       waitFor(readConfig, function (cfg) {
         state.cfg = cfg
-        if (Number(cfg.enabled) !== 1) {
+        if (Number(cfg.enabled) !== 1 || !visibleEnabled(cfg.categories).length) {
           var form = liveForm()
           if (form) form.classList.remove('cra1-ta-form-hidden')
           return
@@ -710,6 +805,11 @@
   }
 
   function init() {
+    if (sourceId) {
+      if (document.readyState === 'complete') startPrefill()
+      else global.addEventListener('load', startPrefill, { once: true })
+    }
+    if (premiumTemplate() || liveRoot()?.id === 'app') return
     var known = readConfig()
     if (known && Number(known.enabled) !== 1) return
     // BUG 修复：DOMContentLoaded 即隐藏表单（此时 Vue 尚未 mount，隐藏类会进

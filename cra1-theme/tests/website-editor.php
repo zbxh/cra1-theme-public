@@ -47,5 +47,27 @@ try{
  check($doc['origin']===$GLOBALS['THEME_ORIGIN'],'draft preview retains the public authenticated origin rather than a proxy internal Host');
  check($doc['owner_id']===1&&hash_equals($doc['session_hash'],CRA1ThemeSecurity::hashToken($_SESSION['security_token'])),'public origin preservation keeps preview ownership and session binding');
  check(file_get_contents($file)===$bytes,'draft preview does not save live page settings');
+ $reading=$store->editorGet('website','reading')['data'];
+ check($reading['values']['site-reading']['article_toc_position']==='right','article directory defaults to the right on an existing site');
+ $saved=$store->editorSave('website','reading',$reading['revisions'],['site-reading'=>['article_toc_position'=>'left']],'fixture');
+ check($saved['status']===200,'article directory side can be changed in the website editor');
+ $reading=$store->editorGet('website','reading')['data'];
+ $disk=json_decode(file_get_contents($file),true);
+ check($reading['values']['site-reading']['article_toc_position']==='left'&&$disk['article_toc_position']==='left','a fresh editor read returns the saved article directory side');
+ check($disk['page_hero_rows_text']===$raw['page_hero_rows_text'],'article directory settings preserve other website content');
+ $extra='<h3>相关资源</h3><p><a href="/document.html">打开文档</a></p><img src="/sample.png" alt="示例">';
+ check($reading['values']['site-reading']['article_sidebar_enabled']==='0','desktop article sidebar module is disabled on existing sites');
+ $saved=$store->editorSave('website','reading',$reading['revisions'],['site-reading'=>['article_sidebar_enabled'=>'1','article_sidebar_html'=>$extra]],'fixture');
+ check($saved['status']===200,'desktop article sidebar options save together');
+ $reading=$store->editorGet('website','reading')['data'];
+ $config=$reading['values']['site-reading'];
+ $html=cra1_article_sidebar_content($config);
+ check(strpos($html,'<h3>相关资源</h3>')!==false&&strpos($html,'href="/document.html"')!==false&&strpos($html,'src="/sample.png"')!==false,'supported title, link and image render as HTML');
+ $saved=$store->editorSave('website','reading',$reading['revisions'],['site-reading'=>['article_sidebar_enabled'=>'0']],'fixture');
+ $config=$store->editorGet('website','reading')['data']['values']['site-reading'];
+ check($saved['status']===200&&$config['article_sidebar_html']===$extra&&cra1_article_sidebar_content($config)==='','disabling hides the module and retains the saved HTML');
+ check(cra1_article_sidebar_content(['article_sidebar_enabled'=>'1','article_sidebar_html'=>'<p>&nbsp;<br></p>'])==='','blank markup does not create an empty module');
+ $unsafe=cra1_article_sidebar_content(['article_sidebar_enabled'=>'1','article_sidebar_html'=>'<a href="/document.html"><span class="custom">打开</span></a>']);
+ check(strpos($unsafe,'<span>打开</span>')!==false,'sidebar HTML applies the same attribute rules within links');
  echo json_encode(['status'=>'passed','checks'=>$checks,'production_writes'=>0],JSON_UNESCAPED_UNICODE).PHP_EOL;
 }finally{$remove($root);}

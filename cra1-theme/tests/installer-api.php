@@ -27,9 +27,11 @@ function response(string $name,?string $bootstrap,?string $manifest=null):array{
 try{
     $data=response('missing-bootstrap',null);
     check(strpos($data['msg'],'解压到 V10 网站根目录')!==false,'incomplete extraction gives an actionable instruction');
+    $data=response('missing-manifest',(string)file_get_contents($root.'/cra1-theme/backend/bootstrap.php'));
+    check(strpos($data['msg'],'cra1-theme/release.json')!==false&&strpos($data['msg'],'重新完整解压')!==false,'a missing release file is reported before the extracted backend can load');
     $data=response('damaged-manifest',(string)file_get_contents($root.'/cra1-theme/backend/bootstrap.php'),'{damaged');
     check(strpos($data['msg'],'清单损坏')!==false,'damaged release metadata is caught by the API boundary');
-    $data=response('database-error','<?php define("DATABASE_PASSWORD","example-db-secret"); throw new PDOException("SQLSTATE[HY000]: near ON: syntax error password=example-db-secret");');
+    $data=response('database-error','<?php define("DATABASE_PASSWORD","example-db-secret"); throw new PDOException("SQLSTATE[HY000]: near ON: syntax error password=example-db-secret");','{}');
     check(strpos($data['msg'],'near ON: syntax error')!==false,'bootstrap database errors retain the actual cause');
     check($data['error']['phase']==='读取安装程序'&&preg_match('/^[A-F0-9]{12}$/',$data['error']['reference']),'bootstrap failures identify their phase and log reference');
     check(strpos($data['msg'],'example-db-secret')===false,'bootstrap fallback removes database credentials');

@@ -32,7 +32,7 @@
     <script src="/{$template_catalog}/template/{$themes}/components/pagination/pagination.js"></script>
     <script src="/{$template_catalog}/template/{$themes}/components/discountCode/discountCode.js"></script>
     <script src="/{$template_catalog}/template/{$themes}/components/customGoods/customGoods.js"></script>
-    <script src="/{$template_catalog}/template/{$themes}/components/cra1EventCode/eventCode.js"></script>
+    <script src="{:cra1_theme_asset_url('native', 'components/cra1EventCode/eventCode.js', '/clientarea/template/pc/cra1/components/cra1EventCode/eventCode.js')}"></script>
 
     <!-- 购物车文件 -->
     <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/product.js"></script>

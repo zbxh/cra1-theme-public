@@ -1,7 +1,7 @@
 (function (window, undefined) {
-  var old_onload = window.onload;
-  window.onload = function () {
-    const template = document.getElementsByClassName("template")[0];
+  function mountCart() {
+    const template = document.querySelector(".cart-page--flat");
+    if (!template || template.__vue__) return;
     Vue.prototype.lang = window.lang;
     new Vue({
       components: {
@@ -81,12 +81,12 @@
         window.addEventListener("resize", this.__viewportHandler);
         window.addEventListener("storage", this.__cartStorageHandler);
         this.$data.__viewportW = window.innerWidth;
-        const addons_js_arr = JSON.parse(
-          document.querySelector("#addons_js").getAttribute("addons_js")
-        ); // 插件列表
-        const arr = addons_js_arr.map((item) => {
-          return item.name;
-        });
+        let addons = [];
+        try {
+          const value = JSON.parse(document.documentElement.getAttribute("addons_js") || "[]");
+          if (Array.isArray(value)) addons = value;
+        } catch (_) { /* The product catalogue can load without optional promotions. */ }
+        const arr = addons.map((item) => item?.name);
         if (arr.includes("EventPromotion")) {
           // 开启活动满减
           this.isShowFull = true;
@@ -96,11 +96,11 @@
         // 是否开启用户等级
         this.isShowLevel = arr.includes("IdcsmartClientLevel");
         this.initData();
+        this.$el.hidden = false;
+        const startup = document.getElementById("cra1-cart-startup");
+        if (startup) startup.hidden = true;
       },
       updated() {
-        // 关闭loading
-        document.getElementById("mainLoading").style.display = "none";
-        document.getElementsByClassName("template")[0].style.display = "block";
         this.syncDockPadding();
       },
       destroyed() {
@@ -159,6 +159,9 @@
           configOpen: true,
           configPanel: null,   // 快照 v2：{default_open, sticky_summary}
           urlProductId: 0,
+          productLinkNotice: "",
+          productLinkRetry: false,
+          selectionConfirmPending: false,
           searchValue: "", // 搜索内容
           searchLoading: false,
           select_first_obj: {
@@ -1354,10 +1357,10 @@
         // 搜索商品
         searchGoods() {
           this.searchLoading = true;
-          this.goodsParmas.id = "";
+          this.goodsParmas.id = this.goodsParmas.keywords.trim() ? "" : this.select_second_obj.id;
           this.goodsParmas.page = 1;
           this.resetGoodsListState();
-          this.getProductGoodList();
+          return this.getProductGoodList();
         },
         // 获取二级分类
         getProductGroup_second(id) {
@@ -1463,6 +1466,8 @@
         async initData() {
           this.resetDomainState();
           this.catalogError = "";
+          this.productLinkNotice = "";
+          this.productLinkRetry = false;
           this.goodSLoading = true;
           this.resetProductSelection();
           this.goodsListRequestId++;
@@ -1482,13 +1487,18 @@
           if (this.fpg_id) secondTask(this.fpg_id);
           const [first, detail] = await Promise.all([firstTask, detailTask]);
           if (requestId !== this.secondGroupRequestId) return;
-          if (first.error || detail.error) throw first.error || detail.error;
+          if (first.error) throw first.error;
           const pd = detail.value?.data?.data?.product;
           if (this.urlProductId) {
-            if (pd && pd.hidden != 1 && pd.product_group_id) {
+            if (detail.error) {
+              const status = Number(detail.error.data?.status ?? detail.error.response?.status);
+              this.setProductLinkIssue(status === 404 || status === 410 ? "unavailable" : "retry");
+            } else if (Number(pd?.id) === this.urlProductId && Number(pd.hidden) !== 1 && pd.product_group_id) {
               this.fpg_id = Number(pd.product_group_id_first) || this.fpg_id;
               this.spg_id = Number(pd.product_group_id);
-            } else this.urlProductId = 0;
+            } else {
+              this.setProductLinkIssue("unavailable");
+            }
           }
           this.first_group_list = first.value.data.data.list;
           if (this.first_group_list[0]) {
@@ -1517,21 +1527,24 @@
               this.goodsParmas.id = secondId;
               this.secondLoading = false;
               if (!spgValid) {
+                if (this.urlProductId && !this.productLinkNotice) this.setProductLinkIssue("unavailable");
                 this.spg_id = secondId;
                 this.updateUrlParam("spg_id", secondId, "replace");
               }
-              if (this.isDomain) {
+              if (this.isDomain && !this.productLinkNotice) {
                 this.getSuffix();
               }
-              if (this.isSsl) {
+              if (this.isSsl && !this.productLinkNotice) {
                 this.getSslBrands();
               }
               return this.getProductGoodList();
             } else {
+              if (this.urlProductId && !this.productLinkNotice) this.setProductLinkIssue("unavailable");
               this.resetGoodsListState();
               this.goodSLoading = false;
             }
           } else {
+            if (this.urlProductId && !this.productLinkNotice) this.setProductLinkIssue("unavailable");
             this.resetGoodsListState();
             this.goodSLoading = false;
           }
@@ -1539,39 +1552,54 @@
             if (requestId === this.secondGroupRequestId) this.catalogFailure("initial");
           }
         },
-        // 点击一级分类
-        selectFirstType(val) {
-          if (val !== this.select_first_obj.id) this.clearProductEntry();
+        setProductLinkIssue(issue) {
+          this.productLinkRetry = issue === "retry";
+          this.productLinkNotice = {
+            unavailable: "链接中的商品已不可选购，请选择其他商品。",
+            soldOut: "链接中的商品已售罄，请选择其他商品。",
+            retry: "暂时无法读取链接中的商品。您可以重试，或选择其他商品。",
+          }[issue] || "";
+        },
+        clearProductSelectionForCategory() {
+          this.clearProductEntry();
+          this.urlProductId = 0;
+          this.setProductLinkIssue("");
           this.resetProductSelection();
+          this.goodsParmas.keywords = "";
           this.updateUrlParam("product_id", null, "replace");
-          this.select_first_obj.id = val;
-          this.resetSecondGroupState();
-          this.resetGoodsListState();
-          this.goodsParmas.page = 1;
-          this.getProductGroup_second(val);
+        },
+        // 点击一级分类
+        selectFirstType(val, fromHistory = false) {
+          if (Number(val) === Number(this.select_first_obj.id) && !this.productLinkNotice) return;
+          return this.confirmSelectionChange(() => {
+            this.clearProductSelectionForCategory();
+            this.select_first_obj.id = val;
+            this.resetSecondGroupState();
+            this.resetGoodsListState();
+            this.goodsParmas.page = 1;
+            return this.getProductGroup_second(val);
+          }, fromHistory);
         },
         // 点击二级分类
-        selectSecondType(val) {
-          this.resetDomainState(true);
-          if (val !== this.select_second_obj.id) this.clearProductEntry();
-          this.resetProductSelection();
-          this.updateUrlParam("product_id", null, "replace");
-          this.select_second_obj.id = val;
-          const clickItem = this.second_group_list.find((item) => {
-            return item.id === val;
-          });
-          this.select_second_obj.type = clickItem?.type;
-          this.select_second_obj.description = clickItem?.description;
-          this.resetGoodsListState();
-          this.goodsParmas.page = 1;
-          this.goodsParmas.id = val;
-          if (this.isDomain) {
-            this.getSuffix();
-          }
-          if (this.isSsl) {
-            this.getSslBrands();
-          }
-          this.getProductGoodList();
+        selectSecondType(val, fromHistory = false) {
+          if (Number(val) === Number(this.select_second_obj.id) && !this.productLinkNotice) return;
+          const group = this.second_group_list.find(item => Number(item.id) === Number(val));
+          if (!group) return;
+          return this.confirmSelectionChange(() => {
+            this.resetDomainState(true);
+            this.secondGroupRequestId++;
+            this.secondLoading = false;
+            this.clearProductSelectionForCategory();
+            this.select_second_obj.id = group.id;
+            this.select_second_obj.type = group.type;
+            this.select_second_obj.description = group.description;
+            this.resetGoodsListState();
+            this.goodsParmas.page = 1;
+            this.goodsParmas.id = group.id;
+            if (this.isDomain) this.getSuffix();
+            if (this.isSsl) this.getSslBrands();
+            return this.getProductGoodList();
+          }, fromHistory);
         },
         // 获取通用配置
         getCommonData() {
@@ -1655,7 +1683,7 @@
           this.$forceUpdate();
         },
         isSellable(item) {
-          return !(item.stock_control === 1 && item.qty <= 0);
+          return !(Number(item.stock_control) === 1 && item.qty <= 0);
         },
         catalogPriceAmount(item) {
           if (item.pay_type === "free") return "0.00";
@@ -1685,20 +1713,26 @@
             this.$message.warning(lang.inventory_shortage || lang.no_goods || "该商品暂时无法选购");
             return;
           }
-          if (this.selectedProductId === item.id) return;
-          // 配置区有未提交修改时先确认（子页通过 config-dirty 上报）
-          if (this.configState === "ready" && (this.embedDirty || this.isEditingCartItem)) {
-            this.$confirm("当前配置尚未提交，切换商品将丢弃已填内容。是否继续？", "提示", {
-              confirmButtonText: lang.settlement_tip3 || "继续",
-              cancelButtonText: lang.finance_text58 || "取消",
+          if (Number(this.selectedProductId) === Number(item.id)) return;
+          return this.confirmSelectionChange(() => this.doSelectProduct(item));
+        },
+        async confirmSelectionChange(change, fromHistory = false) {
+          if (fromHistory || (!this.embedDirty && !this.entryCartEdit)) return change();
+          if (this.selectionConfirmPending) return;
+          const selection = this.moduleSelectionRequestId;
+          this.selectionConfirmPending = true;
+          try {
+            await this.$confirm("当前配置尚未提交，切换会丢弃已填内容。是否继续？", "切换商品或分组", {
+              confirmButtonText: "继续切换",
+              cancelButtonText: "取消",
               type: "warning",
-            }).then(() => {
-              this.embedDirty = false;
-              this.doSelectProduct(item);
-            }).catch(() => {});
+            });
+          } catch (_) {
             return;
+          } finally {
+            this.selectionConfirmPending = false;
           }
-          this.doSelectProduct(item);
+          if (selection === this.moduleSelectionRequestId) return change();
         },
         doSelectProduct(item, historyMode = "push", resolved = false) {
           const requestId = ++this.moduleSelectionRequestId;
@@ -1710,6 +1744,8 @@
             return this.resolveProductModule(item, historyMode, requestId);
           }
           if (Number(item.id) !== this.entryProductId) this.clearProductEntry();
+          this.urlProductId = 0;
+          this.setProductLinkIssue("");
           this.catalogError = "";
           if (!this.isThemedProduct(item) && !window.__THEME_PREVIEW__) {
             const url = window.CRA1CartModules.url('/cart/goods.htm', item.id);
@@ -1834,33 +1870,42 @@
         },
         // 商品列表返回后：默认选中（URL product_id 优先，否则首个可售）
         async applyDefaultSelection(list) {
-          if (!this.cartConfigReady || this.selectedProductId) return;
-          if (!this.isNormal || !list.length) {
-            this.selectedProductId = 0;
-            this.selectedProduct = null;
-            return;
-          }
-          const requestId = this.goodsListRequestId;
-          const preferred = this.urlProductId || this.defaultProductId;
+          if (!this.cartConfigReady || this.selectedProductId || this.productLinkNotice || this.selectionConfirmPending) return;
           const explicitProduct = this.urlProductId;
-          let target = preferred ? list.find(x => Number(x.id) === Number(preferred) && this.isSellable(x)) : null;
+          if (!this.isNormal) return;
+          if (!list.length && !explicitProduct) return;
+          const requestId = this.goodsListRequestId;
+          const selection = this.moduleSelectionRequestId;
+          const stillCurrent = () => requestId === this.goodsListRequestId &&
+            selection === this.moduleSelectionRequestId && !this.selectedProductId && !this.selectionConfirmPending;
+          const preferred = explicitProduct || this.defaultProductId;
+          const matches = item => Number(item.id) === preferred;
+          let target = preferred ? list.find(matches) : null;
           // The chosen product may be beyond the first list page. Read it through
           // the same group-filtered list API, so another group never leaks in.
           if (!target && preferred) {
             try {
-              const res = await productGoods({ ...this.goodsParmas, page: 1, limit: 1, 'product_ids[0]': preferred });
-              target = (res.data?.data?.list || []).find(x => Number(x.id) === Number(preferred) && this.isSellable(x)) || null;
+              const res = await productGoods({ ...this.goodsParmas, keywords: "", id: this.select_second_obj.id, page: 1, limit: 1, 'product_ids[0]': preferred });
+              target = (res.data?.data?.list || []).find(matches);
               if (target) {
                 target.activeList = [];
                 target.__plainDesc = String(target.description || '').replace(/<[^>]*>/g, ' ').trim();
                 target.safeDescription = this.sanitizeHtml(target.description);
                 this.applyDescMeta(target);
               }
-            } catch (_) { /* unavailable preferences fall back to a sellable card */ }
+            } catch (_) {
+              if (explicitProduct) {
+                if (stillCurrent()) this.setProductLinkIssue("retry");
+                return;
+              }
+            }
           }
-          if (requestId !== this.goodsListRequestId || this.selectedProductId) return;
-          this.urlProductId = 0;
-          if (!target) target = list.find(x => this.isSellable(x));
+          if (!stillCurrent()) return;
+          if (explicitProduct && (!target || !this.isSellable(target))) {
+            this.setProductLinkIssue(target ? "soldOut" : "unavailable");
+            return;
+          }
+          if (!target || !this.isSellable(target)) target = list.find(x => this.isSellable(x));
           // Browsing a category must not navigate away just because its first
           // card is a third-party product. Explicit deep links still open it.
           if (target && (explicitProduct || this.isThemedProduct(target))) this.doSelectProduct(target, "replace");
@@ -1929,6 +1974,7 @@
               this.railAddRequestId = '';
               this.railLoading = false;
               if (data.success === true && data.failed !== true) {
+                this.embedDirty = false;
                 this.refreshTopCart();
                 this.railConfirmAfterAdd();
               } else if (data.reason === 'timeout') {
@@ -2088,7 +2134,7 @@
           const fpg = this.getQuery("fpg_id") * 1 || 0;
           const spg = this.getQuery("spg_id") * 1 || 0;
           if (pid && pid !== this.selectedProductId) {
-            const target = this.goodsList.find((x) => x.id === pid);
+            const target = this.goodsList.find(x => Number(x.id) === pid && this.isSellable(x));
             if (target && (!spg || spg === this.select_second_obj.id)) {
               this.doSelectProduct(target, "replace"); return;
             }
@@ -2104,16 +2150,15 @@
             this.initData();
             return;
           }
-          if (!pid && this.selectedProductId) {
-            // 后退到未选中状态：关闭配置区
-            this.selectedProductId = 0;
-            this.selectedProduct = null;
-            this.configState = "idle";
+          if (!pid) {
+            this.urlProductId = 0;
+            this.setProductLinkIssue("");
+            if (this.selectedProductId) this.resetProductSelection();
           }
           if (fpg && fpg !== this.select_first_obj.id) {
-            this.selectFirstType(fpg);
+            this.selectFirstType(fpg, true);
           } else if (spg && spg !== this.select_second_obj.id) {
-            this.selectSecondType(spg);
+            this.selectSecondType(spg, true);
           }
         },
         // Move only the horizontal model strip; never scroll the page or config panel.
@@ -2173,6 +2218,10 @@
         },
       },
     }).$mount(template);
-    typeof old_onload == "function" && old_onload();
-  };
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", mountCart, { once: true });
+  } else {
+    mountCart();
+  }
 })(window);

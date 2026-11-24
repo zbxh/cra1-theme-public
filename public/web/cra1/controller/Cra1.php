@@ -1387,6 +1387,9 @@ txt2|查看全部方案
 txt3|查看方案 →',
             'hotline' => '400-000-0000',
             'header_support_json' => '',
+            'article_toc_position' => 'right',
+            'article_sidebar_enabled' => '0',
+            'article_sidebar_html' => '',
             'float_enable' => '1',
             'float_items_text' => '在线客服|/contact.html|kefu
 电话咨询|tel:400-000-0000|phone',

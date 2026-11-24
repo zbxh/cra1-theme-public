@@ -101,6 +101,8 @@ def main():
  if build.get('mode')=='maintenance':return maintenance_archive(stage,out,meta,build)
  guides=guide_sources(ROOT)
  data={};refs=dict(meta.get('references',{}));native={r['path']:r for r in meta.get('native_dependencies',[])};asset_rows=[]
+ retired_path='public/clientarea/template/pc/cra1/api/goodsList.js'
+ retired=json.loads((ROOT/'cra1-theme/source/native-references.json').read_text()).get('retired_member_goods_list')
  rights=json.loads((ROOT/'cra1-theme/docs/asset-rights.json').read_text())
  if rights.get('format')!=1 or not isinstance(rights.get('assets'),dict):raise RuntimeError('Unsupported asset rights registry')
  for rel,purpose in NATIVE_CONTRACTS.items():
@@ -116,7 +118,11 @@ def main():
    if p.is_symlink():
     target=os.path.normpath(os.path.join(os.path.dirname(rel),os.readlink(p)))
     if not target.startswith('public/') or '..' in pathlib.PurePosixPath(target).parts:raise RuntimeError('External dependency link: '+rel)
+    if retired and rel==retired_path and target==retired['target']:continue
     if refs.get(rel)!=target:raise RuntimeError('Undeclared native reference; review before packaging: '+rel)
+    continue
+   if retired and rel==retired_path and p.is_file():
+    if digest(p.read_bytes())!=retired['observed_sha256']:raise RuntimeError('Retired member goodsList.js differs from its registered native source.')
     continue
    if p.is_file():include(rel,p.read_bytes())
  for rel in HELPERS:

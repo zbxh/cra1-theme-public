@@ -54,9 +54,9 @@ function catalogFixture(){
  let instance,first=()=>Promise.reject(new Error('private')),second=first,products=first
  function Vue(options){instance=this;Object.assign(this,options.data());for(const[k,fn]of Object.entries(options.methods))this[k]=fn.bind(this);for(const[k,fn]of Object.entries(options.computed))Object.defineProperty(this,k,{get:()=>fn.call(this)});this.$mount=()=>this;this.$nextTick=fn=>fn()}
  Vue.prototype={}
- const window={},env={window,Vue,clearTimeout(){},navigator:{userAgent:'fixture'},lang:{},asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},document:{getElementsByClassName:()=>[{}],documentElement:{scrollTop:0,clientHeight:500,scrollHeight:1000},body:{scrollTop:0}},localStorage:{},productGroupFirst:()=>first(),productGroupSecond:id=>second(id),productGoods:params=>products(params)}
+ const window={},env={window,Vue,clearTimeout(){},navigator:{userAgent:'fixture'},lang:{},asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},document:{querySelector:()=>({}),documentElement:{scrollTop:0,clientHeight:500,scrollHeight:1000},body:{scrollTop:0}},localStorage:{},productGroupFirst:()=>first(),productGroupSecond:id=>second(id),productGoods:params=>products(params)}
  const source=fs.readFileSync(new URL('../source/legacy-assets/cart/20261017-compat-v3/js/goodsList.js',import.meta.url),'utf8')
- vm.runInNewContext(source,env);window.onload()
+ vm.runInNewContext(source,env)
  return{page:instance,env,first:fn=>{first=fn},second:fn=>{second=fn},products:fn=>{products=fn}}
 }
 

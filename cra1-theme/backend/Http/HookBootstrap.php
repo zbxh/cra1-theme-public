@@ -30,6 +30,7 @@ final class HookBootstrap
             // Native dispatch resolves this controller through the container.
             // The adapter delegates every other theme/plugin back to V10.
             app()->bind('app\\home\\controller\\ViewClientController', home\ViewClientController::class);
+            app()->bind('app\\home\\controller\\ViewCartController', home\ViewCartController::class);
             if (class_exists(MemberGuard::class) && class_exists(OperationGuard::class)) {
                 app()->bind('app\\http\\middleware\\CheckHome', MemberGuard::class);
                 app()->bind('app\\http\\middleware\\CheckClientOperatePassword', OperationGuard::class);

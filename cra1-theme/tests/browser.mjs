@@ -50,29 +50,42 @@ const origin=`https://127.0.0.1:${server.address().port}`
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});const results=[];let writes=0
 function check(ok,label){if(!ok)throw Error(label);results.push(label)}
 const compatibility={release:'fixture-candidate',context:{system_version:'10.7.4'},compatible:false,counts:{pass:1,warning:0,blocked:1,unverified:1},checks:[{id:'fixture',status:'blocked',label:'模块版本待核验',path:'public/plugins/server/mf_cloud/MfCloud.php',detail:'数据库与源码版本不一致',impact:'增强操作暂不可用',owner:'V10 原文件（只读）'}]}
+compatibility.checks.push({id:'dependency:route/home.php',status:'unverified',label:'原生路由',detail:'文件未匹配已核验官方基线'})
 try{
  for(const width of [1920,1440,768,390]){
   const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:960}}),page=await context.newPage(),errors=[]
   page.on('pageerror',e=>errors.push(e.message))
-  let applications=0
+  let applications=0, blockedUpload=false, failApply=false, completeApply, serverPhase=''
   await page.route('**/index.php?*',async route=>{
    const action=new URL(route.request().url()).searchParams.get('r')
-   if(!['api.release.check','api.release.history','api.release.online.settings.get','api.release.upload','api.release.apply'].includes(action))throw Error('Unexpected management request: '+action)
+   if(!['api.release.check','api.release.history','api.release.online.settings.get','api.release.upload','api.release.apply','api.release.progress.get'].includes(action))throw Error('Unexpected management request: '+action)
    const details=page.url().includes('many=1')?{...compatibility,checks:Array.from({length:123},(_,i)=>({id:'file-'+i,status:'unverified',label:'待核验文件 '+(i+1),path:'public/cra1-fixture/file-'+i,detail:'隔离测试'}))}:compatibility
    let data=action.endsWith('check')?details:action.endsWith('history')?{current:{},history:[],interrupted:false}:{}
    if(action==='api.release.online.settings.get')data={github_prefix:''}
+   if(action==='api.release.progress.get')data=serverPhase?{phase:serverPhase}:null
    if(action.endsWith('upload')){
     check(route.request().postData().includes('filename="cra1-theme-install.zip"'),`upload uses the same install ZIP ${width}`)
-    data={candidate:'fixture-install',release:'fixture-overlay-v1',version:'v17.1',release_channel:'test',sha256:'a'.repeat(64),signature:'示例安装包',blockers:[],files:[],can_apply:true}
+    const warning='更新后建议检查商品报价。', blocker='主题资源目录不可写，请在网站面板检查权限。'
+    data={candidate:'fixture-install',release:'fixture-overlay-v1',version:'v17.1',release_channel:'test',sha256:'a'.repeat(64),signature:'示例安装包',
+     blockers:blockedUpload?[blocker,blocker]:[],warnings:[warning,warning],files:[],can_apply:!blockedUpload}
    }
    if(action.endsWith('apply')){
     const body=route.request().postDataJSON()
     check(body.candidate==='fixture-install'&&body.expectedDigest==='a'.repeat(64),`apply retains confirmed install digest ${width}`)
     applications++;data={applied:true}
+    if(failApply){
+     await new Promise(resolve=>{completeApply=resolve})
+     return route.fulfill({json:{status:400,error:{phase:'写入主题文件',reason:'主题目录无法写入。',state:'restored',status_text:'原主题文件和生效版本已恢复。',next:'处理原因后重新选择安装包。'}}})
+    }
    }
    await route.fulfill({json:{status:200,data}})
   })
-  await page.goto(origin+'/management.html');await page.getByText('模块版本待核验',{exact:true}).waitFor()
+  await page.goto(origin+'/management.html');await page.getByText('发现需要处理的问题。',{exact:true}).waitFor()
+  check(await page.locator('tbody tr').count()===0,`operator summary hides detailed rows ${width}`)
+  await page.getByRole('button',{name:'查看需要核对的项目'}).click()
+  await page.getByText('模块版本待核验',{exact:true}).waitFor()
+  check(await page.getByText(/已核验官方基线/).count()===0,`file details omit legacy native baseline rows ${width}`)
+  await page.getByRole('tab',{name:'版本与兼容'}).click()
   check(await page.getByRole('button',{name:'重新检查'}).count()===1,`management loaded ${width}`)
   check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`management no document overflow ${width}`)
   await page.screenshot({path:path.join(output,`management-${width}.png`),fullPage:true})
@@ -81,12 +94,37 @@ try{
   const apply=page.getByRole('button',{name:'确认覆盖更新',exact:true})
   await apply.waitFor()
   check(await apply.isEnabled(),`installation preflight allows overwrite ${width}`)
+  check(!/SHA-256|示例安装包/.test(await page.getByRole('region',{name:'安装包检查结果'}).innerText()),`candidate displays the decision without hashes or release metadata ${width}`)
+  const advice=page.getByText('更新后建议检查商品报价。',{exact:true})
+  check(!await advice.isVisible(),`optional update advice is collapsed ${width}`)
+  await page.getByText('更新后检查建议',{exact:true}).click()
+  check(await advice.isVisible()&&await advice.count()===1,`optional update advice is deduplicated ${width}`)
   page.once('dialog',dialog=>dialog.dismiss());await apply.click()
   check(applications===0,`cancel leaves installed theme untouched ${width}`)
   page.once('dialog',dialog=>dialog.accept());await apply.click()
   await page.getByText('更新完成，请刷新页面加载对应资源。',{exact:true}).waitFor()
   check(applications===1,`confirmed install submits only once ${width}`)
-  check(await page.getByRole('tab').count()===5,`customer management has five tabs ${width}`)
+  check(await page.getByRole('tab').count()===6,`superadmin retains all six management tabs ${width}`)
+  if(width===1440||width===390){
+   await page.getByLabel('上传主题安装包 ZIP（推荐，最多 80MB）').setInputFiles({name:'cra1-theme-install.zip',mimeType:'application/zip',buffer:Buffer.from('isolated write failure fixture')})
+   await apply.waitFor()
+   failApply=true
+   page.once('dialog',dialog=>dialog.accept());await apply.click()
+   for(const next of ['解包并校验文件','写入主题文件','恢复原主题']){
+    serverPhase=next
+    await page.getByRole('status').filter({hasText:next}).waitFor()
+   }
+   await page.screenshot({path:path.join(output,`updating-${width}.png`),fullPage:true})
+   completeApply()
+   await page.getByText('写入主题文件失败',{exact:true}).waitFor()
+   check(await page.getByText(/原主题文件和生效版本已恢复。.*重新选择安装包/).isVisible(),`update failure displays the real stage, current theme, and retry action ${width}`)
+   await page.screenshot({path:path.join(output,`update-failure-${width}.png`),fullPage:true})
+   serverPhase='';failApply=false
+  }
+  blockedUpload=true
+  await page.getByLabel('上传主题安装包 ZIP（推荐，最多 80MB）').setInputFiles({name:'cra1-theme-install.zip',mimeType:'application/zip',buffer:Buffer.from('isolated blocked upload fixture')})
+  await page.getByText('安装包检查未通过，本次操作未切换生效版本。请先处理以下问题，再重新检查。',{exact:true}).waitFor()
+  check(await apply.isDisabled()&&await page.getByText('主题资源目录不可写，请在网站面板检查权限。',{exact:true}).count()===1,`real blocker remains actionable and update is disabled ${width}`)
   for(const name of ['版本与兼容','文件明细','安装与更新','备份与回退']){
    await page.getByRole('tab',{name,exact:true}).click()
    check(!/商业授权|商用发行|许可证|发行验收|免费商用/.test(await page.locator('body').innerText()),`customer tab contains only management content ${name} ${width}`)
@@ -124,8 +162,10 @@ try{
   const tier=page.getByRole('combobox',{name:'手机端二级菜单展开档位'});await tier.waitFor()
   const layout=await tier.evaluate(control=>{const row=control.parentElement,label=row.firstElementChild,title=label.firstElementChild;return{labelWidth:label.getBoundingClientRect().width,titleHeight:title.getBoundingClientRect().height,rowHeight:row.getBoundingClientRect().height,contained:control.getBoundingClientRect().right<=row.getBoundingClientRect().right}})
   check(layout.labelWidth>=160&&layout.titleHeight<=40&&layout.rowHeight<240&&layout.contained,`appearance narrow column remains readable ${width}`)
-  await tier.selectOption('all');check(await tier.inputValue()==='all',`appearance selection updates local draft ${width}`)
-  await page.getByRole('button',{name:'撤销',exact:true}).click();check(await tier.inputValue()==='one',`appearance undo restores selection ${width}`)
+  await tier.click();await page.getByRole('option',{name:'全部展开',exact:true}).click()
+  check((await tier.innerText()).trim()==='全部展开',`appearance selection updates local draft ${width}`)
+  await page.getByRole('button',{name:'撤销',exact:true}).click()
+  check((await tier.innerText()).trim()==='展开一个（默认）',`appearance undo restores selection ${width}`)
   await page.screenshot({path:path.join(output,`appearance-narrow-${width}.png`),fullPage:true})
   await context.close()
  }

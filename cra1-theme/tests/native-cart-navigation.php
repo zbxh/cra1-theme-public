@@ -38,6 +38,16 @@ try {
     navCheck(strpos(navFooter($single), "nonce='x'") !== false, 'native attributes retained');
     navCheck(navFooter(str_replace('topMenu.js', 'unknown.js', $original)) === null, 'unrecognized footer keeps complete native navigation');
     navCheck(navFooter($original."<script src='/components/topMenu/topMenu.js'></script>") === null, 'duplicate declarations do not produce mixed navigation');
+    $cart=OfficialCart::cartDocument($data, true, false);
+    navCheck(strpos($cart, '/cart/template/pc/default/js/goods.js') !== false, 'native mobile cascade keeps the installed cart loader');
+    navCheck(strpos($cart, 'native-cart-navigation') === false && OfficialCart::fullOfficialCart(), 'complete cart does not load CRA1 navigation');
+    navCheck(strpos($cart, 'product_id') < strpos($cart, '/cart/template/pc/default/js/goods.js'), 'legacy product ID normalized before the native loader');
+    $panel=OfficialCart::panelDocument($data, true, false);
+    navCheck(strpos($panel, '/clientarea/template/pc/default/js/productdetail.js') !== false, 'official panel loads the installed host view loader');
+    navCheck(strpos($panel, 'native-cart-navigation') === false && OfficialCart::handlesPanel() && !OfficialCart::panelUsesCRA1(), 'complete panel does not load CRA1 navigation');
+    navCheck(strpos($panel, '.product_detail.template:first-child:not([v-cloak])') !== false, 'the mounted native panel stays visible');
+    $adaptedPanel=navFooter($panel);
+    navCheck($adaptedPanel !== null && substr_count($adaptedPanel, '/fixture/') === 2 && strpos($adaptedPanel, '/clientarea/template/pc/default/js/productdetail.js') !== false, 'panel navigation replacement preserves native module scripts');
     echo json_encode(['status'=>'passed','checks'=>$checks,'php'=>PHP_VERSION,'business_writes'=>0]).PHP_EOL;
 } finally {
     if (is_dir($cache)) {

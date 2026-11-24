@@ -84,7 +84,7 @@
         var url = route(raw), children = node.children || node.child || node.items || [];
         // Product category projections use this stable menu ID to retain their
         // product selection and content settings on the destination page.
-        if (url && url.pathname === '/productList.htm' && node.id && !url.searchParams.has('cloud_menu')) url.searchParams.set('cloud_menu', node.id);
+        if (url && url.pathname === '/productList.htm' && node.id) url = route(shared.Navigation.productListHref(href(url), node.id));
         // A module container's fallback productList URL is not its own page.
         var container = children.length && ['module', 'res_module'].indexOf(node.type) !== -1;
         if (url && !container) {

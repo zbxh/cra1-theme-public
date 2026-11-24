@@ -119,7 +119,7 @@ if (is_file(IDCSMART_ROOT . 'public/clientarea/template/' . $public_themes . '/u
 $__cra1NativeComponents=\CRA1\Theme\Compatibility\NativeComponents::forPath((string)($_SERVER['REQUEST_URI']??''));
 if ($__cra1NativeComponents) echo '<script src="'.htmlspecialchars(cra1_theme_asset_url('native','js/native-capabilities.js','/clientarea/template/pc/cra1/js/native-capabilities.js'),ENT_QUOTES,'UTF-8').'"></script>';
 foreach ($__cra1NativeComponents as $__cra1Name=>$__cra1Relative) {
-    $__cra1Source=$__cra1Name==='payDialog'
+    $__cra1Source=\CRA1\Theme\Compatibility\NativeComponents::usesThemeAssets($__cra1Name)
         ?cra1_theme_asset_url('native',$__cra1Relative,'/clientarea/template/pc/cra1/'.$__cra1Relative)
         :'/clientarea/template/'.$__shared.'/'.$__cra1Relative;
     echo '<script src="'.htmlspecialchars($__cra1Source,ENT_QUOTES,'UTF-8').'"></script>';

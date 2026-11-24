@@ -30,7 +30,6 @@
     "public/clientarea/template/pc/cra1/api/account.js": "public/clientarea/template/pc/default/api/account.js",
     "public/clientarea/template/pc/cra1/api/certification.js": "public/clientarea/template/pc/default/api/certification.js",
     "public/clientarea/template/pc/cra1/api/goods.js": "public/clientarea/template/pc/default/api/goods.js",
-    "public/clientarea/template/pc/cra1/api/goodsList.js": "public/clientarea/template/pc/default/api/goodsList.js",
     "public/clientarea/template/pc/cra1/api/home.js": "public/clientarea/template/pc/default/api/home.js",
     "public/clientarea/template/pc/cra1/api/orderDetail.js": "public/clientarea/template/pc/default/api/orderDetail.js",
     "public/clientarea/template/pc/cra1/api/product.js": "public/clientarea/template/pc/default/api/product.js",
@@ -90,7 +89,6 @@
     "public/clientarea/template/pc/cra1/releases/{release}/api/account.js": "public/clientarea/template/pc/default/api/account.js",
     "public/clientarea/template/pc/cra1/releases/{release}/api/certification.js": "public/clientarea/template/pc/default/api/certification.js",
     "public/clientarea/template/pc/cra1/releases/{release}/api/goods.js": "public/clientarea/template/pc/default/api/goods.js",
-    "public/clientarea/template/pc/cra1/releases/{release}/api/goodsList.js": "public/clientarea/template/pc/default/api/goodsList.js",
     "public/clientarea/template/pc/cra1/releases/{release}/api/home.js": "public/clientarea/template/pc/default/api/home.js",
     "public/clientarea/template/pc/cra1/releases/{release}/api/orderDetail.js": "public/clientarea/template/pc/default/api/orderDetail.js",
     "public/clientarea/template/pc/cra1/releases/{release}/api/product.js": "public/clientarea/template/pc/default/api/product.js",
@@ -101,7 +99,6 @@
     "public/clientarea/template/pc/cra1/releases/{release}/api/withdraw.js": "public/clientarea/template/pc/default/api/withdraw.js",
     "public/clientarea/template/pc/cra1/releases/{release}/components/resetAuth/resetAuth.css": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.css",
     "public/clientarea/template/pc/cra1/releases/{release}/components/resetAuth/resetAuth.js": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.js",
-    "public/clientarea/template/pc/cra1/releases/{release}/components/resetAuth/resetAuth.less": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.less",
     "public/clientarea/template/pc/cra1/releases/{release}/components/unsubscribe/unsubscribe.css": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.css",
     "public/clientarea/template/pc/cra1/releases/{release}/components/unsubscribe/unsubscribe.js": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.js",
     "public/clientarea/template/pc/cra1/releases/{release}/components/unsubscribe/unsubscribe.less": "public/clientarea/template/pc/default/components/unsubscribe/unsubscribe.less",
@@ -110,6 +107,10 @@
     "public/clientarea/template/pc/cra1/utils/util.js": "public/clientarea/template/pc/default/utils/util.js",
     "public/home/template/mobile/cra1": "public/home/template/pc/cra1",
     "public/home/template/pc/cra1/img": "public/home/template/pc/default/img"
+  },
+  "retired_member_goods_list": {
+    "target": "public/clientarea/template/pc/default/api/goodsList.js",
+    "observed_sha256": "1e8ccf939db18fe0efa272f62832976f8aa6ceb4c7fd184f5c1319cce15ed836"
   },
   "native_dependencies": [
     {
@@ -428,17 +429,6 @@
         "cbd9c7c18b5364dd35feccbf8a0273104643bbe74cedc336bdf9e8741e002594"
       ],
       "observed_sha256": "cbd9c7c18b5364dd35feccbf8a0273104643bbe74cedc336bdf9e8741e002594",
-      "verification": "official-10.7.2-to-10.7.4-files",
-      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
-    },
-    {
-      "path": "public/clientarea/template/pc/default/api/goodsList.js",
-      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
-      "impact": "原生版本变化可能影响未知模块回退",
-      "verified_sha256": [
-        "1e8ccf939db18fe0efa272f62832976f8aa6ceb4c7fd184f5c1319cce15ed836"
-      ],
-      "observed_sha256": "1e8ccf939db18fe0efa272f62832976f8aa6ceb4c7fd184f5c1319cce15ed836",
       "verification": "official-10.7.2-to-10.7.4-files",
       "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
     },
@@ -945,17 +935,6 @@
         "7033ff185391f976aac950acbc60c9779fbad0bd89c7fbb30edf54ef112d89f1"
       ],
       "observed_sha256": "7033ff185391f976aac950acbc60c9779fbad0bd89c7fbb30edf54ef112d89f1",
-      "verification": "official-10.7.2-to-10.7.4-files",
-      "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
-    },
-    {
-      "path": "public/clientarea/template/pc/default/components/resetAuth/resetAuth.less",
-      "purpose": "客户合法安装中的原生组件（不随主题再分发）",
-      "impact": "原生版本变化可能影响未知模块回退",
-      "verified_sha256": [
-        "15aff1099e8bec85ed1a0e6528780a0a5419ab6aa97a913d4cbeab66632dcf46"
-      ],
-      "observed_sha256": "15aff1099e8bec85ed1a0e6528780a0a5419ab6aa97a913d4cbeab66632dcf46",
       "verification": "official-10.7.2-to-10.7.4-files",
       "verification_scope": "File provenance only; complete business/module upgrade acceptance remains pending."
     },

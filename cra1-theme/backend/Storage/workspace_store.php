@@ -31,9 +31,11 @@ function theme_workspace_revision(array $values): string
 }
 
 require_once __DIR__ . '/editor_store.php';
+require_once __DIR__ . '/effective_sources.php';
 final class ThemeWorkspaceStore
 {
     use ThemeEditorStore;
+    use EffectiveSources;
     private string $root;
     private string $configFile;
     private array $catalog;

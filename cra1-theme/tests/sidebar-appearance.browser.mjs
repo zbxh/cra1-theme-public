@@ -52,8 +52,9 @@ async function fixture({ configured = 0, preference, delayed = false, denied = f
       window.getCommon = () => Promise.resolve({ data: { data: { website_name: '演示控制台' } } })
       window.accountDetail = () => Promise.resolve({ data: { status: 200, data: { account: { id: 1 } } } })
       window.getMenu = () => Promise.resolve({ data: { status: 200, data: { menu: [{ id: 'fallback', name: '系统菜单', url: 'productList.htm' }] } } })
-      window.CRA1Shared = { Access: { read: () => Promise.resolve(), canUrl: () => true }, Navigation: { href: n => n.url || '' } }
+      window.CRA1Shared = { Access: { read: () => Promise.resolve(), canUrl: () => true } }
     })
+    await page.addScriptTag({ content: fs.readFileSync(path.join(root, 'public/cra1-shared/src/runtime.js'), 'utf8').split('(function(root){')[0] })
     await page.addScriptTag({ content: fs.readFileSync(component, 'utf8') })
     await page.evaluate(() => { window.fixture = new Vue({ el: '#root', components: { 'aside-menu': asideMenu } }); window.nav = fixture.$refs.nav })
   }

@@ -150,7 +150,9 @@ final class References
             $children=[];foreach($references as $path=>$next)if(strncmp($path,$target.'/',strlen($target)+1)===0)$children[]=$next;
             if($children){foreach($children as $child)self::resolve($root,$child,$references,$seen);return $root.'/'.$target;}
         }
-        throw new \RuntimeException('依赖不存在：'.$target);
+        if(strpos($target,'/default/')!==false)
+            throw new \RuntimeException('找不到所需的 V10 默认模板资源「'.$target.'」。请核对当前 V10 版本，并将缺失文件和版本告知主题维护者，确认应使用的安装包。');
+        throw new \RuntimeException('找不到主题资源「'.$target.'」。请重新完整解压主题安装包后再试。');
     }
     public static function inspect(string $root,array $references,string $entry='cra1admin'): array
     {

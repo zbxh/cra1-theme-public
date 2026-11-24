@@ -18,7 +18,7 @@
   function focusArticle(){var heading=detail.querySelector('.cra1-notification-center__title');if(!heading)return;shared.UI.focus(heading);if(root.matchMedia('(max-width:640px)').matches)heading.scrollIntoView({block:'start',behavior:'instant'});}
   function render(moveFocus){
    var items=currentItems(),filtered=items.filter(function(it){return !query||(it.title+' '+(it.summary||'')+' '+textOf(it.detail)).toLocaleLowerCase().includes(query);});
-   var current=filtered.find(function(it){return it.id===selected;})||filtered[0];if(current)selected=current.id;
+   var current=filtered.find(function(it){return it.id===selected;})||filtered[0];
    total.textContent=loadState==='ready'?(query?'找到 '+filtered.length+' 条通知':'共 '+items.length+' 条通知'):'';
    hint.hidden=loadState!=='ready'||payload.member_authenticated!==false;
    host.setAttribute('data-load-state',loadState);feedback.hidden=!!filtered.length&&loadState!=='error';
@@ -33,7 +33,7 @@
    filtered.forEach(function(item){
     var entry=node('a','cra1-notification-center__entry'),tag=node('span','cra1-notice-reader__entry-label',item.label||'通知'),title=node('span','cra1-notice-reader__entry-title',item.title),summary=node('span','cra1-notice-reader__entry-summary',item.summary||textOf(item.detail));
     var href=new URL(root.location.href);href.searchParams.set('notice',item.id);entry.href=href;entry.setAttribute('aria-current',current&&current.id===item.id?'true':'false');entry.append(tag,title,summary);
-    entry.onclick=function(event){if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();selected=item.id;root.history.pushState(null,'',entry.href);render(true);};list.append(entry);
+    entry.onclick=function(event){if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();selected=item.id;if(entry.href!==root.location.href)root.history.pushState(null,'',entry.href);render(true);};list.append(entry);
    });
    if(!current)return;
    var tag=node('span','cra1-notice-reader__label',current.label||'通知'),heading=node('h2','cra1-notification-center__title',current.title),article=node('article','cra1-notification-center__article'),links=node('div','cra1-notification-center__actions');
@@ -60,7 +60,7 @@
    }).finally(function(){root.clearTimeout(deadline);if(destroyed||ticket!==generation)return;flight=null;host.setAttribute('aria-busy','false');if(!doc.hidden)timer=root.setTimeout(refresh,Math.max(1,Math.min(30,Number(payload.refresh_after)||30))*1000);});
   }
   search.oninput=function(){query=search.value.trim().toLocaleLowerCase();render(false);};
-  root.addEventListener('popstate',function(){selected=new URL(root.location.href).searchParams.get('notice')||'';render(false);});
+  root.addEventListener('popstate',function(){selected=new URL(root.location.href).searchParams.get('notice')||'';search.value='';query='';render(false);});
   doc.addEventListener('visibilitychange',function(){if(doc.hidden)clearSession();else refresh();});
   root.addEventListener('pagehide',function(){destroyed=true;clearSession();});
   root.addEventListener('pageshow',function(e){if(e.persisted){destroyed=false;clearSession();refresh();}});

@@ -17,7 +17,7 @@ const server=http.createServer((req,res)=>{
  res.setHeader('cache-control','no-store')
  if(u.pathname==='/fixture.htm'){
   res.setHeader('content-type','text/html; charset=utf-8')
-  res.end('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><div id="host"></div><script>window.__CRA1_SHARED_BASE__="/native/";window.url="/native/";window.lang={};window.CRA1Shared={Request:{getToken:()=>"fixture-token",request:()=>Promise.resolve({data:window.fixtureAccess})}};window.fixtureAccess={all:false,pages:[{url:"/plugin/91/source.htm",allowed:false},{url:"/plugin/91/source.htm?tab=allowed",allowed:true},{url:"/plugin/92/source.htm",allowed:true}],known:[],rules:[]};</script><script src="/native/js/common/vue.js"></script><script src="/runtime.js"></script><script>const asideMenu={theme:true},topMenu={theme:true};</script><script src="/deps.js"></script>')
+  res.end('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><div id="host"></div><script>window.__CRA1_SHARED_BASE__="/native/";window.__CRA1_PAYMENT_BASE__="/theme-assets";window.url="/native/";window.lang={};window.CRA1Shared={Request:{getToken:()=>"fixture-token",request:()=>Promise.resolve({data:window.fixtureAccess})}};window.fixtureAccess={all:false,pages:[{url:"/plugin/91/source.htm",allowed:false},{url:"/plugin/91/source.htm?tab=allowed",allowed:true},{url:"/plugin/92/source.htm",allowed:true}],known:[],rules:[]};</script><script src="/native/js/common/vue.js"></script><script src="/runtime.js"></script><script>const asideMenu={theme:true},topMenu={theme:true};</script><script src="/deps.js"></script>')
   return
  }
  if(u.pathname.includes('/template/pc/cra1/components/futureBadge/')){res.writeHead(404);res.end();return}
@@ -31,6 +31,7 @@ const server=http.createServer((req,res)=>{
  if(u.pathname==='/hook-a.js'||u.pathname==='/hook-b.js'){const name=u.pathname.includes('hook-a')?'A':'B';setTimeout(()=>{res.setHeader('content-type','text/javascript');res.end('window.onload=function(){window.hook'+name+'=(window.hook'+name+'||0)+1}')},name==='A'?80:160);return}
  if(u.pathname==='/slow.js'){setTimeout(()=>{res.setHeader('content-type','text/javascript');res.end('window.staleBoot=true')},400);return}
  let file=u.pathname==='/deps.js'?path.join(root,'public/clientarea/template/pc/cra1/js/module-deps.js'):u.pathname==='/runtime.js'?path.join(root,'public/cra1-shared/src/runtime.js'):u.pathname.startsWith('/native/')?path.join(native,'public/clientarea/template/pc/default',u.pathname.slice(8)):null
+ if(u.pathname.startsWith('/theme-assets/'))file=path.join(root,'public/clientarea/template/pc/cra1',u.pathname.slice('/theme-assets/'.length))
  if(!file||!fs.existsSync(file)){res.writeHead(404);res.end();return}
  res.setHeader('content-type','text/javascript');res.end(fs.readFileSync(file))
 })

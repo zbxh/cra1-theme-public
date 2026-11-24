@@ -2,9 +2,38 @@
 declare(strict_types=1);
 namespace CRA1\Theme\Http\home;
 
+use CRA1\Theme\Compatibility\ModulePresentation;
+use CRA1\Theme\Context;
+use CRA1\Theme\Presentation\ClientareaTemplates;
+use CRA1\Theme\Presentation\OfficialCart;
+
 /** Keep the native dispatch, initialization, permissions and unknown-page fallback. */
 class ViewClientController extends \app\home\controller\ViewClientController
 {
+    public function index()
+    {
+        $params = $this->request->param();
+        $expected = $params['cra1_verify_module'] ?? null;
+        if (($params['view_html'] ?? '') !== 'productdetail' || !is_string($expected) || get_client_id(false) <= 0) return parent::index();
+        header('Cache-Control: private, no-store');
+        try {
+            $matches = ModulePresentation::checkPanel($expected, $params['id'] ?? null);
+        } catch (\Throwable $error) {
+            $matches = null;
+        }
+        if ($matches !== true) {
+            return response($matches === false ? '模块快速验证：所选实例不属于待验证模块。请核对实例编号。'
+                : '模块快速验证：该实例不可访问。请登录有权查看此实例的测试会员账号。', $matches === false ? 400 : 404)
+                ->contentType('text/plain', 'utf-8');
+        }
+        $html = parent::index();
+        if (!is_string($html)) return $html;
+        $message = !OfficialCart::handlesPanel() ? '实例模块匹配。当前页面使用 V10 默认加载流程，未进入酷锐A1的模块展示适配。'
+            : (OfficialCart::panelUsesCRA1() ? '实例模块匹配。实际显示酷锐A1导航与官方控制面板。'
+                : '实例模块匹配。实际显示完整官方控制面板。');
+        return ModulePresentation::verificationNotice($html, $message);
+    }
+
     public function module()
     {
         $params=$this->request->param();
@@ -14,6 +43,10 @@ class ViewClientController extends \app\home\controller\ViewClientController
         // bookmark actionable rather than rendering an empty, unusable panel.
         if (\CRA1\Theme\Context::isCRA1($theme) && ($params['view_html']??'')==='product_detail'
             && (!is_scalar($params['id']??null) || !preg_match('~^[1-9][0-9]*$~D',(string)$params['id']))) return redirect('/productList.htm');
+        if (($params['view_html'] ?? '') === 'product_detail' && is_string($params['module'] ?? null)) {
+            $panel = $this->nativeModulePanel($params);
+            if ($panel !== null) return $panel;
+        }
         if (use_mobile() && \CRA1\Theme\Context::isCRA1($theme) && is_string($params['module']??null)) {
             $module=\app\admin\model\PluginModel::where('name',parse_name($params['module'],1))->where('status',1)->where('module','server')->find();
             if ($module) {
@@ -22,6 +55,38 @@ class ViewClientController extends \app\home\controller\ViewClientController
             }
         }
         return parent::module();
+    }
+
+    private function nativeModulePanel(array $params): ?string
+    {
+        $mobile = use_mobile();
+        $pc = (string)($params['theme'] ?? (cookie('clientarea_theme') ?: configuration('clientarea_theme')));
+        $phone = (string)($params['theme_mobile'] ?? (cookie('clientarea_theme_mobile') ?: configuration('clientarea_theme_mobile')));
+        $shell = (new ClientareaTemplates())->resolvePublicShell($mobile, $pc, $phone);
+        if (!Context::isCRA1($shell['themes'] ?? '')) return null;
+        try {
+            $module = parse_name($params['module']);
+            $key = ModulePresentation::key('server', $module);
+            if ($key === null || $key !== ModulePresentation::panel($params['id'] ?? null)) return null;
+            $plugins = new \app\admin\model\PluginModel();
+            if (!$plugins->where('name', parse_name($module, 1))->where('status', 1)->where('module', 'server')->find()) return null;
+            $mode = (new ModulePresentation(CRA1_THEME_ROOT))->mode($key, 'panel');
+            $data = assign_clientarea_lang_config([
+                'addons'=>$plugins->plugins('addon')['list'],
+                'system_version'=>configuration('system_version'),
+                'clientarea_theme_color'=>configuration('clientarea_theme_color') ?? 'default',
+            ]);
+            $html = OfficialCart::directPanel($data, $module, $mobile, $mode === 'cra1');
+        } catch (\Throwable $error) {
+            error_log('CRA1: using the standard module controller for detail');
+            return null;
+        }
+        if ($html === null) return null;
+        header('Cache-Control: private, no-store');
+        return $this->applyViewAppendHook('clientarea_view_append', [
+            'page_type'=>'clientarea_module', 'view_html'=>'product_detail', 'module'=>$module,
+            'themes'=>$shell['themes'], 'client_id'=>get_client_id(false),
+        ], $html);
     }
 
     public function plugin()

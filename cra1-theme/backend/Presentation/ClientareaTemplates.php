@@ -50,4 +50,13 @@ final class ClientareaTemplates
         }
         return [];
     }
+
+    public function cartTheme(string $page, bool $mobile, string $pc, string $phone): string
+    {
+        if (!$this->validName($page)) return '';
+        foreach ($this->levels($mobile, $pc, $phone) as $theme) {
+            if (is_file(CRA1_THEME_ROOT.'/public/cart/template/'.$theme.'/'.$page.'.php')) return $theme;
+        }
+        return '';
+    }
 }

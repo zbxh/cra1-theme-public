@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { Save, RotateCcw, Plus, Trash2, Pencil, Power, X } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, PageHeader } from '@ui/card'
 import { Button } from '@ui/button'
-import { Input, Label, Select, Textarea } from '@ui/input'
+import { Field, Input, Label, Select, Textarea } from '@ui/input'
 import { Badge, Alert, Skeleton } from '@ui/feedback'
 import { useToast } from '@ui/toast'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@ui/dialog'
@@ -17,8 +17,10 @@ import { DragHandle, DropBadge, DRAG_LIST_BASE, RowIconBtn, dragRowClass, useFla
 import { TreeSortEditor, findNode, replaceNode, removeNode } from '../ui/treeSort'
 import { cn } from '@ui/utils'
 import { memberApi } from '../lib/api'
-import { homeArticleCatalog, productListTree } from '../lib/member-content'
+import { homeArticleCatalog, productListTree, productCopyFallback, productPurchaseFallback, validProductPurchaseUrl } from '../lib/member-content'
+import { publicSettingRoute } from '../lib/navigation'
 import ProductListEntries from './ProductListEntries'
+import EffectiveSources from '../components/EffectiveSources'
 
 /** 会员中心页面内容：产品说明、首页区块及工单助手。 */
 
@@ -44,39 +46,41 @@ function Toggle({ label, desc, on, onChange }) {
   )
 }
 
-/** 产品列表顶部文案编辑弹窗（全局默认 / 覆盖项共用） */
-function ProductForm({ title, value, onSubmit, onCancel }) {
+/** 产品列表文案和购买按钮分别继承或覆盖。 */
+function ProductForm({ title, value, fallback, purchaseFallback, canInherit, saveLabel, onSubmit, onCancel }) {
   const [form, setForm] = useState(value)
+  const [urlError, setUrlError] = useState('')
   const set = (patch) => setForm({ ...form, ...patch })
+  const purchase = { enabled: 0, text: '', url: '', target: 'self', ...(form.purchase ?? purchaseFallback.value) }
+  const setPurchase = patch => set({ purchase: { ...purchase, ...patch } })
   return (
-    <Dialog open onOpenChange={(open) => !open && onCancel()}><DialogContent className="max-w-[640px]"><DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>修改后应用到当前草稿</DialogDescription></DialogHeader>
+    <Dialog open onOpenChange={(open) => !open && onCancel()}><DialogContent className="max-w-[640px]"><DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>应用到草稿后，点击页面顶部的「{saveLabel}」即可生效。</DialogDescription></DialogHeader>
       <form
         className="w-full space-y-4"
         onSubmit={(e) => {
           e.preventDefault()
-          onSubmit(form)
+          if (form.purchase && !validProductPurchaseUrl(purchase.url)) {
+            setUrlError('请输入有效的站内路径或 HTTP/HTTPS 链接。')
+            return
+          }
+          onSubmit(form.purchase ? { ...form, purchase: { ...purchase, url: purchase.url.trim() } } : form)
         }}
       >
-        <div className="flex items-center justify-between">
-          <h3 className="text-[15px] font-semibold text-title">{title}</h3>
-          <button type="button" aria-label="取消" className="inline-flex size-6 items-center justify-center rounded text-muted-foreground transition-colors duration-150 hover:bg-accent" onClick={onCancel}><X className="size-3.5" aria-hidden="true" /></button>
-        </div>
-
         <Toggle
-          label="启用本配置"
-          desc="关闭时该入口回到主题内置的默认标题"
+          label="启用页头文案"
+          desc={`关闭时${fallback}，并保留已填写的内容。`}
           on={Number(form.enabled) === 1}
           onChange={(v) => set({ enabled: v ? 1 : 0 })}
         />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <Label className="mb-1.5 block">标题</Label>
-            <Input aria-label="标题" value={form.title} placeholder="例如：产品与服务"
+            <Label className="mb-1.5 block" htmlFor="product-heading-title">页面标题</Label>
+            <Input id="product-heading-title" value={form.title} placeholder="例如：产品与服务"
                    onChange={(e) => set({ title: e.target.value })} />
           </div>
           <div>
-            <Label className="mb-1.5 block">副标题 / 描述</Label>
-            <Input aria-label="副标题 / 描述" value={form.description} placeholder="例如：查看与管理您的云资源"
+            <Label className="mb-1.5 block" htmlFor="product-heading-description">页面说明</Label>
+            <Input id="product-heading-description" value={form.description} placeholder="例如：查看与管理您的云资源"
                    onChange={(e) => set({ description: e.target.value })} />
           </div>
         </div>
@@ -86,6 +90,35 @@ function ProductForm({ title, value, onSubmit, onCancel }) {
 
         </div>
 
+        <section aria-labelledby="product-purchase-title" className="space-y-3 border-t border-line pt-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 id="product-purchase-title" className="text-sm font-semibold text-ink">购买按钮</h3>
+            {canInherit && (form.purchase
+              ? <Button type="button" variant="ghost" size="sm" onClick={() => { set({ purchase: undefined }); setUrlError('') }}>恢复继承</Button>
+              : <span className="text-xs text-muted-foreground">继承{purchaseFallback.label}</span>)}
+          </div>
+          <Toggle label="显示购买按钮" desc="开启后显示在产品列表页头右侧，可独立于页头文案设置。"
+            on={Number(purchase.enabled) === 1} onChange={enabled => setPurchase({ enabled: enabled ? 1 : 0 })} />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="product-purchase-text">按钮文本</Label>
+              <Input id="product-purchase-text" value={purchase.text} placeholder="购买产品" maxLength={30}
+                onChange={e => setPurchase({ text: e.target.value })} />
+            </div>
+            <div>
+              <Label htmlFor="product-purchase-target">打开方式</Label>
+              <Select id="product-purchase-target" value={purchase.target} onChange={e => setPurchase({ target: e.target.value })}>
+                <option value="self">当前页跳转</option>
+                <option value="blank">新标签页打开</option>
+              </Select>
+            </div>
+          </div>
+          <Field label="购买链接" htmlFor="product-purchase-url" error={urlError}>
+            <Input id="product-purchase-url" value={purchase.url} placeholder="留空使用该列表的默认购物车链接"
+              maxLength={2048} aria-invalid={urlError ? true : undefined}
+              onChange={e => { setPurchase({ url: e.target.value }); setUrlError('') }} />
+          </Field>
+        </section>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" size="sm" onClick={onCancel}>取消</Button>
           <Button type="submit" size="sm">应用到草稿</Button>
@@ -95,7 +128,7 @@ function ProductForm({ title, value, onSubmit, onCancel }) {
   )
 }
 
-export default function MemberContent({ workspace, scope = 'home', block }) {
+export default function MemberContent({ workspace, scope = 'home', block, navigate }) {
   /* 页头操作区引用：悬浮操作条观察它是否滚出视野。
      必须声明在**本组件的第一个 Hook 位置**且早于任何提前 return，
      否则会触发 React #300（Rendered more hooks than during the previous render）。
@@ -193,30 +226,41 @@ export default function MemberContent({ workspace, scope = 'home', block }) {
       {scope === 'products' && (
       <Card>
         <CardHeader>
-          <CardTitle>产品列表顶部</CardTitle>
+          <CardTitle>产品列表页头与购买按钮</CardTitle>
           <CardDescription>
-            「我的产品 / 各分类产品列表」页面的标题、说明与顶部介绍。
-            全局默认作用于所有产品列表入口；每个菜单可单独设置。
+            设置「我的产品」及各分类产品列表的页头文案和购买按钮。各列表可继承上级入口或全局默认，也可单独设置。
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {workspace && <EffectiveSources domain="member" id="products" dirty={workspace.dirty} revision={workspace.revision}
+            onEditProduct={id => {
+              if (id === null) { setPlistEditing({ node:null, value:content.product_list.default }); return }
+              const hit = findNode(productNodes,id)
+              if (hit) setPlistEditing({ node:hit.node, value:content.product_list.overrides?.[id] || { enabled:0, title:'', description:'', html:'' } })
+              else toast('当前草稿中找不到这个入口，请核对侧边栏设置', 'error')
+            }}
+            onEditMenu={id=>navigate(publicSettingRoute('member','sidebar',{menu:id}))}/>}
           <p className="rounded-lg border border-dashed border-line bg-surface-alt/40 px-4 py-3 text-[13px] leading-5 text-muted-foreground">
-            下方按会员菜单的分组、层级和顺序展示。点击“编辑”修改对应入口的标题、说明和介绍。
-            菜单层级与顺序请在「公共设置 → 菜单」中调整。
+            下方按会员菜单的分组、层级和顺序展示。点击「编辑」修改对应入口的文案和购买按钮。
+            菜单名称、层级、顺序、链接及关联商品在 <a href={`#${publicSettingRoute('member', 'sidebar')}`} className="font-medium text-ink underline underline-offset-2">公共设置 → 菜单</a> 调整。
           </p>
           <ProductListEntries tree={productNodes} config={content.product_list}
-            onEdit={(node, value) => setPlistEditing({ key: node?.id, kind: node ? 'override' : 'default', label: node?.label, value })}
+            onEdit={(node, value) => setPlistEditing({ node, value })}
             onToggle={(node, value) => setContentSection('product_list', { ...content.product_list, overrides: { ...content.product_list.overrides, [node.id]: { ...value, enabled: Number(value.enabled) === 1 ? 0 : 1 } } })}
           />
 
           {plistEditing && (
             <ProductForm
-              title={plistEditing.kind === 'default' ? '编辑：全局默认' : '编辑：' + plistEditing.label}
+              title={`编辑产品列表 · ${plistEditing.node?.label || '全局默认'}`}
               value={plistEditing.value}
+              fallback={productCopyFallback(content.product_list, plistEditing.node)}
+              purchaseFallback={productPurchaseFallback(content.product_list, plistEditing.node)}
+              canInherit={!!plistEditing.node}
+              saveLabel={workspace ? '保存产品列表配置' : '保存'}
               onCancel={() => setPlistEditing(null)}
               onSubmit={(block) => {
-                const { key, kind } = plistEditing
-                if (kind === 'default') {
+                const key = plistEditing.node?.id
+                if (!key) {
                   setContentSection('product_list', { ...content.product_list, default: block })
                 } else {
                   setContentSection('product_list', {

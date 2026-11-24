@@ -236,7 +236,7 @@ def enrich(out, root):
                 label='页面文字' if mid.startswith(('sol-','page-')) else MODULE_NAMES.get(mid,scopes['page:'+pk+':content']['label'].replace('内容',''))
                 mods.append({'id':mid,'label':label,'fixed':True});known.add(mid)
         editors['page:'+pk]={'id':'page:'+pk,'domain':'website','label':name+'配置','pageKey':pk,'category':p['category'],'route':p['route'],'sections':{'content':'page:'+pk+':content','layout':'page:'+pk+':layout','seo':'page:'+pk+':seo'},'fields':list(pagefields.values()),'modules':mods,'kind':'page'}
-    for id,label,ids in [('header','头部配置',['site-info','site-menu','site-support']),('footer','底部配置',['site-footer']),('float','悬浮工具配置',['site-float']),('seo-default','搜索引擎默认设置',['site:seo']),('custom','自定义 CSS / JS',['site-custom'])]:
+    for id,label,ids in [('header','头部配置',['site-info','site-menu','site-support']),('footer','底部配置',['site-footer']),('float','悬浮工具配置',['site-float']),('reading','文章详情',['site-reading']),('seo-default','搜索引擎默认设置',['site:seo']),('custom','自定义 CSS / JS',['site-custom'])]:
         editors[id]={'id':id,'domain':'website','label':label,'kind':'public','sections':{s:s for s in ids},'fields':[]}
     for id,s in scopes.items():
         if s['kind']=='shared': editors['common:'+s['moduleId']]={'id':'common:'+s['moduleId'],'domain':'website','label':MODULE_NAMES.get(s['moduleId'],s['label'])+'通用内容','kind':'public','sections':{id:id},'fields':[],'affectedPageKeys':s['affectedPageKeys']}

@@ -14,11 +14,12 @@ const {chromium}=createRequire(path.join(root,'cra1-theme/scripts/package.json')
 let mode='fail',calls=0,delay=0,expiry=null
 const title='服务安排与使用说明'
 const item=()=>({id:'notice-one',revision:1,title,label:'通知',summary:'使用说明',detail:'<p>'+('长说明IPv6：2001:db8:abcd:0123:4567:89ab:cdef:0123。'.repeat(20))+'</p><pre>'+('configuration-key-'.repeat(60))+'</pre><p><a href="#end">阅读相关说明</a></p>',expires_in:expiry})
+const second={id:'notice-two',revision:1,title:'维护计划',summary:'升级安排'}
 const server=http.createServer((req,res)=>{
  const p=new URL(req.url,'http://fixture.invalid').pathname
  if(p==='/bundle.js'){res.setHeader('Content-Type','text/javascript');res.end(js);return}
  if(p==='/style.css'){res.setHeader('Content-Type','text/css');res.end(css);return}
- if(p==='/cra1-shared/notifications.php'){calls++;setTimeout(()=>{res.setHeader('Content-Type','application/json');res.end(JSON.stringify(mode==='fail'?{status:503,msg:'SQLSTATE /www/private.php token=fixture-secret'}:mode==='denied'?{status:401}:{status:200,data:{items:mode==='empty'?[]:[item()],refresh_after:1,member_authenticated:false}}))},delay);return}
+ if(p==='/cra1-shared/notifications.php'){calls++;setTimeout(()=>{res.setHeader('Content-Type','application/json');res.end(JSON.stringify(mode==='fail'?{status:503,msg:'SQLSTATE /www/private.php token=fixture-secret'}:mode==='denied'?{status:401}:{status:200,data:{items:mode==='empty'?[]:mode==='two'?[item(),second]:[item()],refresh_after:1,member_authenticated:false}}))},delay);return}
  res.setHeader('Content-Type','text/html; charset=utf-8');res.end('<!doctype html><html data-cra1-theme="website"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/style.css"><style>body{margin:0;font:14px/1.6 system-ui}main{max-width:1100px;margin:auto;padding:16px}.cra1-notification-center__article{max-height:210px;overflow:auto}</style><main><h1>所有通知</h1><div data-cra1-notification-center></div></main><script src="/bundle.js"></script></html>')
 })
 await new Promise(r=>server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+server.address().port
@@ -53,5 +54,23 @@ try{
  mode='ready';expiry=.45;await p.getByRole('button',{name:'重新加载'}).click();await p.locator('.cra1-notification-center__title').waitFor();mode='fail';await p.locator('.cra1-notification-center__title').waitFor({state:'hidden'});check(true,'retained content still expires during read failures')
  mode='empty';expiry=null;await p.getByRole('searchbox').fill('');await p.waitForFunction(()=>document.querySelector('.cra1-notification-center__message').textContent==='暂无生效中的通知。')
  check(await p.getByRole('button',{name:'重新加载'}).isHidden(),'successful empty response has no failure retry')
+ mode='two'
+ await p.goto(origin+'/?notice=notice-one')
+ const search=p.getByRole('searchbox'),heading=p.locator('.cra1-notification-center__title')
+ await heading.getByText(title,{exact:true}).waitFor()
+ await search.fill('维护')
+ check(await heading.textContent()===second.title,'search can temporarily display a different notice')
+ await search.fill('')
+ check(await heading.textContent()===title,'clearing search restores the linked notice')
+ await search.fill('维护')
+ await p.locator('.cra1-notification-center__entry').click()
+ check(new URL(p.url()).searchParams.get('notice')===second.id,'selecting a result updates the link')
+ await p.goBack()
+ check(await heading.textContent()===title,'back restores the linked notice even after filtering')
+ await p.goForward()
+ check(await heading.textContent()===second.title,'forward restores the selected result')
+ await p.reload()
+ await heading.getByText(second.title,{exact:true}).waitFor()
+ check(await search.inputValue()==='','reloading a shared link opens the selected notice')
  check(errors.length===0,'no browser exceptions');console.log(JSON.stringify({status:'passed',checks:checks.length,errors,businessWrites:0}))
 }finally{await browser.close();await new Promise(r=>server.close(r))}

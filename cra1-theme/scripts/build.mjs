@@ -36,6 +36,7 @@ if(identityAudit.status!==0)throw new Error('CRA1 identity/license audit failed;
 if(native.format!==1)throw new Error('Native reference input is unsupported.')
 const nativeRefs=Object.fromEntries(Object.entries(native.references).map(([p,target])=>[p.replaceAll('{release}',release),target]))
 const nativeHashes=new Map(native.native_dependencies.map(row=>[row.path,row.observed_sha256]))
+const retiredGoodsList=native.retired_member_goods_list
 function run(args,cwd,extra={}){const result=spawnSync(process.execPath,args,{cwd,env:{...process.env,...extra},stdio:'inherit'});if(result.status!==0)throw new Error('Build failed: '+args.join(' '))}
 function copyRegularTree(from,to){
   if(!fs.existsSync(from))return
@@ -45,6 +46,12 @@ function copyRegularTree(from,to){
     if(ent.isDirectory())copyRegularTree(src,dst)
     else if(ent.isFile()){
       const rel=path.relative(output,dst).split(path.sep).join('/'),target=nativeRefs[rel]
+      // An older installation can have a local copy instead of a link.
+      if(rel===`public/clientarea/template/pc/cra1/releases/${release}/api/goodsList.js`&&retiredGoodsList){
+        const observed=createHash('sha256').update(fs.readFileSync(src)).digest('hex')
+        if(observed!==retiredGoodsList.observed_sha256)throw new Error('Retired member goodsList.js differs from its registered native source.')
+        continue
+      }
       if(target){
         const observed=createHash('sha256').update(fs.readFileSync(src)).digest('hex')
         if(observed!==nativeHashes.get(target))throw new Error('Native reference source changed; review ownership before building: '+rel)

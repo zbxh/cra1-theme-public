@@ -49,7 +49,29 @@
 .cart-page.cra1-basket-page .footer-box .total-price{font-size:24px!important;color:var(--cui-title)!important;font-weight:600}
 /* Reserve the rendered footer, including wrapped totals and the device safe area. */
 .cart-page.cra1-basket-page .goods-box{padding-bottom:calc(var(--cra1-basket-footer-height,160px) + 12px)!important}
-html:not([data-cra1-native-module]) .template.cra1-basket-page .el-footer{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))!important}
+.cra1-basket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-bottom: 22px;
+}
+.template.cra1-basket-page .cra1-basket-header .main-title { margin: 0 !important; }
+.template.cra1-basket-page .cra1-basket-header .search-box {
+  flex: 0 1 260px;
+  min-width: 0;
+  margin: 0 !important;
+}
+.template.cra1-basket-page .cra1-basket-header .search-box .el-input { width: 100%; }
+html:not([data-cra1-native-module]) .template.cra1-basket-page .el-footer {
+  height: auto !important;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+}
+@media (max-width: 767px) {
+  .cra1-basket-header { margin-bottom: 16px; }
+  .template.cra1-basket-page .cra1-basket-header .search-box { flex-basis: 100%; }
+}
 @media(hover:hover){.cart-page:is(.cra1-confirm-page,.cra1-basket-page) .shopping-goods:hover{border-color:var(--cui-line)!important;box-shadow:inset 0 1px 0 #fff,0 5px 20px color-mix(in srgb,var(--cui-night) 4.314%,transparent),0 0 0 2px #b7a17b0c}.cart-page:is(.cra1-confirm-page,.cra1-basket-page) .el-button--primary:hover{box-shadow:inset 0 1px 0 color-mix(in srgb,var(--cui-white) 25.098%,transparent),0 0 0 3px #ae967625,0 4px 12px color-mix(in srgb,var(--cui-night) 14.902%,transparent)!important}}
 @media(max-width:1200px){.cra1-confirm-layout{grid-template-columns:minmax(0,1fr) 275px;gap:16px}.cart-page.cra1-confirm-page .main-card{padding:18px!important}.cra1-confirm-summary{padding:20px}}
 @media(max-width:1024px){.cra1-confirm-layout{grid-template-columns:minmax(0,1fr)}.cra1-confirm-summary{position:static}.cra1-confirm-summary h2{margin-bottom:14px}.template.cra1-confirm-page .cra1-confirm-summary .footer-right{gap:18px!important}.cra1-confirm-summary .btn-box{max-width:480px}.cra1-confirm-summary .total-price{font-size:26px!important}}

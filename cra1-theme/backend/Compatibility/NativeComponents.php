@@ -7,7 +7,13 @@ final class NativeComponents
 {
     public static function registry(): array
     {
-        return \CRA1\Theme\Files::json(CRA1_THEME_BACKEND.'/Compatibility/native-components.json');
+        static $registry;
+        return $registry??($registry=\CRA1\Theme\Files::json(CRA1_THEME_BACKEND.'/Compatibility/native-components.json'));
+    }
+
+    public static function usesThemeAssets(string $name): bool
+    {
+        return in_array($name,self::registry()['versioned']??['payDialog'],true);
     }
 
     public static function forPath(string $request): array
@@ -23,7 +29,7 @@ final class NativeComponents
             $visiting[$name]=true;
             foreach ($registry['dependencies'][$name]??[] as $dependency) $visit($dependency);
             $relative=$registry['paths'][$name];
-            if (!is_string($relative)||!preg_match('~^components/([A-Za-z][A-Za-z0-9_]*)/\1\.js$~D',$relative)) throw new \RuntimeException('Invalid native component path');
+            if (!is_string($relative)||!preg_match('~^components/[A-Za-z][A-Za-z0-9_]*/'.preg_quote($name,'~').'\.js$~D',$relative)) throw new \RuntimeException('Invalid native component path');
             $scripts[$name]=$relative;unset($visiting[$name]);
         };
         $names=$registry['groups'][$group];

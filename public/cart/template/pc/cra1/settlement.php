@@ -230,6 +230,6 @@
   <!-- =======页面独有======= -->
   <script src="/{$template_catalog_cart}/template/{$themes_cart}/api/shopping.js"></script>
   <script src="{:cra1_theme_asset_url('native', 'components/payDialog/payDialog.js', '/clientarea/template/pc/cra1/releases/20261017-compat-v3/components/payDialog/payDialog.js')}"></script>
-  <script src="/{$template_catalog}/template/{$themes}/components/cra1EventCode/eventCode.js"></script>
+  <script src="{:cra1_theme_asset_url('native', 'components/cra1EventCode/eventCode.js', '/clientarea/template/pc/cra1/components/cra1EventCode/eventCode.js')}"></script>
   <script src="{:cra1_theme_asset_url('cart', '20261013-security-snapshot-v1/js/cart-config.js', '/cart/template/pc/cra1/releases/20261013-security-snapshot-v1/js/cart-config.js')}"></script>
 <script src="{:cra1_theme_asset_url('cart', '20261017-compat-v3/js/settlement.js', '/cart/template/pc/cra1/releases/20261017-compat-v3/js/settlement.js')}"></script>

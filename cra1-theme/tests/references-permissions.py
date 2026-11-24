@@ -59,6 +59,7 @@ try{
         for name in files:
             (Path(directory) / name).chmod(0o644)
     runtime = site / 'runtime/cra1_theme'
+    os.chown(runtime.parent, account.pw_uid, account.pw_gid)
     os.chown(runtime, account.pw_uid, account.pw_gid)
     theme = site / 'public/cart/template/mobile/cra1'
     parent = theme.parent

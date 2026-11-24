@@ -5,6 +5,7 @@ import { Input, Label, Textarea, Select } from '@ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
 import { Alert, Badge } from '@ui/feedback'
 import WorkspaceFrame from '../components/WorkspaceFrame'
+import EffectiveSources from '../components/EffectiveSources'
 import VisualField from '../components/VisualField'
 import Switch from '../ui/Switch'
 import registry from '../workspace.registry.json'
@@ -51,6 +52,6 @@ function PublicEditor({w,query,navigate,showNavigation=true}){
 }
 export default function VisualWebsite({editorId,query='',navigate,embedded=false}){
   const editor=registry.editors[editorId]||registry.editors['page:home']
-  const frame=<WorkspaceFrame key={editor.id} domain="website" editorId={editor.id} title={editor.label} saveDescription={embedded?'保存当前设置的全部修改':undefined}>{w=>editor.kind==='page'?<PageEditor w={w} query={query} navigate={navigate}/>:<PublicEditor w={w} query={query} navigate={navigate} showNavigation={!embedded}/>}</WorkspaceFrame>
+  const frame=<WorkspaceFrame key={editor.id} domain="website" editorId={editor.id} title={editor.label} saveDescription={embedded?'保存当前设置的全部修改':undefined}>{w=>editor.kind==='page'?<div className="space-y-4"><EffectiveSources domain="website" id={editor.id} dirty={w.dirty} revision={w.revision} navigate={navigate}/><PageEditor w={w} query={query} navigate={navigate}/></div>:<PublicEditor w={w} query={query} navigate={navigate} showNavigation={!embedded}/>}</WorkspaceFrame>
   return embedded?frame:<div className="space-y-5"><div className="editor-page-header"><div><p className="text-sm text-muted-foreground">官网主题</p><h1 className="text-2xl font-semibold">{editor.label}</h1></div>{editor.route&&<Button variant="outline" onClick={()=>window.open(editor.route,'_blank','noopener')}><ExternalLink className="size-4"/>查看已发布页面</Button>}</div>{frame}</div>
 }

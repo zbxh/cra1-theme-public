@@ -73,13 +73,15 @@ try{
    const result=await page.evaluate(()=>{
     const rect=n=>{const {top,right,bottom,left,width,height}=n.getBoundingClientRect();return {top,right,bottom,left,width,height};};
     const footer=document.querySelector('.cra1-basket-page .el-footer'),card=footer.querySelector('.footer-box');
+    const header=document.querySelector('.cra1-basket-header');
+    const title=rect(header.querySelector('.main-title')),search=rect(header.querySelector('.search-box'));
     const button=footer.querySelector('.buy-btn'),total=footer.querySelector('.footer-right p'),r=rect(button);
     const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
     const quantity=[...document.querySelectorAll('.cra1-basket-page .el-input-number')].filter(n=>n.getClientRects().length).map(n=>{
      const input=n.querySelector('.el-input__inner');
      return {input:rect(input),steps:[...n.querySelectorAll('.el-input-number__decrease,.el-input-number__increase')].map(step=>({rect:rect(step),icon:rect(step.querySelector('i')),disabled:step.classList.contains('is-disabled')}))};
     });
-    return {viewport:{width:innerWidth,height:innerHeight},footer:rect(footer),card:rect(card),button:{...r,disabled:button.disabled,hit:hit===button||button.contains(hit)},total:rect(total),quantity,overflow:document.documentElement.scrollWidth>innerWidth+1,padding:parseFloat(getComputedStyle(document.querySelector('.goods-box')).paddingBottom)};
+    return {viewport:{width:innerWidth,height:innerHeight},footer:rect(footer),card:rect(card),button:{...r,disabled:button.disabled,hit:hit===button||button.contains(hit)},total:rect(total),title,search,quantity,overflow:document.documentElement.scrollWidth>innerWidth+1,padding:parseFloat(getComputedStyle(document.querySelector('.goods-box')).paddingBottom)};
    });
    report.cases.push({width,state,...result});save();
    await page.screenshot({path:path.join(out,`${width}-${state}.png`),fullPage:false});
@@ -88,6 +90,7 @@ try{
    check(result.total.top>=result.card.top&&result.total.bottom<=result.card.bottom+1,'total fits inside the footer card '+label);
    check(result.button.bottom<=result.card.bottom+1&&result.card.bottom<=result.footer.bottom+1,'footer contains both rows '+label);
    check(!result.overflow,'cart has no horizontal overflow '+label);
+   check(result.title.bottom+8<=result.search.top||result.title.right+8<=result.search.left,'cart search clears the page title '+label);
    check(result.button.disabled||result.button.hit,'enabled checkout button is not covered '+label);
    for(const q of result.quantity){
     check(q.input.width>=100,'quantity value has room between the step buttons '+label);
@@ -99,6 +102,11 @@ try{
   await open();await page.locator('.footer-left .all-check').click();
   await page.waitForFunction(()=>!document.querySelector('.buy-btn').disabled);
   await measure('selected');
+  if(width===1440){
+   await page.setViewportSize({width:320,height:700});
+   await measure('resize-selected');
+   await page.setViewportSize({width,height:1000});
+  }
   const quantity=page.locator('.cra1-basket-page .el-input-number:visible').first();
   check(await quantity.locator('.el-input-number__decrease').evaluate(n=>n.classList.contains('is-disabled')),'minimum quantity keeps decrease disabled '+width);
   await quantity.locator('.el-input-number__increase').click();
@@ -120,6 +128,10 @@ try{
   fixture.items=0;await open();
   check(await page.locator('.buy-btn').isDisabled(),'empty cart keeps checkout disabled '+width);
   await measure('empty');
+  if(width===1440){
+   await page.setViewportSize({width:320,height:700});
+   await measure('resize-empty');
+  }
   // Reflow without reloading must reserve the newly measured footer height.
   await page.setViewportSize({width:width<=480?820:320,height:700});
   await measure('resized');

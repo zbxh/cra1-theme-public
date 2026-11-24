@@ -94,6 +94,16 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page > .el-con
   background: var(--cui-page);
 }
 
+/* The separately selected V10 shell uses a sticky sidebar beside the cart. */
+html[data-cra1-cart-native-shell]:not([data-cra1-native-module]) .cart-page > .el-container {
+  flex-direction: row;
+}
+
+html[data-cra1-cart-native-shell]:not([data-cra1-native-module]) .cart-page > .el-container > .el-container {
+  flex-direction: column;
+  min-width: 0;
+}
+
 /* 价格数字：表格数字对齐 */
 .cart-page:not([data-cra1-native-module]) .price-num,
 .cart-page:not([data-cra1-native-module]) .item-price,

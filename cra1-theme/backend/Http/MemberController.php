@@ -54,7 +54,33 @@ final class MemberController
                     break;
                 case 'productList':
                     if (!NativeAuthorization::allows('app\\home\\controller\\HostController::list')) return $this->denied();
-                    $result = ['status'=>200,'data'=>(new \CRA1\Theme\Compatibility\ProductList())->read($request->param())];
+                    $pins = new \CRA1\Theme\Storage\ProductPins(CRA1_THEME_ROOT, (int)get_client_id(), $self);
+                    $available = true;
+                    try { $order = $pins->listOrder(); }
+                    catch (\Throwable $e) {
+                        $order = [];
+                        $available = false;
+                        error_log('CRA1: product pins could not be read');
+                    }
+                    $data = (new \CRA1\Theme\Compatibility\ProductList())->read($request->param(), $order);
+                    $data['pins_available'] = $available;
+                    if ($request->param('include_actions') === '1' || $request->param('include_actions') === 1) {
+                        try { $data['ticket_entry'] = \CRA1\Theme\Compatibility\ProductTicket::entry(CRA1_THEME_ROOT); }
+                        catch (\Throwable $e) { $data['ticket_entry'] = ''; }
+                    }
+                    $result = ['status'=>200,'data'=>$data];
+                    break;
+                case 'productPin':
+                    if (!NativeAuthorization::allows('app\\home\\controller\\HostController::list')) return $this->denied();
+                    $pinned = $request->param('pinned');
+                    if (!is_bool($pinned)) throw new \InvalidArgumentException('请选择置顶或取消置顶');
+                    $id = (int)$request->param('id');
+                    (new \CRA1\Theme\Storage\ProductPins(CRA1_THEME_ROOT, (int)get_client_id(), $self))->set($id, $pinned);
+                    $result = ['status'=>200,'data'=>['id'=>$id,'pinned'=>$pinned]];
+                    break;
+                case 'productTicket':
+                    $url = \CRA1\Theme\Compatibility\ProductTicket::forHost(CRA1_THEME_ROOT, $request->param('id'));
+                    $result = ['status'=>200,'data'=>['url'=>$url]];
                     break;
                 case 'field':
                     if (!NativeAuthorization::allows('app\\home\\controller\\HostController::index')) return $this->denied();

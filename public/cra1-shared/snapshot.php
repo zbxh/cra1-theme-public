@@ -10,7 +10,7 @@ try{
     require_once CRA1_THEME_BACKEND.'/Storage/member_store.php';
     require_once CRA1_THEME_BACKEND.'/Storage/cart_store.php';
     if($domain==='member'){$store=new \CRA1\Theme\Storage\MemberCenterStore($root.'/runtime');$config=$store->read();$data=$store->snapshotProjection($config);}
-    else{$store=new \CRA1\Theme\Storage\CartThemeStore($root.'/runtime');$config=$store->read();$data=['schema_version'=>\CRA1\Theme\Storage\CartThemeStore::SCHEMA_VERSION,'version'=>(int)$config['version'],'content'=>$store->publicContent($config),'custom_code'=>CRA1ThemePublicProjection::code($config['custom_code']),'projection_version'=>2];}
+    else{$store=new \CRA1\Theme\Storage\CartThemeStore($root.'/runtime');$config=$store->read();$data=method_exists($store,'snapshotProjection')?$store->snapshotProjection($config):['schema_version'=>\CRA1\Theme\Storage\CartThemeStore::SCHEMA_VERSION,'version'=>(int)$config['version'],'content'=>$store->publicContent($config),'custom_code'=>CRA1ThemePublicProjection::code($config['custom_code']),'projection_version'=>2];}
     // Effective features and disabled content are projected by the same store implementation.
     echo json_encode(['status'=>200,'msg'=>'已读取','code'=>'OK','data'=>$data],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
 }catch(Throwable $e){http_response_code(503);echo json_encode(['status'=>503,'msg'=>'展示配置暂时无法读取','code'=>'SNAPSHOT_UNAVAILABLE'],JSON_UNESCAPED_UNICODE);}

@@ -66,8 +66,9 @@ check(fileinode($site.'/'.$helper)===$inode&&(fileperms($site.'/lib')&0777)===$m
 $files[$helper]='changed-helper';$files[$command]='changed-command';$hash=archive($archive,$files);
 $check=$updater->preflight($archive);
 check(!$check['can_apply'],'actually changed read-only helpers still stop before any update');
-check(count($check['blockers'])===1&&strpos($check['blockers'][0],'lib/')!==false&&strpos($check['blockers'][0],'bin/')!==false,'permission failures are grouped with actionable relative directories');
-check(strpos($check['blockers'][0],$site)===false,'permission explanation omits the absolute server path');
+$permissionMessages=implode("\n",$check['blockers']);
+check(count($check['blockers'])===2&&strpos($permissionMessages,'lib/')!==false&&strpos($permissionMessages,'bin/')!==false,'permission failures identify both actionable relative directories');
+check(strpos($permissionMessages,$site)===false,'permission explanations omit the absolute server path');
 check(!is_file($temp.'/cra1_theme/distribution/pending.json'),'blocked preflight creates no update transaction');
 try{$updater->apply($archive,$hash);check(false,'blocked apply must fail');}catch(RuntimeException $error){check(true,'server rejects blocked apply independently of the browser');}
 check(file_get_contents($site.'/public/web/cra1/page.js')==='before','blocked apply leaves installed files intact');
@@ -131,14 +132,17 @@ echo json_encode(['status'=>'passed','checks'=>count($checks),'results'=>$checks
     (site / 'public/cart/template/pc/cra1/new-source.js').write_text('installed source')
     cache_directory = site / 'runtime/temp'
     cache_directory.mkdir()
-    (cache_directory / ('b' * 32 + '.php')).write_text('<?php /*' + str(site / 'public/cart/template/pc/default/page.php') + '*/ native')
+    def compiled_header(view):
+        return f'<?php /*a:1:{{s:{len(view.encode("utf-8"))}:"{view}";i:1;}}*/ ?>'
+
+    (cache_directory / ('b' * 32 + '.php')).write_text(compiled_header('../public/cart/template/pc/default/page.php') + 'native')
     process = subprocess.Popen([*prefix, args.php, str(script), str(site)], text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     for _ in range(500):
         if (site / 'runtime/theme-cache-trigger').is_file() or process.poll() is not None:
             break
         time.sleep(0.01)
     if process.poll() is None:
-        (cache_directory / ('a' * 32 + '.php')).write_text('<?php /*' + str(site / 'public/web/cra1/page.php') + '*/ theme')
+        (cache_directory / ('a' * 32 + '.php')).write_text(compiled_header('../public/cart/template/pc/cra1/page.php') + 'theme')
         (site / 'runtime/theme-cache-placed').write_text('ready')
     stdout, stderr = process.communicate(timeout=15)
     result = subprocess.CompletedProcess(process.args, process.returncode, stdout, stderr)

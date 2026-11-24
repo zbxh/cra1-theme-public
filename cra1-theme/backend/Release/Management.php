@@ -10,14 +10,30 @@ final class Management
         $root=$GLOBALS['ROOT'];$actor=theme_actor();
         theme_require_role(in_array($action,['check','history','diagnostics','online.check'],true)?['admin','super_admin']:['super_admin']);
         $updater=new Updater($root,$GLOBALS['SLUG']);$dir=$root.'/runtime/cra1_theme/distribution';
+        if($action==='progress.get')return ['status'=>200,'data'=>(new OperationProgress($root,$GLOBALS['THEME_SESSION_HASH'],$p['operation']??null))->read()];
+        $steps=['upload'=>'接收上传的安装包','local.import'=>'读取本地安装包','online.download'=>'下载安装包','apply'=>'检查安装包','rollback'=>'回退主题','recover'=>'恢复中断更新'];
+        $phase=$steps[$action]??null;$progress=null;
+        if($phase!==null&&isset($p['operation'])){
+            $progress=new OperationProgress($root,$GLOBALS['THEME_SESSION_HASH'],$p['operation']);$progress->step($phase);
+        }
+        try{
         switch($action){
             case 'lifecycle.get': case 'lifecycle.plan': case 'lifecycle.apply':
                 $data=self::lifecycle($root,$action,$p);break;
-            case 'check': $data=Inspector::inspect($root,['entry'=>$GLOBALS['SLUG'],'https'=>!empty($GLOBALS['THEME_NETWORK']['https']),'origin'=>$GLOBALS['THEME_SETTINGS']['canonical_url']??'']);$data['nginx_rules']=ServerRules::nginx($GLOBALS['SLUG']);break;
+            case 'check': $data=CustomerData::inspection(Inspector::inspect($root,['entry'=>$GLOBALS['SLUG']]));break;
             case 'diagnostics': $data=Diagnostics::collect($root,$GLOBALS['SLUG'],['https'=>!empty($GLOBALS['THEME_NETWORK']['https'])]);break;
             case 'history': $data=$updater->history();break;
             case 'online.settings.get': $data=(new OnlineUpdateSettings($root))->get();break;
             case 'online.settings.save': $data=(new OnlineUpdateSettings($root))->save((string)($p['github_prefix']??''));break;
+            case 'modules.get': case 'modules.verify.get': case 'modules.save':
+                $settings=new \CRA1\Theme\Compatibility\ModulePresentation($root);
+                $store=new \MemberCenterStore($root.'/runtime');
+                $catalogue=$store->installedModules();
+                if ($action === 'modules.get') $data = $settings->listing($catalogue);
+                elseif ($action === 'modules.verify.get') {
+                    $data = $settings->verification($catalogue, $p, [$store, 'moduleVerificationDirectory']);
+                } else $data = $settings->save($catalogue, $p);
+                break;
             case 'online.check':
                 $current=Files::json($dir.'/current.json',true)['manifest']??[];
                 $settings=(new OnlineUpdateSettings($root))->get();
@@ -29,6 +45,7 @@ final class Management
                     $pointer=is_file($dir.'/current.json')?hash_file('sha256',$dir.'/current.json'):'missing';
                     $settings=(new OnlineUpdateSettings($root))->get();
                     $source=(new OnlineUpdates(null,$settings['github_prefix']))->download((string)($p['version']??''),$path,$current);
+                    $phase='解包并检查文件';if($progress)$progress->step($phase);
                     $data=self::checkCandidate($updater,$dir,$id,$path,(int)$actor['id']);
                     if(($data['version']??'')!==$source['version']||(($data['release_channel']??'')==='test')!==($source['release_channel']==='test'))throw new \InvalidArgumentException('安装包内容与发布版本不一致，请重新检查最新版本');
                     $meta=Files::json($dir.'/candidates/'.$id.'.json');$meta['pointer_sha256']=$pointer;
@@ -45,11 +62,20 @@ final class Management
                 if(in_array($file['error']??UPLOAD_ERR_NO_FILE,[UPLOAD_ERR_INI_SIZE,UPLOAD_ERR_FORM_SIZE],true))throw new \InvalidArgumentException('安装包超过服务器上传限制，可使用下方的服务器本地导入');
                 if(($file['error']??UPLOAD_ERR_NO_FILE)!==UPLOAD_ERR_OK||!is_uploaded_file($file['tmp_name']??'')||($file['size']??0)>LocalPackages::MAX_BYTES)throw new \InvalidArgumentException('请选择不超过 80MB 的主题安装包 ZIP');
                 [$id,$path]=self::candidatePath($dir);
-                \CRA1\Theme\Failure::attempt('保存上传的安装包',$path,static function()use($file,$path){return move_uploaded_file($file['tmp_name'],$path);},0600);chmod($path,0600);
-                $data=self::checkCandidate($updater,$dir,$id,$path,(int)$actor['id']);break;
+                try{
+                    \CRA1\Theme\Failure::attempt('保存上传的安装包',$path,static function()use($file,$path){return move_uploaded_file($file['tmp_name'],$path);},0600);
+                    \CRA1\Theme\Failure::attempt('设置上传文件权限',$path,static function()use($path){return chmod($path,0600);},0600);
+                    $phase='解包并检查文件';if($progress)$progress->step($phase);
+                    $data=self::checkCandidate($updater,$dir,$id,$path,(int)$actor['id']);
+                }catch(\Throwable $error){
+                    if(is_file($path))@unlink($path);
+                    throw $error;
+                }
+                break;
             case 'local.import':
                 [$id,$path]=self::candidatePath($dir);
                 (new LocalPackages($root))->copyToCandidate((string)($p['file']??''),$path);
+                $phase='解包并检查文件';if($progress)$progress->step($phase);
                 $data=self::checkCandidate($updater,$dir,$id,$path,(int)$actor['id']);break;
             case 'candidate.get': case 'apply':
                 $id=(string)($p['candidate']??'');if(!preg_match('/^[a-f0-9]{32}$/D',$id))throw new \InvalidArgumentException('候选包标识无效');
@@ -59,14 +85,26 @@ final class Management
                 if($action==='candidate.get')$data=CustomerData::candidate($updater->preflight($path)+['candidate'=>$id]);
                 else{
                     if(!hash_equals($meta['sha256'],(string)($p['expectedDigest']??'')))throw new \RuntimeException('请使用当前预检校验值确认');
-                    $data=$updater->apply($path,$meta['sha256'],$meta['pointer_sha256']??null);
-                    unlink($path);unlink($dir.'/candidates/'.$id.'.json');
+                    $data=$updater->apply($path,$meta['sha256'],$meta['pointer_sha256']??null,$progress);
+                    if(!@unlink($path)||!@unlink($dir.'/candidates/'.$id.'.json'))error_log('CRA1 update: could not remove a used candidate');
                 }break;
             case 'rollback': $data=$updater->rollback((string)($p['history']??''));break;
             case 'recover': $data=$updater->recover();break;
             default: throw new \InvalidArgumentException('未知主题管理操作');
         }
         return ['status'=>200,'msg'=>'已完成','data'=>$data];
+        }catch(\Throwable $error){
+            if($phase===null)throw $error;
+            $pending=is_file($dir.'/pending.json');
+            $state=$pending?'recovery_required':(in_array($action,['rollback','recover'],true)?'unknown':'unchanged');
+            if(!$error instanceof UpdateFailure){
+                $reference=\CRA1\Theme\Diagnostics::record($error,$phase,$root);
+                $error=new UpdateFailure($phase,\CRA1\Theme\Diagnostics::reason($error,$root),$state,$error,$reference);
+            }
+            return ['status'=>400,'msg'=>$error->message(),'error'=>$error->details()];
+        }finally{
+            if($progress)$progress->finish();
+        }
     }
 
     private static function lifecycle(string $root,string $action,array $p): array

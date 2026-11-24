@@ -427,17 +427,21 @@ final class CartThemeStore
         return CRA1ThemePublicProjection::content($public);
     }
 
-    /** 写入前台运行时快照（publicContent 投影） */
-    public function writePublicSnapshot(?array $config = null): bool
+    public function snapshotProjection(array $config): array
     {
-        $config = $config ?? $this->read();
-        $snapshot = [
+        return [
             'schema_version' => self::SCHEMA_VERSION,
             'version'        => (int) $config['version'],
             'content'        => $this->publicContent($config),
             'custom_code'    => CRA1ThemePublicProjection::code($config['custom_code']),
             'projection_version' => 2,
         ];
+    }
+
+    /** 写入前台运行时快照（publicContent 投影） */
+    public function writePublicSnapshot(?array $config = null): bool
+    {
+        $snapshot = $this->snapshotProjection($config ?? $this->read());
         if (!is_dir($this->dir)) {
             @mkdir($this->dir, 0755, true);
         }

@@ -13,6 +13,8 @@ final class Routes
             ['POST','security/operation/verify','verify'], ['GET','security/operation/status','status'],
             ['GET','member/avatar','avatar'], ['PUT','member/avatar','saveAvatar'], ['POST','member/avatar/upload','uploadAvatar'],
             ['GET','member/products','products'], ['GET','member/product-list','productList'],
+            ['PUT','member/product-list/:id/pin','productPin'],
+            ['GET','member/host/:id/ticket-entry','productTicket'],
             ['GET','member/search','search'], ['GET','member/host/:id/field/:field','field'],
             ['GET','module/mf_cloud/:id/disk','disks'], ['GET','module/mf_cloud/:id/flow','flow'],
             ['DELETE','module/mf_cloud/:id/disk/:disk/failed','deleteFailedDisk'],

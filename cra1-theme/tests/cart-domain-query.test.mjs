@@ -16,14 +16,14 @@ function fixture(query='') {
     this.$message={warning:message=>warnings.push(message)};this.$mount=()=>this;
   }
   Vue.prototype={};
-  const window={location:{search:query}},document={getElementsByClassName:()=>[{}]};
+  const window={location:{search:query}},document={querySelector:()=>({})};
   const env={window,document,Vue,URLSearchParams,asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},lang:{template_text140:'请输入域名',template_text143:'该后缀不支持中文'},
     domainSuffix:async id=>{calls.push({api:'suffix',id});return response(suffixes)},
     domainSetting:async()=>{calls.push({api:'config'});return response({default_search_domain:'.cn',batch_search_domain:1})},
     domainSearch:async params=>{calls.push({api:'search',...params});return response([{name:params.domain+params.suffix,avail:1}])},
     domainPrice:async params=>{calls.push({api:'price',...params});return response([{buyyear:1,buyprice:'20.00'}])},
     domainBatch:async params=>{calls.push({api:'batch',...params});return response({avail:[],unavail:[],fail:[]})}};
-  vm.runInNewContext(source,env);window.onload();
+  vm.runInNewContext(source,env);
   page.select_first_obj.id=1;page.select_second_obj={id:2,type:'domain'};
   page.domainInput=new URLSearchParams(query).get('domain')||'';page.host_id=7;
   return {page,env,calls,warnings};

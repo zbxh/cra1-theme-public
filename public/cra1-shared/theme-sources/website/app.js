@@ -379,7 +379,7 @@
     /* Configured text navigation. Shared popovers own dismissal and header exclusivity. */
     Alpine.data('headerMenu', function () {
       return {
-        open: false, activeGroup: 0,
+        open: false, activeGroup: 0, clickedOpen: false,
         _root: null, _popover: null, _onResize: null, _groupTimer: null, _focusFrame: null,
         init: function () {
           var self = this;
@@ -393,9 +393,10 @@
           this.$nextTick(function () {
             self._popover = CRA1Shared.UI.createPopover({
               root: self._root, trigger: self.$refs.navTrigger, panel: self.$refs.navPanel,
-              manageVisibility: false, hover: true,
+              manageVisibility: false, hover: true, bindTrigger: !self.$refs.navTrigger.classList.contains('cra1-nav-trigger--icon'),
               onOpenChange: function (value) {
                 self.cancelGroup();
+                if (!value) self.clickedOpen = false;
                 // Position while hidden too: x-show can apply display one frame after nextTick.
                 if (value) self.position();
                 self.open = value;
@@ -404,20 +405,25 @@
             });
           });
         },
+        toggleLinkedMenu: function (event) {
+          if (!this._popover) return;
+          // Moving the mouse onto the arrow can open the panel before the click.
+          this.clickedOpen = !(event.detail === 0 ? this.open : this.clickedOpen);
+          this._popover.setOpen(this.clickedOpen);
+        },
         position: function () {
           var host = this._root.getBoundingClientRect(), panel = this.$refs.navPanel;
           var nav = this._root.closest('.cra1-primary-nav');
-          var trigger = this.$refs.navTrigger.getBoundingClientRect();
           var viewport = document.documentElement.clientWidth;
           var width = 1016;
           // Use one centered width for every menu and keep their pointers inside the card.
-          nav.querySelectorAll('.cra1-nav-trigger').forEach(function (item) {
+          nav.querySelectorAll('.cra1-nav-dropdown').forEach(function (item) {
             var bounds = item.getBoundingClientRect(), center = bounds.left + bounds.width / 2;
             width = Math.max(width, viewport - 2 * (center - 48), 2 * (center + 48) - viewport);
           });
           width = Math.min(width, viewport - 48);
           var left = (viewport - width) / 2;
-          var pointer = Math.max(20, Math.min(trigger.left + trigger.width / 2 - left, width - 20));
+          var pointer = Math.max(20, Math.min(host.left + host.width / 2 - left, width - 20));
           panel.style.width = width + 'px';
           panel.style.left = (left - host.left) + 'px';
           panel.style.setProperty('--cra1-nav-pointer', pointer + 'px');
@@ -1427,6 +1433,8 @@
 
         initEndpoint: function (endpoint, detailSuffix) {
           var self = this;
+          if (this._readingCleanup) this._readingCleanup();
+          this._readingCleanup = null;
           this.endpoint = endpoint;
           this.detailLabel = detailSuffix;
           var request = this._request = (this._request || 0) + 1;
@@ -1495,8 +1503,8 @@
         },
         prepareReading: function () {
           var article = this.$root.querySelector('[data-reading-article]'), content = article && article.querySelector('.reading-content');
-          if (!content || !this.item || content.dataset.preparedId === String(this.item.id)) return;
-          content.dataset.preparedId = this.item.id;
+          if (!content || !this.item || content.dataset.preparedRequest === String(this._request)) return;
+          content.dataset.preparedRequest = String(this._request);
           content.querySelectorAll('p').forEach(function (p) { if (!p.textContent.trim() && !p.querySelector('img,iframe,video,code,table')) p.classList.add('reading-blank'); });
           // Keep wide author tables readable without expanding the whole page.
           // A wrapper preserves native table semantics and column relationships.
@@ -1508,17 +1516,7 @@
             scroll.setAttribute('aria-label', caption && caption.textContent.trim() ? caption.textContent.trim() : '文章表格，可横向滚动');
             table.before(scroll); scroll.appendChild(table);
           });
-          var headings = Array.from(content.querySelectorAll('h1,h2,h3,h4')).filter(function (heading) { return heading.textContent.trim(); });
-          var prior = article.querySelector('.reading-toc'); if (prior) prior.remove();
-          if (headings.length >= 3 && content.textContent.length >= 600) {
-            var toc = document.createElement('details'); toc.className = 'reading-toc'; toc.open = window.innerWidth >= 768;
-            var summary = document.createElement('summary'); summary.textContent = '本文目录'; toc.appendChild(summary);
-            var list = document.createElement('ol');
-            headings.forEach(function (heading, index) {
-              heading.id = 'reading-section-' + index;
-              var li = document.createElement('li'), link = document.createElement('a'); link.href = '#' + heading.id; link.textContent = heading.textContent.trim(); li.appendChild(link); list.appendChild(li);
-            }); toc.appendChild(list); content.before(toc);
-          }
+          this._readingCleanup = setupReadingDirectory(content, article.closest('[data-reading-layout]'));
           content.querySelectorAll('img').forEach(function (img) {
             if (img.closest('a')) return;
             var enable = function () {
@@ -1530,6 +1528,10 @@
             };
             if (img.complete) enable(); else img.addEventListener('load',enable,{once:true});
           });
+        },
+
+        destroy: function () {
+          if (this._readingCleanup) this._readingCleanup();
         },
 
         /** 附件兼容：数组、JSON 字符串或逗号分隔字符串 */
@@ -1862,6 +1864,300 @@
     });
   });
 
+  function setupReadingDirectory(content, layout) {
+    const sidebar = layout?.querySelector('[data-reading-sidebar]');
+    if (!sidebar) return null;
+
+    const headings = [...content.querySelectorAll('h1,h2,h3,h4')].filter(heading => heading.textContent.trim());
+    const entries = [];
+    const roots = [];
+    const parents = [];
+    const byAnchor = new Map();
+    function visibleInArticle(heading) {
+      if (getComputedStyle(heading).visibility !== 'visible') return false;
+      // Alpine may still be revealing the layout while its article HTML is ready.
+      // Only inspect authored containers here, so that reveal does not hide the TOC.
+      for (let node = heading; node !== content; node = node.parentElement) {
+        if (node.matches('[hidden],[aria-hidden="true"]')) return false;
+        const style = getComputedStyle(node);
+        if (style.display === 'none' || style.contentVisibility === 'hidden') return false;
+      }
+      return true;
+    }
+    headings.forEach((heading, index) => {
+      if (!visibleInArticle(heading)) return;
+      const legacy = 'reading-section-' + index;
+      if (!heading.id || document.getElementById(heading.id) !== heading) {
+        let id = legacy;
+        for (let suffix = 2; document.getElementById(id); suffix++) id = legacy + '-' + suffix;
+        heading.id = id;
+      }
+      const rank = Number(heading.tagName.slice(1));
+      while (parents.length && parents[parents.length - 1].rank >= rank) parents.pop();
+      const parent = parents[Math.min(parents.length, 2) - 1];
+      const entry = { heading, rank, parent, children: [], label: heading.textContent.trim().replace(/\s+/g, ' ') };
+      (parent ? parent.children : roots).push(entry);
+      parents.push(entry);
+      entries.push(entry);
+      if (!byAnchor.has(legacy)) byAnchor.set(legacy, entry);
+      byAnchor.set(heading.id, entry);
+    });
+    if (!entries.length) return null;
+
+    const mobile = window.matchMedia('(max-width:767px)');
+    const signalController = new AbortController();
+    const signal = signalController.signal;
+    const aside = document.createElement('div');
+    aside.className = 'reading-toc-side';
+    const collapse = document.createElement('button');
+    collapse.type = 'button';
+    collapse.textContent = '本文目录';
+    collapse.setAttribute('aria-expanded', 'true');
+    collapse.setAttribute('aria-controls', 'cra1-reading-toc');
+    const nav = document.createElement('nav');
+    nav.id = 'cra1-reading-toc';
+    nav.className = 'reading-toc-nav';
+    nav.setAttribute('aria-label', '本文目录');
+    aside.append(collapse, nav);
+    sidebar.prepend(aside);
+    layout.dataset.toc = 'ready';
+
+    const trigger = document.querySelector('[data-reading-open]');
+    const dialog = document.createElement('dialog');
+    dialog.id = 'cra1-reading-toc-sheet';
+    dialog.className = 'reading-toc-sheet';
+    dialog.setAttribute('aria-labelledby', 'cra1-reading-toc-title');
+    const bar = document.createElement('div');
+    bar.className = 'reading-toc-sheet-bar';
+    const title = document.createElement('span');
+    title.id = 'cra1-reading-toc-title';
+    title.textContent = '本文目录';
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.textContent = '×';
+    close.setAttribute('aria-label', '关闭文章目录');
+    bar.append(title, close);
+    dialog.append(bar);
+
+    let active = null;
+    let frame = 0;
+    let jumpOffset = null;
+    let desktopOpen = true;
+    let focusOnClose = true;
+
+    function applyBranches(entry) {
+      const opened = new Set();
+      for (let item = entry; item; item = item.parent) opened.add(item);
+      entries.forEach(item => {
+        if (!item.branch) return;
+        const open = opened.has(item);
+        if (!open && item.group.contains(document.activeElement)) item.branch.focus({preventScroll:true});
+        item.branch.setAttribute('aria-expanded', String(open));
+        item.group.hidden = !open;
+      });
+    }
+
+    function keepCurrentVisible() {
+      if (!active || !nav.clientHeight || !active.link.getClientRects().length) return;
+      const bounds = nav.getBoundingClientRect();
+      const link = active.link.getBoundingClientRect();
+      if (link.top < bounds.top) nav.scrollTop += link.top - bounds.top;
+      else if (link.bottom > bounds.bottom) nav.scrollTop += link.bottom - bounds.bottom;
+    }
+
+    function select(entry) {
+      if (entry === active) return;
+      if (active) active.link.removeAttribute('aria-current');
+      active = entry;
+      if (active) active.link.setAttribute('aria-current', 'location');
+      applyBranches(active);
+      keepCurrentVisible();
+    }
+
+    function syncScroll() {
+      frame = 0;
+      if (!content.getClientRects().length) return;
+      if (jumpOffset !== null && Math.abs(window.scrollY - jumpOffset) < 2) return;
+      jumpOffset = null;
+      const offset = parseFloat(getComputedStyle(entries[0].heading).scrollMarginTop) || 0;
+      let current = null;
+      entries.forEach(entry => {
+        if (entry.heading.getClientRects().length && entry.heading.getBoundingClientRect().top <= offset + 2 && visibleInArticle(entry.heading)) current = entry;
+      });
+      select(current);
+    }
+
+    function scheduleSync() {
+      if (!frame) frame = requestAnimationFrame(syncScroll);
+    }
+
+    function jump(entry, fromClick) {
+      if (!entry.heading.getClientRects().length || !visibleInArticle(entry.heading)) return;
+      if (dialog.open) {
+        focusOnClose = !fromClick;
+        dialog.close();
+      }
+      if (fromClick) {
+        const hash = '#' + encodeURIComponent(entry.heading.id);
+        if (window.location.hash !== hash) window.history.pushState(null, '', hash);
+      }
+      entry.heading.scrollIntoView({block:'start', behavior:'instant'});
+      jumpOffset = window.scrollY;
+      select(entry);
+      applyBranches(entry);
+      keepCurrentVisible();
+      if (fromClick) {
+        if (!entry.heading.hasAttribute('tabindex')) {
+          entry.heading.tabIndex = -1;
+          entry.heading.addEventListener('blur', () => entry.heading.removeAttribute('tabindex'), {once:true});
+        }
+        entry.heading.focus({preventScroll:true});
+      }
+    }
+
+    function buildList(items) {
+      const list = document.createElement('ul');
+      list.className = 'reading-toc-list';
+      list.setAttribute('role', 'list');
+      items.forEach(entry => {
+        const item = document.createElement('li');
+        const row = document.createElement('div');
+        row.className = 'reading-toc-row';
+        const link = document.createElement('a');
+        link.className = 'reading-toc-link';
+        link.href = '#' + encodeURIComponent(entry.heading.id);
+        link.textContent = entry.label;
+        link.addEventListener('click', event => {
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          jump(entry, true);
+        }, {signal});
+        entry.link = link;
+        row.append(link);
+        item.append(row);
+        if (entry.children.length) {
+          const group = buildList(entry.children);
+          group.id = 'cra1-reading-branch-' + entries.indexOf(entry);
+          group.hidden = true;
+          const branch = document.createElement('button');
+          branch.type = 'button';
+          branch.className = 'reading-toc-branch';
+          branch.setAttribute('aria-controls', group.id);
+          branch.setAttribute('aria-expanded', 'false');
+          branch.setAttribute('aria-label', entry.label + '的子目录');
+          branch.addEventListener('click', () => applyBranches(group.hidden ? entry : entry.parent), {signal});
+          entry.branch = branch;
+          entry.group = group;
+          row.append(branch);
+          item.append(group);
+        }
+        list.append(item);
+      });
+      return list;
+    }
+
+    function applyHash() {
+      let id = window.location.hash.slice(1);
+      try { id = decodeURIComponent(id); } catch (_) { /* Keep literal fragments. */ }
+      const entry = byAnchor.get(id);
+      if (entry && content.getClientRects().length) jump(entry, false);
+      else scheduleSync();
+    }
+
+    function applyMode() {
+      if (mobile.matches && trigger) {
+        dialog.append(nav);
+        nav.hidden = false;
+        trigger.hidden = false;
+      } else {
+        if (dialog.open) {
+          focusOnClose = false;
+          dialog.close();
+        }
+        if (trigger) trigger.hidden = true;
+        aside.append(nav);
+        nav.hidden = !desktopOpen;
+        keepCurrentVisible();
+      }
+    }
+
+    nav.append(buildList(roots));
+    collapse.addEventListener('click', () => {
+      desktopOpen = !desktopOpen;
+      collapse.setAttribute('aria-expanded', String(desktopOpen));
+      nav.hidden = !desktopOpen;
+      if (desktopOpen) applyBranches(active);
+      keepCurrentVisible();
+    }, {signal});
+    if (trigger) {
+      document.body.append(dialog);
+      trigger.setAttribute('aria-controls', dialog.id);
+      trigger.addEventListener('click', () => {
+        scheduleSync();
+        applyBranches(active);
+        dialog.showModal();
+        trigger.setAttribute('aria-expanded', 'true');
+        close.focus();
+        keepCurrentVisible();
+      }, {signal});
+      close.addEventListener('click', () => dialog.close(), {signal});
+      dialog.addEventListener('click', event => {
+        if (event.target !== dialog) return;
+        const bounds = dialog.getBoundingClientRect();
+        if (event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+      }, {signal});
+      dialog.addEventListener('close', () => {
+        trigger.setAttribute('aria-expanded', 'false');
+        if (focusOnClose && mobile.matches) trigger.focus({preventScroll:true});
+        focusOnClose = true;
+      }, {signal});
+    }
+    mobile.addEventListener('change', applyMode, {signal});
+    window.addEventListener('scroll', scheduleSync, {passive:true, signal});
+    window.addEventListener('resize', scheduleSync, {signal});
+    window.addEventListener('hashchange', applyHash, {signal});
+    const observer = new ResizeObserver(scheduleSync);
+    observer.observe(content);
+    applyMode();
+    const initial = requestAnimationFrame(applyHash);
+    return () => {
+      cancelAnimationFrame(initial);
+      cancelAnimationFrame(frame);
+      signalController.abort();
+      observer.disconnect();
+      aside.remove();
+      dialog.remove();
+      delete layout.dataset.toc;
+      if (trigger) {
+        trigger.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.removeAttribute('aria-controls');
+      }
+    };
+  }
+
+  function setupMobileReadingTools() {
+    const tools = document.querySelector('[data-reading-mobile-tools]');
+    if (!tools) return;
+    const top = tools.querySelector('[data-reading-top]');
+    const mobile = window.matchMedia('(max-width:767px)');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const bars = [...document.querySelectorAll('.mobile-action-bar')];
+    function update() {
+      top.hidden = !mobile.matches || window.scrollY < 320;
+    }
+    if (bars.length) {
+      const measure = () => tools.style.setProperty('--reading-action-height', Math.max(...bars.map(bar => bar.getBoundingClientRect().height)) + 'px');
+      const observer = new ResizeObserver(measure);
+      bars.forEach(bar => observer.observe(bar));
+      measure();
+    }
+    window.addEventListener('scroll', update, {passive:true});
+    mobile.addEventListener('change', update);
+    top.addEventListener('click', () => window.scrollTo({top:0, behavior:reduce.matches ? 'instant' : 'smooth'}));
+    update();
+  }
+
   function showReadingImage(source, trigger) {
     var dialog = document.createElement('dialog'); dialog.className = 'reading-lightbox';
     var bar = document.createElement('div'); bar.className = 'reading-lightbox-bar';
@@ -1874,6 +2170,7 @@
   }
 
   function setupPresentation() {
+    setupMobileReadingTools();
     var header = document.querySelector('.cra1-site-header');
     if (!document.querySelector('.anchor-nav') && header) {
       var measure = function () { var height = header.getBoundingClientRect().height; document.documentElement.style.setProperty('--cra1-header-offset',height+'px'); document.documentElement.style.setProperty('--cra1-scroll-offset',(height+16)+'px'); };

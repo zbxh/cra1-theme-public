@@ -1,0 +1,6 @@
+{php}$readingSidebarContent = cra1_article_sidebar_content($data['cra1'] ?? []);{/php}
+<aside class="reading-sidebar" data-reading-sidebar aria-label="文章侧栏">
+    {if $readingSidebarContent !== ''}
+    <div class="reading-sidebar-extra">{$readingSidebarContent|raw}</div>
+    {/if}
+</aside>

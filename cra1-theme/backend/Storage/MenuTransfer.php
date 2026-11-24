@@ -27,42 +27,130 @@ final class MenuTransfer
         }
         return ['navs'=>$navs,'plugins'=>$plugins];
     }
-    public function preview(array $sidebar): array
+    public function preview(array $sidebar,string $origin=''): array
     {
-        self::checkTree($sidebar['nodes']??[]);$errors=$this->store->validateTree($sidebar['nodes']??[],true);if($errors)throw new \InvalidArgumentException(implode('；',array_slice($errors,0,3)));$catalog=$this->catalog();
+        $nodes=$sidebar['nodes']??[];
+        self::checkTree($nodes);
+        $catalog=$this->catalog();
         if(!empty($catalog['error']))throw new \InvalidArgumentException('系统导航读取失败，本次未能完成菜单检查，请重试');
-        $issues=[];$seen=[];$visible=0;$hidden=0;$navs=[];$products=[];
-        foreach($catalog['navs']??[]as$nav)$navs[(int)$nav['id']]=$nav;
-        foreach($catalog['products']??[]as$product)$products[(int)$product['id']]=true;
-        $inspect=function(array $nodes,string $parent='',bool $ancestorHidden=false)use(&$inspect,&$issues,&$seen,&$visible,&$hidden,$navs,$products){
-            foreach($nodes as$n){
-                $path=$parent===''?$n['label']:$parent.' / '.$n['label'];$suppressed=$ancestorHidden||!empty($n['hidden']);
-                if($suppressed){$hidden++;}else{$visible++;}
-                $url=trim((string)($n['url']??''));$type=$n['source_type']??'custom';$kids=$n['children']??[];
-                $issue=function(string $text)use(&$issues,$n,$path){$issues[]=['id'=>$n['id'],'path'=>$path,'message'=>$text];};
-                if(!$suppressed&&$type!=='separator'){
-                    if(!$url&&!$kids&&$type!=='module')$issue('该分组或页面没有链接及可用子项');
-                    if(in_array($type,['system','plugin'],true)&&!empty($n['source_nav_id'])&&!isset($navs[(int)$n['source_nav_id']]))$issue('原系统导航已不存在，请重新选择链接');
-                    if($url&&$url!=='#'){$target=strtolower(ltrim($url,'/'));if(isset($seen[$target]))$issue('与「'.$seen[$target].'」指向相同页面，请确认是否需要保留');else$seen[$target]=$path;}
-                    if($url==='#')$issue('链接尚未完成配置');
-                    if($type==='module'){
-                        $ids=$n['product_id']??[];if(!$ids)$issue('尚未关联商品，请检查产品分类关联');
-                        elseif(array_diff($ids,array_keys($products)))$issue('部分关联商品已不可用，请重新确认商品');
+        $tree=$this->store->sidebarPreview($nodes,$catalog['preview_capabilities']??null);
+        $live=[];
+        $collect=function(array &$list)use(&$collect,&$live,$origin):void{
+            foreach($list as &$node){
+                if($node['name']==='分隔符'&&empty($node['url'])&&empty($node['children']))$node['type']='separator';
+                $node['target']=self::target($node,$origin);
+                $live[$node['id']]=$node['target'];
+                if(!empty($node['children']))$collect($node['children']);
+            }
+        };
+        $collect($tree);
+        $issues=[];$targets=[];$visible=0;$hidden=0;
+        $navs=array_column($catalog['navs']??[],null,'id');
+        $plugins=array_column($catalog['plugins']??[],null,'id');
+        $options=$catalog['navigation_options']??MemberNavigationOptions::build($this->root,array_values($navs),$catalog['plugins']??[]);
+        $pluginPages=[];
+        foreach($options as $option){
+            if(!empty($option['is_plugin'])&&preg_match('~^/?plugin/(\d+)/~',$option['url'],$match))$pluginPages[$option['name']][(int)$match[1]][]=$option['url'];
+        }
+        $products=array_column($catalog['products']??[],null,'id');
+        $inspect=function(array $list,string $parent='',bool $ancestorHidden=false)use(&$inspect,&$issues,&$targets,&$visible,&$hidden,$navs,$plugins,$pluginPages,$products,$live):void{
+            foreach($list as $node){
+                $id=$node['id'];$type=$node['source_type']??'custom';$url=$node['url']??'';$kids=$node['children']??[];
+                $path=$parent===''?$node['label']:$parent.' / '.$node['label'];
+                $suppressed=$ancestorHidden||!empty($node['hidden']);
+                if($suppressed)$hidden++;else $visible++;
+                if($type==='separator'||($node['label']==='分隔符'&&$url===''&&!$kids))continue;
+                $target=$live[$id]??'';
+                $issue=static function(string $message)use(&$issues,$id,$path,$target):void{$issues[]=['id'=>$id,'path'=>$path,'target'=>$target,'message'=>$message];};
+                $source=$navs[(int)($node['source_nav_id']??0)]??null;
+                $pluginId=preg_match('~^/?plugin/(\d+)/~',$url?:($source['url']??''),$match)?(int)$match[1]:0;
+                $sourceIssue=$node['source_issue']??'';
+                if($sourceIssue==='plugin')$issue('导入时未匹配到本站插件页面，请重新选择来源并确认是否显示。');
+                elseif($sourceIssue==='navigation')$issue('导入时未匹配到本站导航，请核对当前链接或重新选择来源。');
+                elseif($pluginId&&empty($plugins[$pluginId]['enabled']))$issue('对应插件已停用或未安装，请启用插件或更换链接。');
+                elseif(in_array($type,['system','plugin'],true)&&(!$source||($type==='plugin')!==!empty($source['plugin'])))$issue('原来源导航无法匹配，请重新选择来源。');
+                elseif(!$suppressed&&!array_key_exists($id,$live))$issue('当前功能或插件不可用，该项不会在前台显示。');
+                elseif(!$suppressed&&($url==='#'||(!$target&&!$kids&&$type!=='module')))$issue('该项没有可跳转的链接，请选择页面或补充子菜单。');
+                if(!$suppressed&&$kids&&!array_filter($kids,static function($child){return empty($child['hidden']);}))$issue('所有直接子项均已隐藏。');
+                if(!$suppressed&&$target){
+                    $key=self::targetKey($target);
+                    $targets[$key][]=['id'=>$id,'path'=>$path,'target'=>$target];
+                    $matches=array_values(array_unique($pluginPages[$node['label']][$pluginId]??[]));
+                    if(count($matches)===1&&!self::matchesPage($target,$matches[0])){
+                        $issue('名称对应的插件页面是 /'.ltrim($matches[0],'/').'，请核对当前跳转。');
                     }
-                    if($kids&&!array_filter($kids,static function($child){return empty($child['hidden']);}))$issue('所有直接子项均已隐藏');
+                }
+                if(!$suppressed&&$type==='module'){
+                    $ids=$node['product_id']??[];
+                    if(!$ids)$issue('尚未关联商品，请检查产品分类关联。');
+                    elseif(array_diff($ids,array_keys($products)))$issue('部分关联商品已不可用，请重新确认商品。');
                 }
                 $inspect($kids,$path,$suppressed);
             }
-        };$inspect($sidebar['nodes']??[]);
-        $caps=$catalog['preview_capabilities']??null;
-        $tree=$this->store->sidebarPreview($sidebar['nodes']??[],$caps);
-        $liveIds=[];$collect=function(array $nodes)use(&$collect,&$liveIds){foreach($nodes as$n){$liveIds[$n['id']]=true;$collect($n['children']??[]);}};$collect($tree);
-        $check=function(array $nodes,string $parent='',bool $ancestorHidden=false)use(&$check,&$issues,$liveIds){foreach($nodes as$n){
-            $path=$parent===''?$n['label']:$parent.' / '.$n['label'];$hidden=$ancestorHidden||!empty($n['hidden']);
-            if(!$hidden&&!isset($liveIds[$n['id']]))$issues[]=['id'=>$n['id'],'path'=>$path,'message'=>'当前功能或插件不可用，该项不会在前台显示'];
-            $check($n['children']??[],$path,$hidden);
-        }};$check($sidebar['nodes']??[]);
-        return ['nodes'=>$tree,'issues'=>$issues,'counts'=>['configured'=>$visible+$hidden,'hidden'=>$hidden,'projected'=>count($liveIds)],'permission_note'=>'预览包含当前草稿和本站功能状态；正式菜单还会按各会员权限过滤。'];
+        };
+        $inspect($nodes);
+        foreach($targets as $items){
+            if(count($items)<2)continue;
+            foreach($items as $item){
+                $other=$item['id']===$items[0]['id']?$items[1]:$items[0];
+                $issues[]=$item+['message'=>'与「'.$other['path'].'」指向相同页面，请核对。'];
+            }
+        }
+        return ['nodes'=>$tree,'issues'=>$issues,'counts'=>['configured'=>$visible+$hidden,'hidden'=>$hidden,'projected'=>count($live)],'permission_note'=>'正式菜单还会按会员权限过滤。'];
+    }
+
+    private static function matchesPage(string $url,string $expected): bool
+    {
+        return ltrim((string)parse_url($url,PHP_URL_PATH),'/')===ltrim((string)parse_url($expected,PHP_URL_PATH),'/');
+    }
+
+    private static function targetKey(string $url): string
+    {
+        $parts=parse_url($url);
+        if(empty($parts['query']))return $url;
+        $query=explode('&',$parts['query']);
+        $keys=array_map(static function($pair){return urldecode(explode('=',$pair,2)[0]);},$query);
+        if(count(array_unique($keys))!==count($keys))return $url;
+        sort($query,SORT_STRING);
+        $prefix=strcspn($url,'?');
+        return substr($url,0,$prefix).'?'.implode('&',$query).(isset($parts['fragment'])?'#'.$parts['fragment']:'');
+    }
+
+    public static function target(array $node,string $origin): string
+    {
+        $url=$node['url']??'';$type=$node['type']??'';
+        if($url===''||$url==='#'||$type==='separator')return '';
+        if(preg_match('~^(?:mailto:|tel:|#)~i',$url)&&$type!=='embedded')return $url;
+        $parts=parse_url($url);
+        if(!$parts||isset($parts['user'])||isset($parts['pass'])||(isset($parts['scheme'])&&!in_array(strtolower($parts['scheme']),['http','https'],true)))return '';
+        $external=isset($parts['host'])&&stripos($url,rtrim($origin,'/').'/')!==0;
+        if($external&&$type!=='embedded')return !empty($node['second_reminder'])?'/transfer.htm?target='.rawurlencode($url):$url;
+        $path='/'.ltrim($parts['path']??'','/');$query=$parts['query']??'';$hash=isset($parts['fragment'])?'#'.$parts['fragment']:'';
+        if($path==='/custom_iframe.htm'&&!$external){
+            $tail=preg_split('/[?&]iframe_url=/',$url)[1]??'';
+            $iframe=preg_match('~^https?://~i',$tail)?$tail:'';
+            if($iframe==='')foreach(explode('&',$query) as $pair){
+                [$key,$value]=array_pad(explode('=',$pair,2),2,'');
+                if(urldecode($key)==='iframe_url'){$iframe=urldecode($value);break;}
+            }
+            if($iframe!=='')return $path.'?iframe_url='.rawurlencode($iframe);
+        }
+        if($type==='embedded')return '/custom_iframe.htm?iframe_url='.rawurlencode($external?$url:$origin.$path.($query!==''?'?'.$query:'').$hash);
+        if($path==='/productList.htm'&&!empty($node['id'])){
+            $params=[];$hasId=false;
+            foreach(explode('&',$query) as $pair){
+                if($pair==='')continue;
+                [$key,$value]=array_map('urldecode',array_pad(explode('=',$pair,2),2,''));
+                if($key==='cloud_menu'){
+                    if($hasId)continue;
+                    $value=$node['id'];$hasId=true;
+                }
+                $params[]=str_replace('%2A','*',urlencode($key).'='.urlencode($value));
+            }
+            if(!$hasId)$params[]='cloud_menu='.urlencode($node['id']);
+            $query=implode('&',$params);
+        }
+        return $path.($query!==''?'?'.$query:'').$hash;
     }
     public static function checkTree(array $nodes): void
     {
@@ -72,10 +160,11 @@ final class MenuTransfer
             foreach($list as$n){
                 if(!is_array($n)||++$count>500||$depth>3)throw new \InvalidArgumentException('菜单最多 500 项、三级层级');
                 $id=$n['id']??null;if(!is_string($id)||!preg_match('/^[A-Za-z0-9_-]{6,64}$/D',$id)||isset($seen[$id]))throw new \InvalidArgumentException('菜单标识缺失或重复');$seen[$id]=true;
-                $allowed=['id','label','language','source_type','source_nav_id','url','icon','icon_style','second_reminder','module','res_module','product_id','show_quick_order','quick_order_url','is_cross_module','select_field','select_field_set','select_field_version','hidden','order','import_key','children'];
+                $allowed=['id','label','language','source_type','source_nav_id','url','icon','icon_style','second_reminder','module','res_module','product_id','show_quick_order','quick_order_url','is_cross_module','select_field','select_field_set','select_field_version','hidden','order','import_key','source_issue','children'];
                 if(array_diff(array_keys($n),$allowed))throw new \InvalidArgumentException('菜单包含未知字段，请使用兼容版本导出的文件');
                 foreach(['source_type','icon','import_key']as$k)if(isset($n[$k])&&!is_string($n[$k]))throw new \InvalidArgumentException('菜单文字字段格式不正确');
                 foreach(['source_nav_id','second_reminder','show_quick_order','is_cross_module','hidden','order','select_field_version']as$k)if(isset($n[$k])&&!is_int($n[$k]))throw new \InvalidArgumentException('菜单数值字段格式不正确');
+                if(isset($n['source_issue'])&&!in_array($n['source_issue'],['navigation','plugin'],true))throw new \InvalidArgumentException('菜单来源标记无效');
                 if(isset($n['select_field_set'])&&!is_bool($n['select_field_set']))throw new \InvalidArgumentException('菜单显示字段格式不正确');
                 foreach(['module','res_module','select_field','product_id','language']as$k)if(isset($n[$k])){
                     $v=is_object($n[$k])?(array)$n[$k]:$n[$k];if(!is_array($v)||count($v)>500)throw new \InvalidArgumentException('菜单关联字段格式不正确');
@@ -136,14 +225,14 @@ final class MenuTransfer
                 $n['children']=$walk($n['children']??[]);$oldId=(string)($n['source_nav_id']??0);$nav=$bindings['navs'][$oldId]??null;
                 if(in_array($n['source_type']??'',['system','plugin'],true)){
                     $matched=null;foreach($target['navs']as$id=>$candidate){if(!empty($candidate['plugin'])&&empty($catalog['plugins'][$candidate['plugin']]['enabled']))continue;if($nav&&($nav['plugin']??'')===($candidate['plugin']??'')&&preg_replace('~^/?plugin/\d+/~','plugin/',(string)($nav['url']??''))===preg_replace('~^/?plugin/\d+/~','plugin/',(string)($candidate['url']??''))){$matched=(int)$id;break;}}
-                    if($matched!==null)$n['source_nav_id']=$matched;
-                    elseif(!$sameSite){$n['source_type']='custom';$n['source_nav_id']=0;if(($nav['plugin']??'')!=='')$n['hidden']=1;$warnings[]='部分导航未匹配，相关入口已隐藏或保留为普通站内链接，请复核。';}
+                    if($matched!==null){$n['source_nav_id']=$matched;unset($n['source_issue']);}
+                    elseif(!$sameSite){$n['source_issue']=$n['source_type']==='plugin'||!empty($nav['plugin'])?'plugin':'navigation';$n['source_type']='custom';$n['source_nav_id']=0;if($n['source_issue']==='plugin')$n['hidden']=1;$warnings[]='部分导航未匹配，相关入口已隐藏或保留为普通站内链接，请复核。';}
                 }
                 foreach(['url','quick_order_url']as$field){$url=(string)($n[$field]??'');
                     if(preg_match('~^(/?)plugin/(\d+)/(.*)$~',$url,$m)){
                         $name=$bindings['plugins'][$m[2]]??null;
                         if($name&&isset($byPlugin[$name]))$n[$field]=$m[1].'plugin/'.$byPlugin[$name].'/'.$m[3];
-                        elseif(!$sameSite){$n['hidden']=1;$n[$field]='';if($field==='url'&&!$n['children'])$n[$field]='#';$warnings[]='目标站未启用部分插件，对应菜单已隐藏。';}
+                        elseif(!$sameSite){$n['hidden']=1;$n[$field]='';if($field==='url')$n['source_issue']='plugin';if($field==='url'&&!$n['children'])$n[$field]='#';$warnings[]='目标站未启用部分插件，对应菜单已隐藏。';}
                     }
                 }
                 if(!$sameSite&&!empty($n['product_id'])){$n['product_id']=[];$n['hidden']=1;$warnings[]='商品关联属于原站，相关菜单已隐藏，请在目标站重新选择商品后启用。';}

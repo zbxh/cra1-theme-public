@@ -20,6 +20,7 @@ import { TreeSortEditor, countTree, findNode, replaceNode, removeNode, collectDe
 import { FloatingActions } from '../ui/FloatingActions'
 import MenuTransfer from '../components/MenuTransfer'
 import MenuPreview from '../components/MenuPreview'
+import EffectiveSources from '../components/EffectiveSources'
 
 /**
  * 会员中心侧边栏导航（独立副本）
@@ -116,7 +117,7 @@ function clampInt(v, min, max, dflt) {
 
 /* -------------------------------------------------------------------------- */
 
-export default function MemberSidebar({ member, loading, error, reload, workspace }) {
+export default function MemberSidebar({ member, loading, error, reload, workspace, query = '' }) {
   const toast = useToast()
   /* 页头操作区引用：悬浮操作条观察它是否滚出视野（Hook 顺序需稳定，故在所有提前 return 之前声明） */
   const actionsRef = useRef(null)
@@ -132,6 +133,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
   const [catalog, setCatalog] = useState(null)
   const [catLoading, setCatLoading] = useState(true)
   const [editing, setEditing] = useState(null)
+  const [menuReview, setMenuReview] = useState(0)
   const [confirmDel, setConfirmDel] = useState(null)
   const [confirmImport, setConfirmImport] = useState(null)
 
@@ -230,6 +232,15 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
     toast('已添加分界线，可拖到需要的位置，保存后生效')
   }
 
+  function editMenu(id, issue) {
+    const hit = findNode(nodes, id)
+    if (hit) setEditing({ ...hit.node, __parentId:hit.parentId, __review:issue })
+  }
+  const deepLink = new URLSearchParams(query).get('menu')
+  useEffect(() => {
+    if (deepLink) editMenu(deepLink)
+  }, [deepLink])
+
   /**
    * 提交一条菜单项。
    *
@@ -240,6 +251,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
   function saveNode(payload) {
     payload = { ...payload }
     delete payload.__parentId
+    delete payload.__review
     const editingId = editing?.id
     const parentId = editing?.__parentId
     const isNew = !editingId || !findNode(nodes, editingId)
@@ -247,7 +259,11 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
     setNodes((list) => {
       // 用最新的 list 重新判断，而不是依赖外层快照
       if (editingId && findNode(list, editingId)) {
-        return replaceNode(list, editingId, (n) => ({ ...n, ...payload }))
+        return replaceNode(list, editingId, (node) => {
+          const next = { ...node, ...payload }
+          if (!payload.source_issue) delete next.source_issue
+          return next
+        })
       }
       if (parentId && findNode(list, parentId)) {
         return replaceNode(list, parentId, (n) => ({
@@ -258,6 +274,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
       return [...list, { ...emptyNode(), ...payload }]
     })
     setEditing(null)
+    setMenuReview(count => count + 1)
     // isNew 仅用于诊断语义，这里不改变行为（新增与编辑都会落到上面分支）
     void isNew
   }
@@ -279,6 +296,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
 
   return (
     <div className="space-y-4">
+      {workspace && <EffectiveSources domain="member" id="sidebar" dirty={dirty} revision={workspace.revision} onEditMenu={editMenu}/>}
       <PageHeader
         title="侧边栏导航"
         description="管理独立的三级菜单，支持排序、导入和导出，不影响系统导航"
@@ -326,9 +344,10 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
       {bootInfo.role!=='operator'&&<Card><CardHeader><CardTitle>菜单导入与导出</CardTitle><CardDescription>可选择一级分组、二级分组、三级页面和最近访问设置；跨站导入后请复核商品关联。</CardDescription></CardHeader><CardContent><MenuTransfer sidebar={{shape,nodes,recent,pull_enabled:pullEnabled}} disabled={saving||workspace?.saving} onBusy={value=>{setSaving(value);workspace?.setBusy(value)}} onApply={next=>{
         if(workspace){workspace.setBusy(false);workspace.setValues(current=>({...current,sidebar:{...current.sidebar,...next}}))}
         else {setNodes(next.nodes);setShape(next.shape);setRecent(next.recent)}
+        setMenuReview(count => count + 1)
         toast('已应用到菜单草稿，请检查后保存')
       }}/></CardContent></Card>}
-      <MenuPreview sidebar={{shape,nodes,recent}} disabled={saving||workspace?.saving}/>
+      <MenuPreview sidebar={{shape,nodes,recent}} refresh={menuReview} onEdit={editMenu} disabled={saving||workspace?.saving}/>
       {/* 系统导航导入区 */}
       <Card>
         <CardHeader>
@@ -459,7 +478,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
         <CardHeader>
           <CardTitle>菜单结构</CardTitle>
           <CardDescription>
-            一级分组显示在左侧入口，二级分组显示在展开面板中，三级页面显示为分组内的链接。每级都支持新增/编辑/删除与拖拽排序
+            一级分组可配置跳转地址。会员点击名称或图标进入该地址，点击右侧箭头查看下级菜单。未设置链接的一级分组点击整行展开。
             （拖到某一项上可将其变为子级，最多三级）；「显示」开关控制前台是否渲染该项。
             分界线只能放在一级菜单之间，可排序、隐藏或删除。
           </CardDescription>
@@ -473,7 +492,7 @@ export default function MemberSidebar({ member, loading, error, reload, workspac
             isSeparator={isMenuSeparator}
             levelLabels={LEVEL_LABELS}
             isBranch={(node) => !isMenuSeparator(node) && nodeLevel(nodes, node.id) < 3 && !node.url}
-            onEdit={(node) => setEditing({ ...node, __parentId: findNode(nodes, node.id)?.parentId })}
+            onEdit={(node) => editMenu(node.id)}
             onAddChild={(node) => setEditing({ ...emptyNode(), __parentId: node?.id || null, source_type: 'custom' })}
             onDelete={(node) => setConfirmDel(node)}
             onToggleHidden={(node) => setNodes((list) => replaceNode(list, node.id, (x) => ({ ...x, hidden: x.hidden ? 0 : 1 })))}
@@ -557,6 +576,8 @@ function typeLabel(t) {
 /* 菜单项表单：一次编辑全部参数                                                  */
 /* -------------------------------------------------------------------------- */
 
+const navigationChoice = (id, url) => id ? id + ':' + String(url || '').replace(/^\//, '') : ''
+
 function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
   const set = (k, v) => onChange({ ...value, [k]: v })
   const type = value.source_type
@@ -565,14 +586,13 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
   const depth = value.__parentId ? nodeLevel(nodes, value.__parentId) + 1 : 1
   const isGroup = depth < 3 && type === 'custom'
 
-  const navOptions = useMemo(() => {
-    const navs = catalog?.navs || []
-    if (type === 'plugin') return navs.filter((n) => n.is_plugin)
-    if (type === 'system') return navs.filter((n) => !n.is_plugin)
-    return navs
-  }, [catalog, type])
-
-  const pickedNav = (catalog?.navs || []).find((n) => Number(n.id) === Number(value.source_nav_id))
+  const navOptions = (catalog?.navigation_options || []).filter((n) => n.is_plugin === (type === 'plugin'))
+  const currentChoice = navigationChoice(value.source_nav_id, value.url)
+  const pickedNav = navOptions.find((n) => navigationChoice(n.id, n.url) === currentChoice)
+    || (!value.url && navOptions.find((n) => n.id === Number(value.source_nav_id)))
+  const selectedChoice = pickedNav ? navigationChoice(pickedNav.id, pickedNav.url) : currentChoice
+  const currentUrl = value.url || pickedNav?.url || ''
+  const sourceNeedsReview = value.source_issue && !pickedNav
 
   if (isMenuSeparator(value)) return (
     <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); onSubmit({ ...value, label: value.label.trim() || '分界线', source_type: 'separator', url: '', icon: '', children: [] }) }}>
@@ -592,6 +612,12 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
         const err = validate(value, depth)
         if (err) { alert(err); return }
         const next = { ...value }
+        if (isSystemLike && pickedNav) {
+          next.url = currentUrl
+          if (next.label === pickedNav.translation_key) next.label = pickedNav.name
+        }
+        const previous = findNode(nodes, value.id)?.node
+        if (pickedNav || (next.url && next.url !== '#' && next.url !== previous?.url)) delete next.source_issue
         for (const key of ['module', 'res_module', 'select_field']) {
           if (typeof next[key] === 'string') next[key] = next[key].split(',').map((x) => x.trim()).filter(Boolean)
         }
@@ -603,10 +629,19 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
         onSubmit(next)
       }}
     >
+      {value.__review && <Alert tone="warning">{value.__review.message}</Alert>}
+      {sourceNeedsReview && !value.__review && <Alert tone="warning">导入时未匹配到本站来源，请重新选择页面或核对链接。</Alert>}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <Label className="mb-1.5 block">菜单类型 *</Label>
-          <Select aria-label="菜单类型" value={type} onChange={(e) => e.target.value === 'separator' ? onChange(emptyNode({ id: value.id, label: '分界线', source_type: 'separator', hidden: value.hidden })) : set('source_type', e.target.value)}>
+          <Select aria-label="菜单类型" value={type} onChange={(e) => {
+            const sourceType = e.target.value
+            if (sourceType === 'separator') {
+              onChange(emptyNode({ id: value.id, label: '分界线', source_type: 'separator', hidden: value.hidden }))
+            } else {
+              onChange({ ...value, source_type: sourceType, source_nav_id: 0 })
+            }
+          }}>
             {TYPES.filter((t) => t.value !== 'separator' || (!value.__parentId && !(value.children || []).length)).map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
           </Select>
           <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
@@ -622,25 +657,31 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
       {isSystemLike ? (
         <div>
           <Label className="mb-1.5 block">来源导航 *</Label>
-          <Select aria-label="来源导航" value={String(value.source_nav_id || '')} onChange={(e) => {
-            const nav = (catalog?.navs || []).find((n) => String(n.id) === e.target.value)
+          <Select aria-label="来源导航" value={selectedChoice} onChange={(e) => {
+            const nav = navOptions.find((n) => navigationChoice(n.id, n.url) === e.target.value)
+            const automaticName = !value.label.trim() || value.label === pickedNav?.name || value.label === pickedNav?.translation_key
             onChange({
               ...value,
-              source_nav_id: Number(e.target.value) || 0,
-              // 选中系统导航后自动带出名称/链接/图标，避免手填错
-              url: nav?.url || value.url,
+              source_nav_id: nav?.id || 0,
+              url: nav?.url || '',
               icon: nav?.icon || value.icon,
-              label: value.label || nav?.name || '',
+              label: automaticName ? nav?.name || '' : value.label,
             })
           }}>
             <option value="">请选择来源</option>
+            {currentChoice && !pickedNav && (
+              <option value={currentChoice}>{catalog?.navigation_options ? '原有链接（未列入可选导航）' : '原有链接'}</option>
+            )}
             {navOptions.map((n) => (
-              <option key={n.id} value={n.id}>{n.name || '系统页面'}</option>
+              <option key={navigationChoice(n.id, n.url)} value={navigationChoice(n.id, n.url)}>
+                {n.plugin_title && n.plugin_title !== n.name ? n.plugin_title + ' · ' + n.name : n.name}
+              </option>
             ))}
           </Select>
-          {pickedNav && (
-            <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
-              将跳转：<code className="rounded bg-muted-bg px-1 font-mono">{pickedNav.url || '（该导航无链接）'}</code>
+          {(pickedNav || currentUrl) && (
+            <p className="mt-1.5 break-all text-xs leading-5 text-muted-foreground">
+              {pickedNav?.name && <>来源页面：{pickedNav.name}<br/></>}
+              将跳转：<code className="rounded bg-muted-bg px-1 font-mono">{currentUrl || '（该导航无链接）'}</code>
             </p>
           )}
         </div>
@@ -653,7 +694,7 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
           </Label>
           <LinkPicker label="菜单跳转链接" value={value.url} onChange={v=>set('url',v)}/>
           <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
-            可选择站内页面、商品和联系方式，也可以填写外部网址。
+            可选择站内页面、商品和联系方式，也可以填写外部网址。一级分组设置链接后，点击名称即可跳转，有下级菜单时可用右侧箭头展开。
           </p>
         </div>
       ) : null}
@@ -673,18 +714,18 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
         </details>
       </div> : null}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
+      <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 sm:gap-4">
+        <div className="min-w-0">
           <MenuIcon value={value.icon} iconStyle={value.icon_style} label={value.label} onChange={(icon,icon_style)=>onChange({...value,icon,icon_style})}/>
         </div>
-        <div>
-          <Label className="mb-1.5 block">父级</Label>
+        <div className="min-w-0">
+          <Label>父级菜单</Label>
           <Select
             value={value.__parentId || ''}
             onChange={(e) => set('__parentId', e.target.value || null)}
             disabled={!!findNode(nodes, value.id)}
           >
-            <option value="">（作为一级菜单）</option>
+            <option value="">作为一级菜单</option>
             {allIds.filter((id) => id !== value.id).map((id) => {
               const hit = findNode(nodes, id)
               if (!hit) return null

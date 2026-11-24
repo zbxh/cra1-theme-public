@@ -11,6 +11,13 @@
     return clean;
   }
   shared.Navigation = {
+    productListHref: function (value, id) {
+      var raw = String(value || '');
+      if (!id || !/^\/?productList\.htm(?:[?#]|$)/.test(raw)) return raw;
+      var url = new URL(raw, root.location.origin + '/');
+      url.searchParams.set('cloud_menu', id);
+      return (raw.charAt(0) === '/' ? url.pathname : url.pathname.slice(1)) + url.search + url.hash;
+    },
     href: function (item) {
       var raw=String(typeof item==='string'?item:(item && item.url)||'').trim();
       if(!raw)return '';
@@ -41,9 +48,10 @@
     link: function (name) { return (this.context().links || {})[name] || ''; },
     error: function (error, options) { return shared.Errors.message(error, options); }
   };
-  // The native cart owns /common and its cache, including third-party fields.
+  // Native module pages own /common and its cache, including third-party fields.
   // Navigation can use the theme projection without changing that contract.
-  if (!root.document.documentElement.hasAttribute('data-cra1-native-cart')) {
+  var element = root.document.documentElement;
+  if (!element.hasAttribute('data-cra1-native-cart') && !element.hasAttribute('data-cra1-native-panel')) {
   try {
     var old = JSON.parse(root.localStorage.getItem('common_set_before') || '{}');
     root.localStorage.setItem('common_set_before', JSON.stringify(context.common ? filterCommon(context.common) : filterCommon(old)));

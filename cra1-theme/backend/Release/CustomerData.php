@@ -16,10 +16,27 @@ final class CustomerData
 
     public static function candidate(array $data): array
     {
-        $out=array_intersect_key($data,array_flip(['sha256','bytes','release_channel','files','native_dependencies','blockers','warnings','can_apply','signature','candidate']));
+        $out=array_intersect_key($data,array_flip(['sha256','bytes','release_channel','blockers','warnings','can_apply','candidate']));
         $out['release']=$data['manifest']['release']??$data['release']??null;
         if(isset($data['manifest']['version']))$out['version']=$data['manifest']['version'];
-        $out['files']=array_values(array_filter($out['files']??[],static function($row){return !self::repositoryFile((string)($row['path']??''));}));
+        // Keep actionable rows for older admin clients. The digest is still
+        // needed to confirm exactly the package that passed preflight.
+        $out['files']=array_values(array_filter($data['files']??[],static function($row){
+            return ($row['status']??'')==='阻断'&&!self::repositoryFile((string)($row['path']??''));
+        }));
+        return $out;
+    }
+
+    public static function inspection(array $data): array
+    {
+        $out=array_intersect_key($data,array_flip(['release','version','release_channel','compatible','read_only']));
+        $out['context']=['system_version'=>$data['context']['system_version']??'','php_version'=>PHP_VERSION];
+        $out['checks']=array_values(array_filter($data['checks'],static function(array $row): bool {
+            return $row['id']!=='compatibility'&&strpos($row['id'],'dependency:')!==0;
+        }));
+        $out['counts']=array_replace(['pass'=>0,'warning'=>0,'blocked'=>0,'unverified'=>0],array_count_values(array_column($out['checks'],'status')));
+        $out['overview']=Inspector::overview($out['checks']);
+        unset($out['overview']['contracts']);
         return $out;
     }
 

@@ -33,13 +33,14 @@ fs.writeFileSync(path.join(output, 'cra1-shared.js'), banner + modules.map(file=
 fs.writeFileSync(path.join(output, 'announcements-preview.js'), banner + read('ui.js') + '\n' + read('announcements.js'))
 // Native fallback templates keep their business UI and need only this small guard.
 fs.writeFileSync(path.join(output, 'member-session.js'), banner + read('errors.js') + '\n' + read('request.js') + '\n' + read('context.js') + '\n' + read('session.js'))
-// Standalone third-party carts keep installed V10 business scripts, Axios,
+// Standalone third-party carts and panels keep installed V10 business scripts, Axios,
 // jQuery, rem scaling and component loading. Only navigation uses this bundle.
 const navigationModules = ['errors.js', 'request.js', 'context.js', 'runtime.js', 'ui.js', 'notification-session.js', 'announcements.js', 'avatar.js', 'search-match.js', 'member-search-pages.js', 'header-search.js', 'header-actions.js', 'icon-style.js', 'ui-effects.js', 'native-cart-context.js']
 fs.writeFileSync(path.join(output, 'native-cart-navigation.js'), banner + navigationModules.map(read).join('\n'))
 // Derive the shell from the same maintained navigation styles, never the
 // member/module layout overrides. Filter each selector, including mixed rules.
 const navigationClass = /^cra1-(?:header(?:__|--|-|$)|breadcrumb(?:__|$)|aside(?:__|\.|$)|primary-(?:item|separator)|nav-(?:l2|l3|group|recent|sub)|recent-flow|msg-(?:panel|item)|lang(?:__|$)|account(?:__|--|$)|upanel(?:__|--|$)|panel-grid)/
+const nativeDocument = 'html:is([data-cra1-native-cart],[data-cra1-native-panel])'
 const navigationShell = postcss.parse(fs.readFileSync(new URL('theme-sources/member/cra1-shell.css', import.meta.url), 'utf8'))
 navigationShell.walkComments(comment => comment.remove())
 navigationShell.walkRules(rule => {
@@ -50,7 +51,7 @@ navigationShell.walkRules(rule => {
     return classes.length > 0 && classes.every(name => navigationClass.test(name))
   })
   if (!selectors.length) rule.remove()
-  else rule.selector = selectors.map(selector => selector === ':root' ? 'html[data-cra1-native-cart]' : 'html[data-cra1-native-cart] ' + selector).join(', ')
+  else rule.selector = selectors.map(selector => selector === ':root' ? nativeDocument : nativeDocument + ' ' + selector).join(', ')
 })
 navigationShell.walkAtRules(rule => {
   if (/keyframes$/.test(rule.name) && !rule.params.startsWith('cra1-')) rule.remove()
@@ -62,9 +63,9 @@ function navigationCss(css, scope = '') {
   tree.walkRules(rule => {
     if (rule.parent.type === 'atrule' && /keyframes$/.test(rule.parent.name)) return
     rule.selector = rule.selectors.map(selector => {
-      if (selector === ':root') return 'html[data-cra1-native-cart]'
-      if (!scope && /^html\b/.test(selector)) return selector.replace(/^html\b/, 'html[data-cra1-native-cart]')
-      return 'html[data-cra1-native-cart] ' + scope + selector
+      if (selector === ':root') return nativeDocument
+      if (!scope && /^html\b/.test(selector)) return selector.replace(/^html\b/, nativeDocument)
+      return nativeDocument + ' ' + scope + selector
     }).join(', ')
   })
   return tree.toString()

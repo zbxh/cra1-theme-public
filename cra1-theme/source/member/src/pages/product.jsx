@@ -11,6 +11,7 @@ import { get, formatDate, formatMoney, formatDateTime } from '../lib'
 import { cn } from '../ui/utils'
 import ServerPanel from './serverPanel/index'
 import ProductListPage from './productList'
+import ProductTicket from './product-ticket'
 import { detectServerModule } from './serverPanel/api'
 import { releaseTimeText } from './serverPanel/auto-release-time'
 
@@ -223,10 +224,11 @@ function HostDetailPage({ hostId }) {
       <PageHeader
         title={host.product_name || '产品详情'}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Badge tone={(HOST_STATUS[host.status] || {}).tone || 'muted'}>
               {(HOST_STATUS[host.status] || {}).label || host.status}
             </Badge>
+            <ProductTicket hostId={host.id} />
             <Button variant="outline" size="sm" onClick={() => { window.location.href = '/productList.htm' }}>
               返回列表
             </Button>

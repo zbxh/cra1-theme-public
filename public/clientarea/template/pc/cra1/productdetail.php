@@ -1,3 +1,22 @@
+{php}
+require_once IDCSMART_ROOT.'public/cra1-shared/official-cart.php';
+$__cra1NativePanel = null;
+if (class_exists(\CRA1\Theme\Compatibility\ModulePresentation::class)) {
+    try {
+        $__cra1PanelModule = \CRA1\Theme\Compatibility\ModulePresentation::panel(request()->param('id'));
+        if ($__cra1PanelModule !== null) {
+            $__cra1PanelMode = (new \CRA1\Theme\Compatibility\ModulePresentation(CRA1_THEME_ROOT))->mode($__cra1PanelModule, 'panel');
+            $__cra1NativePanel = \CRA1\Theme\Presentation\OfficialCart::panelDocument(get_defined_vars(), use_mobile(), $__cra1PanelMode === 'cra1');
+        }
+    } catch (\Throwable $error) {
+        error_log('CRA1: using the standard panel for module details');
+    }
+}
+if ($__cra1NativePanel !== null) {
+    header('Cache-Control: private, no-store');
+    echo $__cra1NativePanel;
+} else {
+{/php}
 <?php
 $__schUrl = '';
 try {
@@ -83,3 +102,4 @@ $__schUrlJson = json_encode($__schUrl, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_AP
   })();
   </script>
   {include file="footer"}
+{php}}{/php}

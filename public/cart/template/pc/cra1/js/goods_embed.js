@@ -46,6 +46,30 @@
     post('config-resize', { height: h });
   }
 
+  function markConfigDirty() {
+    if (EMBED_FLAG && window.__CART_EMBED__.ready && !window.__CART_EMBED__.nativeModule) {
+      post('config-dirty', { dirty: true });
+    }
+  }
+
+  function onConfigControl(event) {
+    var target = event.target;
+    if (!event.isTrusted || !target.closest || target.closest('[disabled], .is-disabled, [aria-disabled="true"]')) return;
+    // Element mounts its options outside the configuration container.
+    if (event.type === 'click' && target.closest('.el-select-dropdown__item')) {
+      markConfigDirty();
+      return;
+    }
+    if (!target.closest('.config-box .content')) return;
+    if (event.type === 'input' || event.type === 'change') {
+      if (!target.closest('.el-select input[type="text"]')) markConfigDirty();
+    } else if (event.type === 'pointerup' || event.type === 'keyup') {
+      if (target.closest('.el-slider__runway')) markConfigDirty();
+    } else if (target.closest('.el-input-number__increase, .el-input-number__decrease, .el-select .el-input__clear, .cloud-item, .v-item, .el-form-item .add, .el-form-item .del')) {
+      markConfigDirty();
+    }
+  }
+
   window.__CART_EMBED__ = {
     productId: productId,
     nonce: nonce,
@@ -60,9 +84,17 @@
       var loading = document.getElementById('mainLoading');
       if (loading) loading.style.display = 'none';
       var root = document.querySelector('.cart-embed');
-      if (root) root.style.display = 'block';
+      if (root) {
+        root.style.display = 'block';
+        root.setAttribute('aria-busy', 'false');
+      }
       postHeight();
       post('config-ready', {});
+      if (EMBED_FLAG && !this.nativeModule) {
+        ['input', 'change', 'click', 'pointerup', 'keyup'].forEach(function (type) {
+          document.addEventListener(type, onConfigControl, true);
+        });
+      }
       if (typeof ResizeObserver !== 'undefined') {
         var ro = new ResizeObserver(function () { postHeight(); });
         ro.observe(document.documentElement);
@@ -87,7 +119,10 @@
       var loading = document.getElementById('mainLoading');
       if (loading) loading.style.display = 'none';
       var root = document.querySelector('.cart-embed');
-      if (root) root.style.display = 'block';
+      if (root) {
+        root.style.display = 'block';
+        root.setAttribute('aria-busy', 'false');
+      }
     },
   };
 
@@ -417,6 +452,7 @@
     var vm = railVM;
     if (!vm || !action) return;
     var field = action.field, value = action.value;
+    var selection = field === 'duration' || field === 'qty' ? quoteSelection(vm) : null;
     try {
       if (field === 'duration') {
         if (railKind === 'f-order') {
@@ -438,6 +474,7 @@
         }
       } else if (field === 'coupon' || field === 'coupon-remove') couponAction(value, field === 'coupon-remove');
     } catch (e) { /* 模块方法异常：轮询会把实际状态回传父页 */ }
+    if (selection !== null && selection !== quoteSelection(vm)) markConfigDirty();
     // Always acknowledge actions, including unchanged quantities and rejected
     // coupons; deduplicated polling alone cannot clear the parent's busy state.
     setTimeout(function () { railPush(true); }, 900);

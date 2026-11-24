@@ -6,11 +6,12 @@ import {test} from 'node:test';
 const code=fs.readFileSync(new URL('../source/legacy-assets/cart/20261017-compat-v3/js/goods_embed.js',import.meta.url),'utf8');
 const tick=()=>new Promise(resolve=>setTimeout(resolve,0));
 function fixture(module='mf_cloud'){
- const hooks=[],requests=[],messages=[],timers=[];
+ const hooks=[],requests=[],messages=[],timers=[],listeners={};
  const Axios={post(url,body){return new Promise((resolve,reject)=>requests.push({url,body:JSON.parse(JSON.stringify(body)),resolve,reject}));}};
  const Vue={mixin:h=>hooks.push(h)},originalPost=Axios.post;
  let product;
- const document={body:{scrollHeight:640,classList:{add(){},remove(){}}},documentElement:{scrollHeight:640},getElementById:()=>({style:{}}),querySelector:()=>({style:{}}),querySelectorAll:selector=>selector==='.m-cloud-m, .m-dcim-m, .template'?[{__vue__:product}]:[]};
+ const root={style:{},busy:'true',setAttribute(name,value){if(name==='aria-busy')this.busy=value;}};
+ const document={body:{scrollHeight:640,classList:{add(){},remove(){}}},documentElement:{scrollHeight:640},getElementById:()=>({style:{}}),querySelector:()=>root,querySelectorAll:selector=>selector==='.m-cloud-m, .m-dcim-m, .template'?[{__vue__:product}]:[],addEventListener:(type,listener)=>{listeners[type]=listener}};
  const window={location:new URL('https://example.invalid/cart/goods_embed.htm?id=501&embed=1'),addEventListener(){},parent:{postMessage:value=>messages.push(value)},Vue,Axios,CRA1Shared:{Runtime:{common:()=>({})}}};
  vm.runInNewContext(code,{window,document,location:window.location,URLSearchParams,Promise,setInterval:(fn,ms)=>{timers.push({fn,ms});return timers.length;},clearInterval(){},setTimeout,Date});
  window.__CART_EMBED__.prepare(module);
@@ -21,9 +22,10 @@ function fixture(module='mf_cloud'){
   }}}};
  for(const hook of hooks)hook.beforeCreate.call(product);
  Object.assign(product,product.$options.methods);window.__CART_EMBED__.nativeModule=module==='vendor_custom';window.__CART_EMBED__.markReady();
+ assert.equal(root.busy,'false','mounted embed releases its loading state');
  const poll=()=>timers.find(t=>t.ms===800)?.fn();
  const resolve=(index,price)=>requests[index].resolve({data:{status:200,data:{price,price_total:price}}});
- return{product,requests,messages,poll,resolve,Axios,originalPost,hooks};
+ return{product,requests,messages,poll,resolve,Axios,originalPost,hooks,listeners};
 }
 test('native quote failures stay unavailable; retry and a real zero quote recover',async()=>{
  const f=fixture();let promise=f.product.changeConfig();await tick();f.resolve(0,10);await promise;f.poll();assert.equal(f.messages.at(-1).payload.availability,'ready');
@@ -41,4 +43,13 @@ test('rapid configuration changes retain native methods but serialize and coales
 test('unknown third-party modules do not acquire a quote wrapper or Vue mixin',()=>{
  const f=fixture('vendor_custom');assert.equal(f.hooks.length,0);assert.equal(f.Axios.post,f.originalPost);
  assert.equal(f.messages.at(-1).type,'rail-fallback');
+ assert.deepEqual(f.listeners,{});
+});
+test('only real edits in the configurator report pending changes',()=>{
+ const f=fixture(),target={closest:selector=>selector==='.config-box .content'?{}:null};
+ f.listeners.input({type:'input',isTrusted:false,target});
+ assert.equal(f.messages.some(message=>message.type==='config-dirty'),false);
+ f.listeners.input({type:'input',isTrusted:true,target});
+ assert.equal(f.messages.at(-1).type,'config-dirty');
+ assert.equal(f.messages.at(-1).dirty,true);
 });

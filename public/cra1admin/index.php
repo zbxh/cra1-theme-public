@@ -1283,7 +1283,7 @@ if (strpos($r,'api.')===0) {
         }
         if($action==='menu.preview'){
             if(!is_array($body['sidebar']??null))throw new InvalidArgumentException('菜单草稿格式不正确');
-            json_out(['status'=>200,'data'=>$transfer->preview($body['sidebar'])]);
+            json_out(['status'=>200,'data'=>$transfer->preview($body['sidebar'],$THEME_ORIGIN)]);
         }
         if(!is_array($body['document']??null))throw new InvalidArgumentException('菜单文件格式不正确');
         $transfer->validate($body['document']);
@@ -1350,6 +1350,7 @@ if (strpos($r,'api.')===0) {
             json_out($workspace->editorImport((string)($body['mode']??'merge'),$body['nodes']??null,isset($body['shape'])?(int)$body['shape']:null));
         }
         if ($sub === 'editor.get') json_out($workspace->editorGet($domain,(string)($body['editorId']??'')));
+        if ($sub === 'sources.get') json_out($workspace->effectiveSources($domain,(string)($body['editorId']??'')));
         if ($sub === 'editor.save') {
             if(!is_array($body['patch']??null)||!is_array($body['expectedRevisions']??null))throw new InvalidArgumentException('修改内容或版本格式不正确');
             $result=$workspace->editorSave($domain,(string)($body['editorId']??''),$body['expectedRevisions'],$body['patch'],(string)($_SESSION['cra1_admin']??'admin'));
@@ -1947,7 +1948,7 @@ if (strpos($r,'api.')===0) {
         }
 
         if ($sub === 'catalog') {
-            $catalog = $member->readSystemCatalog();
+            $catalog = $member->readSystemCatalog(true);
             json_out([
                 'status' => 200,
                 'msg'    => 'success',

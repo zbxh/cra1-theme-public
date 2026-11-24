@@ -18,9 +18,9 @@ function fixture(){
  function Vue(o){options=o;page=this;Object.assign(this,o.data());this.$data=this;this.$refs={};this.$nextTick=fn=>fn?fn():Promise.resolve();for(const[k,f]of Object.entries(o.methods))this[k]=f.bind(this);for(const[k,f]of Object.entries(o.computed))Object.defineProperty(this,k,{get:()=>f.call(this)});this.$mount=()=>this}
  Vue.prototype={}
  const read=(type,...args)=>{reads.push({type,args});return Promise.resolve(handlers[type](...args))}
- vm.runInNewContext(code,{Vue,window,navigator:{userAgent:'fixture'},document:{getElementsByClassName:()=>[{}]},lang:{},asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},sessionStorage:{removeItem(){}},URL,URLSearchParams,AbortController,clearTimeout,clearInterval,
+ vm.runInNewContext(code,{Vue,window,navigator:{userAgent:'fixture'},document:{querySelector:()=>({})},lang:{},asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},sessionStorage:{removeItem(){}},URL,URLSearchParams,AbortController,clearTimeout,clearInterval,
  productGroupFirst:()=>read('first'),apiProductDetail:p=>read('detail',p),productGroupSecond:id=>read('second',id),productGoods:p=>read('products',p),getOrederConfig:p=>read('config',p)})
- window.onload();page.sanitizeHtml=v=>v||'';page.needScroll=()=>{};page.cartConfigReady=false
+ page.sanitizeHtml=v=>v||'';page.needScroll=()=>{};page.cartConfigReady=false
  return {page,options,reads,handlers,window,navigate}
 }
 test('deep-link reads overlap and respect validated product category ownership',async()=>{
@@ -53,7 +53,32 @@ test('a stale category hint is checked instead of trusted over product ownership
 })
 test('failed deep-link details remain retryable rather than choosing another product',async()=>{
  const f=fixture();f.page.urlProductId=7;f.handlers.detail=()=>Promise.reject(new Error('private backend'))
- await f.page.initData();assert.match(f.page.catalogError,/重试/);assert.equal(f.page.urlProductId,7);assert.equal(f.page.selectedProductId,0);assert.equal(f.reads.some(x=>x.type==='products'),false)
+ f.handlers.first=()=>response({list:[{id:1}]});f.handlers.second=()=>response({list:[{id:2,type:'normal'}]})
+ f.handlers.products=()=>response({list:[{id:8,module:'mf_cloud'}]});f.page.cartConfigReady=true
+ await f.page.initData();assert.match(f.page.productLinkNotice,/重试/);assert.equal(f.page.catalogError,'')
+ assert.equal(f.page.urlProductId,7);assert.equal(f.page.selectedProductId,0);assert.equal(f.page.goodsList[0].id,8)
+})
+test('an unavailable deep link never selects a different sellable product',async()=>{
+ for(const explicit of [null,{id:7,module:'mf_cloud',stock_control:'1',qty:0}]){
+  const f=fixture();f.page.urlProductId=7;f.page.cartConfigReady=true
+  f.page.select_second_obj={id:2,type:'normal'}
+  const products=[{id:8,module:'mf_cloud'},...(explicit?[explicit]:[])]
+  await f.page.applyDefaultSelection(products)
+  assert.equal(f.page.selectedProductId,0)
+  assert.equal(f.window.location.searchParams.get('product_id'),'7')
+  assert.match(f.page.productLinkNotice,explicit?/售罄/:/不可选购/)
+  await f.page.selectProduct(products[0])
+  assert.equal(f.page.selectedProductId,8);assert.equal(f.page.productLinkNotice,'')
+ }
+})
+test('clearing catalogue search restores the active category without changing selection',async()=>{
+ const f=fixture();f.page.select_second_obj={id:2,type:'normal'};f.page.selectedProductId=7
+ f.page.goodsParmas.keywords='other'
+ await f.page.searchGoods()
+ f.page.goodsParmas.keywords=''
+ await f.page.searchGoods()
+ assert.deepEqual(f.reads.map(read=>[read.args[0].id,read.args[0].keywords]),[['','other'],[2,'']])
+ assert.equal(f.page.selectedProductId,7)
 })
 test('catalog zero placeholders differ from explicit free products and zero discounts',()=>{
  const f=fixture()

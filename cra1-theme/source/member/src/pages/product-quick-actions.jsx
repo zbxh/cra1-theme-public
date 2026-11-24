@@ -1,7 +1,7 @@
 import {Guard,useAccess} from '../ui/access'
 import {usePaymentReturn} from '../ui/use-payment-return'
 import { lazy, Suspense, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { ArrowUpDown, CalendarPlus, ExternalLink, KeyRound, Loader2, Monitor, MoreHorizontal, Power, PowerOff, RefreshCw, RotateCw, ShieldCheck } from 'lucide-react'
+import { ArrowUpDown, CalendarPlus, ExternalLink, KeyRound, Loader2, MessageSquarePlus, Monitor, MoreHorizontal, Pin, PinOff, Power, PowerOff, RefreshCw, RotateCw, ShieldCheck } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
@@ -32,7 +32,7 @@ function CheckDialog({ action, error, retry, close, url }) {
   </Dialog>
 }
 
-export default function ProductQuickActions({ host, onChanged }) {
+export default function ProductQuickActions({ host, onChanged, ticketEntry, onPin, pendingPin }) {
   const {can}=useAccess()
   const toast = useToast(), changed = useRef(onChanged), mounted = useRef(false)
   changed.current = onChanged
@@ -196,6 +196,9 @@ export default function ProductQuickActions({ host, onChanged }) {
     <DropdownMenu open={open} onOpenChange={value => { if (value) returnFocus.current = trigger.current; else if (securityBusy) generation.current++; setOpen(value) }}>
       <DropdownMenuTrigger asChild><Button ref={trigger} size="sm" variant="ghost" className="cra1-product-card__quick" title="更多操作" aria-label={`更多操作 ${host.name || host.product_name || host.id}`} aria-busy={busy || Boolean(operation)}>{operation ? <Loader2 className="animate-spin" aria-hidden="true" /> : <MoreHorizontal aria-hidden="true" />}</Button></DropdownMenuTrigger>
       <DropdownMenuContent align="end" collisionPadding={12} sideOffset={6} className="cra1-product-actions-menu" aria-label={`服务器操作 ${host.name || host.id}`} onCloseAutoFocus={event => { if (selected) event.preventDefault() }}>
+        {onPin && <DropdownMenuItem disabled={pendingPin} onSelect={onPin}>{host.pinned ? <PinOff aria-hidden="true" /> : <Pin aria-hidden="true" />}{host.pinned ? '取消置顶' : '置顶产品'}</DropdownMenuItem>}
+        {ticketEntry && !['Deleted', 'Cancelled'].includes(host.status) && <DropdownMenuItem asChild><a href={ticketEntry + '?cra1_host=' + encodeURIComponent(host.id)}><MessageSquarePlus aria-hidden="true" />提交工单</a></DropdownMenuItem>}
+        {(onPin || ticketEntry) && <DropdownMenuSeparator />}
         {MENU_GROUPS.map((keys, index) => <div key={index}>{index > 0 && <DropdownMenuSeparator />}<DropdownMenuLabel className="cra1-product-actions-menu__label">{index ? '配置管理' : '实例操作'}</DropdownMenuLabel>{index === 1 && <Guard permission="action:control"><CopyLoginMenuItem host={host} api={api} active={open} /></Guard>}{keys.map(key => {
           const option = options.find(item => item.key === key), Icon = ICONS[key]
           return <DropdownMenuItem permission={index?'action:control':'action:power'} key={key} disabled={option.disabled} title={option.reason || undefined} variant={key === 'reinstall' ? 'destructive' : 'default'} onSelect={() => begin(option, trigger.current)}><Icon aria-hidden="true" />{option.title}</DropdownMenuItem>

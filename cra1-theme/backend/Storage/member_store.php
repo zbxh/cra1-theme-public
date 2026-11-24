@@ -131,10 +131,8 @@ final class MemberCenterStore
             /*
              * 会员中心内容设置（页面文案 / 公告），与官网 config.json 无关。
              *
-             *   product_list  产品列表页顶部文案：default 全局默认，
+             *   product_list  产品列表页头文案与购买按钮：default 全局默认，
              *                 overrides 按侧栏节点 UUID 覆盖（不用会重建的 menu id）。
-             *                 每条可用 global 标记为「全局公告」（所有页面显示），
-             *                 未标记的仅首页显示。标签/标题支持 HTML（含内联样式）。
              *
              * 与 appearance/sidebar 一样只保留白名单键；HTML 一律经过
              * sanitizeContentHtml() 白名单清理后才入库与下发。
@@ -411,6 +409,19 @@ final class MemberCenterStore
     public function snapshotProjection(array $config): array
     {
         $content=CRA1ThemePublicProjection::content($config['content']);
+        $productList = $config['content']['product_list'];
+        $needsCartLinks = false;
+        $projectPurchase = static function (array $block, array &$projected) use (&$needsCartLinks): void {
+            if (isset($block['purchase'])) {
+                $button = CRA1ThemePublicProjection::content($block['purchase']);
+                $projected['purchase'] = $button;
+                $needsCartLinks = $needsCartLinks || ($button['enabled'] && $button['url'] === '');
+            }
+        };
+        $projectPurchase($productList['default'], $content['product_list']['default']);
+        foreach ($productList['overrides'] as $key => $block) {
+            $projectPurchase($block, $content['product_list']['overrides'][$key]);
+        }
         // Authentication pages get their own display-only projection at render
         // time; the global member snapshot does not need either page's copy.
         unset($content['auth_login'], $content['auth_regist']);
@@ -424,7 +435,7 @@ final class MemberCenterStore
             'appearance'     => $config['appearance'],
             // 不含 favorites：收藏属前台会员个人偏好（浏览器本地存储），
             // 后台不下发、也不覆盖用户自己的设置。
-            'sidebar' => $this->publicTree($config['sidebar']['nodes'] ?? []),
+            'sidebar' => $this->publicTree($config['sidebar']['nodes'] ?? [], 1, $needsCartLinks ? $this->productCartLinks() : null),
             // 树形态：3 = 一级分组树（前台按 分组→菜单→页面 渲染），
             // 2 = 旧两级（前台按 服务分类 面板渲染）。迁移/结构变化时前台自适应。
             'nav_shape' => ((int) ($config['sidebar']['shape'] ?? 2) >= 3) ? 3 : 2,
@@ -457,7 +468,7 @@ final class MemberCenterStore
         return $data['sidebar'];
     }
 
-    private function publicTree(array $nodes, int $depth = 1): array
+    private function publicTree(array $nodes, int $depth = 1, ?array $cartLinks = null): array
     {
         $out = [];
         foreach ($nodes as $n) {
@@ -475,6 +486,11 @@ final class MemberCenterStore
                 'type'    => (string) ($n['source_type'] ?? 'custom'),
                 'second_reminder' => (int) ($n['second_reminder'] ?? 0),
             ];
+            // Older default menus used the bare current-products URL for this leaf.
+            // Keep the saved tree and IDs intact, including explicitly configured tabs.
+            if ($depth === 3 && empty($n['children']) && $item['name'] === '全部产品') {
+                $item['url'] = preg_replace('~^(/?productList\.htm)(?=#|$)~', '$1?tab=all', $item['url']);
+            }
             if(!empty($n['icon_style']))$item['icon_style']=cra1_icon_style_clean($n['icon_style']);
             if($item['icon']!=='') { $d=cra1_icons_resolve($item['icon'],'member-sidebar');if($d['available'])$item['icon_resolved']=['url'=>$d['url'],'colorable'=>$d['colorable']]; }
             // 模块类菜单需要模块标识，前端据此决定是否为产品列表入口
@@ -497,8 +513,20 @@ final class MemberCenterStore
             if (!empty($n['is_cross_module'])) {
                 $item['is_cross_module'] = 1;
             }
+            if ($cartLinks !== null && preg_match('~^/?productList\.htm(?:[?#]|$)~', $item['url'])) {
+                $url = self::purchaseUrl($n['quick_order_url'] ?? '');
+                if ($url !== '') {
+                    $item['purchase_url'] = $url;
+                } else {
+                    $groups = [];
+                    foreach ($item['product_id'] ?? [] as $id) {
+                        if (isset($cartLinks[$id])) $groups[$cartLinks[$id]] = true;
+                    }
+                    if (count($groups) === 1) $item['purchase_url'] = key($groups);
+                }
+            }
             if ($depth < self::MAX_DEPTH && !empty($n['children'])) {
-                $kids = $this->publicTree($n['children'], $depth + 1);
+                $kids = $this->publicTree($n['children'], $depth + 1, $cartLinks);
                 if ($kids) {
                     $item['children'] = $kids;
                 }
@@ -506,6 +534,34 @@ final class MemberCenterStore
             $out[] = $item;
         }
         return $out;
+    }
+
+    /** Reuse the cart catalogue so the default never points to a hidden group or product. */
+    private function productCartLinks(): array
+    {
+        require_once CRA1_THEME_ROOT.'/public/web/cra1/controller/MenuCatalog.php';
+        $links = [];
+        foreach (\cra1_menu_cart_tree() as $group) {
+            foreach ($group['children'] as $section) {
+                foreach ($section['children'] as $product) {
+                    parse_str((string)parse_url($product['file_address'], PHP_URL_QUERY), $query);
+                    $links[$query['product_id']] = $section['file_address'];
+                }
+            }
+        }
+        return $links;
+    }
+
+    private static function purchaseUrl($value): string
+    {
+        if (!is_string($value)) return '';
+        $url = trim($value, ' ');
+        if ($url === '' || strlen($url) > 2048 || preg_match('/[\x00-\x20\x7f<>"\'\\\\]/', $url) || strpos($url, '//') === 0) return '';
+        if (preg_match('~^https?://~i', $url)) {
+            $parts = parse_url($url);
+            return !empty($parts['host']) && !isset($parts['user']) && !isset($parts['pass']) ? $url : '';
+        }
+        return preg_match('~^[^/?#]*:~', $url) ? '' : $url;
     }
 
     /* ===================================================================== */
@@ -583,12 +639,23 @@ final class MemberCenterStore
 
         $normBlock = function (array $b) use ($plDef): array {
             $d = $plDef['default'];
-            return [
+            $block = [
                 'enabled'     => (int) ($b['enabled'] ?? $d['enabled']) ? 1 : 0,
                 'title'       => mb_substr(trim((string) ($b['title'] ?? '')), 0, 60),
                 'description' => mb_substr(trim((string) ($b['description'] ?? '')), 0, 200),
                 'html'        => $this->sanitizeContentHtml((string) ($b['html'] ?? '')),
             ];
+            $purchase = $b['purchase'] ?? null;
+            if (is_array($purchase)) {
+                $text = is_string($purchase['text'] ?? null) ? trim($purchase['text']) : '';
+                $block['purchase'] = [
+                    'enabled' => (int)($purchase['enabled'] ?? 0) === 1 ? 1 : 0,
+                    'text' => mb_substr($text, 0, 30),
+                    'url' => self::purchaseUrl($purchase['url'] ?? ''),
+                    'target' => ($purchase['target'] ?? '') === 'blank' ? 'blank' : 'self',
+                ];
+            }
+            return $block;
         };
 
         $overrides = [];
@@ -603,9 +670,10 @@ final class MemberCenterStore
             if (!preg_match('/^[A-Za-z0-9_-]{6,64}$/', $key)) {
                 continue;
             }
-            // 只留「真的改了东西」的覆盖项，避免 overrides 无限膨胀
-            if ($b['enabled'] ?? 0) {
-                $overrides[$key] = $normBlock($b);
+            // Preserve disabled drafts for later reactivation. Public projection strips their copy.
+            $block = $normBlock($b + ['enabled' => 0]);
+            if ($block['enabled'] || $block['title'] !== '' || $block['description'] !== '' || $block['html'] !== '' || isset($block['purchase'])) {
+                $overrides[$key] = $block;
             }
         }
         ksort($overrides);
@@ -895,6 +963,9 @@ final class MemberCenterStore
             if ($url === '') {
                 return '';
             }
+            if (preg_match('/[\x00-\x1f\x7f]/', $url) || strpos($url, '\\') !== false) {
+                return '';
+            }
             // 保留站内链接及 HTTP/HTTPS；拒绝可执行协议与协议相对地址。
             if (preg_match('~^\s*(javascript|vbscript|data|file)\s*:~i', $url)) {
                 return '';
@@ -969,10 +1040,7 @@ final class MemberCenterStore
                         $node->removeChild($c);
                         continue;
                     }
-                    // <a>/<img> 不再递归（不允许嵌套链接/图），其余继续深挖子节点
-                    if (strtolower($kept->tagName) !== 'a' && strtolower($kept->tagName) !== 'img') {
-                        $walkRemove($kept);
-                    }
+                    $walkRemove($kept);
                     continue;
                 }
                 if ($c instanceof DOMComment || $c instanceof DOMProcessingInstruction) {
@@ -1050,6 +1118,7 @@ final class MemberCenterStore
                 'order'           => $order,
             ];
             if(isset($n['icon_style'])) { $style=cra1_icon_style_clean($n['icon_style']);if($style)$item['icon_style']=$style; }
+            if (in_array($n['source_issue'] ?? '', ['navigation', 'plugin'], true)) $item['source_issue'] = $n['source_issue'];
             if (preg_match('/^[a-z0-9:-]{1,100}$/D', (string) ($n['import_key'] ?? ''))) $item['import_key'] = $n['import_key'];
             $order++;
             $kids = is_array($n['children'] ?? null) ? $n['children'] : [];
@@ -1235,7 +1304,7 @@ final class MemberCenterStore
      * 读取系统导航目录（只读）。
      * 刻意不用 MenuModel：它会触发 createHomeMenu() 写入默认菜单。
      */
-    public function readSystemCatalog(): array
+    public function readSystemCatalog(bool $includeEditorOptions = false): array
     {
         $pdo = $this->pdo();
         if (!$pdo) {
@@ -1311,30 +1380,61 @@ final class MemberCenterStore
         // 已启用的插件（用于标记 plugin 类导航是否可用）
         $plugins = [];
         try {
-            $pRows = \CRA1\Theme\Compatibility\Database::query($pdo,"SELECT name, title, status FROM idcsmart_plugin WHERE status = 1")
+            $pRows = \CRA1\Theme\Compatibility\Database::query($pdo,"SELECT id, name, title, module FROM idcsmart_plugin WHERE status = 1")
                 ->fetchAll(PDO::FETCH_ASSOC);
             foreach ($pRows as $p) {
-                $plugins[(string) $p['name']] = ['title' => (string) $p['title'], 'enabled' => true];
+                $plugins[(string) $p['name']] = ['title' => (string) $p['title'], 'enabled' => true,
+                    'id' => (int) $p['id'], 'module' => (string) $p['module']];
             }
         } catch (Throwable $e) {
             $plugins = [];
         }
 
-        return array_merge(['menu' => $rows, 'navs' => $navs, 'plugins' => $plugins, 'error' => ''], $this->visualCatalog());
+        $catalog = array_merge(['menu' => $rows, 'navs' => $navs, 'plugins' => $plugins, 'error' => ''], $this->visualCatalog());
+        if ($includeEditorOptions) {
+            $catalog['navigation_options'] = MemberNavigationOptions::build(dirname($this->dir, 2), $navs, $plugins);
+        }
+        return $catalog;
+    }
+
+    public function installedModules(): array
+    {
+        $titles = [];
+        if ($pdo = $this->pdo()) {
+            try {
+                $records = \CRA1\Theme\Compatibility\Database::query($pdo,
+                    "SELECT module,name,title FROM idcsmart_plugin WHERE module IN ('server','reserver')");
+                foreach ($records as $record) {
+                    $titles[$record['module']][strtolower($record['name'])] = trim((string)$record['title']);
+                }
+            } catch (\RuntimeException $error) {
+                // File-only modules can still supply their own display name.
+            }
+        }
+        $root = dirname($this->dir, 2);
+        $out = ['modules'=>[], 'res_modules'=>[]];
+        foreach (['server'=>'modules', 'reserver'=>'res_modules'] as $folder=>$kind) {
+            foreach (glob($root.'/public/plugins/'.$folder.'/*', GLOB_ONLYDIR) ?: [] as $dir) {
+                $name = basename($dir);
+                if (!preg_match('/^[a-z][a-z0-9_]{0,99}$/D', $name)) continue;
+                $class = str_replace(' ', '', ucwords(str_replace('_', ' ', $name)));
+                $file = $dir.'/'.$class.'.php';
+                if (!is_file($file)) continue;
+                $title = $titles[$folder][strtolower($class)] ?? $titles[$folder][$name] ?? '';
+                if ($title === '' || strcasecmp($title, $name) === 0 || strcasecmp($title, $class) === 0) {
+                    $source = is_readable($file) ? file_get_contents($file) : false;
+                    $title = $source !== false && preg_match('/[\'"]display_name[\'"]\s*=>\s*[\'"]([^\'"]+)[\'"]/u', $source, $match)
+                        ? trim($match[1]) : '';
+                }
+                $out[$kind][] = ['name'=>$name, 'label'=>$title !== '' ? $title : $name];
+            }
+        }
+        return $out;
     }
 
     public function visualCatalog(): array
     {
-        $out=['modules'=>[],'res_modules'=>[],'products'=>[],'groups'=>[]];
-        $root=dirname($this->dir,2);
-        foreach(['server'=>'modules','reserver'=>'res_modules']as$folder=>$kind){
-            foreach(glob($root.'/public/plugins/'.$folder.'/*',GLOB_ONLYDIR)?:[]as$dir){
-                $name=basename($dir);$class=str_replace(' ','',ucwords(str_replace('_',' ',$name)));$file=$dir.'/'.$class.'.php';
-                if(!is_file($file))continue;$text=file_get_contents($file);$title=$name;
-                if(preg_match('/[\'"]display_name[\'"]\s*=>\s*[\'"]([^\'"]+)[\'"]/u',$text,$m))$title=$m[1];
-                $out[$kind][]=['name'=>$name,'label'=>$title];
-            }
-        }
+        $out=$this->installedModules()+['products'=>[],'groups'=>[]];
         $pdo=$this->pdo();if(!$pdo){$out['error']='商品目录暂时不可用';return $out;}
         try{
             $out['groups']=\CRA1\Theme\Compatibility\Database::query($pdo,'SELECT id,name FROM idcsmart_product_group WHERE parent_id=0 ORDER BY `order`,id')->fetchAll(PDO::FETCH_ASSOC);
@@ -1350,6 +1450,65 @@ final class MemberCenterStore
             foreach(\CRA1\Theme\Compatibility\Database::query($pdo,$sql)->fetchAll(PDO::FETCH_ASSOC)as$p){$p['id']=(int)$p['id'];$p['url']=cra1_cart_product_url($p['id']);$out['products'][]=$p;}
         }catch(Throwable$e){$out['error']='商品目录读取失败';}
         return $out;
+    }
+
+    public function themeSelectionForInspection(): array
+    {
+        $pdo = $this->pdo();
+        if (!$pdo) return [];
+        $prefix = \CRA1\Theme\Compatibility\Database::prefix();
+        $keys = array_merge(\CRA1\Theme\Release\ThemeSelection::KEYS, ['web_switch']);
+        $query = $pdo->prepare("SELECT setting,value FROM {$prefix}configuration WHERE setting IN (".implode(',', array_fill(0,count($keys),'?')).')');
+        $query->execute($keys);
+        return $query->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
+
+    public function moduleVerificationDirectory(array $module, string $search, int $page): array
+    {
+        $pdo = $this->pdo();
+        if (!$pdo) throw new \RuntimeException('商品目录暂时无法读取，请稍后重试');
+        $prefix = \CRA1\Theme\Compatibility\Database::prefix();
+        $class = str_replace(' ', '', ucwords(str_replace('_', ' ', $module['name'])));
+        // V10 loads installed reseller classes directly; server plugins use the registry.
+        $enabled = $module['kind'] === 'reserver';
+        if (!$enabled) {
+            $plugin = $pdo->prepare("SELECT status FROM {$prefix}plugin WHERE module='server' AND name=? LIMIT 1");
+            $plugin->execute([$class]);
+            $enabled = (int)$plugin->fetchColumn() === 1;
+        }
+        $filter = $module['kind'] === 'reserver'
+            ? 'u.id IS NOT NULL AND u.res_module=:name'
+            : 'u.id IS NULL AND (s.module=:direct OR sg.module=:grouped)';
+        $values = $module['kind'] === 'reserver' ? ['name'=>$module['name']] : ['direct'=>$module['name'],'grouped'=>$module['name']];
+        $from = "FROM {$prefix}product p
+            LEFT JOIN {$prefix}product_group g ON g.id=p.product_group_id
+            LEFT JOIN {$prefix}product_group parent ON parent.id=g.parent_id
+            LEFT JOIN {$prefix}server s ON p.type='server' AND s.id=p.rel_id
+            LEFT JOIN {$prefix}server sg ON p.type='server_group' AND sg.id=(SELECT gs.id FROM {$prefix}server gs WHERE gs.server_group_id=p.rel_id LIMIT 1)
+            LEFT JOIN {$prefix}upstream_product u ON u.id=(SELECT up.id FROM {$prefix}upstream_product up WHERE up.product_id=p.id AND up.mode='only_api' LIMIT 1)
+            WHERE p.product_id=0 AND {$filter}";
+        if ($search !== '') {
+            $from .= ' AND (p.name LIKE :search OR p.id=:id)';
+            $values['search'] = '%'.$search.'%';
+            $values['id'] = ctype_digit($search) ? (int)$search : 0;
+        }
+        $count = $pdo->prepare('SELECT COUNT(*) '.$from);
+        $count->execute($values);
+        $total = (int)$count->fetchColumn();
+        $pageSize = 12;
+        $page = min($page, max(1, (int)ceil($total / $pageSize)));
+        $offset = ($page - 1) * $pageSize;
+        $select = $pdo->prepare("SELECT p.id,p.name,p.hidden,g.hidden group_hidden,parent.hidden parent_hidden,
+            g.name group_name, parent.name parent_name {$from} ORDER BY p.id LIMIT {$pageSize} OFFSET {$offset}");
+        $select->execute($values);
+        $products = [];
+        foreach ($select->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $id = (int)$row['id'];
+            $hidden = (int)$row['hidden'] === 1 || (int)$row['group_hidden'] === 1 || (int)$row['parent_hidden'] === 1;
+            $products[] = ['id'=>$id,'name'=>$row['name'],'group'=>$row['group_name'],'parent'=>$row['parent_name'],
+                'hidden'=>$hidden, 'url'=>$enabled && !$hidden ? '/cart/goods.htm?id='.$id : ''];
+        }
+        return ['products'=>$products,'enabled'=>$enabled,'page'=>$page,'pages'=>max(1, (int)ceil($total / $pageSize)),'total'=>$total];
     }
 
     /**
@@ -1568,7 +1727,7 @@ final class MemberCenterStore
             ['商品列表', 'cart/goodsList.htm'], ['购物车', 'cart/shoppingCar.htm'],
         ],
         'productList.htm' => [
-            ['全部产品', 'productList.htm'], ['使用中', 'productList.htm?tab=using'],
+            ['全部产品', 'productList.htm?tab=all'], ['使用中', 'productList.htm?tab=using'],
             ['即将到期', 'productList.htm?tab=expiring'], ['已逾期', 'productList.htm?tab=overdue'],
             ['已删除', 'productList.htm?tab=deleted'],
         ],

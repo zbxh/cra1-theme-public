@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { loadCategoryHosts, hostDisplayFields, localizedMenuName, completeHostDisplayData, productNavigationCategories, productOverviewAliases, findProductCategory } from '../src/lib/product-config.js'
+import { loadCategoryHosts, hostDisplayFields, localizedMenuName, completeHostDisplayData, productNavigationCategories, productOverviewAliases, findProductCategory, productListEntries, productListCopy } from '../src/lib/product-config.js'
 
 test('language names and explicit empty field lists retain the menu contract', () => {
   assert.equal(localizedMenuName({name:'云服务',language:{'en-us':'CRA1'}},'en-us'),'CRA1')
@@ -75,4 +75,26 @@ test('generic sidebar list ids select the overview without widening an unassigne
   assert.deepEqual(productOverviewAliases(nodes), ['overview', 'overview-active'])
   assert.equal(findProductCategory(productNavigationCategories(nodes), 'unassigned').product_id.length, 0)
   assert.equal(findProductCategory(productNavigationCategories(nodes), 'category-active').key, 'unassigned')
+})
+
+test('child page copy can override its category without changing the products it contains', () => {
+  const menu = [{ id: 'cloud', type: 'module', url: 'productList.htm', product_id: [5], children: [
+    { id: 'cloud-all', url: '/productList.htm?tab=all#list' },
+    { id: 'cloud-using', url: 'productList.htm?tab=using' },
+    { id: 'cloud-hidden', url: 'productList.htm?tab=expiring', hidden: 1 },
+  ] }, { id: 'mine', url: 'productList.htm?tab=all', children: [{ id: 'mine-all', url: '/productList.htm?tab=all' }] }]
+  const entries = productListEntries(menu)
+  const enabled = title => ({ enabled: 1, title })
+  const config = { default: enabled('全局'), overrides: {
+    cloud: enabled('云分类'), 'cloud-all': enabled('云全部'), 'cloud-using': { enabled: 0, title: '关闭' },
+    'cloud-hidden': enabled('隐藏'), mine: enabled('我的产品'), 'mine-all': enabled('我的全部'),
+  } }
+  for (const [key, tab, title] of [
+    ['cloud-all', 'all', '云全部'], ['cloud', 'all', '云全部'], ['cloud', 'current', '云分类'],
+    ['cloud-all', 'using', '云分类'], ['cloud-using', 'using', '云分类'], ['cloud', 'expiring', '云分类'],
+    ['cloud-hidden', 'expiring', '全局'], ['mine', 'all', '我的产品'], ['mine-all', 'all', '我的全部'],
+    ['mine-all', 'using', '我的产品'], ['all', 'current', '全局'],
+  ]) assert.equal(productListCopy(config, entries, key, tab)?.title, title, `${key} ${tab}`)
+  assert.equal(productListCopy({}, entries, 'cloud-using', 'using'), null)
+  assert.deepEqual(findProductCategory(productNavigationCategories(menu), 'cloud-all').product_id, [5])
 })

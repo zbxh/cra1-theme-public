@@ -114,8 +114,14 @@ button:disabled { cursor:not-allowed; }
 }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
 /* Business editors: navigation follows pages; one visible block at a time. */
-.theme-nav-label{display:flex;gap:8px;align-items:center;padding:10px 8px;color:var(--foreground);font-weight:650;font-size:.85rem}
-.theme-nav-label>svg{flex-shrink:0}.nav-group-items{padding-left:36px}
+.theme-nav-label { display:flex; align-items:center; gap:8px; width:100%; min-height:36px; padding:8px; border-radius:var(--cui-radius-control); color:var(--foreground); font-size:.85rem; font-weight:650; text-align:left; }
+.theme-nav-label > svg { flex-shrink:0; }
+.theme-nav-label > svg:last-child { color:var(--muted-foreground); }
+.theme-nav-label:hover { background:var(--cui-hover); }
+.theme-nav-label[data-active] { background:var(--cui-selected); box-shadow:inset 2px 0 0 var(--cui-selection-mark); }
+.theme-nav-label:focus-visible { outline:2px solid var(--cui-focus); outline-offset:-2px; }
+.nav-group-items { padding-left:36px; }
+@media (max-width:767px), (pointer:coarse) { .theme-nav-label { min-height:44px; } }
 .choice-grid{display:flex;flex-wrap:wrap;gap:.5rem}.choice-chip{display:flex;align-items:center;gap:.5rem;min-height:36px;padding:.5rem .65rem;border:1px solid var(--border);border-radius:var(--cui-radius-control);font-size:.8rem;background:white;cursor:pointer}.choice-chip:has(input:checked){background:var(--secondary);border-color:var(--primary)}.icon-choice{display:flex;align-items:center;gap:.4rem;padding:.5rem .75rem;border:1px solid var(--border);border-radius:var(--cui-radius-control);font-size:.8rem;min-height:36px}.icon-choice.active{background:var(--secondary);border-color:var(--primary)}
 @media(max-width:767px){.choice-chip,.icon-choice{min-height:44px}.choice-chip input{min-width:18px}}
 .theme-nav-icon{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px}.nav-category-trigger{position:relative;display:flex;align-items:center;gap:.4rem;width:100%;padding:.55rem 10px;text-align:left;font-size:.8rem;color:var(--muted-foreground);min-height:36px}.nav-category-trigger>svg{position:absolute;left:-8px}.nav-category-items{margin-left:12px;border-left:1px solid var(--border);padding-left:4px}.nav-item{min-height:36px}
