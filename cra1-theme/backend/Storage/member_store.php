@@ -1629,13 +1629,16 @@ final class MemberCenterStore
      */
     public function readTicketTypeCatalog(): array
     {
-        $out = ['types' => [], 'error' => ''];
+        $out = ['enabled' => false, 'types' => [], 'error' => ''];
         $pdo = $this->pdo();
         if (!$pdo) {
             $out['error'] = '数据库不可用';
             return $out;
         }
         try {
+            $plugins = $this->readContentPluginStates($pdo);
+            $out['enabled'] = $plugins['idcsmartticket'] ?? false;
+            if (!$out['enabled']) return $out;
             $rows = \CRA1\Theme\Compatibility\Database::query($pdo,
                 'SELECT id, name FROM idcsmart_addon_idcsmart_ticket_type ORDER BY id ASC'
             )->fetchAll(PDO::FETCH_ASSOC);
@@ -1646,8 +1649,7 @@ final class MemberCenterStore
                 ];
             }
         } catch (Throwable $e) {
-            // 表不存在 = 工单插件未安装/未启用：不视为错误，目录为空即可
-            $out['types'] = [];
+            $out['error'] = '暂时无法读取工单部门';
         }
         return $out;
     }
@@ -1661,7 +1663,6 @@ final class MemberCenterStore
             'error'        => '',
         ];
 
-        $plugins = [];
         $pdo = $this->pdo();
         if (!$pdo) {
             $out['error'] = '数据库连接不可用';
@@ -1669,48 +1670,36 @@ final class MemberCenterStore
         }
 
         try {
-            foreach (\CRA1\Theme\Compatibility\Database::query($pdo,"SELECT name, status FROM idcsmart_plugin")->fetchAll(PDO::FETCH_ASSOC) as $p) {
-                // 插件名在库里是驼峰（IdcsmartNews / IdcsmartAnnouncement），
-                // 归一成小写去下划线后匹配，避免大小写/命名风格差异导致误判「未安装」
-                $norm = strtolower(str_replace('_', '', (string) $p['name']));
-                $plugins[$norm] = (int) $p['status'] === 1;
+            $plugins = $this->readContentPluginStates($pdo);
+            foreach (['news', 'announcement', 'help'] as $source) {
+                $out[$source]['enabled'] = $plugins['idcsmart'.$source] ?? false;
+                if (!$out[$source]['enabled']) continue;
+                $rows = \CRA1\Theme\Compatibility\Database::query($pdo,
+                    'SELECT id, name FROM idcsmart_addon_idcsmart_'.$source.'_type ORDER BY id ASC'
+                )->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($rows as $row) {
+                    $name = trim((string) $row['name']);
+                    if ($name !== '') $out[$source]['types'][] = ['id' => (int) $row['id'], 'name' => $name];
+                }
             }
         } catch (Throwable $e) {
-            // 插件表不可用时按未安装处理
+            $out['error'] = '暂时无法读取文章分类';
         }
-
-        $readTypes = function (string $table) use ($pdo): array {
-            try {
-                $rows = \CRA1\Theme\Compatibility\Database::query($pdo,"SELECT id, name FROM `{$table}` ORDER BY id ASC")
-                    ->fetchAll(PDO::FETCH_ASSOC);
-            } catch (Throwable $e) {
-                return [];      // 表不存在 = 插件未安装
-            }
-            $out = [];
-            foreach ($rows as $r) {
-                $name = trim((string) $r['name']);
-                if ($name === '') {
-                    continue;
-                }
-                $out[] = ['id' => (int) $r['id'], 'name' => $name];
-            }
-            return $out;
-        };
-
-        $out['news']['enabled'] = ($plugins['idcsmartnews'] ?? false) === true;
-        // ThinkPHP 模型名 addon_idcsmart_news_type + 全局前缀 idcsmart_
-        $out['news']['types'] = $readTypes('idcsmart_addon_idcsmart_news_type');
-        if ($out['news']['enabled'] && $out['news']['types'] === []) {
-            // 插件启用但还没建分类：仍允许用「最新内容」作为来源（category_id=0）
-            $out['news']['types'] = [];
-        }
-
-        $out['announcement']['enabled'] = ($plugins['idcsmartannouncement'] ?? false) === true;
-        $out['announcement']['types'] = $readTypes('idcsmart_addon_idcsmart_announcement_type');
-        $out['help']['enabled'] = ($plugins['idcsmarthelp'] ?? false) === true;
-        $out['help']['types'] = $readTypes('idcsmart_addon_idcsmart_help_type');
 
         return $out;
+    }
+
+    private function readContentPluginStates(PDO $pdo): array
+    {
+        $plugins = [];
+        $rows = \CRA1\Theme\Compatibility\Database::query($pdo,
+            'SELECT name, status FROM idcsmart_plugin'
+        )->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($rows as $row) {
+            $name = strtolower(str_replace('_', '', (string) $row['name']));
+            $plugins[$name] = (int) $row['status'] === 1;
+        }
+        return $plugins;
     }
 
     /* ===================================================================== */

@@ -1,0 +1,42 @@
+<?php
+declare(strict_types=1);
+namespace CRA1\Theme\Compatibility;
+
+/** Native module pages expect their original shell components before business JS. */
+final class NativeComponents
+{
+    public static function registry(): array
+    {
+        static $registry;
+        return $registry??($registry=\CRA1\Theme\Files::json(CRA1_THEME_BACKEND.'/Compatibility/native-components.json'));
+    }
+
+    public static function usesThemeAssets(string $name): bool
+    {
+        return in_array($name,self::registry()['versioned']??['payDialog'],true);
+    }
+
+    public static function forPath(string $request): array
+    {
+        $path=parse_url($request,PHP_URL_PATH);
+        if (!is_string($path) || !preg_match('~^/module/([A-Za-z][A-Za-z0-9_]*)/(product_list|product_detail)\.htm$~D',$path,$match)) return [];
+        $registry=self::registry();
+        $group=$match[2]==='product_list'?'list':(in_array($match[1],['mf_cloud','mf_dcim'],true)?'detail':'detailCommon');
+        $scripts=[];$visiting=[];
+        $visit=static function(string $name) use (&$visit,&$scripts,&$visiting,$registry): void {
+            if (isset($scripts[$name])) return;
+            if (isset($visiting[$name]) || !isset($registry['paths'][$name])) throw new \RuntimeException('Invalid native component dependencies');
+            $visiting[$name]=true;
+            foreach ($registry['dependencies'][$name]??[] as $dependency) $visit($dependency);
+            $relative=$registry['paths'][$name];
+            if (!is_string($relative)||!preg_match('~^components/[A-Za-z][A-Za-z0-9_]*/'.preg_quote($name,'~').'\.js$~D',$relative)) throw new \RuntimeException('Invalid native component path');
+            $scripts[$name]=$relative;unset($visiting[$name]);
+        };
+        $names=$registry['groups'][$group];
+        // Some resource modules share a page layout but declare additional
+        // native components. Load those bindings before their business script.
+        $names=array_merge($names,$registry['module_dependencies'][$match[1]][$match[2]]??[]);
+        foreach ($names as $name) $visit($name);
+        return $scripts;
+    }
+}

@@ -21,9 +21,12 @@ if(preg_match('~^/cra1-shared/releases/[a-z0-9-]+$~D',$uiBase))foreach(['tokens.
 }
 ?><!doctype html><html lang="zh-CN" data-cra1-ui="installer"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>酷锐A1主题安装与维护</title><?php foreach(['tokens.css','ui-effects.css'] as $uiStyle):if(isset($uiAssets[$uiStyle])):?><link rel="stylesheet" href="<?=htmlspecialchars($uiAssets[$uiStyle],ENT_QUOTES,'UTF-8')?>"><?php endif;endforeach;?><link rel="stylesheet" href="installer.css?v=<?=$assetVersion?>"></head><body>
 <main id="installer" data-csrf="<?=htmlspecialchars($csrf,ENT_QUOTES,'UTF-8')?>">
-<h1>酷锐A1主题安装与维护</h1><p>上传解压主题安装包后，在这里设置主题后台即可，无需先登录 V10 系统后台。安装完成后，再按需要手动启用主题。</p>
+<h1>酷锐A1主题安装与维护</h1>
+<div id="install-intro" hidden>
+<p>上传解压主题安装包后，在这里设置主题后台即可，无需先登录 V10 系统后台。安装完成后，再按需要手动启用主题。</p>
 <ol><li>设置主题后台</li><li>完成安装</li><li>进入主题后台</li></ol>
-<button type="button" id="check" hidden<?=$startupError!==''?' disabled':''?>>重新检测</button><p id="status" role="status"><?=htmlspecialchars($startupError,ENT_QUOTES,'UTF-8')?></p><details id="environment" hidden><summary>运行信息</summary><div id="checks"></div></details>
+</div>
+<button type="button" id="check" hidden<?=$startupError!==''?' disabled':''?>>重新检测</button><p id="status" role="status"><?=htmlspecialchars($startupError?:'正在读取主题安装状态…',ENT_QUOTES,'UTF-8')?></p><details id="environment" hidden><summary>运行信息</summary><div id="checks"></div></details>
 <form id="setup" hidden autocomplete="off" novalidate><h2>设置主题后台</h2>
 <label>后台地址<input name="entry" pattern="[a-z][a-z0-9]{5,31}" minlength="6" maxlength="32" required placeholder="例如 cra1admin"></label>
 <label>管理账号<input name="username" pattern="[A-Za-z0-9_\-]{3,32}" minlength="3" maxlength="32" required autocomplete="off"></label>

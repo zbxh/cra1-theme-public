@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { MessageSquarePlus } from 'lucide-react'
 import { api } from '../lib'
-import { Button } from '../ui/button'
+import { buttonVariants } from '../ui/button'
 
 export default function ProductTicket({ hostId }) {
   const [entry, setEntry] = useState(null)
@@ -14,5 +14,9 @@ export default function ProductTicket({ hostId }) {
     return () => controller.abort()
   }, [hostId])
   if (entry?.hostId !== hostId || !entry?.url) return null
-  return <Button size="sm" variant="outline" asChild><a href={entry.url}><MessageSquarePlus aria-hidden="true" />提交工单</a></Button>
+  return (
+    <a className={buttonVariants({ size: 'sm', variant: 'outline' })} href={entry.url}>
+      <MessageSquarePlus aria-hidden="true" />提交工单
+    </a>
+  )
 }

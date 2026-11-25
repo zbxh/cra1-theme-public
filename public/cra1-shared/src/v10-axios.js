@@ -125,4 +125,33 @@
     return Promise.reject(value);
   });
   window.Axios = Axios;
+
+  const nativeCartShell = window.document?.documentElement?.getAttribute('data-cra1-cart-native-shell');
+  if (nativeCartShell == null) return;
+  document.addEventListener('DOMContentLoaded', () => {
+    // The native footer initializes its own Axios before the cart mounts.
+    window.Axios = Axios;
+    if (nativeCartShell !== 'default' || typeof topMenu === 'undefined') return;
+    const initialize = topMenu.methods?.GetIndexData;
+    if (typeof initialize !== 'function' || typeof window.accountDetail !== 'function') return;
+
+    // The official header starts its account read synchronously and only has a
+    // success and completion handler. Adapt this call without changing other reads.
+    topMenu.methods.GetIndexData = function (...args) {
+      const accountDetail = window.accountDetail;
+      window.accountDetail = () => accountDetail().catch(error => {
+        const status = Number(error?.data?.status || error?.response?.status) || 503;
+        if (status !== 401) {
+          const message = '账户信息暂时无法读取，请刷新重试。';
+          this.$message?.warning(shared.I18n?.t(message) || message);
+        }
+        return { data: { status } };
+      });
+      try {
+        return initialize.apply(this, args);
+      } finally {
+        window.accountDetail = accountDetail;
+      }
+    };
+  }, { once:true });
 })();

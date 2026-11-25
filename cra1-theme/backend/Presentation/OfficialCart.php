@@ -33,9 +33,8 @@ final class OfficialCart
             'themes_cart' => 'pc/default',
         ];
         $html = self::nativePart($part, $data);
-        // The goods template, its fragment loader and module dependencies are
-        // always the installed native implementation, byte for byte.
-        if ($part === 'goods') return $html;
+        if ($part === 'goods') return self::cartBody($html, true);
+        if ($part === 'header') $html = self::allowZoom($html);
         $assets = self::navigationAssets();
         if (!$assets) return $html;
         $footer = self::navigationFooter($part === 'footer' ? $html : self::nativePart('footer', $data), $assets);
@@ -58,15 +57,25 @@ final class OfficialCart
         $body = CRA1_THEME_ROOT.'/public/cart/template/'.$cart.'/goods.php';
         if ($shell === null || !is_file($body)) return null;
         $data = self::shellData($variables, $shell) + ['template_catalog_cart'=>'cart', 'themes_cart'=>$cart];
-        // Some older customer links use product_id. Normalize before the original loader runs.
-        $alias = '<script>(function(){var u=new URL(location.href),id=u.searchParams.get("product_id");'
-            .'if(!u.searchParams.has("id")&&/^[1-9]\\d*$/.test(id||"")){u.searchParams.set("id",id);'
-            .'history.replaceState(history.state,"",u.pathname+u.search.replace(/\\+/g,"%20")+u.hash);}})();</script>';
-        $html = $alias.self::template($body, $data);
-        $html = self::template($shell['header'], $data).$html.self::template($shell['footer'], $data);
+        $html = self::cartBody(self::template($body, $data), $useCRA1);
+        $html = self::allowZoom(self::template($shell['header'], $data).$html.self::template($shell['footer'], $data));
         $result = $useCRA1 ? self::withNavigation($html, 'goods') : null;
         self::$fullOfficialCart = $result === null;
         return $result ?? $html;
+    }
+
+    private static function cartBody(string $html, bool $withFeedback): string
+    {
+        // Normalize older links before any of the native scripts read the ID.
+        $alias = '<script>(function(){var u=new URL(location.href),id=u.searchParams.get("product_id");'
+            .'if(!u.searchParams.has("id")&&/^[1-9]\\d*$/.test(id||"")){u.searchParams.set("id",id);'
+            .'history.replaceState(history.state,"",u.pathname+u.search.replace(/\\+/g,"%20")+u.hash);}})();</script>';
+        if (!$withFeedback) return $alias.$html;
+        $css = \CRA1\Theme\Release\Assets::url('shared', 'native-cart-feedback.css');
+        $js = \CRA1\Theme\Release\Assets::url('shared', 'native-cart-feedback.js');
+        if ($css === '' || $js === '') return $alias.$html;
+        return $alias.'<link rel="stylesheet" href="'.htmlspecialchars($css, ENT_QUOTES, 'UTF-8').'">'
+            .'<script src="'.htmlspecialchars($js, ENT_QUOTES, 'UTF-8').'"></script>'.$html;
     }
 
     /** Both modes use V10's real productdetail entry and host view loader. */
@@ -100,7 +109,27 @@ final class OfficialCart
         $result = $useCRA1 ? self::withNavigation($html, 'productdetail', $headEnd) : null;
         self::$nativePanel = true;
         self::$nativeNavigation = $result !== null;
-        return $result ?? $html;
+        return self::allowZoom($result ?? $html);
+    }
+
+    /** Leave the installed templates intact while allowing zoom in their rendered shell. */
+    private static function allowZoom(string $html): string
+    {
+        if (!preg_match('~<head\b[^>]*>~i', $html, $opening, PREG_OFFSET_CAPTURE)) return $html;
+        $start = $opening[0][1] + strlen($opening[0][0]);
+        $end = stripos($html, '</head>', $start) ?: strlen($html);
+
+        $head = preg_replace_callback(
+            '~<meta\b(?=[^>]*\sname\s*=\s*(?:"viewport"|\x27viewport\x27|viewport(?=\s|/?>)))[^>]*>~i',
+            static function (array $tag): string {
+                return preg_replace_callback('~(\scontent\s*=\s*)(["\x27])(.*?)\2~is', static function (array $attribute): string {
+                    $content = preg_replace('~(?:^|[,;])\s*(?:maximum-scale|minimum-scale|user-scalable)\s*=[^,;]*~i', '', $attribute[3]);
+                    return $attribute[1].$attribute[2].ltrim($content, ',;').$attribute[2];
+                }, $tag[0], 1);
+            },
+            substr($html, $start, $end - $start)
+        );
+        return substr($html, 0, $start).$head.substr($html, $end);
     }
 
     private static function defaultShell(bool $mobile, ?string $page = null): ?array

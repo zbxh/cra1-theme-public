@@ -15,6 +15,19 @@
     if (product.mode === 'only_api' && product.res_module) return 're' + product.res_module;
     return product.module || product.module1 || '';
   }
+  async function configurationModule(config, id) {
+    const module = typeof config.module === 'string' ? config.module.trim() : '';
+    if (module) return module;
+
+    // Some V10 versions return the configuration without its module identifier.
+    const { data } = await window.apiProductDetail({ id });
+    const product = data?.data?.product;
+    // An identified product can have no module assigned. A missing product
+    // response does not establish which configurator to open.
+    if (data?.status !== 200 || Number(product?.id) !== Number(id)) return null;
+    const identified = catalogModule(product);
+    return typeof identified === 'string' ? identified.trim() : null;
+  }
   function url(path, id, address) {
     const value = new URL(address || window.location.href, window.location.href);
     value.pathname = path;
@@ -23,5 +36,5 @@
     // Official module query parsers use decodeURIComponent, which leaves '+'.
     return value.pathname + value.search.replace(/\+/g, '%20') + value.hash;
   }
-  window.CRA1CartModules = Object.freeze({profile, catalogModule, url});
+  window.CRA1CartModules = Object.freeze({profile, catalogModule, configurationModule, url});
 })(window);

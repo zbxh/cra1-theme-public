@@ -25,51 +25,66 @@ const TABS = [
   { key: 'custom', label: '自定义', icon: Pencil },
 ]
 
+function useLinkSource(open, request, validate) {
+  const [result, setResult] = useState({ loading: true })
+  const [attempt, setAttempt] = useState(0)
+  const cached = result.data !== undefined
+
+  useEffect(() => {
+    if (!open || cached) return
+    let active = true
+    setResult({ loading: true })
+    request().then(response => {
+      if (response.status !== 200) throw new Error(response.msg || '暂时无法读取链接列表')
+      if (!validate(response.data)) throw new Error('链接列表未能完整读取')
+      if (active) setResult({ data: response.data })
+    }).catch(error => {
+      if (active) setResult({ error: error.message || '暂时无法读取链接列表' })
+    })
+    return () => { active = false }
+  }, [open, request, validate, cached, attempt])
+
+  return { ...result, retry: () => setAttempt(n => n + 1) }
+}
+
+const isPageList = data => Array.isArray(data?.pages)
+const isProductList = data => Array.isArray(data?.products) && Array.isArray(data?.groups)
+
+function LinkChoice({ name, url, group, onPick }) {
+  return (
+    <button type="button" onClick={() => onPick(url)}
+            className="grid w-full gap-y-1 rounded-md px-2.5 py-1.5 text-left text-[13px] text-body transition-colors duration-150 hover:bg-surface-alt">
+      <span className="min-w-0 [overflow-wrap:anywhere]">{name}</span>
+      <span className="flex min-w-0 flex-wrap gap-x-2 text-[11px] text-muted-foreground">
+        {group && <span className="min-w-0 [overflow-wrap:anywhere]">{group}</span>}
+        <code className="min-w-0 font-mono [overflow-wrap:anywhere]">{url}</code>
+      </span>
+    </button>
+  )
+}
+
 export default function LinkPicker({ value, onChange, placeholder, label='跳转链接', styledSelect=false }) {
   const Choice = styledSelect ? MenuSelect : Select
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState('page')
-  const [pages, setPages] = useState([])
-  const [products, setProducts] = useState({ groups: [], products: [] })
-  const [loading, setLoading] = useState({ page: true, product: true })
-  const [loaded, setLoaded] = useState({ page: false, product: false })
+  const pageSource = useLinkSource(open, websiteApi.linkOptions, isPageList)
+  const productSource = useLinkSource(open, websiteApi.productOptions, isProductList)
+  const source = tab === 'page' ? pageSource : tab === 'product' ? productSource : null
+  const pages = pageSource.data?.pages
+  const products = productSource.data
   const [q, setQ] = useState('')
   const [groupId, setGroupId] = useState('')
-  const [error, setError] = useState({ page: false, product: false })
   const [contactType, setContactType] = useState(/^mailto:/.test(value||'')?'mailto':'tel')
-
-  useEffect(() => {
-    if (!open) return
-    let alive = true
-    function read(key, request, apply) {
-      if (loaded[key]) return
-      request().then((res) => {
-        if (!alive) return
-        if (res.status !== 200) throw new Error(res.msg || '链接列表读取失败，服务未提供具体原因')
-        apply(res.data)
-      }).catch((error) => {
-        if (alive) setError((prev) => ({ ...prev, [key]: error.message || '链接列表读取未完成，请重试' }))
-      }).finally(() => {
-        if (!alive) return
-        setLoaded((prev) => ({ ...prev, [key]: true }))
-        setLoading((prev) => ({ ...prev, [key]: false }))
-      })
-    }
-    read('page', websiteApi.linkOptions, (data) => setPages(data?.pages || []))
-    read('product', websiteApi.productOptions, (data) => setProducts(data || { groups: [], products: [] }))
-    return () => { alive = false }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
 
   const filteredPages = useMemo(() => {
     const s = q.trim().toLowerCase()
-    if (!s) return pages
-    return pages.filter((p) => p.label.toLowerCase().includes(s) || p.url.toLowerCase().includes(s))
+    if (!s) return pages || []
+    return (pages || []).filter((p) => p.label.toLowerCase().includes(s) || p.url.toLowerCase().includes(s))
   }, [pages, q])
 
   const filteredProducts = useMemo(() => {
     const s = q.trim().toLowerCase()
-    return (products.products || []).filter((p) => {
+    return (products?.products || []).filter((p) => {
       if (groupId && String(p.group) !== String(groupId)) return false
       if (!s) return true
       return p.name.toLowerCase().includes(s) || String(p.sub||'').toLowerCase().includes(s)
@@ -91,7 +106,6 @@ export default function LinkPicker({ value, onChange, placeholder, label='跳转
 
       {open && (
         <div className="mt-2 overflow-hidden rounded-lg border border-line bg-surface">
-          {error[tab] && <div role="alert" className="p-3 text-xs text-danger">{error[tab]}</div>}
           <div className="flex flex-wrap items-center gap-1 border-b border-line bg-surface-alt/60 p-2">
             {TABS.map((t) => {
               const Icon = t.icon
@@ -113,21 +127,20 @@ export default function LinkPicker({ value, onChange, placeholder, label='跳转
           </div>
 
           <div className="max-h-64 overflow-y-auto p-2">
-            {loading[tab] && <p className="px-2 py-3 text-[12px] text-muted-foreground">加载中…</p>}
+            {source?.loading && <p role="status" className="px-2 py-3 text-[12px] text-muted-foreground">加载中…</p>}
+            {source?.error && <div role="alert" className="flex flex-wrap items-center gap-2 p-2 text-xs text-danger">
+              {source.error}<Button type="button" size="sm" variant="outline" onClick={source.retry}>重新读取</Button>
+            </div>}
 
-            {!loading.page && !error.page && tab === 'page' && (
+            {pages && tab === 'page' && (
               filteredPages.length === 0
                 ? <p className="px-2 py-3 text-[12px] text-muted-foreground">没有匹配的页面</p>
                 : filteredPages.map((p) => (
-                  <button key={p.url} type="button" onClick={() => pick(p.url)}
-                          className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-[13px] text-body transition-colors duration-150 hover:bg-surface-alt">
-                    <span className="min-w-0 flex-1 truncate">{p.label}</span>
-                    <code className="shrink-0 font-mono text-[11px] text-muted-foreground">{p.url}</code>
-                  </button>
+                  <LinkChoice key={p.url} name={p.label} url={p.url} onPick={pick} />
                 ))
             )}
 
-            {!loading.product && !error.product && tab === 'product' && (
+            {products && tab === 'product' && (
               <>
                 <div className="mb-2 flex flex-wrap items-center gap-2 px-1">
                   <Label className="text-[11px] text-muted-foreground">分组</Label>
@@ -140,12 +153,8 @@ export default function LinkPicker({ value, onChange, placeholder, label='跳转
                 {filteredProducts.length === 0
                   ? <p className="px-2 py-3 text-[12px] text-muted-foreground">没有匹配的商品</p>
                   : filteredProducts.map((p) => (
-                    <button key={p.id} type="button" onClick={() => pick(p.url)}
-                            className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-[13px] text-body transition-colors duration-150 hover:bg-surface-alt">
-                      <span className="min-w-0 flex-1 truncate">{p.name}</span>
-                      <span className="shrink-0 text-[11px] text-muted-foreground">{p.group}{p.sub ? ' / ' + p.sub : ''}</span>
-                      <code className="shrink-0 font-mono text-[11px] text-muted-foreground">{p.url}</code>
-                    </button>
+                    <LinkChoice key={p.id} name={p.name} url={p.url}
+                                group={[p.group, p.sub].filter(Boolean).join(' / ')} onPick={pick} />
                   ))}
               </>
             )}

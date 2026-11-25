@@ -75,6 +75,11 @@
     nonce: nonce,
     embed: EMBED_FLAG,
     ready: false,
+    requestNativePage: function () {
+      if (!EMBED_FLAG || !nonce || !window.frameElement?.hasAttribute('data-cra1-cart-catalog')) return false;
+      post('config-native');
+      return true;
+    },
     /**
      * 配置内容装载完成后由 loader 调用：通知父页就绪并启动高度观察。
      */
@@ -145,15 +150,30 @@
   var railLastSnap = '';
   var railWatchTimer = null;
   var railAwaitSince = null;
-  var railAddPending = null;
+  var railSubmission = null;
   var quoteExecution = null;
+  var periodExecution = null;
   var quotePrepared = false;
   var couponPending = false;
   var couponFailure = '';
+  var provisioningFields = new Set([
+    'name', 'notes', 'password', 're_password', 'port', 'rand_port', 'auto_renew',
+    'security_group_id', 'security_group_protocol',
+  ]);
 
   function quoteSelection(vm) {
-    return JSON.stringify(vm.params ? [vm.params, vm.qty, vm.activeName, vm.packageId, vm.promo]
-      : [vm.configForm, vm.cycle, vm.orderData && vm.orderData.qty, vm.customfield]);
+    if (!vm.params) return JSON.stringify([vm.configForm, vm.cycle, vm.orderData && vm.orderData.qty, vm.customfield]);
+    // These fields configure provisioning after purchase. Keep them in native
+    // requests, but do not invalidate the price or retain passwords in the signature.
+    return JSON.stringify([vm.params, vm.qty, vm.activeName, vm.packageId, vm.promo?.promo_code, vm.promo?.event_promotion],
+      function (field, value) {
+        if (this !== vm.params) return value;
+        if (provisioningFields.has(field)) return undefined;
+        // Cloud's native quote checks whether an SSH key can be used with
+        // the selected image. The identity of the key does not affect it.
+        if (field === 'ssh_key_id') return vm.__cra1Quote?.module === 'mf_cloud' && value ? true : undefined;
+        return value;
+      });
   }
 
   // The three integrated modules retain their native calculation method. Run
@@ -164,16 +184,27 @@
     if (quotePrepared || !['mf_cloud', 'mf_dcim', 'idcsmart_common'].includes(module)) return;
     if (!window.Vue || !window.Axios) return;
     quotePrepared = true;
-    var axios = window.Axios, nativePost = axios.post;
+    var axios = window.Axios, nativePost = axios.post, nativePut = axios.put;
     axios.post = function (url, data) {
       var path = String(url).split('?')[0].replace(/^\/console\/v1/, '');
       var quote = path === '/product/' + productId + '/config_option';
       var cycles = path === '/product/' + productId + '/configoption/calculate';
       var operation = (quote || cycles) ? quoteExecution : null;
+      var period = path === '/product/' + productId + '/mf_dcim/duration' ? periodExecution : null;
       if (operation && quote) operation.selection = quoteSelection(operation.owner);
       var response = nativePost.apply(this, arguments);
-      if (!operation && path !== '/promo_code/apply') return response;
+      if (path === '/cart' && railSubmission?.type === 'rail-add') {
+        return railObserveCartWrite(response, railSubmission);
+      }
+      if (!operation && !period && path !== '/promo_code/apply') return response;
       return response.then(function (result) {
+        if (period) {
+          var values = result?.data?.data;
+          if (Number(result?.data?.status) !== 200 || !Array.isArray(values) || !values.length) {
+            period.failed = true;
+            throw new Error('计费周期暂时无法读取');
+          }
+        }
         if (operation && quote) {
           var value = result && result.data && result.data.data;
           operation.success = !!value && Number(result.data.status) === 200
@@ -183,18 +214,28 @@
         return result;
       }, function (error) {
         if (operation) operation.failed = true;
+        if (period) period.failed = true;
         if (path === '/promo_code/apply') couponFailure = window.CRA1Shared?.Errors?.message(error,
           { fallback: '优惠码暂时无法使用，请检查后重试' }) || '优惠码暂时无法使用，请检查后重试';
         throw error;
       });
     };
+    if (typeof nativePut === 'function') {
+      axios.put = function (url) {
+        var response = nativePut.apply(this, arguments);
+        if (railSubmission?.type === 'rail-save' && /^(?:\/console\/v1)?\/cart\/\d+(?:\?|$)/.test(String(url))) {
+          return railObserveCartWrite(response, railSubmission);
+        }
+        return response;
+      };
+    }
     window.Vue.mixin({
       beforeCreate: function () {
         var methods = this.$options.methods;
         if (!methods || typeof methods.changeConfig !== 'function'
             || !(methods.handlerCart && methods.submitOrder || methods.addCart && methods.buyNow)) return;
         var nativeChange = methods.changeConfig;
-        this.__cra1Quote = { state: 'loading', pending: false, running: null, args: [] };
+        this.__cra1Quote = { module: module, state: 'loading', pending: false, running: null, args: [] };
         this.$options.methods = Object.assign({}, methods, { changeConfig: function () {
           var vm = this, state = vm.__cra1Quote;
           state.args = Array.from(arguments);
@@ -223,6 +264,51 @@
           });
           return state.running;
         } });
+        if (module === 'mf_dcim' && typeof methods.getCycleList === 'function') {
+          this.$options.methods.getCycleList = async function () {
+            var state = this.__cra1Quote;
+            var period = { failed: false };
+            state.period = period;
+            state.periodFailed = false;
+            state.state = 'loading';
+            if (railVM === this) railPush(true);
+            var request;
+            periodExecution = period;
+            try { request = methods.getCycleList.apply(this, arguments); }
+            finally { periodExecution = null; }
+            try { await request; }
+            catch (error) { period.failed = true; }
+            if (state.period !== period) return;
+            state.period = null;
+            if (period.failed) {
+              this.loadingPrice = false;
+              this.isInit = false;
+              state.periodFailed = true;
+              state.state = 'error';
+            }
+            if (railVM === this) railPush(true);
+          };
+        }
+        if (module !== 'idcsmart_common' && typeof methods.formatData === 'function') {
+          this.$options.methods.formatData = function () {
+            // The native mode switch can clear the password while keeping its previous validation flags.
+            if (module === 'mf_cloud' && typeof this.changeInput === 'function'
+                && window.lang?.set_pas && this.login_way === window.lang.set_pas) {
+              this.changeInput(String(this.params?.password ?? ''));
+            }
+            var valid = methods.formatData.apply(this, arguments);
+            if (valid !== true && railSubmission?.owner === this) {
+              railFinishSubmission(railSubmission, false, 'rejected');
+            }
+            return valid;
+          };
+        }
+      },
+      created: function () {
+        if (module !== 'mf_cloud' || !this.__cra1Quote) return;
+        this.$watch(function () { return !!this.params?.ssh_key_id; }, function () {
+          if (railVM === this && (this.__cra1Quote.selection || this.__cra1Quote.running)) this.changeConfig();
+        });
       },
     });
   };
@@ -310,11 +396,12 @@
     var snap = null;
     if (railKind === 'f-order') {
       // cloud / dcim：周期 cycleList + params.duration_id，数量 qty，服务端计价 calcTotalPrice/totalPrice
-      var durations = (vm.cycleList || []).map(function (d, i) {
+      var periodFailed = vm.__cra1Quote?.periodFailed;
+      var durations = (periodFailed ? [] : vm.cycleList || []).map(function (d, i) {
         var name = d && (d.name || ((d.num || '') + (d.unit || '')));
         return { id: d && d.id !== undefined ? d.id : i, name: String(name || ('周期' + (i + 1))) };
       }).filter(function (d) { return d.name; });
-      if (!durations.length) return null;
+      if (!durations.length && !periodFailed) return null;
       var calc = railIsFiniteNum(vm.calcTotalPrice) ? Number(vm.calcTotalPrice) : null;
       var total = railIsFiniteNum(vm.totalPrice) ? Number(vm.totalPrice) : null;
       // 当前配置明细（f-order「配置费用」popover 的数据源）
@@ -399,7 +486,8 @@
       snap.availability = selected && priced && !vm.loadingPrice && !vm.dataLoading ? 'ready' : 'loading';
       if (vm.__cra1Quote && vm.__cra1Quote.state !== 'ready') snap.availability = vm.__cra1Quote.state;
       if (vm.__cra1Quote?.state === 'ready' && vm.__cra1Quote.selection !== quoteSelection(vm)) snap.availability = 'error';
-      if (vm.__cra1Quote?.running || vm.__cra1Quote?.pending || couponPending) snap.availability = 'loading';
+      if (vm.__cra1Quote?.periodFailed) snap.availability = 'error';
+      if (vm.__cra1Quote?.period || vm.__cra1Quote?.running || vm.__cra1Quote?.pending || couponPending) snap.availability = 'loading';
       var coupon = couponComponent();
       snap.couponApplied = String(coupon && coupon.appliedPromoCode || '');
       if (snap.availability !== 'ready') {
@@ -491,49 +579,88 @@
     return false;
   }
 
-  function railDoAdd(requestId) {
-    if (railAddPending) return;
+  function railFinishSubmission(operation, success, reason) {
+    if (railSubmission !== operation) return;
+    clearInterval(operation.timer);
+    railSubmission = null;
+    post(operation.type === 'rail-add' ? 'rail-added' : 'rail-action-result', {
+      requestId: operation.id, success: success, failed: !success, reason: reason || '',
+    });
+  }
+
+  function railObserveCartWrite(response, operation) {
+    operation.sent = true;
+    function fail(result) {
+      var vm = operation.owner;
+      if (operation.type === 'rail-save' && railVM === vm && !vm.__cra1Quote?.running
+          && (!railSubmission || railSubmission === operation)) {
+        // Some native modules clear this flag only after a successful save.
+        vm.dataLoading = false;
+        railPush(true);
+      }
+      var status = Number(result?.data?.status ?? result?.status);
+      railFinishSubmission(operation, false, status >= 400 && status < 500 ? 'rejected' : 'timeout');
+    }
+    return response.then(function (result) {
+      if (result?.data?.status && Number(result.data.status) !== 200) {
+        fail(result);
+        throw result;
+      }
+      return result;
+    }, function (error) {
+      fail(error?.response ?? error);
+      throw error;
+    });
+  }
+
+  function railSubmit(type, requestId) {
+    if (railSubmission) return;
+    var vm = railVM;
+    var adding = type === 'rail-add';
+    var operation = { type: type, id: requestId, owner: vm, timer: null };
+    railSubmission = operation;
+    if (!railCanSubmit()) {
+      if (vm) railPush(true);
+      railFinishSubmission(operation, false, 'quote');
+      return;
+    }
     var started = Date.now();
-    var previousMessages = Array.from(document.querySelectorAll('.el-message--error'));
-    var operation = { id: requestId, timer: null };
-    railAddPending = operation;
-    function finish(success, reason) {
-      if (railAddPending !== operation) return;
-      clearInterval(operation.timer);
-      railAddPending = null;
-      post('rail-added', { requestId: requestId, success: success, failed: !success, reason: reason || '' });
+    var previousMessages = new Set(document.querySelectorAll('.el-message--error'));
+    try {
+      var common = railKind === 'order-right';
+      if (adding) {
+        railDoCloseDialog();
+        if (!railClick(common ? '.order-right .f-btn .cart' : '.f-order .right .add-cart')) {
+          if (common) vm.addCart();
+          else vm.handlerCart();
+        }
+      } else if (type === 'rail-save' && typeof vm.changeCart === 'function') {
+        // Saving keeps the original cart position through the module's update API.
+        vm.changeCart();
+      } else if (type === 'rail-buy') {
+        if (!railClick(common ? '.order-right .f-btn .buy-btn' : '.f-order .right .buy, .botton-buy-btn .buy-btn, .botton-buy-btn .buy')) {
+          if (common) vm.buyNow(new MouseEvent('click'));
+          else vm.submitOrder(new MouseEvent('click'));
+        }
+      } else {
+        railFinishSubmission(operation, false, 'rejected');
+      }
+    } catch (error) {
+      railFinishSubmission(operation, false, 'rejected');
     }
-    // Dismiss a previous success before starting a new native operation.
-    railDoCloseDialog();
-    var ok = railKind === 'order-right'
-      ? railClick('.order-right .f-btn .cart')
-      : railClick('.f-order .right .add-cart');
-    if (!ok) { // 兜底：直接调模块方法
-      try {
-        if (railKind === 'order-right' && typeof railVM.addCart === 'function') railVM.addCart();
-        else if (typeof railVM.handlerCart === 'function') railVM.handlerCart();
-      } catch (e) { finish(false, 'rejected'); return; }
-    }
-    // 监听模块加购成功对话框（渲染在 iframe 文档内）：出现即关闭——
-    // 模块对话框+全屏遮罩会罩住配置区（看起来像独立深色模块），父页确认框独占交互
+    if (railSubmission !== operation) return;
     operation.timer = setInterval(function () {
-      var dlg = document.querySelector('.cartDialog');
-      var visible = dlg && dlg.offsetHeight > 0;
-      if (visible && railVM && railVM.cartDialog === true) {
-        try {
-          if (railVM && railVM.cartDialog === true) railVM.cartDialog = false;
-          else {
-            var btn = dlg.querySelector('.dialog-footer button');
-            if (btn) btn.click();
-          }
-        } catch (e) { }
-        finish(true);
-      } else if (Date.now() - started > 120 && Array.from(document.querySelectorAll('.el-form-item.is-error, .el-message--error')).some(function (el) { return el.offsetHeight > 0 && previousMessages.indexOf(el) < 0; })) {
-        // Keep the module's own field and API error messages visible.
-        finish(false, 'rejected');
-      } else if (Date.now() - started > 30000) {
-        // A missing acknowledgement never proves that the cart was updated.
-        finish(false, 'timeout');
+      var elapsed = Date.now() - started;
+      if (adding && vm.cartDialog === true && document.querySelector('.cartDialog')?.offsetHeight > 0) {
+        // Native success is reflected by the parent dialog only.
+        vm.cartDialog = false;
+        railFinishSubmission(operation, true);
+      } else if (!operation.sent && elapsed > 120 && Array.from(document.querySelectorAll('.el-form-item.is-error, .el-message--error')).some(function (el) {
+        return el.offsetHeight > 0 && !previousMessages.has(el);
+      })) {
+        railFinishSubmission(operation, false, 'rejected');
+      } else if (elapsed > (type === 'rail-buy' ? 6000 : 30000)) {
+        railFinishSubmission(operation, false, 'timeout');
       }
     }, 60);
   }
@@ -554,7 +681,8 @@
     if (String(data.productId) !== String(productId) || data.nonce !== nonce) return;
     if (data.type === 'rail-init') railBoot(true);
     else if (data.type === 'rail-requote') {
-      if (railVM && typeof railVM.changeConfig === 'function') railVM.changeConfig();
+      if (railVM?.__cra1Quote?.periodFailed) railVM.getCycleList();
+      else if (railVM && typeof railVM.changeConfig === 'function') railVM.changeConfig();
     }
     else if (data.type === 'shell-config') {
       // 父页下发壳层配置（v6.5：选配方式标题文本，后台可自定义）
@@ -565,26 +693,8 @@
       }
     }
     else if (data.type === 'rail-set') railExec(data);
-    else if (data.type === 'rail-add' && railCanSubmit()) railDoAdd(data.requestId);
-    else if (data.type === 'rail-save') {
-      if (!railCanSubmit()) return;
-      // Editing updates the existing cart position through the module's own
-      // validation and update API; it must never add another item or check out.
-      if (railVM && typeof railVM.changeCart === 'function') railVM.changeCart();
-    }
+    else if (['rail-add', 'rail-buy', 'rail-save'].includes(data.type)) railSubmit(data.type, data.requestId);
     else if (data.type === 'rail-close') railDoCloseDialog();
-    else if (data.type === 'rail-buy') {
-      if (!railCanSubmit()) return;
-      var ok = railKind === 'order-right'
-        ? railClick('.order-right .f-btn .buy-btn')
-        : railClick('.f-order .right .buy, .botton-buy-btn .buy-btn, .botton-buy-btn .buy');
-      if (!ok) {
-        try {
-          if (railKind === 'order-right' && typeof railVM.buyNow === 'function') railVM.buyNow();
-          else if (typeof railVM.submitOrder === 'function') railVM.submitOrder(new MouseEvent('click'));
-        } catch (e) { }
-      }
-    }
   });
 
   function railContract(vm) {

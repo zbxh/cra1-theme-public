@@ -8,6 +8,7 @@ const origin=process.env.CRA1_MODULE_TEST_ORIGIN,out=process.env.CRA1_MODULE_TES
 if(!origin||!out)throw Error('Set CRA1_MODULE_TEST_ORIGIN and an external CRA1_MODULE_TEST_OUT.');
 fs.mkdirSync(out,{recursive:true});
 const products=[
+ {id:504,module:'mf_cloud',name:'目录与实际模块不一致'},
  {id:501,module:'vendor_custom',name:'第三方模块'},
  {id:502,module:null,module1:'vendor_group',name:'接口分组模块'},
  {id:503,module:'mf_cloud',mode:'only_api',res_module:'cloud_service',name:'第三方代理模块'}
@@ -23,7 +24,8 @@ const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 let page;
 try{
  for(const width of (process.env.CRA1_MODULE_TEST_WIDTHS||'1920,1440,768,390,320').split(',').map(Number)){
-  const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:900},reducedMotion:'reduce'});
+  const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:900},reducedMotion:'reduce',
+   ...(width<=430?{isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36'}:{})});
   await context.addInitScript(common=>{localStorage.setItem('common_set_before',JSON.stringify(common));localStorage.setItem('lang','zh-cn');},common);
   const reads=[];
   await context.route('**/*',async route=>{
@@ -44,9 +46,9 @@ try{
    if(p==='/console/v1/product/group/first')return json(route,{list:[{id:300,name:'测试产品'}]});
    if(p==='/console/v1/product/group/second')return json(route,{list:[{id:301,name:'商品配置',type:'normal'}]});
    if(p==='/console/v1/product')return json(route,{list:Number(u.searchParams.get('page')||1)>1?[]:products,count:products.length});
-   const detail=/^\/console\/v1\/product\/(50[1-3])$/.exec(p);
+   const detail=/^\/console\/v1\/product\/(50[1-4])$/.exec(p);
    if(detail)return json(route,{product:products.find(x=>x.id===Number(detail[1]))});
-   const config=/^\/console\/v1\/product\/(50[1-3])\/config_option$/.exec(p);
+   const config=/^\/console\/v1\/product\/(50[1-4])\/config_option$/.exec(p);
    if(config){reads.push({path:p,flag:u.searchParams.get('flag')});return json(route,{module:Number(config[1])===503?'recloud_service':'vendor_custom',content:moduleHtml(config[1])});}
    if(p==='/fixture/vendor-boot.js')return route.fulfill({contentType:'text/javascript',body:'window.vendorMounts=(window.vendorMounts||0)+1;const settings=JSON.parse(document.querySelector(".third-party-module #vendor-settings").textContent);window.vendorVM=new Vue({el:".third-party-module",data:{...settings,plan:"标准版",bought:0},watch:{async plan(){Object.assign(this,await(await fetch("/fixture/vendor-config")).json())}}});'});
    if(p==='/fixture/vendor-config')return route.fulfill({json:{bandwidth:37,traffic:3072}});
@@ -68,21 +70,26 @@ try{
   };
   await page.goto(origin+'/cart/goodsList.htm?product_id=501',{waitUntil:'load'});await ready(501);
   check(await page.locator('#vendor-bandwidth').textContent()==='19','nested JSON stays inside the module before boot '+width);
-  await page.getByRole('combobox').selectOption({label:'专业版'});await page.waitForFunction(()=>document.querySelector('#vendor-bandwidth').textContent==='37');
+  await page.locator('.third-party-module select').selectOption({label:'专业版'});await page.waitForFunction(()=>document.querySelector('#vendor-bandwidth').textContent==='37');
   check(await page.locator('#vendor-traffic').textContent()==='3072','native selection updates module values '+width);
   await page.getByRole('button',{name:'原生订购 0',exact:true}).click();
   check(await page.getByRole('button',{name:'原生订购 1',exact:true}).isVisible(),'native action stays active '+width);
   await page.screenshot({path:path.join(out,'third-party-cart-'+width+'.png'),fullPage:true});
-  await page.goto(origin+'/cart/goodsList.htm?fpg_id=300&spg_id=301',{waitUntil:'load'});
-  await page.locator('.cl-goods-card').first().waitFor();await page.waitForTimeout(250);
-  check(new URL(page.url()).pathname==='/cart/goodsList.htm','category browsing stays in the list '+width);
-  for(const id of [502,503]){
+  const configRead=page.waitForResponse(response=>new URL(response.url()).pathname==='/console/v1/product/504/config_option');
+  await page.goto(origin+'/cart/goodsList.htm',{waitUntil:'domcontentloaded'});
+  await configRead;
+  await page.waitForFunction(()=>location.pathname==='/cart/goods.htm'||document.querySelector('.cart-page--flat')?.__vue__?.configState==='idle');
+  const catalogAddress=new URL(page.url());
+  check(catalogAddress.pathname==='/cart/goodsList.htm'&&!catalogAddress.searchParams.has('product_id'),'catalogue stays open when the returned module contradicts its list metadata '+width);
+  await page.locator('.cl-goods-card').first().waitFor();
+  await page.screenshot({path:path.join(out,'cart-catalogue-'+width+'.png'),fullPage:true});
+  for(const id of [504,502,503]){
    await page.locator('.cl-goods-card').filter({hasText:products.find(p=>p.id===id).name}).click();await ready(id);
    await page.goBack({waitUntil:'load'});await page.locator('.cl-goods-card').first().waitFor();
    check(new URL(page.url()).pathname==='/cart/goodsList.htm','back returns to the catalogue without a redirect loop '+id+'/'+width);
   }
-  await page.evaluate(()=>sessionStorage.setItem('product_information',JSON.stringify({position:3,product_id:501,config_options:{plan:'标准版'}})));
-  await page.goto(origin+'/cart/goodsList.htm?product_id=501&change=true&name=A%20B&config=%7B%22a%22%3A1%7D#network',{waitUntil:'load'});await ready(501);
+  await page.evaluate(()=>sessionStorage.setItem('product_information',JSON.stringify({position:3,product_id:504,config_options:{plan:'标准版'}})));
+  await page.goto(origin+'/cart/goodsList.htm?product_id=504&change=true&name=A%20B&config=%7B%22a%22%3A1%7D#network',{waitUntil:'load'});await ready(504);
   const address=new URL(page.url());
   check(address.searchParams.get('change')==='true'&&address.searchParams.get('name')==='A B'&&address.searchParams.get('config')==='{"a":1}'&&address.hash==='#network','native route preserves cart editing and deep-link context '+width);
   check(await page.evaluate(()=>JSON.parse(sessionStorage.product_information).position===3),'native navigation retains the existing cart position '+width);

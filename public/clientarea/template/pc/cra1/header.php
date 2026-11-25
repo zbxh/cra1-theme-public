@@ -26,8 +26,7 @@ if (is_file(IDCSMART_ROOT . 'public/clientarea/template/' . $public_themes . '/u
     <script>window.__CRA1_RUNTIME__ = {:json_encode($__cra1Runtime, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE)};</script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 页面标题：v10 系统对会员中心与购物车各页统一传 '首页-智简魔方'
          （ViewClientController / ViewCartController），直接输出会导致「登录页也叫首页」。
          该值由系统层决定、主题不得改系统（§9），因此由主题的

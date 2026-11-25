@@ -791,7 +791,9 @@ function HomeNewsCard({ content, setContentSection }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {catalogError && <Alert tone="warning">{catalogError}</Alert>}
+        {catalogError && <Alert tone="warning" role="alert">
+          {catalogError} <Button type="button" variant="outline" size="sm" onClick={() => setAttempt(n => n + 1)}>重新读取文章分类</Button>
+        </Alert>}
         {!catalogError && catalog && !catalog[source]?.enabled && <Alert>{sources[source]}插件当前不可用，设置将保留，插件恢复后生效。</Alert>}
         <Toggle
           label="启用文章时间轴"
@@ -912,15 +914,24 @@ function TicketAssistCard({ content, setContentSection }) {
   const setField = (k, v) => setContentSection('ticket_assist', { ...live, [k]: v })
   const [editing, setEditing] = useState(null)
   const [phEditing, setPhEditing] = useState(null)   // {index?, type_id, placeholder}
-  const [types, setTypes] = useState([])
-  const [catalogError,setCatalogError] = useState('')
+  const [catalog, setCatalog] = useState({ state: 'loading', types: [] })
   const [attempt,setAttempt] = useState(0)
+  const { types } = catalog
 
   useEffect(() => {
-    setCatalogError('')
+    let active = true
+    setCatalog({ state: 'loading', types: [] })
     memberApi.ticketCatalog()
-      .then((r) => { if (r.status !== 200) throw new Error(r.msg || '分类读取失败'); setTypes(r.data?.types || []) })
-      .catch((e) => setCatalogError(e.message))
+      .then((r) => {
+        if (!active) return
+        const data = r.data
+        if (r.status !== 200 || data?.error || typeof data?.enabled !== 'boolean' || !Array.isArray(data.types)) {
+          throw new Error(data?.error || r.msg || '暂时无法读取工单部门')
+        }
+        setCatalog({ state: data.enabled ? 'ready' : 'disabled', types: data.enabled ? data.types : [] })
+      })
+      .catch((error) => { if (active) setCatalog({ state: 'error', types: [], error: error.message }) })
+    return () => { active = false }
   }, [attempt])
 
   const typeName = (id) => (types.find((t) => Number(t.id) === Number(id)) || {}).name || (id ? `类型 #${id}` : '（进入表单后选择）')
@@ -953,7 +964,6 @@ function TicketAssistCard({ content, setContentSection }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {catalogError && <Alert tone="warning">{catalogError}</Alert>}
         <Toggle
           label="启用工单提交助手"
           desc="总开关：关闭时提交工单页保持插件原样"
@@ -1006,9 +1016,13 @@ function TicketAssistCard({ content, setContentSection }) {
         {/* 必选产品的部门：多选 */}
         <div>
           <Label className="mb-1.5 block">必须选择关联产品才能提交的工单部门</Label>
-          {types.length === 0 ? (
-            <Alert tone="info">工单插件类型表为空（插件未安装或未启用）。启用插件后此处会自动列出部门。</Alert>
-          ) : (
+          {catalog.state === 'loading' && <p role="status" className="text-sm text-muted-foreground">正在读取工单部门…</p>}
+          {catalog.state === 'error' && <Alert tone="warning" role="alert">
+            {catalog.error} <Button type="button" variant="outline" size="sm" onClick={() => setAttempt(n => n + 1)}>重新读取工单部门</Button>
+          </Alert>}
+          {catalog.state === 'disabled' && <Alert tone="info">工单插件当前未安装或未启用，已保存的设置会保留。</Alert>}
+          {catalog.state === 'ready' && types.length === 0 && <Alert tone="info">工单插件已启用，暂无可用部门。可在 V10 工单设置中添加部门。</Alert>}
+          {types.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {types.map((t) => {
                 const on = (live.require_host_types || []).map(Number).includes(Number(t.id))

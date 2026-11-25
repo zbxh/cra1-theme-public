@@ -1,0 +1,13 @@
+{
+  "release": "20261014-theme-fixes-v1",
+  "files": {
+    "app.css": {
+      "bytes": 282516,
+      "sha256": "85aeb3d437ea354eaa6b8d079a75746b5526a83140f90d02deb8f450bace5912"
+    },
+    "app.js": {
+      "bytes": 99008,
+      "sha256": "2804efb1fe7540237d77e935ac828b0bd157ac6bb4954df9f89ea7130eff6d34"
+    }
+  }
+}

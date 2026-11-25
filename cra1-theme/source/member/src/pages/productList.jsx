@@ -336,8 +336,10 @@ export default function ProductListPage() {
       {pinFeedback && <Alert tone={pinFeedback.host ? 'warning' : 'info'} role={pinFeedback.host ? 'alert' : 'status'}>{pinFeedback.message}
         {pinFeedback.host && <Button size="sm" variant="ghost" disabled={pendingPin !== null} onClick={() => changePin(pinFeedback.host)}>重试</Button>}
       </Alert>}
-      {hasSummaryFailure && !loading && !error && <p className="cra1-products__sync-note" role="status">页面错误，请刷新重试</p>}
-      {error ? <Alert tone="error"><span>页面错误，请刷新重试</span></Alert>
+      {hasSummaryFailure && !loading && !error && <p className="cra1-products__sync-note" role="status">部分产品的配置信息暂时无法读取。 <Button type="button" size="sm" variant="ghost" onClick={() => setRefresh(n => n + 1)}>重新加载</Button></p>}
+      {error ? <Alert tone="error" role="alert">
+        <span>产品列表暂时无法读取。</span> <Button type="button" size="sm" variant="outline" onClick={() => setRefresh(n => n + 1)}>重新加载</Button>
+      </Alert>
         : loading ? <div className="cra1-products__grid" aria-label="产品加载中" aria-busy="true">{Array.from({ length: limit }).map((_, i) => <Skeleton key={i} className="h-[220px] rounded-2xl" />)}</div>
           : rows.length === 0 ? <div className="cra1-products__empty"><EmptyState icon={Package} title={onlyPinned ? '没有符合条件的置顶产品' : keywords ? '没有符合条件的产品' : tab === 'deleted' ? '没有已删除的产品' : '暂无产品'} description={onlyPinned ? '可取消筛选，或打开产品的更多操作将它置顶。' : keywords ? '试试名称、IP、客户备注，或“Ubuntu 香港 100Mbps”。' : tab === 'deleted' ? '此分类下没有已删除的产品。' : '当前分类及状态下没有产品。'} action={<div className="cra1-products__empty-actions"><Button size="sm" variant="outline" onClick={reset}>清除筛选</Button>{!onlyPinned && !keywords && tab !== 'deleted' && <Button size="sm" onClick={() => { window.location.href = '/cart/goodsList.htm' }}>浏览产品</Button>}</div>} /></div>
             : <div className="cra1-products__grid" role="list" aria-label="产品卡片">{rows.map(h => <HostCard key={h.id} host={h} fields={fields} onOperation={onHostOperation} ticketEntry={ticketEntry}

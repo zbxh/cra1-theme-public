@@ -134,4 +134,4 @@ const metadata={...identity,release,release_channel:channel,security_epoch:1,
   asset_bases:{member:`/clientarea/template/pc/cra1/releases/${release}`,native:`/clientarea/template/pc/cra1/releases/${release}`,cart:`/cart/template/pc/cra1/releases/${release}`,shared:`/cra1-shared/releases/${release}`,website:`/web/cra1/releases/${release}`,admin:`assets/releases/${release}`},
   references:nativeRefs,native_dependencies:native.native_dependencies}
 fs.writeFileSync(path.join(output,'release.json'),JSON.stringify(metadata,null,2)+'\n')
-fs.writeFileSync(path.join(output,'build.json'),JSON.stringify({format:1,release,release_channel:channel,entry:'cra1-theme/scripts/build.mjs',outputs:{member:release,admin:release,shared:release,website:release}},null,2)+'\n')
+fs.writeFileSync(path.join(output,'build.json'),JSON.stringify({format:1,release,release_channel:channel,built_at:new Date().toISOString(),entry:'cra1-theme/scripts/build.mjs',outputs:{member:release,admin:release,shared:release,website:release}},null,2)+'\n')

@@ -173,15 +173,21 @@ localStorage.setItem = function (key, newValue) {
           try {
             const params = { id: this.id, flag: this.isIfram };
             const res = await getOrederConfig(params);
-            if (!res.data || res.data.status !== 200 || !res.data.data || typeof res.data.data.content !== "string") {
+            const config = res.data?.data;
+            if (res.data?.status !== 200 || typeof config?.content !== "string") {
               this.configError("商品配置暂不可用，请重试或选择其他商品。");
               return false;
             }
-            const module=typeof res.data.data.module === 'string' ? res.data.data.module : '';
             const modules=window.CRA1CartModules;
             if (!modules) throw new Error('商品页面尚未加载');
+            const module = await modules.configurationModule(config, this.id);
+            if (module === null) {
+              this.configError("商品配置暂不可用，请重试或选择其他商品。");
+              return false;
+            }
             const managed=!!modules.profile(module);
             if (!managed) {
+              if (window.__CART_EMBED__?.requestNativePage?.()) return false;
               // Legacy embed links retain the complete native document.
               window.top.location.replace(modules.url('/cart/goods.htm', this.id));
               return false;
@@ -198,13 +204,13 @@ localStorage.setItem = function (key, newValue) {
             if (this.isEmbed && window.__CART_EMBED__?.prepare) window.__CART_EMBED__.prepare(module);
             if (nativeModule) {
               $.ajaxSetup({cache:true});
-              $(host).html(res.data.data.content);
+              $(host).html(config.content);
             } else {
-              host.innerHTML=window.CRA1CartControls.transform(res.data.data.content,module);
+              host.innerHTML=window.CRA1CartControls.transform(config.content,module);
               await window.CRA1ModuleDeps.mountScripts(host);
             }
             if (window.__CART_EMBED__ && this.isEmbed) window.__CART_EMBED__.markReady();
-            this.content = res.data.data.content;
+            this.content = config.content;
             return true;
           } catch (error) {
             this.configError("商品配置加载失败，请稍后重试。");

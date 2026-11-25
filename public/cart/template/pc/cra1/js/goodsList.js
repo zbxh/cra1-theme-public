@@ -1,4 +1,16 @@
 (function (window, undefined) {
+  function decodeDomainImport(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let encoding = "utf-8";
+    if (bytes[0] === 0xff && bytes[1] === 0xfe) encoding = "utf-16le";
+    if (bytes[0] === 0xfe && bytes[1] === 0xff) encoding = "utf-16be";
+    try {
+      return new TextDecoder(encoding, { fatal: true }).decode(bytes);
+    } catch (error) {
+      if (encoding !== "utf-8") throw error;
+      return new TextDecoder("gb18030", { fatal: true }).decode(bytes);
+    }
+  }
   function mountCart() {
     const template = document.querySelector(".cart-page--flat");
     if (!template || template.__vue__) return;
@@ -126,6 +138,7 @@
           navSecondLabel: "",  // v10 二级导航名称
           selectedProductId: 0,
           selectedProduct: null,
+          nativeProductIds: [], // The config response can contradict the catalog module hint.
           entryProductId: 0, // URL 配置及购物车编辑数据只属于进入时的商品
           entryCartEdit: false,
           configState: "idle", // idle | loading | ready | error
@@ -140,7 +153,7 @@
         dockDetailOpen: false,
         couponOpen: false,   // idle | bridged | fallback
           railLoading: false,
-          railAddRequestId: '',
+          railSubmission: null,
           railAvailability: "loading",
           railDurationRequired: true,
           railDurations: [],
@@ -220,9 +233,12 @@
           domainSearchRequestId: 0,
           domainBatchRequestId: 0,
           domainEntryPending: true,
+          lastDomainSearch: null,
           isShowUpload: false,
           fileName: "",
-          fileContent: "",
+          fileDomains: [],
+          fileReading: false,
+          fileError: "",
           originalPrice: 0.0,
           /* 传参搜索 */
           fpg_id: "",
@@ -296,7 +312,9 @@
       },
       computed: {
         railStatusText() {
-          if (this.railAvailability === "error") return "配置费用计算失败，请重试。";
+          if (this.railAvailability === "error") {
+            return this.railDurationRequired && !this.railDurations.length ? "计费周期暂时无法读取，请重试。" : "配置费用计算失败，请重试。";
+          }
           if (this.railAvailability === "unavailable") return "暂未获取到可用订购周期，请刷新页面或选择其他商品。";
           return this.railDurationRequired && !this.railDurations.length ? "正在加载订购周期…" : "正在计算配置费用…";
         },
@@ -400,6 +418,10 @@
         // 是否登录
         isLogin() {
           return window.localStorage.jwt ? true : false;
+        },
+        domainBatchLimit() {
+          const limit = Number(this.domainConfig.number_limit);
+          return Number.isSafeInteger(limit) && limit > 0 ? limit : 500;
         },
         calcDomainList() {
           if (this.selectFilterSuffix.length === 0) {
@@ -740,70 +762,68 @@
           return url;
         },
         goLogin() {
-          sessionStorage.redirectUrl = "/cart/goodsList.htm";
+          const target = new URL(window.location.href);
+          if (this.lastDomainSearch) {
+            for (const [key, value] of Object.entries(this.lastDomainSearch)) {
+              if (target.searchParams.get(key) !== value) target.searchParams.set(key, value);
+            }
+          }
+          sessionStorage.redirectUrl = target.pathname + target.search.replace(/\+/g, "%20") + target.hash;
           location.href = "/login.htm";
         },
-        // 选择文件
-        selectFile() {
-          document.getElementById("upFile").click();
-          // 监听文件上传
-          document.getElementById("upFile").addEventListener("change", (e) => {
-            // 获取文件
-            const file = e.target.files[0];
-            // 判断文件类型
-            if (file.type !== "text/plain") {
-              this.$message.warning(lang.template_text137);
+        focusDomainUpload(ref) {
+          this.$refs[ref]?.focus({ preventScroll: true });
+        },
+        readUploadFile(event) {
+          const file = event.target.files[0];
+          this.resetUploadFile();
+          if (!file || !this.isShowUpload) return;
+          if (file.type !== "text/plain" && !/\.txt$/i.test(file.name)) {
+            this.fileError = lang.template_text137;
+            return;
+          }
+          const reader = new FileReader();
+          const current = () => this._domainUploadReader === reader && this.isShowUpload;
+          const finish = (error = "") => {
+            this._domainUploadReader = null;
+            this.fileReading = false;
+            this.fileError = window.CRA1Shared?.I18n?.t(error) || error;
+          };
+          this._domainUploadReader = reader;
+          this.fileName = file.name;
+          this.fileReading = true;
+          reader.onload = () => {
+            if (!current()) return;
+            let content;
+            try {
+              content = decodeDomainImport(reader.result);
+            } catch (_) {
+              finish("无法读取文件，请重新选择 TXT 文件。");
               return;
             }
-            // 读取文件名
-            this.fileName = file.name;
-            // 读取文件
-            const reader = new FileReader();
-            // 判断txt文件编码格式
-            reader.readAsText(file, "utf-8");
-            reader.onload = (e) => {
-              const txtString = e.target.result;
-              // utf-8 的 中文编码 正则表达式
-              const patrn = /[\u4E00-\u9FA5]/gi;
-              // 检测当前文本是否含有中文（如果没有，则当乱码处理）
-              // 两个格式的英文编码一样，所以纯英文文件也当成乱码再处理一次
-              if (!patrn.exec(txtString)) {
-                let reader_gb2312 = new FileReader();
-                // 再拿一次纯文本，这一次拿到的文本一定不会乱码
-                reader_gb2312.readAsText(file, "gb2312");
-                reader_gb2312.onload = (e2) => {
-                  this.fileContent = e2.target.result;
-                };
-              } else {
-                this.fileContent = txtString;
-              }
-            };
-          });
+            this.fileDomains = content.split(/[,\r\n]+/).map(value => value.trim()).filter(Boolean);
+            finish(this.fileDomains.length ? "" : "文件中没有可导入的域名。");
+          };
+          reader.onerror = () => {
+            if (current()) finish("无法读取文件，请重新选择 TXT 文件。");
+          };
+          reader.readAsArrayBuffer(file);
         },
         confirmUpload() {
-          // 解析输入框中的换行 把换行替换成\n 传字符串
-          let params = this.fileContent
-            .replace(/[\r\n]/g, ",")
-            .split(",")
-            .filter((item) => {
-              return item !== "";
-            });
-          const maxLimt = this.domainConfig.number_limit || 500;
-          if (params.length > maxLimt) {
-            // 截取前500个
-            params = params.slice(0, maxLimt);
-          }
-          this.textarea2 = params.join("\n");
-          this.cancelUpload();
-        },
-        cancelUpload() {
-          document.getElementById("upFile").value = "";
-          document
-            .getElementById("upFile")
-            .removeEventListener("change", () => { });
-          this.fileName = "";
-          this.fileContent = "";
+          if (!this.isShowUpload || !this.fileDomains.length) return;
+          this.textarea2 = this.fileDomains.slice(0, this.domainBatchLimit).join("\n");
           this.isShowUpload = false;
+        },
+        resetUploadFile() {
+          const reader = this._domainUploadReader;
+          this._domainUploadReader = null;
+          if (reader && reader.readyState === FileReader.LOADING) reader.abort();
+          const input = this.$refs?.domainUploadFile;
+          if (input) input.value = "";
+          this.fileName = "";
+          this.fileDomains = [];
+          this.fileReading = false;
+          this.fileError = "";
         },
         domainScopeKey() {
           return [this.select_first_obj.id, this.select_second_obj.id, this.host_id].join(":");
@@ -816,12 +836,15 @@
           this.domainConfig = {};
           this.suffixList = [];
           this.selectSuffix = "";
+          this.lastDomainSearch = null;
           this.domainList = [];
           this.availList = [];
           this.unavailList = [];
           this.faillList = [];
           this.isSearching = false;
           this.batchLoading = false;
+          this.isShowUpload = false;
+          this.resetUploadFile();
           if (cancelEntry) this.domainEntryPending = false;
         },
         // 后缀与设置必须属于当前域名分类，切换分类后的迟到响应不再生效。
@@ -886,7 +909,6 @@
           }
           if (!this.isLogin) {
             this.$message.warning(lang.template_text139);
-            sessionStorage.redirectUrl = "/cart/goodsList.htm";
             this.goLogin();
             return;
           }
@@ -923,10 +945,9 @@
               return item !== "";
             })
             .join(",");
-          const maxLimt = this.domainConfig.number_limit || 500;
-          if (params.split(",").length - 1 >= maxLimt) {
+          if (params.split(",").length > this.domainBatchLimit) {
             this.$message.warning(
-              `${lang.template_text141}${maxLimt}${lang.template_text142}`
+              `${lang.template_text141}${this.domainBatchLimit}${lang.template_text142}`
             );
             return;
           }
@@ -1238,6 +1259,7 @@
           this.domainEntryPending = false;
           this.selectSuffix = selected.suffix;
           this.domainInput = parsed.domain;
+          this.lastDomainSearch = { domain: parsed.domain, suffix: selected.suffix };
           this.isShowSuffixBox = false;
           this.isSearching = true;
           this.domainList = [];
@@ -1334,13 +1356,13 @@
         },
         resetProductSelection() {
           this.moduleSelectionRequestId++;
+          clearTimeout(this.embedTimer);
           this.selectedProductId = 0;
           this.selectedProduct = null;
           this.configState = "idle";
           this.embedDirty = false;
           this.railState = "idle";
-          clearTimeout(this.railAddTimer);
-          this.railAddRequestId = '';
+          this.clearRailSubmission();
         },
         // 重置二级分组状态并作废旧请求
         resetSecondGroupState() {
@@ -1713,7 +1735,10 @@
             this.$message.warning(lang.inventory_shortage || lang.no_goods || "该商品暂时无法选购");
             return;
           }
-          if (Number(this.selectedProductId) === Number(item.id)) return;
+          if (Number(this.selectedProductId) === Number(item.id)) {
+            this.updateUrlParam("product_id", item.id, "push");
+            return;
+          }
           return this.confirmSelectionChange(() => this.doSelectProduct(item));
         },
         async confirmSelectionChange(change, fromHistory = false) {
@@ -1738,9 +1763,8 @@
           const requestId = ++this.moduleSelectionRequestId;
           const modules = window.CRA1CartModules;
           if (!resolved && modules && !modules.catalogModule(item) && !window.__THEME_PREVIEW__) {
-            // Some catalogue hooks omit module metadata. Resolve it through
-            // V10's actual config response rather than guessing from markup or
-            // bouncing between the list and native page.
+            // Catalogue hooks can omit module metadata. Resolve it from the
+            // same V10 responses used by the embedded configurator.
             return this.resolveProductModule(item, historyMode, requestId);
           }
           if (Number(item.id) !== this.entryProductId) this.clearProductEntry();
@@ -1762,8 +1786,7 @@
           this.configErrorText = "";
           // v6：重置价格计算器桥接状态（等壳侧 rail-data）
           this.railState = "idle";
-          clearTimeout(this.railAddTimer);
-          this.railAddRequestId = '';
+          this.clearRailSubmission();
           this.railLoading = true;
           this.railAvailability = "loading";
           this.railDurationRequired = true;
@@ -1774,6 +1797,8 @@
           this.railDurations = [];
           this.railDurationId = 0;
           this.railPreview = [];
+          // An automatic preview leaves the catalog address and scroll position alone.
+          if (historyMode === "auto") return;
           // URL 深链（pushState：后退可回上一商品）
           this.updateUrlParam("product_id", item.id, historyMode);
           this.$nextTick(() => {
@@ -1785,8 +1810,10 @@
         },
         reloadConfig() {
           if (!this.selectedProduct) return;
-          clearTimeout(this.railAddTimer);
-          this.railAddRequestId = '';
+          this.clearRailSubmission();
+          this.railState = "idle";
+          this.railLoading = true;
+          this.railAvailability = "loading";
           this.configState = "loading";
           this.embedSeq++;
           this.embedNonce = `n${Date.now().toString(36)}${this.embedSeq}`;
@@ -1795,14 +1822,17 @@
         },
         isThemedProduct(item) {
           const modules = window.CRA1CartModules;
-          return !!(modules && modules.profile(modules.catalogModule(item)));
+          return !!(item && modules && !this.nativeProductIds.includes(Number(item.id)) && modules.profile(modules.catalogModule(item)));
         },
         async resolveProductModule(item, historyMode, requestId) {
           try {
             const res = await getOrederConfig({id:item.id,flag:false});
             if (requestId !== this.moduleSelectionRequestId) return;
-            if (res.data?.status !== 200 || typeof res.data?.data?.content !== 'string') throw new Error('unavailable configuration');
-            const module = typeof res.data.data.module === 'string' ? res.data.data.module : '';
+            const config = res.data?.data;
+            if (res.data?.status !== 200 || typeof config?.content !== 'string') throw new Error('unavailable configuration');
+            const module = await window.CRA1CartModules.configurationModule(config, item.id);
+            if (requestId !== this.moduleSelectionRequestId) return;
+            if (module === null) throw new Error('unavailable module');
             this.doSelectProduct({...item,module,module1:'',res_module:'',mode:''},historyMode,true);
           } catch (_) {
             if (requestId !== this.moduleSelectionRequestId) return;
@@ -1908,7 +1938,9 @@
           if (!target || !this.isSellable(target)) target = list.find(x => this.isSellable(x));
           // Browsing a category must not navigate away just because its first
           // card is a third-party product. Explicit deep links still open it.
-          if (target && (explicitProduct || this.isThemedProduct(target))) this.doSelectProduct(target, "replace");
+          if (target && (explicitProduct || this.isThemedProduct(target))) {
+            this.doSelectProduct(target, explicitProduct ? "replace" : "auto");
+          }
           else {
             this.selectedProductId = 0;
             this.selectedProduct = null;
@@ -1926,6 +1958,16 @@
           if (Number(data.productId) !== Number(this.selectedProductId)) return;
           if (data.nonce !== this.embedNonce) return;
           switch (data.type) {
+            case "config-native":
+              clearTimeout(this.embedTimer);
+              // Clicking an automatically selected card adds its product_id as well.
+              if (Number(this.getQuery("product_id")) === Number(this.selectedProductId)) {
+                window.location.replace(window.CRA1CartModules.url('/cart/goods.htm', this.selectedProductId));
+              } else {
+                this.nativeProductIds.push(Number(this.selectedProductId));
+                this.resetProductSelection();
+              }
+              break;
             case "config-ready":
               clearTimeout(this.embedTimer);
               this.configState = "ready";
@@ -1960,27 +2002,28 @@
             case "rail-updated":
               // 价格计算器数据（v6）：桥接成功
               this.railState = "bridged";
-              this.railLoading = !!this.railAddRequestId;
               this.applyRailData(data.payload || {});
-              break;            case "rail-fallback":
+              break;
+            case "rail-fallback":
               // 壳侧 VM 不可达：降级提示（iframe 内保留 v5 侧栏卡片）
               this.railState = "fallback";
               this.railLoading = false;
               this.railFallbackText = window.CRA1Shared.Errors.message(data.message, { fallback:'请在下方查看价格并完成订购' });
               break;
             case "rail-added":
-              if (!this.railAddRequestId || data.requestId !== this.railAddRequestId) break;
-              clearTimeout(this.railAddTimer);
-              this.railAddRequestId = '';
-              this.railLoading = false;
-              if (data.success === true && data.failed !== true) {
+            case "rail-action-result": {
+              const submission = this.railSubmission;
+              if (!submission || data.requestId !== submission.id) break;
+              const adding = submission.type === "rail-add";
+              if (adding !== (data.type === "rail-added")) break;
+              this.finishRailSubmission(data.reason);
+              if (adding && data.success === true && data.failed !== true) {
                 this.embedDirty = false;
                 this.refreshTopCart();
                 this.railConfirmAfterAdd();
-              } else if (data.reason === 'timeout') {
-                this.$message.warning('暂未收到加购结果，请先查看购物车，再决定是否重试。');
               }
               break;
+            }
             case "rail-coupon-result":
               this.railCouponBusy = false;
               this.railCouponApplied = String(data.applied || "");
@@ -1995,7 +2038,7 @@
         /* ---- 价格计算器（v6）：父侧状态与方法 ---- */
         applyRailData(p) {
           this.railAvailability = p.availability || "ready";
-          this.railLoading = !!this.railAddRequestId || this.railAvailability !== "ready";
+          this.railLoading = !!this.railSubmission || this.railAvailability !== "ready";
           if (p.couponApplied !== undefined) this.railCouponApplied = String(p.couponApplied || "");
           this.railDurationRequired = p.durationRequired !== false;
           if (Array.isArray(p.durations)) this.railDurations = p.durations;
@@ -2057,34 +2100,35 @@
           this.railLoading = true;
           this.railPost("rail-set", { field: "coupon-remove" });
         },
-        railAddCart() {
+        clearRailSubmission() {
+          clearTimeout(this.railSubmitTimer);
+          this.railSubmission = null;
+        },
+        finishRailSubmission(reason) {
+          const type = this.railSubmission?.type;
+          this.clearRailSubmission();
+          this.railLoading = this.railAvailability !== "ready";
+          if (reason === "timeout" && type === "rail-add") {
+            this.$message.warning("暂未收到加购结果，请先查看购物车，再决定是否重试。");
+          } else if (reason === "timeout" && type === "rail-save") {
+            this.$message.warning("暂未收到保存结果，请先查看购物车，再决定是否重试。");
+          }
+        },
+        submitRailAction(type) {
           if (this.railLoading || this.railAvailability !== "ready") return;
           this.railLoading = true;
           const requestId = this.embedNonce + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
-          this.railAddRequestId = requestId;
-          this.railPost("rail-add", { requestId });
-          clearTimeout(this.railAddTimer);
-          this.railAddTimer = setTimeout(() => {
-            if (this.railAddRequestId !== requestId) return;
-            this.railAddRequestId = '';
-            this.railLoading = false;
-            this.$message.warning('暂未收到加购结果，请先查看购物车，再决定是否重试。');
-          }, 32000);
+          this.railSubmission = { id: requestId, type };
+          this.railPost(type, { requestId });
+          this.railSubmitTimer = setTimeout(() => {
+            if (this.railSubmission?.id === requestId) this.finishRailSubmission("timeout");
+          }, type === "rail-buy" ? 8000 : 32000);
         },
-        railBuyNow() {
-          if (this.railLoading || this.railAvailability !== "ready") return;
-          this.railLoading = true;
-          this.railPost("rail-buy");
-          clearTimeout(this.railBuyTimer);
-          this.railBuyTimer = setTimeout(() => { this.railLoading = false; }, 6000);
+        railAddCart() {
+          this.submitRailAction("rail-add");
         },
         railPrimaryAction() {
-          if (this.railLoading || this.railAvailability !== "ready") return;
-          if (!this.isEditingCartItem) { this.railBuyNow(); return; }
-          this.railLoading = true;
-          this.railPost("rail-save");
-          clearTimeout(this.railBuyTimer);
-          this.railBuyTimer = setTimeout(() => { this.railLoading = false; }, 6000);
+          this.submitRailAction(this.isEditingCartItem ? "rail-save" : "rail-buy");
         },
 
         // Measure the actual dock in every module/layout, including delayed
@@ -2201,8 +2245,7 @@
         this.resetDomainState(true);
         this.moduleSelectionRequestId++;
         this.__dockObserver?.disconnect();
-        clearTimeout(this.railAddTimer);
-        clearTimeout(this.railBuyTimer);
+        this.clearRailSubmission();
       },
       watch: {
         selectedProductId(pid) {

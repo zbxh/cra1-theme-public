@@ -65,7 +65,7 @@ function addFixture(){
  let successes=0,refreshes=0;const warnings=[];
  f.env.window.location={origin:'https://example.test'};
  f.env.clearTimeout=()=>{};
- p.selectedProductId=8;p.embedNonce='current';p.railAddRequestId='attempt-1';p.railLoading=true;
+ p.selectedProductId=8;p.embedNonce='current';p.railSubmission={id:'attempt-1',type:'rail-add'};p.railAvailability='ready';p.railLoading=true;
  p.$refs={configPanel:{querySelector:()=>frame}};
  p.railConfirmAfterAdd=()=>successes++;p.refreshTopCart=()=>refreshes++;
  p.$message={warning:s=>warnings.push(s)};
@@ -75,7 +75,7 @@ function addFixture(){
 test('rejected native add never becomes a cart success, while remaining retryable',()=>{
  const f=addFixture();f.receive({failed:true,success:false,reason:'rejected'});
  assert.equal(f.successes(),0);assert.equal(f.refreshes(),0);assert.equal(f.page.railLoading,false);
- assert.equal(f.page.railAddRequestId,'');assert.equal(f.warnings.length,0);
+ assert.equal(f.page.railSubmission,null);assert.equal(f.warnings.length,0);
 });
 test('only a confirmed result from the current operation opens one success prompt',()=>{
  const f=addFixture();f.receive({success:true,failed:false});f.receive({success:true,failed:false});
@@ -89,13 +89,29 @@ test('missing, contradictory and timed-out results never report success',()=>{
 });
 test('old operations, old products and old frames cannot finish the pending add',()=>{
  for(const data of [{requestId:'attempt-0',success:true},{nonce:'old',success:true},{productId:9,success:true}]){
-  const f=addFixture();f.receive(data);assert.equal(f.successes(),0);assert.equal(f.page.railAddRequestId,'attempt-1');
+  const f=addFixture();f.receive(data);assert.equal(f.successes(),0);assert.equal(f.page.railSubmission.id,'attempt-1');
  }
 });
 test('a quote refresh cannot release the pending add or permit a duplicate submission',()=>{
  const f=addFixture();f.receive({type:'rail-updated',payload:{availability:'ready',durations:[]}});
  assert.equal(f.page.railLoading,true);let submissions=0;f.page.railPost=()=>submissions++;
  f.page.railAddCart();assert.equal(submissions,0);
+});
+test('an action rejected after the quote expires stays disabled until new pricing arrives',()=>{
+ const f=addFixture();f.receive({type:'rail-updated',payload:{availability:'error'}});
+ f.receive({failed:true,success:false,reason:'quote'});
+ assert.equal(f.page.railSubmission,null);assert.equal(f.page.railLoading,true);assert.equal(f.warnings.length,0);
+ f.receive({type:'rail-updated',payload:{availability:'ready'}});
+ assert.equal(f.page.railLoading,false);
+});
+test('buy and edit failures unlock the controls and never display an add confirmation',()=>{
+ for(const type of ['rail-buy','rail-save']){
+  const f=addFixture();f.page.railSubmission.type=type;
+  f.receive({type:'rail-updated',payload:{availability:'ready'}});
+  assert.equal(f.page.railLoading,true);
+  f.receive({type:'rail-action-result',success:false,failed:true,reason:'rejected'});
+  assert.equal(f.page.railLoading,false);assert.equal(f.successes(),0);
+ }
 });
 test('catalog outage exits loading without claiming no products; retry clears the failure',async()=>{
  const f=catalogFixture();await f.page.initData()

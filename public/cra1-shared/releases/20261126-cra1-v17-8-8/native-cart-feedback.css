@@ -1,0 +1,34 @@
+/* Generated from public/cra1-shared/src. Edit the source and rebuild. */
+.cra1-cart-read-feedback {
+  box-sizing: border-box;
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1px solid var(--cui-line,#d0d6d8);
+  border-radius: 8px;
+  background: var(--cui-white,#fff);
+  color: var(--cui-body,#394447);
+  font: 14px/1.6 system-ui,sans-serif;
+  overflow-wrap: anywhere;
+}
+.cra1-cart-read-feedback h2 { margin: 0; color: var(--cui-title,#161b1d); font-size: 16px; }
+.cra1-cart-read-feedback p { margin: 4px 0 12px; }
+.cra1-cart-read-feedback div { display: flex; flex-wrap: wrap; gap: 8px; }
+.cra1-cart-read-feedback :is(button,a) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--cui-control-edge,#829094);
+  border-radius: 4px;
+  color: var(--cui-title,#161b1d);
+  background: var(--cui-white,#fff);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.cra1-cart-read-feedback button:disabled { cursor: wait; opacity: .65; }
+[data-cra1-dcim-read-failed] .bot-price { visibility: hidden; }
+[data-cra1-dcim-read-failed] :is(.f-order .right .buy,.f-order .right .add-cart,.botton-buy-btn) { opacity: .6; cursor: not-allowed; }
+@media (max-width: 600px) {
+  .cra1-cart-read-feedback :is(button,a) { min-height: 44px; }
+}

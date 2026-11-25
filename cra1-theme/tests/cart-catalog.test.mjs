@@ -10,16 +10,21 @@ const tick=()=>new Promise(r=>setTimeout(r,0))
 function fixture(){
  let page,options
  const reads=[],handlers={first:()=>response({list:[]}),detail:()=>response({product:null}),second:()=>response({list:[]}),products:()=>response({list:[]}),config:()=>response({module:'vendor_custom',content:'<div>native module</div>'})}
- let location=new URL('https://fixture.invalid/cart/goodsList.htm?product_id=7&fpg_id=1&spg_id=2&config=kept')
+ let location
  const navigate=[]
- location.assign=url=>navigate.push({mode:'assign',url});location.replace=url=>navigate.push({mode:'replace',url})
- const window={innerWidth:390,get location(){return location},history:{replaceState(s,t,url){location=new URL(url,location)},pushState(s,t,url){location=new URL(url,location)}}}
+ function setLocation(address){
+  location=new URL(address,location)
+  location.assign=url=>navigate.push({mode:'assign',url})
+  location.replace=url=>navigate.push({mode:'replace',url})
+ }
+ setLocation('https://fixture.invalid/cart/goodsList.htm?product_id=7&fpg_id=1&spg_id=2&config=kept')
+ const read=(type,...args)=>{reads.push({type,args});return Promise.resolve(handlers[type](...args))}
+ const window={innerWidth:390,apiProductDetail:p=>read('detail',p),get location(){return location},history:{replaceState(s,t,url){setLocation(url)},pushState(s,t,url){setLocation(url)}}}
  vm.runInNewContext(policy,{window,URL})
  function Vue(o){options=o;page=this;Object.assign(this,o.data());this.$data=this;this.$refs={};this.$nextTick=fn=>fn?fn():Promise.resolve();for(const[k,f]of Object.entries(o.methods))this[k]=f.bind(this);for(const[k,f]of Object.entries(o.computed))Object.defineProperty(this,k,{get:()=>f.call(this)});this.$mount=()=>this}
  Vue.prototype={}
- const read=(type,...args)=>{reads.push({type,args});return Promise.resolve(handlers[type](...args))}
  vm.runInNewContext(code,{Vue,window,navigator:{userAgent:'fixture'},document:{querySelector:()=>({})},lang:{},asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},sessionStorage:{removeItem(){}},URL,URLSearchParams,AbortController,clearTimeout,clearInterval,
- productGroupFirst:()=>read('first'),apiProductDetail:p=>read('detail',p),productGroupSecond:id=>read('second',id),productGoods:p=>read('products',p),getOrederConfig:p=>read('config',p)})
+ productGroupFirst:()=>read('first'),apiProductDetail:window.apiProductDetail,productGroupSecond:id=>read('second',id),productGoods:p=>read('products',p),getOrederConfig:p=>read('config',p)})
  page.sanitizeHtml=v=>v||'';page.needScroll=()=>{};page.cartConfigReady=false
  return {page,options,reads,handlers,window,navigate}
 }
@@ -115,14 +120,80 @@ test('an ordinary category listing does not auto-open its first third-party card
  await f.page.applyDefaultSelection([{id:7,module:'direct_admin',stock_control:0}])
  assert.equal(f.navigate.length,0);assert.equal(f.page.selectedProductId,0);assert.equal(f.page.configState,'idle')
 })
+test('a module mismatch in an automatic preview keeps the category and lets the customer choose',async()=>{
+ const f=fixture(),item={id:8,module:'mf_cloud'}
+ f.window.history.replaceState({},'', '/cart/goodsList.htm?fpg_id=1&spg_id=2')
+ f.page.cartConfigReady=true;f.page.select_second_obj={id:2,type:'normal'}
+ await f.page.applyDefaultSelection([item])
+ assert.match(f.page.embedSrc,/goods_embed\.htm/)
+ assert.equal(f.window.location.searchParams.has('product_id'),false)
+ const source={}
+ f.page.$refs.configPanel={querySelector:()=>({contentWindow:source})}
+ const message={origin:f.window.location.origin,source,data:{v:1,type:'config-native',productId:8,nonce:f.page.embedNonce}}
+ f.page.handleEmbedMessage({...message,data:{...message.data,nonce:'late-frame'}})
+ assert.equal(f.page.selectedProductId,8)
+ f.page.handleEmbedMessage(message)
+ assert.equal(f.page.selectedProductId,0);assert.equal(f.navigate.length,0)
+ await f.page.applyDefaultSelection([item])
+ assert.equal(f.page.embedSrc,'')
+ await f.page.selectProduct(item)
+ assert.equal(f.navigate[0].mode,'assign')
+ assert.equal(new URL(f.navigate[0].url,f.window.location).searchParams.get('id'),'8')
+})
+test('an explicit selection confirmed as third-party routes with the original edit context',async()=>{
+ const f=fixture(),item={id:7,module:'mf_cloud'},source={}
+ f.page.entryProductId=7
+ f.window.history.replaceState({},'', '/cart/goodsList.htm?product_id=7&change=true&config=kept#network')
+ f.page.doSelectProduct(item,'replace')
+ f.page.$refs.configPanel={querySelector:()=>({contentWindow:source})}
+ f.page.handleEmbedMessage({origin:f.window.location.origin,source,data:{v:1,type:'config-native',productId:7,nonce:f.page.embedNonce}})
+ const target=new URL(f.navigate[0].url,f.window.location)
+ assert.equal(f.navigate[0].mode,'replace');assert.equal(target.pathname,'/cart/goods.htm')
+ assert.equal(target.searchParams.get('id'),'7');assert.equal(target.searchParams.get('change'),'true')
+ assert.equal(target.searchParams.get('config'),'kept');assert.equal(target.hash,'#network')
+})
+test('clicking the automatic preview while it loads makes the selection explicit',async()=>{
+ const f=fixture(),item={id:8,module:'mf_cloud'},source={}
+ f.window.history.replaceState({},'', '/cart/goodsList.htm?fpg_id=1&spg_id=2')
+ f.page.cartConfigReady=true;f.page.select_second_obj={id:2,type:'normal'}
+ await f.page.applyDefaultSelection([item])
+ const nonce=f.page.embedNonce
+ await f.page.selectProduct(item)
+ assert.equal(f.page.embedNonce,nonce);assert.equal(f.window.location.searchParams.get('product_id'),'8')
+ f.page.$refs.configPanel={querySelector:()=>({contentWindow:source})}
+ f.page.handleEmbedMessage({origin:f.window.location.origin,source,data:{v:1,type:'config-native',productId:8,nonce}})
+ assert.equal(f.navigate.length,1);assert.equal(f.navigate[0].mode,'replace')
+})
 test('missing catalogue metadata is resolved using the actual config response',async()=>{
  const f=fixture();f.page.entryProductId=7
  await f.page.doSelectProduct({id:7},'replace')
  assert.equal(f.reads[0].args[0].flag,false);assert.equal(f.navigate.length,1);assert.match(f.navigate[0].url,/goods\.htm/)
 })
-test('an unnamed native response is not resolved recursively',async()=>{
+test('a confirmed product without an assigned module opens the official page',async()=>{
  const f=fixture();f.page.entryProductId=7;f.handlers.config=()=>response({module:'',content:'<div>hook module</div>'})
- await f.page.doSelectProduct({id:7},'replace');assert.equal(f.reads.length,1);assert.equal(f.navigate.length,1)
+ f.handlers.detail=()=>response({product:{id:7}})
+ await f.page.doSelectProduct({id:7},'replace')
+ assert.deepEqual(f.reads.map(x=>x.type),['config','detail'])
+ assert.equal(f.navigate.length,1)
+})
+test('missing configuration and catalogue metadata uses the matching reseller detail',async()=>{
+ const f=fixture();f.page.entryProductId=7;f.handlers.config=()=>response({content:'<div>legacy config</div>'})
+ f.handlers.detail=()=>response({product:{id:7,module:'vendor_custom',mode:'only_api',res_module:'mf_cloud'}})
+ await f.page.doSelectProduct({id:7},'replace')
+ assert.deepEqual(f.reads.map(x=>x.type),['config','detail'])
+ assert.equal(f.page.selectedProduct.module,'remf_cloud')
+ assert.match(f.page.embedSrc,/goods_embed\.htm/)
+ assert.equal(f.navigate.length,0)
+})
+test('late details cannot change the active selection',async()=>{
+ const f=fixture(),a=later();f.handlers.config=()=>response({content:'<div>legacy config</div>'});f.handlers.detail=()=>a.promise
+ const first=f.page.doSelectProduct({id:7})
+ await tick()
+ assert.deepEqual(f.reads.map(x=>x.type),['config','detail'])
+ f.page.doSelectProduct({id:8,module:'mf_cloud'})
+ a.resolve(response({product:{id:7,module:'vendor_custom'}}));await first
+ assert.equal(f.page.selectedProductId,8)
+ assert.equal(f.navigate.length,0)
 })
 test('a stale module lookup cannot replace the product selected afterward',async()=>{
  const f=fixture(),a=later();f.page.entryProductId=7;f.handlers.config=()=>a.promise

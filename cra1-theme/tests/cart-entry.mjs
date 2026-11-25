@@ -7,7 +7,7 @@ const policy=fs.readFileSync(new URL('../source/legacy-assets/cart/20261012-cart
 const checks=[]
 async function run({params={},address='',cache='{"cart_change_product":1}',config={data:{status:200,data:{module:'idcsmart_common',content:'<div>fixture configuration</div>'}}},product={data:{status:404}},framed=false}={}){
  const requests=[],errors=[],messages=[],loading={style:{}},root={style:{}},content={innerHTML:''};let instance
- const window={location:new URL(address||'https://fixture.invalid/cart/goods_embed.htm'),addEventListener(){},dispatchEvent(){},__CART_EMBED__:{fail:s=>errors.push(s),markReady:()=>messages.push('ready')}}
+ const window={location:new URL(address||'https://fixture.invalid/cart/goods_embed.htm'),addEventListener(){},dispatchEvent(){},apiProductDetail:async()=>product,__CART_EMBED__:{fail:s=>errors.push(s),markReady:()=>messages.push('ready')}}
  window.history={state:{marker:'retained'},replaceState(state,title,value){assert.equal(state,this.state);window.location=new URL(value,window.location)}}
  window.CRA1ModuleDeps={async ensure(group){assert.equal(group,'config')},async mountScripts(host){assert.equal(host,content);messages.push(host.innerHTML)}}
  window.self=window;window.top=framed?{}:window
@@ -18,7 +18,7 @@ async function run({params={},address='',cache='{"cart_change_product":1}',confi
  function Vue(options){instance=this;Object.assign(this,options.data());for(const[k,method]of Object.entries(options.methods))this[k]=method.bind(this);this.$message={error:s=>errors.push(s)};this.$nextTick=fn=>fn?fn():Promise.resolve();this.$mount=()=>{options.mounted.call(this);return this};options.created.call(this)}
  Vue.prototype={}
  const jquery=()=>({html:s=>messages.push(s)});jquery.ajaxSetup=()=>{}
- const context={window,localStorage,Vue,document:{title:'',documentElement:{toggleAttribute(){}},getElementsByClassName:()=>[root],getElementById:()=>loading,querySelector:selector=>selector==='.config-box .content'?content:null},getUrlParams:()=>({...Object.fromEntries(new URLSearchParams(window.location.search)),...params}),asideMenu:{},topMenu:{},pagination:{},getOrederConfig:async p=>{requests.push(p);return config},apiProductDetail:async()=>product,productGroupSecond:async()=>({data:{data:{list:[]}}}),$:jquery,URLSearchParams,Event:class{},setInterval:()=>1,clearInterval(){}}
+ const context={window,localStorage,Vue,document:{title:'',documentElement:{toggleAttribute(){}},getElementsByClassName:()=>[root],getElementById:()=>loading,querySelector:selector=>selector==='.config-box .content'?content:null},getUrlParams:()=>({...Object.fromEntries(new URLSearchParams(window.location.search)),...params}),asideMenu:{},topMenu:{},pagination:{},getOrederConfig:async p=>{requests.push(p);return config},apiProductDetail:window.apiProductDetail,productGroupSecond:async()=>({data:{data:{list:[]}}}),$:jquery,URLSearchParams,Event:class{},setInterval:()=>1,clearInterval(){}}
  vm.runInNewContext(source,context);window.onload();await new Promise(resolve=>setTimeout(resolve,0));return{requests,errors,messages,instance,location:window.location}
 }
 for(const params of [{},{id:'0'},{id:'NaN'}]){
@@ -32,6 +32,15 @@ for(const page of ['goods','goods_iframe','goods_embed']){
 const explicit=await run({address:'https://fixture.invalid/cart/goods_iframe.htm?id=5&product_id=4'});assert.equal(explicit.location.searchParams.get('id'),'5');assert.equal(explicit.requests[0].id,'5');checks.push('an explicit native id is not replaced by a link alias');
 const failed=await run({params:{id:'4'},config:{data:{status:403,msg:'provider private path /internal/fixture'}}});assert.equal(failed.errors[0],'商品配置暂不可用，请重试或选择其他商品。');assert.equal(failed.messages.length,0);checks.push('unavailable product has a safe error and never reads absent detail')
 const nativeContent='<div data-vendor="untouched">original module</div>'
+const legacyConfig={data:{status:200,data:{content:nativeContent}}}
+const legacyCloud=await run({params:{id:'4'},config:legacyConfig,product:{data:{status:200,data:{product:{id:4,module:'mf_cloud'}}}},framed:true})
+assert.deepEqual(legacyCloud.messages,[nativeContent,'ready'])
+assert.deepEqual(legacyCloud.errors,[])
+checks.push('legacy V10 embeds the configured module when the public product identifies it')
+const unrelated=await run({params:{id:'4'},config:legacyConfig,product:{data:{status:200,data:{product:{id:5,module:'mf_cloud'}}}},framed:true})
+assert.deepEqual(unrelated.messages,[])
+assert.match(unrelated.errors[0],/重试/)
+checks.push('a nonmatching product detail shows retry without promoting the iframe')
 for(const page of ['goods_iframe','goods_embed'])for(const framed of [false,true]){
  const promoted=await run({address:'https://fixture.invalid/cart/'+page+'.htm?id=4&change=true&name=A%20B',config:{data:{status:200,data:{module:'recloud_service',content:nativeContent}}},framed})
  assert.match(promoted.messages[0].redirect,/\/cart\/goods.htm\?/);assert.match(promoted.messages[0].redirect,/id=4/);assert.match(promoted.messages[0].redirect,/change=true/);assert.match(promoted.messages[0].redirect,/name=A%20B/);assert.equal(promoted.messages.includes(nativeContent),false);

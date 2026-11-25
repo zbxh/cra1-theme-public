@@ -37,6 +37,9 @@ fs.writeFileSync(path.join(output, 'member-session.js'), banner + read('errors.j
 // jQuery, rem scaling and component loading. Only navigation uses this bundle.
 const navigationModules = ['errors.js', 'request.js', 'context.js', 'runtime.js', 'ui.js', 'notification-session.js', 'announcements.js', 'avatar.js', 'search-match.js', 'member-search-pages.js', 'header-search.js', 'header-actions.js', 'icon-style.js', 'ui-effects.js', 'native-cart-context.js']
 fs.writeFileSync(path.join(output, 'native-cart-navigation.js'), banner + navigationModules.map(read).join('\n'))
+for (const asset of ['native-cart-feedback.js', 'native-cart-feedback.css']) {
+  fs.writeFileSync(path.join(output, asset), banner + read(asset))
+}
 // Derive the shell from the same maintained navigation styles, never the
 // member/module layout overrides. Filter each selector, including mixed rules.
 const navigationClass = /^cra1-(?:header(?:__|--|-|$)|breadcrumb(?:__|$)|aside(?:__|\.|$)|primary-(?:item|separator)|nav-(?:l2|l3|group|recent|sub)|recent-flow|msg-(?:panel|item)|lang(?:__|$)|account(?:__|--|$)|upanel(?:__|--|$)|panel-grid)/

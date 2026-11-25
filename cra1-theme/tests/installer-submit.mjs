@@ -47,7 +47,7 @@ async function fixture({width=1440,fastTimeout=false,blockedStorage=false,native
   if(fastTimeout)await page.addInitScript(()=>{const original=window.setTimeout;window.setTimeout=(fn,ms,...args)=>original(fn,[60000,150000].includes(ms)?100:ms,...args);});
   page.on('pageerror',error=>errors.push(error.message));
   page.on('console',message=>{if(message.type()==='error')consoles.push(message.text());});
-  const state={mode:'success',checkResponse:structuredClone(ready),calls:0,installs:0,updates:0,recoveries:0,release:null};
+  const state={mode:'success',checkResponse:structuredClone(ready),checkFailure:null,calls:0,installs:0,updates:0,recoveries:0,release:null};
   await page.route('**/cra1-install/api.php?progress=1',async route=>{
     check(/^[a-f0-9]{32}$/.test(route.request().headers()['x-cra1-operation']),'installer progress belongs to a specific request');
     await route.fulfill({json:{status:200,data:{phase:'写入主题后台和配置'}}});
@@ -56,7 +56,7 @@ async function fixture({width=1440,fastTimeout=false,blockedStorage=false,native
     const input=route.request().postDataJSON();state.calls++;
     check(nativeToken?route.request().headers().authorization==='Bearer isolated-native-admin':!route.request().headers().authorization,nativeToken?'optional maintenance authentication forwarded':'fresh installation sends requests without a V10 login');
     check(!!route.request().headers()['x-csrf-token'],'installer CSRF retained');
-    if(input.action==='check'){await route.fulfill({json:{status:200,data:state.checkResponse}});return;}
+    if(input.action==='check'){await route.fulfill(state.checkFailure||{json:{status:200,data:state.checkResponse}});return;}
     if(['update','recover_update'].includes(input.action)){
       check(input.confirmation==='a'.repeat(64),'completion carries only the server-issued confirmation');
       check(!Object.hasOwn(input,'username')&&!Object.hasOwn(input,'password')&&!Object.hasOwn(input,'entry'),'maintenance never submits replacement credentials or an entry');
@@ -92,7 +92,9 @@ async function fixture({width=1440,fastTimeout=false,blockedStorage=false,native
   return {context,page,state,inspect,fill,close:()=>context.close()};
 }
 try{
+  check(rendered.stdout.includes('<div id="install-intro" hidden>'),'first-install instructions stay hidden while status is unknown');
   const f=await fixture();await f.inspect();await f.fill();
+  check(await f.page.locator('#install-intro').isVisible(),'confirmed first installation shows its instructions');
   for(const [name,value,description]of [
     ['entry','','missing entry'],['entry','abc','short entry'],['entry','ExampleAdmin','uppercase entry'],
     ['username','ab','short username'],['username','测试账号','non-ASCII username'],['username','user@example.com','invalid username punctuation'],
@@ -163,8 +165,19 @@ try{
   await privateBrowser.page.locator('#install').click();await privateBrowser.page.locator('#success').waitFor();
   check(privateBrowser.state.installs===1,'disabled localStorage does not block first-time setup');await privateBrowser.close();
   const maintenance={mode:'maintenance',version:'v17.3',release_channel:'test',checks:[],update_state:'ready',can_update:true,confirmation:'a'.repeat(64),admin_url:'/customadmin/index.php'};
+  const guest=await fixture({width:390});
+  guest.state.checkFailure={status:401,json:{status:401,msg:'本站已安装主题。可从原主题后台上传安装包更新；通过此入口完成解压更新时，请先登录本站 V10 系统超级管理员。'}};
+  await guest.inspect();
+  check(await guest.page.locator('#install-intro').isHidden()&&await guest.page.locator('#setup').isHidden(),'maintenance without a V10 session hides first-install instructions and fields');
+  check((await guest.page.locator('#status').innerText()).includes('V10 系统超级管理员'),'maintenance without a V10 session explains how to continue');
+  guest.state.checkFailure={status:503,contentType:'text/html',body:'Service unavailable'};
+  await guest.inspect();
+  check(await guest.page.locator('#install-intro').isHidden()&&await guest.page.locator('#maintenance').isHidden(),'unreadable status offers neither first installation nor update');
+  check((await guest.page.locator('#status').innerText()).includes('HTTP 503'),'unreadable status retains the error and retry instructions');
+  await guest.close();
   const update=await fixture({nativeToken:true});update.state.checkResponse=maintenance;await update.inspect();
   check(await update.page.locator('#setup').isHidden(),'existing installation never exposes new account fields');
+  check(await update.page.locator('#install-intro').isHidden(),'authenticated maintenance shows only the update instructions');
   check(await update.page.locator('#update').isDisabled(),'completion waits for backup confirmation');
   await update.page.locator('#backup-confirmed').check();check(await update.page.locator('#update').isEnabled(),'backup enables explicit completion');
   for(const width of [1920,1440,768,390]){

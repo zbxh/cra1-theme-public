@@ -181,6 +181,7 @@ localStorage.setItem = function (key, newValue) {
             if (!modules) throw new Error('商品页面尚未加载');
             const managed=!!modules.profile(module);
             if (!managed) {
+              if (window.__CART_EMBED__?.requestNativePage?.()) return false;
               // Legacy embed links retain the complete native document.
               window.top.location.replace(modules.url('/cart/goods.htm', this.id));
               return false;

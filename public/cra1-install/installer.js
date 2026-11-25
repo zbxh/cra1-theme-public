@@ -2,8 +2,20 @@
   'use strict';
   window.CRA1Shared?.UIEffects?.start();
   const root=document.getElementById('installer'),status=document.getElementById('status'),form=document.getElementById('setup');
+  const installIntro=document.getElementById('install-intro');
   const checkButton=document.getElementById('check'),installButton=document.getElementById('install'),feedback=document.getElementById('setup-status');
   const maintenance=document.getElementById('maintenance'),updateButton=document.getElementById('update'),backup=document.getElementById('backup-confirmed'),updateFeedback=document.getElementById('update-status');
+  // A server with an old entry point still in OPcache can serve older markup.
+  if(![root,status,form,installIntro,checkButton,installButton,feedback,maintenance,updateButton,backup,updateFeedback,document.getElementById('environment')].every(Boolean)){
+    if(status)status.textContent='安装页正在载入新版文件，请稍等几秒后刷新。如果反复出现，请在网站面板重载本站 PHP 服务，再打开安装页。';
+    if(checkButton){
+      checkButton.hidden=false;
+      checkButton.disabled=false;
+      checkButton.textContent='刷新安装页';
+      checkButton.addEventListener('click',()=>location.reload());
+    }
+    return;
+  }
   let busy=false,ready=false,installed=false,confirmation=null,updateState=null;
   function failure(message,needsCheck=false,detail=null){return Object.assign(new Error(message),{needsCheck,detail});}
   async function request(body,onPhase){
@@ -94,7 +106,7 @@
   }
   backup.addEventListener('change',()=>lock(false));
   async function inspect(){
-    if(busy||installed)return;ready=false;confirmation=null;updateState=null;backup.checked=false;lock(true,'check');message('');status.textContent='正在准备安装页面…';form.hidden=true;maintenance.hidden=true;document.getElementById('update-success').hidden=true;updateFeedback.hidden=true;
+    if(busy||installed)return;ready=false;confirmation=null;updateState=null;backup.checked=false;lock(true,'check');message('');status.textContent='正在读取主题安装状态…';installIntro.hidden=true;form.hidden=true;maintenance.hidden=true;document.getElementById('update-success').hidden=true;updateFeedback.hidden=true;
     const environment=document.getElementById('environment');environment.hidden=true;environment.open=false;
     document.getElementById('checks').replaceChildren();
     try{
@@ -120,6 +132,7 @@
         status.textContent=updateState==='current'?'已确认当前主题文件和生效版本一致。':confirmation?'检查通过，请在下方继续。':'本次检查未切换主题。请处理检查提示，再点击“重新检测”。';
         environment.open=!confirmation&&updateState!=='current';return;
       }
+      installIntro.hidden=false;
       ready=data.installation_ready===true;
       environment.open=!ready;
       status.textContent=ready?'请设置主题后台，完成后即可使用。':'运行环境暂不满足，请处理运行信息中的提示后重新检测。';form.hidden=!ready;
@@ -158,13 +171,13 @@
       let adminUrl;
       try{adminUrl=new URL(result.admin_url,location.origin);}catch(_){throw failure('后台地址返回异常，请点击“重新检测”确认当前安装状态。',true);}
       if(adminUrl.origin!==location.origin)throw failure('后台地址返回异常，请点击“重新检测”确认当前安装状态。',true);
-      installed=true;ready=false;form.hidden=true;form.reset();message('');
+      installed=true;ready=false;installIntro.hidden=true;form.hidden=true;form.reset();message('');
       const out=document.getElementById('credentials');out.replaceChildren();
       for(const [label,value]of[['后台地址',result.admin_url],['账号',result.username],['密码',result.password]])out.append(text('dt',label),text('dd',value));
       document.getElementById('admin-link').href=result.admin_url;document.getElementById('success').hidden=false;status.textContent='安装成功，初始化入口已锁定。';
       document.getElementById('success').scrollIntoView({block:'nearest'});
     }catch(error){
-      if(error.needsCheck)ready=false;
+      if(error.needsCheck){ready=false;installIntro.hidden=true;}
       status.textContent='安装未完成，处理方法见下方。';message(explain(error,lastPhase));feedback.focus();
     }finally{delete values.password;lock(false);}
   });

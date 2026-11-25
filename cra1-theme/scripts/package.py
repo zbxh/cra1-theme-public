@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build deterministic source/install/update *candidates*. Never touches runtime or live releases."""
 import argparse, hashlib, json, os, pathlib, re, stat, zipfile, shutil
+from datetime import datetime, timezone
 from bundle_install import bundle_install, guide_sources, read_source
 ROOT=pathlib.Path(__file__).resolve().parents[2]
 RUNTIME_ROOTS=['cra1-theme/backend','cra1-theme/docs','cra1-theme/licenses','public/web/cra1','public/clientarea/template/pc/cra1','public/clientarea/template/mobile/cra1','public/cart/template/pc/cra1','public/cart/template/mobile/cra1','public/home/template/pc/cra1','public/home/template/mobile/cra1','public/cra1-shared','public/cra1admin','public/cra1-install']
@@ -64,15 +65,15 @@ def owned_walk(root):
    if p.is_symlink():yield p;dirs.remove(name)
   for name in sorted(files):yield pathlib.Path(base)/name
 
-def archive(path,files):
+def archive(path,files,timestamp):
  if path.exists():raise RuntimeError('Output already exists; refusing to replace a delivered candidate: '+str(path))
  with zipfile.ZipFile(path,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
   for name,data in sorted(files.items()):
-   i=zipfile.ZipInfo(name,(2026,1,1,0,0,0));i.create_system=3;i.external_attr=(stat.S_IFREG|0o644)<<16;i.compress_type=zipfile.ZIP_DEFLATED
+   i=zipfile.ZipInfo(name,timestamp);i.create_system=3;i.external_attr=(stat.S_IFREG|0o644)<<16;i.compress_type=zipfile.ZIP_DEFLATED
    z.writestr(i,data)
  return {'path':path.name,'bytes':path.stat().st_size,'sha256':digest(path.read_bytes())}
 
-def maintenance_archive(stage,out,meta,build):
+def maintenance_archive(stage,out,meta,build,timestamp):
  if build.get('entry')!='cra1-theme/scripts/build.mjs' or build.get('release')!=meta['release'] or build.get('patches')!=meta.get('maintenance',{}).get('patches'):raise RuntimeError('Maintenance build identity mismatch')
  data={}
  for p in sorted((stage/'payload').rglob('*')):
@@ -83,7 +84,7 @@ def maintenance_archive(stage,out,meta,build):
  data['cra1-theme/release.json']=(json.dumps(meta,ensure_ascii=False,indent=2)+'\n').encode()
  outer={**meta,'files':{p:{'sha256':digest(b),'bytes':len(b)} for p,b in sorted(data.items())}}
  update={'manifest.json':(json.dumps(outer,ensure_ascii=False,indent=2)+'\n').encode(),**{'payload/'+p:b for p,b in data.items()}}
- result=archive(out/f"cra1-theme-{meta['release']}-maintenance-candidate.zip",update)
+ result=archive(out/f"cra1-theme-{meta['release']}-maintenance-candidate.zip",update,timestamp)
  report={'release':meta['release'],'mode':'maintenance','base_release':build['base_release'],'files':len(data),'frontend_bytes_changed':0,'packages':[result]}
  (out/'candidate-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
  print(json.dumps(report,ensure_ascii=False,indent=2))
@@ -97,8 +98,14 @@ def main():
  version=meta.get('version',release)
  if 'version' in meta and (not isinstance(version,str) or not re.fullmatch(r'v[0-9]+\.[0-9]+(?:\.[0-9]+)?',version)):raise RuntimeError('Invalid public version')
  out.mkdir(parents=True,exist_ok=True)
- build=json.loads((stage/'build.json').read_text())
- if build.get('mode')=='maintenance':return maintenance_archive(stage,out,meta,build)
+ build_file=stage/'build.json'
+ build=json.loads(build_file.read_text())
+ # File managers typically preserve ZIP mtimes. A fixed epoch can leave
+ # overwritten PHP entry points cached by OPcache even when bytes changed.
+ built_at=build.get('built_at')
+ build_time=datetime.fromisoformat(built_at.replace('Z','+00:00')) if built_at else datetime.fromtimestamp(build_file.stat().st_mtime,timezone.utc)
+ timestamp=build_time.astimezone(timezone.utc).timetuple()[:6]
+ if build.get('mode')=='maintenance':return maintenance_archive(stage,out,meta,build,timestamp)
  guides=guide_sources(ROOT)
  data={};refs=dict(meta.get('references',{}));native={r['path']:r for r in meta.get('native_dependencies',[])};asset_rows=[]
  retired_path='public/clientarea/template/pc/cra1/api/goodsList.js'
@@ -151,8 +158,8 @@ def main():
  outer={**meta,'files':{p:{'sha256':digest(b),'bytes':len(b)} for p,b in sorted(data.items())}}
  update={'manifest.json':(json.dumps(outer,ensure_ascii=False,indent=2)+'\n').encode(),**{'payload/'+p:b for p,b in data.items()}}
  results=[]
- results.append(archive(out/f'cra1-theme-{version}-install-candidate.zip',data))
- results.append(archive(out/f'cra1-theme-{version}-update-candidate.zip',update))
+ results.append(archive(out/f'cra1-theme-{version}-install-candidate.zip',data,timestamp))
+ results.append(archive(out/f'cra1-theme-{version}-update-candidate.zip',update,timestamp))
  source=dict(data)
  for base in ['cra1-theme/backend','cra1-theme/docs','cra1-theme/licenses','cra1-theme/source','cra1-theme/scripts','cra1-theme/tests','cra1-theme/source/member/tests','cra1-theme/source/admin/tests','public/cra1-shared/src','public/web/cra1/src','public/cra1-shared/theme-sources']:
   for p in owned_walk(ROOT/base):
@@ -172,7 +179,7 @@ def main():
  source['cra1-theme/docs/asset-inventory.json']=(json.dumps(inventory,ensure_ascii=False,indent=2)+'\n').encode()
  for rel in ['public/cra1-shared/README.md','public/clientarea/template/pc/cra1/README.md','public/cra1-shared/package.json','public/cra1-shared/package-lock.json','public/cra1-shared/build.mjs','public/cra1-shared/build-icons.py']:
   if (ROOT/rel).is_file():source[rel]=(ROOT/rel).read_bytes()
- results.append(archive(out/f'cra1-theme-{version}-source-candidate.zip',source))
+ results.append(archive(out/f'cra1-theme-{version}-source-candidate.zip',source,timestamp))
  delivery_dir=out/'delivery';delivery_dir.mkdir()
  delivery_file=delivery_dir/f'CRA1-theme-{version}-install.zip'
  shutil.copyfile(out/results[0]['path'],delivery_file)

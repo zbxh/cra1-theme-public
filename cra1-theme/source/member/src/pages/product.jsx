@@ -123,6 +123,7 @@ function HostDetailPage({ hostId }) {
   const [host, setHost] = useState(null)
   const [loading, setLoading] = useState(!!hostId)
   const [readError, setReadError] = useState('')
+  const [attempt, setAttempt] = useState(0)
   /* 已登记的 mf_cloud / mf_dcim 产品使用 React 控制面板；其他模块保留原生视图。 */
   const [serverReady, setServerReady] = useState(null)
   /* 复用宿主信息及对应模块详情，避免面板再次请求相同数据。 */
@@ -151,10 +152,14 @@ function HostDetailPage({ hostId }) {
           detail: { name: h.product_name || h.name || `产品 #${h.id}` },
         }))
       })
-      .catch(() => { if (alive) { setReadError('页面错误，请刷新重试'); setHost(null); setServerReady(false) } })
+      .catch(error => {
+        if (!alive) return
+        if (error.status !== 404) setReadError(error.status === 403 ? 'denied' : 'failed')
+        setHost(null); setServerReady(false)
+      })
       .finally(() => { if (alive) setLoading(false) })
     return () => { alive = false }
-  }, [hostId])
+  }, [hostId, attempt])
 
   if (!hostId) {
     return (
@@ -203,9 +208,12 @@ function HostDetailPage({ hostId }) {
           <CardContent className="p-5">
             <EmptyState
               icon={Server}
-              title={readError || '产品不存在'}
+              title={readError === 'denied' ? '无法查看该产品' : readError ? '产品详情暂时无法读取' : '产品不存在'}
               description={readError ? '' : '该产品可能已被删除，或不属于当前账户。'}
-              action={<Button size="sm" onClick={() => { window.location.href = '/productList.htm' }}>返回我的产品</Button>}
+              action={<div className="flex flex-wrap justify-center gap-2">
+                {readError === 'failed' && <Button type="button" size="sm" onClick={() => setAttempt(n => n + 1)}>重新加载</Button>}
+                <Button size="sm" variant="outline" onClick={() => { window.location.href = '/productList.htm' }}>返回我的产品</Button>
+              </div>}
             />
           </CardContent>
         </Card>

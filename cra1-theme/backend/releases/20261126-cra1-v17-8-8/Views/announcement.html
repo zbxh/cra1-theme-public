@@ -1,0 +1,14 @@
+</head>
+<body>
+  <div class="cra1-page">
+    <div class="cra1-shell">
+      <aside-menu @getruleslist="getRule"></aside-menu>
+      <div class="cra1-shell__body">
+        <top-menu ref="topMenuRef"></top-menu>
+        <main class="cra1-shell__content" id="cra1-content-slot">
+          <cra1-announcement-page :plugin-id="{$cra1_plugin_id}"></cra1-announcement-page>
+        </main>
+      </div>
+    </div>
+  </div>
+  <script src="{:cra1_theme_asset_url('native', 'js/shell.js', '/clientarea/template/pc/cra1/releases/20261017-compat-v3/js/shell.js')}"></script>

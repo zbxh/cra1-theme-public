@@ -62,6 +62,32 @@ test('without an explicit suffix the real configured suffix or actual first entr
   const f=fixture('?domain=fixture');f.env.domainSetting=async()=>response({default_search_domain:'.unavailable'});
   await f.page.getSuffix();assert.equal(f.calls.find(c=>c.api==='search').suffix,'.cn');
 });
+test('domain login restores a linked or manually submitted query and keeps the cart route',async()=>{
+  const query='?fpg_id=1&spg_id=2&domain=linked&suffix=.cn&host_id=7&ref=info%20page';
+  const f=fixture(query);
+  const path='/cart/goodsList.htm';
+  const hash='#domain';
+  const origin='https://fixture.invalid';
+  Object.assign(f.env,{URL,sessionStorage:{},location:f.env.window.location});
+  const navigateToCart = () => { f.env.location.href=origin+path+query+hash; };
+  navigateToCart();
+  await f.page.getSuffix();
+  f.page.goLogin();
+  assert.equal(f.env.location.href,'/login.htm');
+  assert.equal(f.env.sessionStorage.redirectUrl,path+query+hash);
+
+  navigateToCart();
+  f.page.domainInput='manual.co.uk';
+  await f.page.handelDomainSearch();
+  f.page.domainInput='draft';
+  f.page.goLogin();
+  const returned=new URL(f.env.sessionStorage.redirectUrl,origin);
+  assert.equal(returned.pathname,path);
+  assert.equal(returned.hash,hash);
+  assert.deepEqual(Object.fromEntries(returned.searchParams),{
+    fpg_id:'1',spg_id:'2',domain:'manual',suffix:'.co.uk',host_id:'7',ref:'info page'
+  });
+});
 test('an empty suffix list stops before settings and querying and remains retryable',async()=>{
   const f=fixture('?domain=fixture&suffix=.cn');f.env.domainSuffix=async()=>response([]);
   await f.page.getSuffix();assert.equal(f.page.domainConfigState,'empty');assert.equal(f.page.isSearching,false);

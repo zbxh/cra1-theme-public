@@ -7,6 +7,10 @@ define('CRA1_THEME_ROOT', $root);
 function runtime_path() { return $GLOBALS['cache'].'/'; }
 function view_tpl_replace($content, $data, $name = '') { return $content; }
 require $root.'/vendor/autoload.php';
+require $root.'/cra1-theme/backend/Diagnostics.php';
+require $root.'/cra1-theme/backend/Failure.php';
+require $root.'/cra1-theme/backend/Files.php';
+require $root.'/cra1-theme/backend/Release/Assets.php';
 require $root.'/cra1-theme/backend/Presentation/OfficialCart.php';
 use CRA1\Theme\Presentation\OfficialCart;
 $checks = 0;
@@ -21,7 +25,10 @@ function navFooter(string $html): ?string {
 }
 $data = ['template_catalog'=>'clientarea','themes'=>'pc/default','public_themes'=>'pc/default','template_catalog_cart'=>'cart','themes_cart'=>'pc/default','addons'=>[],'clientarea_theme_color'=>'default','system_version'=>'10.7.4','lang_home'=>'zh-cn','lang_home_follow_browser'=>0,'lang_home_open'=>0];
 try {
-    navCheck(OfficialCart::render('goods', $data) === nativePart('goods', $data), 'native business template remains identical');
+    $nativeGoods = nativePart('goods', $data);
+    $goods = OfficialCart::render('goods', $data);
+    navCheck(substr($goods, -strlen($nativeGoods)) === $nativeGoods, 'native business template remains identical');
+    navCheck(strpos($goods, 'product_id') < strpos($goods, '/cart/template/pc/default/js/goods.js'), 'legacy links normalize before native scripts');
     $original = nativePart('footer', $data); $adapted = navFooter($original);
     navCheck($adapted !== null, 'installed footer accepts CRA1 navigation');
     navCheck(substr_count($adapted, '/fixture/') === 2, 'exactly two components replaced');
@@ -42,10 +49,18 @@ try {
     navCheck(strpos($cart, '/cart/template/pc/default/js/goods.js') !== false, 'native mobile cascade keeps the installed cart loader');
     navCheck(strpos($cart, 'native-cart-navigation') === false && OfficialCart::fullOfficialCart(), 'complete cart does not load CRA1 navigation');
     navCheck(strpos($cart, 'product_id') < strpos($cart, '/cart/template/pc/default/js/goods.js'), 'legacy product ID normalized before the native loader');
+    $viewportFixture = "<head><meta content='maximum-scale=1.0, width=device-width, user-scalable=no, initial-scale=1.0, viewport-fit=cover, minimum-scale=1.0' name='viewport'><meta name='description' content='user-scalable=no'></head><body>原生选配</body>";
+    $zoomableFixture = "<head><meta content=' width=device-width, initial-scale=1.0, viewport-fit=cover' name='viewport'><meta name='description' content='user-scalable=no'></head><body>原生选配</body>";
+    $allowZoom = new ReflectionMethod(OfficialCart::class, 'allowZoom'); $allowZoom->setAccessible(true);
+    navCheck($allowZoom->invoke(null, $viewportFixture) === $zoomableFixture, 'viewport limits removed while unrelated tags, viewport directives and module markup are retained');
+    navCheck(strpos($cart, 'user-scalable=no') === false, 'the installed official cart document allows zoom in the CRA1 cart shell');
+    $header = $allowZoom->invoke(null, nativePart('header', $data));
+    navCheck(strpos($header, 'name="viewport"') !== false && strpos($header, 'user-scalable=no') === false, 'the official header fragment allows zoom before the body is rendered');
     $panel=OfficialCart::panelDocument($data, true, false);
     navCheck(strpos($panel, '/clientarea/template/pc/default/js/productdetail.js') !== false, 'official panel loads the installed host view loader');
     navCheck(strpos($panel, 'native-cart-navigation') === false && OfficialCart::handlesPanel() && !OfficialCart::panelUsesCRA1(), 'complete panel does not load CRA1 navigation');
     navCheck(strpos($panel, '.product_detail.template:first-child:not([v-cloak])') !== false, 'the mounted native panel stays visible');
+    navCheck(strpos($panel, 'user-scalable=no') === false, 'the native control-panel document allows zoom');
     $adaptedPanel=navFooter($panel);
     navCheck($adaptedPanel !== null && substr_count($adaptedPanel, '/fixture/') === 2 && strpos($adaptedPanel, '/clientarea/template/pc/default/js/productdetail.js') !== false, 'panel navigation replacement preserves native module scripts');
     echo json_encode(['status'=>'passed','checks'=>$checks,'php'=>PHP_VERSION,'business_writes'=>0]).PHP_EOL;

@@ -285,7 +285,7 @@
                           <el-button @click="openStandalone">在独立页打开</el-button>
                         </el-empty>
                       </div>
-                      <iframe :key="embedSrc" :src="embedSrc" class="cl-config-frame"
+                      <iframe :key="embedSrc" :src="embedSrc" class="cl-config-frame" data-cra1-cart-catalog
                         :class="{'is-loading': configState === 'loading'}"
                         :style="configState === 'ready' && frameHeight ? { height: frameHeight + 'px' } : {}"
                         :title="selectedProduct.name + ' 配置'"
@@ -370,12 +370,12 @@
                 <template v-if="isDomain && !productLinkNotice">
                   <div class="domain-box">
                     <div class="register-type">
-                      <span class="reg-ridio" :class="regType === '1' ? 'isActice' : ''"
-                        @click="regType = '1'">{{lang.template_text93}}</span>
+                      <button type="button" class="reg-ridio" :class="regType === '1' ? 'isActice' : ''"
+                        :aria-pressed="regType === '1' ? 'true' : 'false'" @click="regType = '1'">{{lang.template_text93}}</button>
                       <template v-if="domainConfig.batch_search_domain === 1">
                         <el-divider direction="vertical"></el-divider>
-                        <span class="reg-ridio" :class="regType === '2' ? 'isActice' : ''"
-                          @click="regType = '2'">{{lang.template_text94}}</span>
+                        <button type="button" class="reg-ridio" :class="regType === '2' ? 'isActice' : ''"
+                          :aria-pressed="regType === '2' ? 'true' : 'false'" @click="regType = '2'">{{lang.template_text94}}</button>
                       </template>
                     </div>
                     <div class="domain-search" v-if="regType === '1'">
@@ -397,11 +397,12 @@
                     <div class="batch-search-box" v-if="regType === '2'">
                       <div class="batch-tips" v-loading="batchLoading">
                         <el-input v-model="textarea2" resize="none" class="input-batch" type="textarea"
-                          :placeholder="`${lang.template_text106}\n${lang.template_text107}${domainConfig.number_limit}${lang.template_text108}${domainConfig.number_limit}${lang.template_text109}\n${lang.template_text110}\n${lang.template_text111}`">
+                          :placeholder="`${lang.template_text106}\n${lang.template_text107}${domainBatchLimit}${lang.template_text108}${domainBatchLimit}${lang.template_text109}\n${lang.template_text110}\n${lang.template_text111}`">
                         </el-input>
                       </div>
                       <div class="batch-btn">
-                        <div class="upload-btn" @click="isShowUpload = true">
+                        <button type="button" ref="domainUploadTrigger" class="upload-btn" aria-haspopup="dialog"
+                          @click="isShowUpload = true">
                           <svg t="1750672276335" class="icon" viewBox="0 0 1024 1024" version="1.1"
                             xmlns="http://www.w3.org/2000/svg" p-id="10857" width="16" height="16">
                             <path
@@ -409,7 +410,7 @@
                               p-id="10858" fill="var(--color-primary)"></path>
                           </svg>
                           {{lang.template_text132}}
-                        </div>
+                        </button>
                         <el-button @click="batchSearchDomain" type="primary"
                           :loading="batchLoading">{{lang.template_text112}}</el-button>
                       </div>
@@ -607,7 +608,7 @@
                           <div class="car-no" v-if="carList.length === 0">
                             {{lang.template_text125}}
                             <span v-show="carList.length === 0">{{lang.template_text126}}</span>
-                            <span v-if="!isLogin" class="blue-a-text" @click="goLogin"> {{lang.template_text127}}</span>
+                            <button v-if="!isLogin" type="button" class="blue-a-text" @click="goLogin">{{lang.template_text127}}</button>
                           </div>
                           <div class="car-list" v-else>
                             <el-checkbox-group v-model="checkList" @change="handleCheckedCitiesChange">
@@ -859,21 +860,28 @@
                 </template>
               </div>
         <div class="up-dialog cra1-domain-upload">
-          <el-dialog width="6.8rem" custom-class="cra1-domain-upload-dialog" :visible.sync="isShowUpload" :show-close=false>
+          <el-dialog width="6.8rem" custom-class="cra1-domain-upload-dialog" :title="lang.template_text131"
+            :visible.sync="isShowUpload" :show-close="false" :close-on-click-modal="true"
+            @close="resetUploadFile" @opened="focusDomainUpload('domainUploadChoose')"
+            @closed="focusDomainUpload('domainUploadTrigger')">
             <div class="dia-title">{{lang.template_text131}}</div>
             <div class="dia-concent">
               <p class="up-tips">{{lang.template_text132}}</p>
               <div class="file-box">
-                <input accept="text/plain" type="file" id="upFile" autocomplete="off" tabindex="-1"
-                  style="display: none;">
-                <input class="file-name" :placeholder="lang.template_text133" readonly :value="fileName">
-                <!-- 选择文件按钮 -->
-                <div class="file-btn" @click="selectFile">{{lang.template_text134}}</div>
+                <input accept="text/plain,.txt" type="file" ref="domainUploadFile" hidden @change="readUploadFile">
+                <input class="file-name" :placeholder="lang.template_text133" :aria-label="lang.template_text133"
+                  tabindex="-1" readonly :value="fileName">
+                <button type="button" ref="domainUploadChoose" class="file-btn" @click="$refs.domainUploadFile.click()">
+                  {{lang.template_text134}}
+                </button>
               </div>
+              <p v-show="fileReading || fileError" class="file-status" :class="{'is-error': fileError}" role="status">
+                {{fileError || lang.goods_loading || '正在读取文件…'}}
+              </p>
             </div>
             <div class="dia-foter">
-              <el-button class="confim-btn" @click="confirmUpload">{{lang.template_text135}}</el-button>
-              <el-button class="cancel-btn" @click="cancelUpload">{{lang.template_text136}}</el-button>
+              <el-button class="confim-btn" :disabled="!fileDomains.length" @click="confirmUpload">{{lang.template_text135}}</el-button>
+              <el-button class="cancel-btn" @click="isShowUpload = false">{{lang.template_text136}}</el-button>
             </div>
           </el-dialog>
         </div>

@@ -11,6 +11,10 @@
 .announcements-page .announcement-field .ip-field-line { min-height:40px; }
 .announcements-page .announcement-field .ip-field-line>.ip-preview-icon { width:40px; height:40px; }
 .announcements-page :is(input,textarea) { min-width:0; }
+.announcements-page input[type=datetime-local] { padding-inline:8px; }
+.announcements-page input[type=datetime-local]::-webkit-datetime-edit { padding-inline:0; }
+.announcements-page input[type=datetime-local]::-webkit-datetime-edit-fields-wrapper { padding:0; }
+.announcements-page input[type=datetime-local]::-webkit-calendar-picker-indicator { flex-shrink:0; margin-inline-start:4px; }
 .announcements-page .announcement-list { max-height:420px; overflow:auto; overscroll-behavior:contain; }
 .announcements-page .announcement-target-tools { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
 .announcements-page .announcement-target-tools>input { flex-basis:220px; }
@@ -44,6 +48,10 @@
  .announcements-page .workspace-savebar>div:last-child { display:flex; flex-wrap:nowrap; align-items:center; gap:6px; }
  .announcements-page .workspace-savebar>div:last-child>button { min-height:44px; padding:0 10px; }
  .announcements-page .workspace-savebar>div:last-child>button:first-child { width:40px; padding:0; font-size:0; gap:0; }
+}
+@container announcement-admin (max-width:320px) {
+ .announcements-page input[type=datetime-local] { padding-inline:4px; }
+ .announcements-page input[type=datetime-local]::-webkit-calendar-picker-indicator { margin-inline-start:2px; }
 }
 @media(max-width:767px) {
  .announcements-page .announcement-settings { gap:16px; align-items:center; }

@@ -1,13 +1,18 @@
 <?php
 if(realpath($_SERVER['SCRIPT_FILENAME']??'')===__FILE__){http_response_code(404);exit;}
 $loginStyle='security-login.css';
-$adminAssets=\CRA1\Theme\Release\Assets::admin('');
-if($adminAssets!==''&&is_file(__DIR__.'/'.$adminAssets.'/security-login.css'))$loginStyle=$adminAssets.'/security-login.css';
+$paletteUrl=$uiEffectStyle=$uiEffectScript='';
+// Sign-in and password recovery must remain available to the operator who
+// needs to recover an interrupted update. Use the entry's standalone skin.
+if(!is_file($STORE.'/distribution/pending.json')){
+    $adminAssets=\CRA1\Theme\Release\Assets::admin('');
+    if($adminAssets!==''&&is_file(__DIR__.'/'.$adminAssets.'/security-login.css'))$loginStyle=$adminAssets.'/security-login.css';
+    $paletteUrl=\CRA1\Theme\Release\Assets::url('shared','tokens.css');
+    $uiEffectStyle=\CRA1\Theme\Release\Assets::url('shared','ui-effects.css');
+    $uiEffectScript=\CRA1\Theme\Release\Assets::url('shared','ui-effects.js');
+}
 $assetVersion=substr(hash('sha256',(string)file_get_contents(__DIR__.'/login.js').(string)file_get_contents(__DIR__.'/'.$loginStyle)),0,16);
-$paletteUrl=\CRA1\Theme\Release\Assets::url('shared','tokens.css');
-$paletteAvailable=is_file(CRA1_THEME_ROOT.'/public'.(string)parse_url($paletteUrl,PHP_URL_PATH));
-$uiEffectStyle=\CRA1\Theme\Release\Assets::url('shared','ui-effects.css');
-$uiEffectScript=\CRA1\Theme\Release\Assets::url('shared','ui-effects.js');
+$paletteAvailable=$paletteUrl!==''&&is_file(CRA1_THEME_ROOT.'/public'.(string)parse_url($paletteUrl,PHP_URL_PATH));
 $uiEffectStyleAvailable=$uiEffectStyle!==''&&is_file(CRA1_THEME_ROOT.'/public'.(string)parse_url($uiEffectStyle,PHP_URL_PATH));
 $uiEffectScriptAvailable=$uiEffectScript!==''&&is_file(CRA1_THEME_ROOT.'/public'.(string)parse_url($uiEffectScript,PHP_URL_PATH));
 $boot=json_encode(['csrf'=>csrf_token(),'base'=>'index.php'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE);

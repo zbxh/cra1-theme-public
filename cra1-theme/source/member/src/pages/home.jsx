@@ -540,9 +540,10 @@ function TodoEmpty({ text, tip, onSwitch }) {
   )
 }
 
-function ReadFailure({ onRetry, className }) {
+function ReadFailure({ onRetry, className, message = '内容暂时无法读取' }) {
   return <div role="status" className={cn('flex flex-wrap items-center justify-between gap-3 py-5 text-[13px] text-muted-foreground', className)}>
-    <span>页面错误，请刷新重试</span>
+    <span>{message}</span>
+    {onRetry && <Button type="button" size="sm" variant="outline" onClick={onRetry}>重新加载</Button>}
   </div>
 }
 
@@ -717,7 +718,8 @@ function HostSection() {
       <CardContent>
         {!loading && renewalError && (
           <Alert tone="warning" className="mb-4">
-            页面错误，请刷新重试
+            部分产品的续费资格暂时无法读取。
+            <Button type="button" size="sm" variant="ghost" onClick={() => setAttempt(n => n + 1)}>重新加载</Button>
           </Alert>
         )}
         {loading ? (
@@ -725,7 +727,7 @@ function HostSection() {
             {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-lg" />)}
           </div>
         ) : error ? (
-          <Alert tone="error">页面错误，请刷新重试</Alert>
+          <ReadFailure message="产品列表暂时无法读取" onRetry={() => setAttempt(n => n + 1)} />
         ) : shown.length === 0 ? (
           <EmptyState
             icon={Server}
