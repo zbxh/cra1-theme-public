@@ -1,6 +1,9 @@
 {php}require_once IDCSMART_ROOT.'public/cra1-shared/cart-runtime.php';cra1_cart_runtime((string)($themes??''));{/php}
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261011-titanium-v1/css/settlement.css', '/cart/template/pc/cra1/releases/20261011-titanium-v1/css/settlement.css')}">
 <link rel="stylesheet" href="{:cra1_theme_asset_url('cart', '20261017-compat-v3/css/purchase-theme.css', '/cart/template/pc/cra1/releases/20261011-titanium-v1/css/cart-theme.css')}">
+<style>
+  .cra1-confirm-page[v-cloak] { display: none !important; }
+</style>
 </head>
 
 <body>
@@ -12,7 +15,7 @@
     <div class="ddr ddr4"></div>
     <div class="ddr ddr5"></div>
   </div>
-  <div class="template cart-page cra1-confirm-page">
+  <div class="template cart-page cra1-confirm-page" v-cloak>
     <el-container>
       <aside-menu @getruleslist="getRule"></aside-menu>
       <el-container>

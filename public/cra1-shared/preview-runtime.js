@@ -59,10 +59,27 @@
     });cartObserver.observe(document.documentElement,{subtree:true,childList:true});
   }
   function applyCode(){var code=snap.custom_code||{};if(code.css_enabled!==false&&code.css){var style=document.createElement('style');style.textContent=code.css;document.head.appendChild(style)}if(code.js_enabled!==false&&code.js){try{(0,eval)(code.js)}catch(e){console.error('自定义脚本预览失败',e)}}}
+  function reportState(state) {
+    window.parent.postMessage({type:'theme-preview',state:state,nonce:boot.nonce,
+      refreshAfter:boot.cartDescription?.refresh_after},boot.parent_origin);
+  }
   document.addEventListener('DOMContentLoaded',function(){
     try{applyCode()}finally{
-      window.parent.postMessage({type:'theme-preview',state:'ready',nonce:boot.nonce,
-        refreshAfter:boot.cartDescription?.refresh_after},boot.parent_origin);
+      if (boot.domain === 'cart' && boot.editorId === 'settlement') {
+        // Settlement mounts on window.load. Check after its load handler has run.
+        window.addEventListener('load', function () {
+          setTimeout(function () {
+            var rendered = document.querySelector('.cra1-confirm-page:not([v-cloak])');
+            if (!rendered) {
+              var loading = document.getElementById('mainLoading');
+              if (loading) loading.style.display = 'none';
+            }
+            reportState(rendered ? 'ready' : 'error');
+          }, 0);
+        }, {once:true});
+      } else {
+        reportState('ready');
+      }
     }
   },{once:true});
 })();
