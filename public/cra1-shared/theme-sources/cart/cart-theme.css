@@ -641,15 +641,34 @@ html[data-cra1-cart-native-shell]:not([data-cra1-native-module]) .cart-page > .e
   position: relative;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .cart-page:not([data-cra1-native-module]) .cl-goods-card.is-sold-out {
   opacity: 0.62;
 }
 
-/* Selectable product cards share the Mist selection marker. */
-.cart-page:not([data-cra1-native-module]) .cl-goods-card {
+.cart-page--flat .cl-card-pick {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
   cursor: pointer;
+}
+.cart-page--flat .cl-card-pick:focus-visible {
+  outline: 2px solid var(--cui-focus);
+  outline-offset: -3px;
+}
+.cart-page--flat .cl-goods-card :is(.cl-card-desc-inner a, .cl-desc-toggle, .el-popover__reference) {
+  position: relative;
+  z-index: 2;
+}
+.cart-page:not([data-cra1-native-module]) .cl-goods-card {
   text-align: left;
 }
 
@@ -2229,56 +2248,86 @@ html[data-cra1-cart-native-shell]:not([data-cra1-native-module]) .cart-page > .e
   display: none !important;
 }
 
-/* ==========================================================================
-   手机端：产品型号卡片横向滑动
-   ========================================================================== */
-.cart-page:not([data-cra1-native-module]) .cl-goods-scroll-hint { display: none; }
-@media (max-width: 768px) {
-  .cart-page:not([data-cra1-native-module]) .cl-goods-grid,
-  .cart-page:not([data-cra1-native-module]) .cl-goods-grid[style*="--cart-cols"] {
-    display: flex !important;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    gap: 12px;
-    padding-bottom: 6px;
-  }
-
-  .cart-page:not([data-cra1-native-module]) .cl-goods-grid::-webkit-scrollbar {
-    display: none;
-    height: 0;
-  }
-
-  .cart-page:not([data-cra1-native-module]) .cl-goods-grid .cl-goods-card {
-    flex: 0 0 auto;
-    width: min(250px, 100%);
-  }
-
-  .cart-page:not([data-cra1-native-module]) .cl-goods-scroll-hint {
-    display: block;
-    margin: 6px 0 0;
-    color: var(--text-muted, var(--cui-muted));
-    font-size: 12px;
-    line-height: 20px;
-  }
-
-  /* 骨架屏同形态 */
-  .cart-page:not([data-cra1-native-module]) .cl-skeleton {
-    display: flex !important;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-    gap: 12px;
-  }
-
-  .cart-page:not([data-cra1-native-module]) .cl-skeleton::-webkit-scrollbar {
-    display: none;
-  }
-
-  .cart-page:not([data-cra1-native-module]) .cl-skeleton .cl-skel-card {
-    flex: 0 0 auto;
-    width: min(250px, 100%);
+.cart-page--flat .cl-catalog-more {
+  display: block;
+  margin-inline-start: auto;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--cui-body);
+  text-decoration: underline;
+}
+.cart-page--flat .cl-catalog-more:disabled {
+  color: var(--cui-muted);
+}
+/* 手机端只显示一张完整型号卡片，点击后在底部浏览其余型号。 */
+.cart-page--flat .cl-skeleton.cl-skeleton--summary {
+  grid-template-columns: minmax(0, 1fr);
+}
+.cart-page--flat :is(.cl-model-current, .cl-model-sheet) .cl-card-head-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.cart-page--flat :is(.cl-model-current, .cl-model-sheet) .cl-card-ribbon {
+  position: static;
+  align-self: flex-start;
+  margin: 8px 12px 0;
+  border-radius: var(--cui-radius-sm);
+}
+.cart-page--flat :is(.cl-model-current, .cl-model-sheet) .cl-card-desc {
+  padding: 0;
+}
+.cart-page--flat .cl-model-switch {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  color: var(--cui-menu);
+  font-size: 13px;
+  font-weight: 500;
+}
+/* Element 的滚动锁可能给 WebKit 保留滚动条尺寸，遮罩仍需覆盖整个视口。 */
+.cart-page--flat #cra1-cart-picker {
+  width: 100vw;
+  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
+}
+.cart-page--flat .cl-picker-sheet.el-drawer {
+  max-width: 560px;
+  max-height: 80vh;
+  max-height: min(80dvh, 720px);
+  margin-inline: auto;
+  border-radius: var(--cui-radius-card) var(--cui-radius-card) 0 0;
+  background: var(--cui-surface);
+  color: var(--cui-body);
+}
+.cart-page--flat .cl-picker-sheet .el-drawer__header {
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding: 0 8px 0 16px;
+  border-bottom: 1px solid var(--cui-edge);
+}
+.cart-page--flat .cl-picker-sheet .el-drawer__body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+.cart-page--flat .cl-model-choices {
+  display: grid;
+  gap: 12px;
+  padding: 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cart-page--flat .el-drawer-fade-enter-active,
+  .cart-page--flat .el-drawer-fade-leave-active,
+  .cart-page--flat .cl-picker-sheet {
+    animation: none;
+    transition: none;
   }
 }
 
@@ -2380,6 +2429,7 @@ html[data-cra1-cart-native-shell]:not([data-cra1-native-module]) .cart-page > .e
   .cart-page:not([data-cra1-native-module]) .cl-rail-dock {
     position: fixed;
     inset: auto 0 0;
+    max-width: 100vw;
     z-index: 30;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -2497,6 +2547,11 @@ html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page--flat:not
 
 html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page--flat:not([data-cra1-native-module]) .cl-nav-search {
   margin-bottom: 26px;
+}
+@media (max-width: 1024px) {
+  html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page--flat:not([data-cra1-native-module]) .cl-nav-search {
+    margin-bottom: 12px;
+  }
 }
 
 html[data-cra1-theme="cart"]:not([data-cra1-native-module]) .cart-page--flat:not([data-cra1-native-module]) .cl-nav-group,

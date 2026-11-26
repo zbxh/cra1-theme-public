@@ -9,14 +9,15 @@ import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 
-const root=path.resolve(new URL('../..',import.meta.url).pathname);
-const {chromium}=createRequire(path.join(root,'cra1-theme/scripts/package.json'))('playwright');
+const root=path.resolve(process.env.CRA1_NATIVE_AUDIT_ROOT||new URL('../..',import.meta.url).pathname);
+const browsers=createRequire(path.join(root,'cra1-theme/scripts/package.json'))('playwright');
 const out=process.env.CRA1_NATIVE_AUDIT_OUT,sourceOrigin=process.env.CRA1_NATIVE_AUDIT_ORIGIN;
 if(!out||!sourceOrigin)throw Error('Set an external CRA1_NATIVE_AUDIT_OUT and the anonymous CRA1_NATIVE_AUDIT_ORIGIN.');
 fs.mkdirSync(out,{recursive:true});
 const selected=(process.env.CRA1_NATIVE_AUDIT_MODULES||'bt_virtual_host,chinac_cloud_phone,chinac_network,direct_admin,mf_cloud_backup,mf_cloud_disk,mf_cloud_ip,mf_cloud_mysql,mf_dcim_cabinet,whmcs_cloud,whmcs_dcim').split(',');
 const widths=(process.env.CRA1_NATIVE_AUDIT_WIDTHS||'1440,390').split(',').map(Number);
 const modes=(process.env.CRA1_NATIVE_AUDIT_MODES||'official,cra1').split(',');
+const nativeFixture=process.env.CRA1_NATIVE_AUDIT_CART_HTML;
 assert.ok(modes.length>0&&modes.every(m=>['official','cra1'].includes(m)),'known comparison modes');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const installedRelease=JSON.parse(read('cra1-theme/release.json')).release;
@@ -27,14 +28,21 @@ const common={website_name:'模块兼容演示',website_url:'',currency_code:'CN
 const projection={projection_version:2,page:'goods',common,auth:[],features:{},links:{},locale:{current:'zh-cn'}};
 const docs={};
 for(const [name,address] of Object.entries({catalog:'/cart/goodsList.htm?product_id=501',native:'/cart/goods.htm?id=501'})){
- const response=await fetch(new URL(address,sourceOrigin));
- assert.equal(response.status,200,'anonymous real template '+name);
- docs[name]=(await response.text())
+ let html;
+ if(name==='native'&&nativeFixture)html=fs.readFileSync(nativeFixture,'utf8');
+ else {
+  const response=await fetch(new URL(address,sourceOrigin));
+  assert.equal(response.status,200,'anonymous real template '+name);
+  html=await response.text();
+ }
+ docs[name]=html
   .replace(/<script\b[^>]*>\s*window\.__CRA1_RUNTIME__[\s\S]*?<\/script>/,`<script>window.__CRA1_RUNTIME__=${JSON.stringify(projection)}</script>`)
   .replace(/addons_js=(['"])[\s\S]*?\1/,'addons_js="[]"')
   .replace(/<script\b[^>]*\bsrc=["']\/plugins\/addon\/[^"']+["'][^>]*>[\s\S]*?<\/script>/gi,'')
   .replaceAll('/releases/'+installedRelease+'/', '/releases/'+release+'/');
 }
+const hasCategories=docs.native.includes('data-cra1-cart-categories="501"');
+if(nativeFixture)assert.ok(hasCategories,'packaged CRA1 shell has the classification slot');
 let official=['public/clientarea/template/pc/default/header.php','public/cart/template/pc/default/goods.php','public/clientarea/template/pc/default/footer.php'].map(read).join('');
 for(const [key,value] of Object.entries({title:'模块兼容演示',template_catalog:'clientarea',themes:'pc/default',public_themes:'pc/default',template_catalog_cart:'cart',themes_cart:'pc/default',clientarea_theme_color:'default',system_version:'10.7.4',lang_home:'zh-cn',lang_home_follow_browser:'0',lang_home_open:'0'}))official=official.replaceAll('{$'+key+'}',value);
 official=official.replace('{:json_encode($addons)}','[]');
@@ -71,6 +79,7 @@ const server=http.createServer(async(req,res)=>{
   let raw='';for await(const chunk of req)raw+=chunk;
   let body;try{body=raw?JSON.parse(raw):null}catch{body=raw}
   calls.push({path:p,method:req.method,query:Object.fromEntries(u.searchParams),body});
+  if(p==='/cra1-shared/cart-description.php')return json({mode:'custom',html:'<p>第三方商品顶部说明</p>',refresh_after:null});
   if(p==='/cra1-shared/snapshot.php')return json({projection_version:3,nav_shape:3,content:{},style:{},settings:{},features:{},appearance:{show_cart:1},sidebar:[]});
   if(p==='/cra1-shared/announcements.php'||p==='/cra1-shared/notifications.php')return json({items:[]});
   if(p==='/cra1-shared/compat.php')return json({all:true,pages:[],known:[],permissions:[],features:{},links:{},account:{id:999,username:'演示用户'}});
@@ -79,8 +88,8 @@ const server=http.createServer(async(req,res)=>{
   if(p==='/console/v1/menu')return json({list:[],menu:[]});
   if(p==='/console/v1/presale_consult/config')return json({presale_consult:0,config:{}});
   if(p.includes('/event_promotion/')){res.writeHead(200,{'content-type':'application/json'});return res.end(JSON.stringify({status:200,msg:'操作成功',list:[]}))}
-  if(p==='/console/v1/product/group/first')return json({list:[{id:300,name:'测试产品'}]});
-  if(p==='/console/v1/product/group/second')return json({list:[{id:301,name:'第三方商品',type:'normal'}]});
+  if(p==='/console/v1/product/group/first')return json({list:[{id:300,name:'测试产品'},{id:400,name:'其他一级分类'}]});
+  if(p==='/console/v1/product/group/second')return json({list:[{id:301,name:'第三方商品',type:'normal',parent_id:300},{id:302,name:'其他二级分类',type:'normal',parent_id:300}]});
   if(p==='/console/v1/product')return json({list:Number(u.searchParams.get('page')||1)>1?[]:[product()],count:1});
   if(p==='/console/v1/product/501')return json({product:product()});
   if(p==='/console/v1/product/501/config_option'&&req.method==='GET')return json({module:moduleName,product_name:product().name,content:read('public/plugins/server/'+moduleName+'/template/cart/pc/default/goods.html')});
@@ -118,7 +127,8 @@ const server=http.createServer(async(req,res)=>{
 });
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const origin='http://127.0.0.1:'+server.address().port;
-const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+const browserName=process.env.CRA1_NATIVE_AUDIT_BROWSER||'chromium';
+const browser=await browsers[browserName].launch(browserName==='chromium'?{args:['--no-sandbox']}:{});
 try{
  for(moduleName of selected)for(const mode of modes)for(const width of widths){
   const item={module:moduleName,mode,width,checks:[],errors:[],consoleErrors:[],outsideRequests:[]};report.cases.push(item);calls=[];misses=[];
@@ -151,6 +161,29 @@ try{
     const footerControls=footer?[...footer.querySelectorAll('.duration-select,.el-input-number,.bot-price,.right .add-cart,.right .buy')].filter(visible).map(n=>({class:n.className,rect:rect(n)})):[];
     return {quantity:v.qty??v.orderData?.qty,cycle:v.params?.duration_id??v.orderData?.cycle??v.cycle,cycles:v.cycleList?.map(c=>c.id)??v.custom_cycles?.map(c=>c.id),price:v.calcTotalPrice??v.totalPrice,overflow:document.documentElement.scrollWidth>innerWidth+1,host:rect(host),header:document.querySelector('.cra1-header')?rect(document.querySelector('.cra1-header')):null,twoColumns:!!columns,l:host.querySelector('.l-config')?rect(host.querySelector('.l-config')):null,sidebar:host.querySelector('.order-right')?{...rect(host.querySelector('.order-right')),position:getComputedStyle(host.querySelector('.order-right')).position}:null,footer:footerRect,recognizedFooter:!!host.querySelector('.f-order > .el-main > .main-card > .left .duration-select'),footerControls,themeQuantityMatches:host.querySelectorAll('.cra1-basket-page .el-input-number,.cra1-confirm-page .el-input-number').length,themeCalculators:document.querySelectorAll('.cl-rail,.cl-rail-dock,.cl-config-frame').length,styles:[...document.querySelectorAll('link[rel=stylesheet]')].map(n=>new URL(n.href).pathname),quantities};
    });
+   const description=page.locator('[data-cra1-cart-description]');
+   if(mode==='cra1'){
+    const text=description.getByText('第三方商品顶部说明',{exact:true});
+    await text.waitFor();
+    check(await description.locator('xpath=following-sibling::div[contains(@class,"config-box")]').count()===1,'description stays outside the native configuration subtree');
+    check(await text.evaluate(element=>parseFloat(getComputedStyle(element).fontSize)>=14),'description uses readable text regardless of the V10 root scale');
+    check(await description.evaluate(element=>element.getBoundingClientRect().height<=64),'one-line description does not take up the configuration space');
+   }else check(await description.count()===0,'official document contains no theme description slot');
+   const categories=page.locator('[data-cra1-cart-categories]');
+   if(mode==='official')check(await categories.count()===0,'official document contains no CRA1 classification slot');
+   if(mode==='cra1'&&hasCategories){
+    check(await categories.locator('xpath=following-sibling::div[contains(@class,"config-box")]').count()===1,'categories are rendered outside module configuration');
+    const shell=await categories.evaluate(element=>{
+     const outer=element.parentElement,rect=outer.getBoundingClientRect(),style=getComputedStyle(outer);
+     return {max:style.maxWidth,border:style.borderTopWidth,left:rect.left,right:rect.right,width:innerWidth};
+    });
+    check(shell.max==='1440px'&&shell.border==='1px'&&shell.left>=0&&shell.right<=shell.width+1,'outer cart width and border follow CRA1');
+    if(width>1024)check(await categories.isHidden(),'desktop keeps its existing navigation');
+    else {
+     await categories.waitFor();
+     check(await categories.locator('.cl-catalog-value').allTextContents().then(names=>names.join('/')==='测试产品/第三方商品'),'both current categories follow the native product');
+    }
+   }
    item.initial=await measure();
    check(item.initial.cycles.length===2,'native periods loaded');
    check(item.initial.themeQuantityMatches===0,'unified cart quantity selectors never match module controls');
@@ -203,6 +236,35 @@ try{
    await page.waitForFunction(()=>[...document.querySelectorAll('.config-box .content > div')].some(n=>{const v=n.__vue__;return v&&(v.qty??v.orderData?.qty)===2}));
    await page.waitForTimeout(250);item.afterPlus=await measure();check(item.afterPlus.quantity===2,'native quantity plus works');
    check(Number(item.afterPlus.price)===200,'native quantity change displays the returned total');
+   if(mode==='cra1'&&hasCategories&&width<=1024){
+    const second=categories.locator('[data-catalog-level="second"]');
+    const first=categories.locator('[data-catalog-level="first"]');
+    const sheet=categories.getByRole('dialog');
+    const quotes=()=>calls.filter(call=>call.method==='POST'&&call.path.endsWith('/config_option')).length;
+    const quoteCount=quotes();
+    await first.click();
+    check(await sheet.getByRole('button',{name:'测试产品',exact:true}).getAttribute('aria-pressed')==='true','first category shows the current selection');
+    await sheet.getByRole('button',{name:'测试产品',exact:true}).click();
+    await sheet.waitFor({state:'hidden'});
+    await second.click();
+    check(await sheet.locator('.cl-catalog-parent strong').textContent()==='测试产品','second category shows its parent');
+    check(await sheet.getByRole('button',{name:'第三方商品',exact:true}).getAttribute('aria-pressed')==='true','second category shows the current selection');
+    const bounds=await sheet.boundingBox();
+    check(bounds.x>=0&&bounds.x+bounds.width<=width+1&&Math.abs(bounds.y+bounds.height-900)<=2,'category sheet fits and meets the bottom of the viewport');
+    if(width===390)await page.screenshot({path:path.join(out,`${moduleName}-${width}-categories.png`)});
+    const confirm=page.waitForEvent('dialog');
+    const select=sheet.getByRole('button',{name:'其他二级分类',exact:true}).click();
+    const prompt=await confirm;
+    check(prompt.type()==='confirm'&&prompt.message().includes('未提交的选配'),'category change asks before leaving native configuration');
+    await prompt.dismiss();
+    await select;
+    check(new URL(page.url()).pathname==='/cart/goods.htm','cancelling keeps the current page');
+    await page.keyboard.press('Escape');
+    await sheet.waitFor({state:'hidden'});
+    check(await second.evaluate(element=>document.activeElement===element),'closing the sheet returns focus to its trigger');
+    const current=await measure();
+    check(current.quantity===2&&current.cycle===22&&Number(current.price)===200&&quotes()===quoteCount,'opening and cancelling keep the native quantity, cycle and quote');
+   }
    const minus=await add.count()?page.locator('.config-box .content .del-add .del:visible').last():await nativeIncrease.count()?page.locator('.config-box .content .f-order .el-input-number__decrease:visible').last():page.locator('.config-box .content .order-right .el-input-number__decrease:visible').last();
    const overlap=item.afterPlus.quantities.some(q=>q.buttons.length===2&&q.buttons[0].rect.right>q.buttons[1].rect.left);
    if(mode==='official'&&overlap){
@@ -235,6 +297,19 @@ try{
    await page.waitForURL('**/cart/settlement.htm?id=501');
    item.checkout=await page.evaluate(()=>JSON.parse(sessionStorage.product_information));
    check(item.checkout.product_id==501&&item.checkout.qty===1,'native purchase preserves product and quantity');
+   if(mode==='cra1'&&hasCategories&&width===390){
+    for(const [kind, label, target] of [
+     ['first','其他一级分类','?fpg_id=400'],
+     ['second','其他二级分类','?fpg_id=300&spg_id=302'],
+    ]){
+     await page.goto(origin+'/cart/goods.htm?id=501&position=2');
+     await categories.locator(`[data-catalog-level="${kind}"]`).click();
+     const navigation=page.waitForRequest(request=>request.isNavigationRequest()&&new URL(request.url()).pathname==='/cart/goodsList.htm');
+     page.once('dialog',dialog=>dialog.accept());
+     await categories.getByRole('dialog').getByRole('button',{name:label,exact:true}).click();
+     check(new URL((await navigation).url()).search===target,'confirmed classification opens its catalogue without module parameters');
+    }
+   }
    check(item.errors.length===0,'no uncaught module exceptions');
    check(item.outsideRequests.length===0,'all browser requests remain on the isolated origin');
    item.status='passed';

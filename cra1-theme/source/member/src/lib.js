@@ -175,11 +175,16 @@ export function memberSnapshot() {
  * 读取 content 段（页面文案），缺段时返回与后端 defaults 同形状的空配置。
  * 快照不可用（后台未配置/改名/不可达）时返回 null，调用方按「未配置」处理。
  */
-export async function memberContentConfig() {
-  const snap = await memberSnapshot()
+export async function memberContentConfig({ fresh = false, signal } = {}) {
+  const snap = fresh && !window.__THEME_PREVIEW__
+    ? await fetch('/cra1-shared/snapshot.php?domain=member', { credentials: 'omit', cache: 'no-store', signal })
+      .then(response => response.ok ? response.json() : null)
+      .then(payload => payload?.status === 200 ? payload.data : null)
+    : await memberSnapshot()
   if (!snap) return null
   const c = snap.content || {}
   return {
+    content_refresh_after: snap.content_refresh_after,
     product_list: {
       default: { enabled: 0, title: '', description: '', html: '', ...(c.product_list?.default || {}) },
       overrides: c.product_list?.overrides || {},

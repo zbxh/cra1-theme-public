@@ -172,9 +172,15 @@ export const mediaApi = {
   rename: (body) => api('api.media.rename', body),
   delete: (body) => api('api.media.delete', body),
   restore: (body) => api('api.media.restore', body),
-  upload: async (file) => {
+  upload: async (file, options) => {
     const body = new FormData(); body.append('file', file)
-    return api('api.media.upload',body)
+    return api('api.media.upload', body, options)
+  },
+  async uploadImage(file, options) {
+    if (file.size > 5 * 1024 * 1024) throw new Error('图片不能超过 5MB')
+    const response = await mediaApi.upload(file, options)
+    if (response.status !== 200 || !response.data?.url) throw new Error(response.msg || '图片上传未完成，请重试')
+    return response.data.url
   },
 }
 

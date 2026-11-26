@@ -59,5 +59,10 @@
     });cartObserver.observe(document.documentElement,{subtree:true,childList:true});
   }
   function applyCode(){var code=snap.custom_code||{};if(code.css_enabled!==false&&code.css){var style=document.createElement('style');style.textContent=code.css;document.head.appendChild(style)}if(code.js_enabled!==false&&code.js){try{(0,eval)(code.js)}catch(e){console.error('自定义脚本预览失败',e)}}}
-  document.addEventListener('DOMContentLoaded',function(){try{applyCode()}finally{window.parent.postMessage({type:'theme-preview',state:'ready',nonce:boot.nonce},boot.parent_origin)}},{once:true});
+  document.addEventListener('DOMContentLoaded',function(){
+    try{applyCode()}finally{
+      window.parent.postMessage({type:'theme-preview',state:'ready',nonce:boot.nonce,
+        refreshAfter:boot.cartDescription?.refresh_after},boot.parent_origin);
+    }
+  },{once:true});
 })();

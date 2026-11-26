@@ -66,7 +66,7 @@ function theme_target(string $action,array $p): string {
     if(strpos($action,'security.mfa.')===0||strpos($action,'security.recovery.')===0||$action==='security.password')return 'account:'.(theme_actor()['id']??0);
     return (string)($p['domain']??(strpos($action,'member.')===0?'member':(strpos($action,'cart.')===0?'cart':'website'))).':'.(string)($p['editorId']??$p['scopeId']??'all');
 }
-function theme_read_action(string $a): bool { return in_array($a,['release.lifecycle.plan','menu.export','menu.inspect','menu.preview','transfer.export','transfer.media.download','transfer.history.prepare','announcements.preview','announcements.legacy-draft','release.check','release.history','release.diagnostics','release.online.check','release.license.get','release.candidate.get','release.local.list','media.list','media.attachments','get','products','site-pages','link-options','icons','icons.catalog','icons.page','icons.resolve','icons.preview','icon-search','navigation-catalog','product-options','logs','security.my','security.accounts.list','security.audit.list','security.audit.detail','security.settings.get','security.alerts'],true)||preg_match('/\.(get|catalog)$/D',$a)===1; }
+function theme_read_action(string $a): bool { return in_array($a,['release.lifecycle.plan','menu.export','menu.inspect','menu.preview','transfer.export','transfer.media.download','transfer.history.prepare','content.preview','cart.descriptions.impact','announcements.preview','announcements.legacy-draft','release.check','release.history','release.diagnostics','release.online.check','release.license.get','release.candidate.get','release.local.list','media.list','media.attachments','get','products','site-pages','link-options','icons','icons.catalog','icons.page','icons.resolve','icons.preview','icon-search','navigation-catalog','product-options','logs','security.my','security.accounts.list','security.audit.list','security.audit.detail','security.settings.get','security.alerts'],true)||preg_match('/\.(get|catalog)$/D',$a)===1; }
 function theme_protected_code_changes(array $p,array $current): bool {
     $keys=['custom_code','custom_css','custom_js','custom_css_enabled','custom_js_enabled'];
     foreach($p as$k=>$v){if(in_array($k,$keys,true)){if($v===null||!array_key_exists($k,$current)||json_encode($current[$k])!==json_encode($v))return true;}elseif(is_array($v)){if(theme_protected_code_changes($v,$current))return true;}elseif(is_string($v)&&preg_match('/(?:overrides|config|patch).*json$/i',(string)$k)){$d=json_decode($v,true);if(is_array($d)&&theme_protected_code_changes($d,$current))return true;}}
@@ -87,7 +87,7 @@ function theme_api_guard(string $action,array $p): void {
     if(strpos($action,'release.')===0)theme_require_role(in_array($action,['release.check','release.history','release.diagnostics','release.online.check','release.license.get'],true)?['admin','super_admin']:['super_admin']);
     if($action==='path'||$action==='security.settings.get'||$action==='security.settings.save'||$code)theme_require_role(['super_admin']);
     if(in_array($action,['media.delete','media.restore','reset','member.reset','cart.reset','workspace.snapshot.rebuild','security.accounts.list','security.accounts.create','security.accounts.update','security.audit.export'],true)||(strpos($action,'import')!==false&&in_array($p['mode']??'',['replace','first'],true)))theme_require_role(['admin','super_admin']);
-    if(preg_match('/save|import|preview$/',$action)&&strpos($action,'security.')!==0){$normal=$p;unset($normal['_reauth']);theme_safe_content($normal);}
+    if($action!=='content.preview'&&preg_match('/save|import|preview$/',$action)&&strpos($action,'security.')!==0){$normal=$p;unset($normal['_reauth']);theme_safe_content($normal);}
     if($a['must_change']&&!theme_read_action($action)&&!in_array($action,['auth.reauth','security.password','logout','security.session.revoke','workspace.preview'],true))throw new CRA1ThemeSecurityError('请先在“我的安全”修改初始密码。',403,'PASSWORD_CHANGE_REQUIRED');
     if($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id']){theme_require_role(['admin','super_admin']);theme_security()->manageAllowed($a,theme_security()->account((int)$p['account_id']));}
     $step=in_array($action,['transfer.apply','transfer.recover'],true)||($action==='security.session.revoke'&&(int)($p['account_id']??$a['id'])!==(int)$a['id'])||in_array($action,['release.lifecycle.apply','release.license.save','reset','member.reset','cart.reset','path','security.settings.save','security.accounts.create','security.accounts.update','security.audit.export','security.password','security.mfa.begin','security.mfa.disable','security.mfa.recovery','security.recovery.begin','security.recovery.remove'],true)||$code;
@@ -151,6 +151,10 @@ function theme_security_api(string $action,array $p): void {
 function theme_safe_content($v,string $key=''): void {
     if(in_array($key,['custom_code','custom_css','custom_js','custom_css_enabled','custom_js_enabled'],true))return;
     if(is_array($v)){foreach($v as$k=>$x)theme_safe_content($x,(string)$k);return;}if(!is_string($v)||$v==='')return;
+    if (in_array($key, ['article_sidebar_html','html','detail'], true)) {
+        \CRA1\Theme\Content\ContentDocument::normalize($v, true);
+        return;
+    }
     $decoded=html_entity_decode($v,ENT_QUOTES|ENT_HTML5,'UTF-8');$normal=preg_replace('/[\x00-\x20\x7f]+/','',$decoded);
     if(preg_match('/(?:javascript|vbscript|file|data|blob)\s*:/i',$normal))throw new CRA1ThemeSecurityError('内容包含不允许的链接协议');
     if(preg_match('/^\s*\/\//',$decoded))throw new CRA1ThemeSecurityError('链接不允许使用省略协议的外部地址');

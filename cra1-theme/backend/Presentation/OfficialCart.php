@@ -33,7 +33,10 @@ final class OfficialCart
             'themes_cart' => 'pc/default',
         ];
         $html = self::nativePart($part, $data);
-        if ($part === 'goods') return self::cartBody($html, true);
+        if ($part === 'goods') {
+            $id = \CRA1\Theme\Content\CartDescriptions::id($_GET['id'] ?? $_GET['product_id'] ?? null);
+            return self::cartBody(self::withCartSlots($html, $id), true);
+        }
         if ($part === 'header') $html = self::allowZoom($html);
         $assets = self::navigationAssets();
         if (!$assets) return $html;
@@ -49,7 +52,7 @@ final class OfficialCart
     }
 
     /** Render the installed cart document, resolving its body and shell independently. */
-    public static function cartDocument(array $variables, bool $mobile, bool $useCRA1): ?string
+    public static function cartDocument(array $variables, bool $mobile, bool $useCRA1, int $productId = 0): ?string
     {
         $shell = self::defaultShell($mobile);
         $cart = $mobile && is_file(CRA1_THEME_ROOT.'/public/cart/template/mobile/default/goods.php')
@@ -61,7 +64,23 @@ final class OfficialCart
         $html = self::allowZoom(self::template($shell['header'], $data).$html.self::template($shell['footer'], $data));
         $result = $useCRA1 ? self::withNavigation($html, 'goods') : null;
         self::$fullOfficialCart = $result === null;
-        return $result ?? $html;
+        return $result === null ? $html : self::withCartSlots($result, $productId, true);
+    }
+
+    private static function withCartSlots(string $html, int $productId, bool $showCategories = false): string
+    {
+        if ($productId <= 0 || !empty($_GET['embed']) || !empty($_GET['view_embed'])) return $html;
+        $description = '<section class="cra1-cart-top-description cra1-content-document" aria-label="商品说明"'
+            .' data-cra1-cart-description="'.$productId.'" hidden v-pre></section>';
+        $categories = $showCategories ? '<section class="cra1-native-cart-categories" aria-label="商品分类"'
+            .' data-cra1-cart-categories="'.$productId.'" hidden v-pre></section>' : '';
+        // Insert beside the official configuration container, never inside its
+        // business template or the subtree replaced by the product view loader.
+        $count = 0;
+        $updated = preg_replace('~<div\b[^>]*\bclass=(["\x27])([^"\x27]*\s)?config-box(?:\s[^"\x27]*)?\1[^>]*>~i',
+            $categories.$description.'$0', $html, 1, $count);
+        if ($count === 1) return $updated;
+        return preg_replace('~<(?:el-main|main)\b[^>]*>~i', '$0'.$description, $html, 1);
     }
 
     private static function cartBody(string $html, bool $withFeedback): string

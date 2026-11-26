@@ -1,6 +1,6 @@
-{php}$readingSidebarContent = cra1_article_sidebar_content($data['cra1'] ?? []);{/php}
+{php}$readingSidebar = cra1_article_sidebar_projection($data['cra1'] ?? []);{/php}
 <aside class="reading-sidebar" data-reading-sidebar aria-label="文章侧栏">
-    {if $readingSidebarContent !== ''}
-    <div class="reading-sidebar-extra">{$readingSidebarContent|raw}</div>
+    {if $readingSidebar['html'] !== '' || $readingSidebar['next_change'] !== null}
+    <div class="reading-sidebar-extra cra1-content-document" aria-label="文章相关内容" data-cra1-article-content data-cra1-content-refresh="{$readingSidebar['refresh_after']|default=''}" {if $readingSidebar['html'] === ''}hidden{/if}>{$readingSidebar['html']|raw}</div>
     {/if}
 </aside>

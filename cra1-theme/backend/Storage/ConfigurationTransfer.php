@@ -2,6 +2,9 @@
 declare(strict_types=1);
 namespace CRA1\Theme\Storage;
 
+use CRA1\Theme\Compatibility\CartCatalog;
+use CRA1\Theme\Content\CartDescriptions;
+
 use CRA1\Theme\Files;
 
 /** Full theme settings only. Installation identities and business databases are never transferable. */
@@ -53,8 +56,16 @@ final class ConfigurationTransfer
         $cart=(new CartThemeStore($this->root.'/runtime'))->normalizedPreview($raw['cart']);
         foreach(['schema_version','version','updated_at','updated_by']as$k){unset($member[$k],$cart[$k]);}
         $notice=new AnnouncementStore($this->root);$n=$raw['notifications']['values']??AnnouncementStore::defaults();
-        return ['format'=>'cra1-configuration','schema'=>1,'site_key'=>$this->menu()->siteKey(),'bindings'=>$this->menu()->bindings(),
+        $document = ['format'=>'cra1-configuration','schema'=>1,'site_key'=>$this->menu()->siteKey(),'bindings'=>$this->menu()->bindings(),
             'settings'=>['website'=>$website,'member'=>$member,'cart'=>$cart,'notifications'=>$notice->normalize($n,$n,false)]];
+        $rules = $cart['content']['goodslist']['top_descriptions'];
+        if (CartDescriptions::hasScopedRules($rules)) {
+            $paths = CartCatalog::paths((new CartCatalog())->directory());
+            foreach ($paths as $scope => $entries) {
+                $document['cart_description_bindings'][$scope] = array_intersect_key($entries, $rules[$scope]);
+            }
+        }
+        return $document;
     }
     public function exportWithMedia(string $origin,int $owner,string $session): array
     {
@@ -191,6 +202,20 @@ final class ConfigurationTransfer
         $sidebar=$settings['member']['sidebar'];unset($settings['member']['sidebar']);
         $settings=$menu->remapLinks($settings,$doc['bindings'],$same,$warnings);$settings['member']['sidebar']=$sidebar;
         $treeErrors=(new MemberCenterStore($this->root.'/runtime'))->validateTree($settings['member']['sidebar']['nodes'],true);if($treeErrors)throw new \InvalidArgumentException(implode('；',array_slice($treeErrors,0,3)));
+        if (isset($settings['cart']['content']['goodslist']['top_descriptions'])) {
+            $rules = CartDescriptions::normalize($settings['cart']['content']['goodslist']['top_descriptions'], true);
+            if (!$same && CartDescriptions::hasScopedRules($rules)) {
+                $source = is_array($doc['cart_description_bindings'] ?? null) ? $doc['cart_description_bindings'] : [];
+                $target = $source ? CartCatalog::paths((new CartCatalog())->directory()) : [];
+                $unmatched = 0;
+                $rules = CartDescriptions::remap($rules, $source, $target, $unmatched);
+                if ($unmatched) $warnings[] = '有 '.$unmatched.' 条购物车顶部说明未匹配目标站分类或商品，未导入。';
+            }
+            $settings['cart']['content']['goodslist']['top_descriptions'] = $rules;
+        } elseif (isset($raw['cart']['content']['goodslist']['top_descriptions'])) {
+            // Older exports did not include this field.
+            $settings['cart']['content']['goodslist']['top_descriptions'] = $raw['cart']['content']['goodslist']['top_descriptions'];
+        }
         $next=[];$next['website']=array_replace($raw['website'],$settings['website']);
         foreach(['member'=>MemberCenterStore::class,'cart'=>CartThemeStore::class]as$domain=>$class){
             $store=new $class($this->root.'/runtime');$current=$store->read();

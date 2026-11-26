@@ -12,14 +12,13 @@ function PrimaryItem({node,active,choose,expand}) {
     <button type="button" className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm"
       aria-expanded={hasLink ? undefined : active} onClick={hasLink ? choose : expand}>
       <Icon node={node}/><span className="min-w-0 break-words">{node.name}</span>
+      {node.expand_only && <ChevronRight className="ml-auto size-4 shrink-0" aria-hidden="true"/>}
     </button>
-    {hasLink && !!node.children?.length && <button type="button" className="grid w-10 shrink-0 place-items-center rounded-lg"
-      aria-expanded={active} aria-label={'展开'+node.name+'菜单'} onClick={expand}><ChevronRight className="size-4" aria-hidden="true"/></button>}
   </div>
 }
 function Target({node}) {
   return <p className="break-all text-xs text-muted-foreground">
-    {node.target ? <>跳转地址：<code>{node.target}</code></> : '无直接跳转'}
+    {node.target ? <>跳转地址：<code>{node.target}</code></> : node.expand_only ? '展开下级菜单' : '无直接跳转'}
   </p>
 }
 function Pages({nodes,choose,selected,level=2}) {

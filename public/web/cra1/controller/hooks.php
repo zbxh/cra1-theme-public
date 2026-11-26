@@ -1674,15 +1674,20 @@ if (!function_exists('cra1_parse_shared_text_rows')) {
 /** Project the desktop article sidebar for both the public page and its preview. */
 function cra1_article_sidebar_content(array $config): string
 {
-    if ((string) ($config['article_sidebar_enabled'] ?? '0') !== '1') return '';
-    $content = trim((string) ($config['article_sidebar_html'] ?? ''));
-    if ($content === '') return '';
+    return cra1_article_sidebar_projection($config)['html'];
+}
 
-    require_once CRA1_THEME_BACKEND . '/Storage/member_store.php';
-    $sanitizer = new \CRA1\Theme\Storage\MemberCenterStore(CRA1_THEME_ROOT . '/runtime');
-    $html = $sanitizer->sanitizeContentHtml($content);
-    $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    return preg_match('/\S/u', $text) || preg_match('/<(?:img|hr)\b/i', $html) ? $html : '';
+function cra1_article_sidebar_projection(array $config): array
+{
+    if ((string) ($config['article_sidebar_enabled'] ?? '0') !== '1') return ['html'=>'', 'next_change'=>null];
+    $source = (string) ($config['article_sidebar_html'] ?? '');
+    $now = time();
+    $content = \CRA1\Theme\Content\ContentDocument::project($source, $now);
+    if (\CRA1\Theme\Content\ContentDocument::containsTimedContent($source) && !headers_sent() && PHP_SAPI !== 'cli') {
+        header('Cache-Control: private, no-store, max-age=0');
+    }
+    $content['refresh_after'] = $content['next_change'] === null ? null : max(1, $content['next_change'] - $now);
+    return $content;
 }
 
 // A validated standalone preview consumes the resolvers above, without native

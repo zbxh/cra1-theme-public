@@ -52,7 +52,7 @@ test('common configuration comes from the filtered runtime, not malformed browse
 
 function catalogFixture(){
  let instance,first=()=>Promise.reject(new Error('private')),second=first,products=first
- function Vue(options){instance=this;Object.assign(this,options.data());for(const[k,fn]of Object.entries(options.methods))this[k]=fn.bind(this);for(const[k,fn]of Object.entries(options.computed))Object.defineProperty(this,k,{get:()=>fn.call(this)});this.$mount=()=>this;this.$nextTick=fn=>fn()}
+ function Vue(options){instance=this;Object.assign(this,options.data());this.$data=this;for(const[k,fn]of Object.entries(options.methods))this[k]=fn.bind(this);for(const[k,fn]of Object.entries(options.computed))Object.defineProperty(this,k,{get:()=>fn.call(this)});this.$mount=()=>this;this.$nextTick=fn=>fn()}
  Vue.prototype={}
  const window={},env={window,Vue,clearTimeout(){},navigator:{userAgent:'fixture'},lang:{},asideMenu:{},topMenu:{},scrollText:{},discountCode:{},eventCode:{},document:{querySelector:()=>({}),documentElement:{scrollTop:0,clientHeight:500,scrollHeight:1000},body:{scrollTop:0}},localStorage:{},productGroupFirst:()=>first(),productGroupSecond:id=>second(id),productGoods:params=>products(params)}
  const source=fs.readFileSync(new URL('../source/legacy-assets/cart/20261017-compat-v3/js/goodsList.js',import.meta.url),'utf8')
@@ -134,7 +134,7 @@ test('an old category failure cannot replace a newer category result',async()=>{
  assert.equal(f.page.catalogError,'');assert.equal(f.page.select_first_obj.id,2);assert.equal(f.page.secondLoading,false)
 })
 test('a full catalog page settles loading while more products may remain',async()=>{
- const f=catalogFixture();f.page.cartConfigReady=false;f.page.goodsParmas.limit=1
+ const f=catalogFixture();f.page.cartConfigReady=false;f.page.gridConf={desktop_columns:1,rows_per_load:1}
  f.page.sanitizeHtml=value=>value;f.page.applyDescMeta=()=>{}
  let resolve;f.products(()=>new Promise(done=>{resolve=done}))
  const task=f.page.getProductGoodList();assert.equal(f.page.goodSLoading,true)
@@ -144,6 +144,7 @@ test('a full catalog page settles loading while more products may remain',async(
 test('scrolling after a failed catalog read cannot start uncontrolled retries',()=>{
  const f=catalogFixture();let reads=0;f.page.catalogError='暂时无法读取商品';f.page.scrollDisabled=false
  f.page.getProductGoodList=()=>{reads++};f.page.goodsParmas.page=1
+ f.env.document.documentElement.scrollTop=500
  f.page.scrollBottom();f.page.needScroll()
  assert.equal(reads,0);assert.equal(f.page.goodsParmas.page,1)
 })

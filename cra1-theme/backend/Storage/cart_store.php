@@ -17,6 +17,7 @@
 declare(strict_types=1);
 namespace CRA1\Theme\Storage;
 use PDO;
+use CRA1\Theme\Content\CartDescriptions;
 use CRA1ThemeSecurity;
 use stdClass;
 use Throwable;
@@ -79,6 +80,7 @@ final class CartThemeStore
             'updated_by'     => '',
             'content'        => [
                 'goodslist' => [
+                    'top_descriptions' => CartDescriptions::defaults(),
                     // 页面文案（一条记录；空=多语言默认）
                     'copy' => [
                         'title'       => '',
@@ -208,6 +210,14 @@ final class CartThemeStore
         return $this->normalizeConfig($data);
     }
 
+    /** Public requests project a single selection without sanitizing every saved rule. */
+    public function topDescriptionRules(): array
+    {
+        $raw = $this->readJson($this->mainFile);
+        $rules = $raw['content']['goodslist']['top_descriptions'] ?? null;
+        return is_array($rules) ? $rules : [];
+    }
+
     /** 确保前台快照与主配置一致（自愈） */
     public function ensureSnapshot(): void
     {
@@ -267,6 +277,9 @@ final class CartThemeStore
                     self::validateHeadingIcons($patch['content']['goodslist']['heading_icons'],$current['content']['goodslist']['heading_icons']??[]);
                 }
                 if (array_key_exists('heading_icon_styles',$patch['content']['goodslist']??[])) self::validateHeadingIconStyles($patch['content']['goodslist']['heading_icon_styles']);
+                if (is_array($patch['content']['goodslist'] ?? null) && array_key_exists('top_descriptions', $patch['content']['goodslist'])) {
+                    $patch['content']['goodslist']['top_descriptions'] = CartDescriptions::normalize($patch['content']['goodslist']['top_descriptions'], true);
+                }
                 $current['content'] = $this->mergeContent($current['content'], $patch['content']);
             }
             if (array_key_exists('custom_code',$patch)) $current['custom_code']=$patch['custom_code'];
@@ -572,6 +585,10 @@ final class CartThemeStore
                     continue; // 白名单外/结构不符拒绝
                 }
                 // rows 类字段：列表结构，按专用清洗器处理（不走关联键合并）
+                if ($group === 'goodslist' && $k === 'top_descriptions') {
+                    $out[$group][$k] = CartDescriptions::normalize($v);
+                    continue;
+                }
                 if ($group === 'goodslist' && $k === 'card_sections') {
                     $out[$group][$k] = $this->sanitizeSections($v);
                     continue;

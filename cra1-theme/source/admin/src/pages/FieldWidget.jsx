@@ -23,6 +23,7 @@ import { TreeSortEditor } from '../ui/treeSort'
 import { ProductImporter } from '../ui/ProductImporter'
 import LinkPicker from './LinkPicker'
 import MediaPicker from '../components/MediaPicker'
+import ContentEditor from '../components/ContentEditor'
 import { TagInput, tagsToString, stringToTags } from '../ui/tag-input'
 
 import { parseRows, serializeRows } from '../lib/row-contract.js'
@@ -70,6 +71,8 @@ function Field({ field, value, onChange, config, setField }) {
     // 这样它与其他字段共用同一份「未保存修改」统计与保存逻辑。
     return <CardsField field={field} config={config} setField={setField} />
   }
+
+  if (type === 'content') return <ContentEditor value={value ?? ''} onChange={onChange} label={label} hint={hint} />
 
   if (type === 'textarea') {
     return (

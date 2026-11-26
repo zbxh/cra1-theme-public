@@ -24,7 +24,8 @@ class ViewCartController extends \app\home\controller\ViewCartController
         if (!Context::isCRA1($theme)) return parent::index();
 
         try {
-            $key = ModulePresentation::cart($params['id'] ?? $params['product_id'] ?? null);
+            $productId = $params['id'] ?? $params['product_id'] ?? null;
+            $key = ModulePresentation::cart($productId);
             if ($key === null) return parent::index();
             $mode = (new ModulePresentation(CRA1_THEME_ROOT))->mode($key, 'cart');
             $data = assign_clientarea_lang_config([
@@ -33,7 +34,7 @@ class ViewCartController extends \app\home\controller\ViewCartController
                 'system_version'=>configuration('system_version'),
                 'clientarea_theme_color'=>configuration('clientarea_theme_color') ?? 'default',
             ]);
-            $content = OfficialCart::cartDocument($data, $mobile, $mode === 'cra1');
+            $content = OfficialCart::cartDocument($data, $mobile, $mode === 'cra1', \CRA1\Theme\Content\CartDescriptions::id($productId));
         } catch (\Throwable $error) {
             error_log('CRA1: using the standard cart controller for module configuration');
             $content = null;

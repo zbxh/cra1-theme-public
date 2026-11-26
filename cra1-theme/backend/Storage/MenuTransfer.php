@@ -35,13 +35,17 @@ final class MenuTransfer
         if(!empty($catalog['error']))throw new \InvalidArgumentException('系统导航读取失败，本次未能完成菜单检查，请重试');
         $tree=$this->store->sidebarPreview($nodes,$catalog['preview_capabilities']??null);
         $live=[];
-        $collect=function(array &$list)use(&$collect,&$live,$origin):void{
+        $collect=function(array &$list,bool $primary=true)use(&$collect,&$live,$origin):bool{
+            $hasEntries=false;
             foreach($list as &$node){
                 if($node['name']==='分隔符'&&empty($node['url'])&&empty($node['children']))$node['type']='separator';
-                $node['target']=self::target($node,$origin);
+                $hasChildren=!empty($node['children'])&&$collect($node['children'],false);
+                $node['expand_only']=$primary&&$hasChildren;
+                $node['target']=$node['expand_only']?'':self::target($node,$origin);
                 $live[$node['id']]=$node['target'];
-                if(!empty($node['children']))$collect($node['children']);
+                $hasEntries=$hasEntries||$hasChildren||$node['target']!=='';
             }
+            return $hasEntries;
         };
         $collect($tree);
         $issues=[];$targets=[];$visible=0;$hidden=0;
@@ -70,7 +74,7 @@ final class MenuTransfer
                 elseif($pluginId&&empty($plugins[$pluginId]['enabled']))$issue('对应插件已停用或未安装，请启用插件或更换链接。');
                 elseif(in_array($type,['system','plugin'],true)&&(!$source||($type==='plugin')!==!empty($source['plugin'])))$issue('原来源导航无法匹配，请重新选择来源。');
                 elseif(!$suppressed&&!array_key_exists($id,$live))$issue('当前功能或插件不可用，该项不会在前台显示。');
-                elseif(!$suppressed&&($url==='#'||(!$target&&!$kids&&$type!=='module')))$issue('该项没有可跳转的链接，请选择页面或补充子菜单。');
+                elseif(!$suppressed&&!$target&&!$kids&&$type!=='module')$issue('该项没有可跳转的链接，请选择页面或补充子菜单。');
                 if(!$suppressed&&$kids&&!array_filter($kids,static function($child){return empty($child['hidden']);}))$issue('所有直接子项均已隐藏。');
                 if(!$suppressed&&$target){
                     $key=self::targetKey($target);

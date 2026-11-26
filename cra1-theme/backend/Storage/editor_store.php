@@ -208,7 +208,7 @@ trait ThemeEditorStore
             foreach(['snapshot_error','save_state'] as $key) if(array_key_exists($key,$result['data']))$payload[$key]=$result['data'][$key];
         return ['status'=>200,'msg'=>$result['msg'],'data'=>$payload];
     }
-    public function preview(string $domain,string $id,array $patch,array $related=[]): array
+    public function preview(string $domain,string $id,array $patch,array $related=[],array $cartSelection=[]): array
     {
         $editor=$this->editor($domain,$id);$raw=$this->editorRead($domain);
         foreach($related as$relatedId=>$p){$e=$this->editor($domain,(string)$relatedId);if($e['kind']!=='public')throw new InvalidArgumentException('预览只能合并本主题公共设置');$raw=$this->applyEditor($e,$raw,$p);}
@@ -222,6 +222,12 @@ trait ThemeEditorStore
         // may carry an internal proxy Host and no Origin or Referer header.
         $origin=$GLOBALS['THEME_ORIGIN']??CRA1ThemeSecurity::currentOrigin($_SERVER);
         $token=bin2hex(random_bytes(32));$doc=['domain'=>$domain,'editorId'=>$id,'pageKey'=>$editor['pageKey']??null,'expires'=>time()+900,'config'=>$raw,'owner_id'=>(int)(theme_actor()['id']??0),'session_hash'=>CRA1ThemeSecurity::hashToken((string)($_SESSION['security_token']??'')),'message_nonce'=>bin2hex(random_bytes(24)),'origin'=>$origin];
+        if ($domain === 'cart' && $id === 'goodslist') {
+            foreach (['first', 'second', 'product'] as $scope) {
+                $value = \CRA1\Theme\Content\CartDescriptions::id($cartSelection[$scope] ?? 0);
+                if ($value) $doc['cart_selection'][$scope] = $value;
+            }
+        }
         \CRA1\Theme\Files::atomic($dir.'/'.$token.'.json',$this->encode($doc),0600);
         $base=basename(dirname($_SERVER['SCRIPT_NAME']??'/cra1admin/index.php'));
         $url='/'.$base.'/index.php?r=preview&__theme_preview='.$token;

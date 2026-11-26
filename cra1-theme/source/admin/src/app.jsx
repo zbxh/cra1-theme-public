@@ -132,12 +132,15 @@ function Content({route,navigate}){
 }
 function ThemeEditor({domain,id,query,navigate,embedded=false}){
  const e=registry.editors[domain+':'+id]
- const frame=<WorkspaceFrame key={domain+id} domain={domain} editorId={id} title={e.label} saveDescription={embedded?'保存当前设置的全部修改':undefined}>{w=>{
+ const [cartTarget,setCartTarget]=useState(null)
+ const cartGoods=domain==='cart'&&id==='goodslist'
+ const frame=<WorkspaceFrame key={domain+id} domain={domain} editorId={id} title={e.label}
+  previewCartTarget={cartGoods?(cartTarget?.previewProduct || cartTarget):undefined} saveDescription={embedded?'保存当前设置的全部修改':undefined}>{w=>{
   const child={...w,values:w.values.main,original:w.original.main,data:{...w.data,scope:w.data.scopes.main},setValues:fn=>w.setValues(v=>({...v,main:typeof fn==='function'?fn(v.main):fn}))}
   if(id==='custom')return <CodeEditor code={child.values.custom_code} onChange={v=>child.setValues({...child.values,custom_code:v})}/>
   return <div className="embedded-editor space-y-4">
     {domain==='cart' && <EffectiveSources domain={domain} id={id} dirty={w.dirty} revision={w.revision} navigate={navigate}/>}
-    {id==='sidebar'?<MemberSidebar workspace={child} member={{...child.values,version:w.data.version}} loading={false} reload={()=>w.reload()} query={query}/>:id==='appearance'?<MemberAppearance workspace={child} member={{...child.values,version:w.data.version}} loading={false} reload={()=>w.reload()}/>:<BusinessContent domain={domain} id={id} query={query} navigate={navigate} workspace={child}/>}
+    {id==='sidebar'?<MemberSidebar workspace={child} member={{...child.values,version:w.data.version}} loading={false} reload={()=>w.reload()} query={query}/>:id==='appearance'?<MemberAppearance workspace={child} member={{...child.values,version:w.data.version}} loading={false} reload={()=>w.reload()}/>:<BusinessContent domain={domain} id={id} query={query} navigate={navigate} workspace={child} cartTarget={cartTarget} onCartTarget={setCartTarget}/>}
   </div>
  }}</WorkspaceFrame>
  return embedded?frame:<div className="space-y-5"><div><p className="text-sm text-muted-foreground">{domain==='member'?'会员中心':'购物车'}</p><h1 className="text-2xl font-semibold">{e.label}</h1></div>{frame}</div>
@@ -172,15 +175,16 @@ function PublicSettings({domain,query,navigate}){
 }
 const BUSINESS_BLOCKS={
  'member:home':[['banner','活动推荐'],['todo','待办事项'],['quick','常用功能'],['news','公告时间轴'],['security','账户安全概览']],
- 'cart:goodslist':[['copy','标题与说明'],['grid','商品卡片排列'],['card_sections','卡片显示内容'],['default_selection','默认商品'],['config_panel','选配区域'],['heading_icons','标题图标']],
+ 'cart:goodslist':[['copy','标题与说明'],['grid','商品卡片排列'],['card_sections','卡片显示内容'],['default_selection','默认商品'],['top_descriptions','商品顶部说明'],['config_panel','选配区域'],['heading_icons','标题图标']],
  'cart:shoppingcar':[['empty','购物车为空时'],['recommendations','推荐商品']],
  'cart:settlement':[['copy','结算文案']], 'cart:orderresult':[['copy','订单结果文案']]
 }
-function BusinessContent({domain,id,query,navigate,workspace}){
+function BusinessContent({domain,id,query,navigate,workspace,cartTarget,onCartTarget}){
  const blocks=BUSINESS_BLOCKS[domain+':'+id],key=new URLSearchParams(query).get('module'),selected=blocks?.find(b=>b[0]===key)?.[0]||blocks?.[0][0]
- const content=<div className="embedded-editor">{domain==='cart'?<CartContent workspace={workspace} scope={id} block={selected}/>:['login','regist'].includes(id)?<MemberAuth key={id} workspace={workspace} kind={id}/>:<MemberContent workspace={workspace} scope={id} block={selected} navigate={navigate}/>}</div>
+ const content=<div className="embedded-editor">{domain==='cart'?<CartContent workspace={workspace} scope={id} block={selected} cartTarget={cartTarget} onCartTarget={onCartTarget}/>:['login','regist'].includes(id)?<MemberAuth key={id} workspace={workspace} kind={id}/>:<MemberContent workspace={workspace} scope={id} block={selected} navigate={navigate}/>}</div>
  if(!blocks||blocks.length===1)return content
- return <div className="visual-workspace"><aside className="block-picker"><p className="block-picker-heading">选择要修改的部分</p><Select aria-label="选择页面区块" className="mobile-block-picker" value={selected} onChange={e=>navigate(routeFor(domain,id)+'?module='+e.target.value)}>{blocks.map(([k,label])=><option key={k} value={k}>{label}</option>)}</Select><div className="desktop-block-picker">{blocks.map(([k,label])=><button className={'block-choice '+(k===selected?'active':'')} type="button" key={k} onClick={()=>navigate(routeFor(domain,id)+'?module='+k)}>{label}</button>)}</div></aside><div className="min-w-0">{content}</div></div>
+ const layout = domain === 'cart' && id === 'goodslist' ? 'visual-workspace cart-goodslist-workspace' : 'visual-workspace'
+ return <div className={layout}><aside className="block-picker"><p className="block-picker-heading">选择要修改的部分</p><Select aria-label="选择页面区块" className="mobile-block-picker" value={selected} onChange={e=>navigate(routeFor(domain,id)+'?module='+e.target.value)}>{blocks.map(([k,label])=><option key={k} value={k}>{label}</option>)}</Select><div className="desktop-block-picker">{blocks.map(([k,label])=><button className={'block-choice '+(k===selected?'active':'')} type="button" key={k} onClick={()=>navigate(routeFor(domain,id)+'?module='+k)}>{label}</button>)}</div></aside><div className="min-w-0">{content}</div></div>
 }
 function Overview({navigate}){
  const ctx=useWorkspaces(),dirty=Object.entries(ctx.records).filter(([,r])=>r.values&&!equal(r.values,r.original)),[state,setState]=useState({}),[loading,setLoading]=useState(false)

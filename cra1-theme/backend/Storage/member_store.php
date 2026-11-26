@@ -31,12 +31,7 @@ use stdClass;
 use Throwable;
 use RuntimeException;
 use InvalidArgumentException;
-use DOMDocument;
-use DOMElement;
-use DOMComment;
-use DOMProcessingInstruction;
-use DOMText;
-use DOMNode;
+use CRA1\Theme\Content\ContentDocument;
 use CRA1ThemePublicProjection;
 
 if (PHP_SAPI !== 'cli' && realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) { http_response_code(404); exit; }
@@ -135,7 +130,7 @@ final class MemberCenterStore
              *                 overrides 按侧栏节点 UUID 覆盖（不用会重建的 menu id）。
              *
              * 与 appearance/sidebar 一样只保留白名单键；HTML 一律经过
-             * sanitizeContentHtml() 白名单清理后才入库与下发。
+             * 共用内容白名单清理后才入库与下发。
              */
             'content'        => [
                 'auth_login' => AuthAppearance::defaults('login'),
@@ -406,11 +401,24 @@ final class MemberCenterStore
         return $this->atomicWrite($this->publicFile, (string) json_encode($snapshot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     }
 
-    public function snapshotProjection(array $config): array
+    public function snapshotProjection(array $config, ?int $contentTime = null): array
     {
         $content=CRA1ThemePublicProjection::content($config['content']);
         $productList = $config['content']['product_list'];
         $needsCartLinks = false;
+        $nextContentChange = null;
+        $projectIntro = static function (array &$block) use ($contentTime, &$nextContentChange): void {
+            if (empty($block['enabled'])) return;
+            $projected = ContentDocument::project((string) ($block['html'] ?? ''), $contentTime);
+            $block['html'] = $projected['html'];
+            if ($projected['next_change'] !== null) {
+                $nextContentChange = $nextContentChange === null
+                    ? $projected['next_change'] : min($nextContentChange, $projected['next_change']);
+            }
+        };
+        $projectIntro($content['product_list']['default']);
+        foreach ($content['product_list']['overrides'] as &$override) $projectIntro($override);
+        unset($override);
         $projectPurchase = static function (array $block, array &$projected) use (&$needsCartLinks): void {
             if (isset($block['purchase'])) {
                 $button = CRA1ThemePublicProjection::content($block['purchase']);
@@ -448,6 +456,9 @@ final class MemberCenterStore
             'projection_version' => 2,
             'updated_at' => (int) $config['updated_at'],
         ];
+        if ($contentTime !== null) {
+            $projection['content_refresh_after'] = $nextContentChange === null ? null : max(1, $nextContentChange - $contentTime);
+        }
         return CRA1ThemePublicProjection::member($projection,CRA1ThemePublicProjection::capabilities($this->pdo()));
     }
 
@@ -624,7 +635,7 @@ final class MemberCenterStore
 
     /**
      * 规范化 content 段。
-     * 三个子段各自白名单化；HTML 一律过 sanitizeContentHtml() 后才入库，
+     * 三个子段各自白名单化；HTML 一律经过共用 HTML 白名单后才入库，
      * 保证主配置与公开快照里的都是已清理内容，前台不需要再信任原始 HTML。
      */
     private function normalizeContent(array $c): array
@@ -643,7 +654,7 @@ final class MemberCenterStore
                 'enabled'     => (int) ($b['enabled'] ?? $d['enabled']) ? 1 : 0,
                 'title'       => mb_substr(trim((string) ($b['title'] ?? '')), 0, 60),
                 'description' => mb_substr(trim((string) ($b['description'] ?? '')), 0, 200),
-                'html'        => $this->sanitizeContentHtml((string) ($b['html'] ?? '')),
+                'html'        => ContentDocument::normalize((string) ($b['html'] ?? '')),
             ];
             $purchase = $b['purchase'] ?? null;
             if (is_array($purchase)) {
@@ -895,182 +906,6 @@ final class MemberCenterStore
 
         return $data;
     }
-
-    /**
-     * 白名单 HTML 清理（后台保存与公开快照共用同一份实现）。
-     *
-     * 允许纯展示标签（段落/强调/列表/表格/图片/链接等），
-     * 删除脚本与样式节点、事件属性、style/class 及危险协议 URL。
-     * 目的：管理员可以贴富文本，但前台永远不会执行脚本或被恶意样式覆盖。
-     *
-     * @param bool $allowStyle 公告场景传 true：保留行内展示标签上的 style
-     *                         （值经 CSS 危险模式拦截），供渐变标签等自定义外观。
-     */
-    public function sanitizeContentHtml(string $html, bool $allowStyle = false): string
-    {
-        $html = trim($html);
-        if ($html === '') {
-            return '';
-        }
-        // 长度护栏：公告条/顶部文案不需要长文（正文用新闻/公告详情）
-        if (mb_strlen($html) > 20000) {
-            $html = mb_substr($html, 0, 20000);
-        }
-
-        $allowTags = [
-            'p', 'br', 'hr', 'strong', 'b', 'em', 'i', 'u', 's', 'small', 'sub', 'sup',
-            'span', 'div', 'a', 'img', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code',
-            'h1', 'h2', 'h3', 'h4', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
-        ];
-
-        // style 只放行给行内展示标签（不允许放进 <a>/<img>，避免覆盖链接态样式）
-        $styleTags = [
-            'span', 'b', 'strong', 'em', 'i', 'u', 's', 'small', 'p', 'div',
-            'h1', 'h2', 'h3', 'h4', 'li', 'td', 'th', 'blockquote', 'pre', 'code',
-        ];
-        // CSS 值拦截：url()/expression/behavior/@import/javascript 等危险模式
-        $safeStyle = function (string $css): string {
-            // 按声明过滤：含危险模式（url()/expression/behavior/@import/js 伪协议）的
-            // 单条声明丢弃，同属性串里的安全声明（如 color:red）保留。
-            $keep = [];
-            foreach (explode(';', $css) as $decl) {
-                $decl = trim($decl);
-                if ($decl === '') {
-                    continue;
-                }
-                if (preg_match('~(url\s*\(|expression|behavior|@import|javascript\s*:|vbscript\s*:)~i', $decl)) {
-                    continue;
-                }
-                $keep[] = $decl;
-            }
-            return implode('; ', $keep);
-        };
-
-        $doc = new DOMDocument();
-        libxml_use_internal_errors(true);
-        // 包一层容器并声明编码，避免中文被 loadHTML 误判为 GBK 乱码
-        $wrapped = '<?xml encoding="utf-8"?><div id="cra1-sanitize-root">' . $html . '</div>';
-        $doc->loadHTML($wrapped, LIBXML_NOWARNING | LIBXML_NOERROR);
-        libxml_clear_errors();
-
-        $root = $doc->getElementById('cra1-sanitize-root');
-        if (!$root) {
-            return '';
-        }
-
-        $safeUrl = function (string $url): string {
-            $url = trim($url);
-            if ($url === '') {
-                return '';
-            }
-            if (preg_match('/[\x00-\x1f\x7f]/', $url) || strpos($url, '\\') !== false) {
-                return '';
-            }
-            // 保留站内链接及 HTTP/HTTPS；拒绝可执行协议与协议相对地址。
-            if (preg_match('~^\s*(javascript|vbscript|data|file)\s*:~i', $url)) {
-                return '';
-            }
-            if (strpos($url, '//') === 0) {
-                return '';
-            }
-            if (preg_match('~^[a-z][a-z0-9+.-]*:~i', $url)
-                && !preg_match('~^(https?|mailto|tel):~i', $url)) {
-                return '';
-            }
-            return $url;
-        };
-
-        $clean = function (DOMElement $el) use ($allowTags, $safeUrl, $allowStyle, $styleTags, $safeStyle): ?DOMElement {
-            $tag = strtolower($el->tagName);
-            if (!in_array($tag, $allowTags, true)) {
-                return null;    // 不在白名单：整体移除（含内容，防止 <script>/<style> 夹带）
-            }
-            // 逐个删除属性，只按标签保留白名单
-            $keep = [];
-            if ($allowStyle && in_array($tag, $styleTags, true)) {
-                $css = $safeStyle((string) $el->getAttribute('style'));
-                if ($css !== '') {
-                    $keep['style'] = $css;
-                }
-            }
-            if ($tag === 'a') {
-                $href = $safeUrl((string) $el->getAttribute('href'));
-                if ($href === '') {
-                    return null;    // 没有合法 href 的 <a> 直接移除
-                }
-                $keep['href'] = $href;
-                if ($el->getAttribute('target') === '_blank') {
-                    $keep['target'] = '_blank';
-                }
-                $keep['rel'] = 'noopener noreferrer';
-            } elseif ($tag === 'img') {
-                $src = $safeUrl((string) $el->getAttribute('src'));
-                if ($src === '') {
-                    return null;
-                }
-                $keep['src'] = $src;
-                if (($alt = trim((string) $el->getAttribute('alt'))) !== '') {
-                    $keep['alt'] = $alt;
-                }
-                foreach (['width', 'height'] as $dim) {
-                    $v = $el->getAttribute($dim);
-                    if ($v !== '' && preg_match('/^\d{1,4}(?:px)?$/', $v)) {
-                        $keep[$dim] = (int) $v;
-                    }
-                }
-            }
-            foreach (iterator_to_array($el->attributes) as $attr) {
-                $el->removeAttribute($attr->nodeName);
-            }
-            foreach ($keep as $k => $v) {
-                $el->setAttribute($k, (string) $v);
-            }
-            return $el;
-        };
-
-        $walkRemove = function (DOMNode $node) use (&$walkRemove, $clean): void {
-            $children = [];
-            foreach ($node->childNodes as $c) {
-                $children[] = $c;
-            }
-            foreach ($children as $c) {
-                if ($c instanceof DOMElement) {
-                    $kept = $clean($c);
-                    if ($kept === null) {
-                        $node->removeChild($c);
-                        continue;
-                    }
-                    $walkRemove($kept);
-                    continue;
-                }
-                if ($c instanceof DOMComment || $c instanceof DOMProcessingInstruction) {
-                    $node->removeChild($c);
-                    continue;
-                }
-                if ($c instanceof DOMText) {
-                    continue;
-                }
-                if ($c->hasChildNodes()) {
-                    $walkRemove($c);
-                }
-            }
-        };
-        $walkRemove($root);
-
-        $out = '';
-        foreach (iterator_to_array($root->childNodes) as $c) {
-            $out .= $doc->saveHTML($c);
-        }
-        return trim($out);
-    }
-
-    /**
-     * 公告专用清理：与 sanitizeContentHtml 同一套白名单，但额外保留内联 style。
-     * 需求：公告标签支持 HTML（例如鎏金黑色渐变标签），没有 style 就写不出渐变。
-     * style 值本身不含可执行语法（现代浏览器不会执行样式里的脚本），
-     * 事件属性、脚本节点与危险协议 URL 的拦截与基础版完全一致。
-     */
-
 
     /**
      * 规范化树：递归补齐字段、重排 order、丢弃非法项。
@@ -1960,38 +1795,7 @@ final class MemberCenterStore
 
     private function pdo(): ?PDO
     {
-        static $pdo = null;
-        static $tried = false;
-        if ($tried) {
-            return $pdo;
-        }
-        $tried = true;
-
-        // 独立管理台不引导 ThinkPHP，也就不会自动加载 config.php。
-        // 这里按需加载一次站点配置以取得 DATABASE_* 常量（只读，不改任何配置）。
-        if (!defined('DATABASE_HOSTNAME')) {
-            global $ROOT;
-            $cfg = ($ROOT ?: CRA1_THEME_ROOT) . '/config.php';
-            if (is_file($cfg)) {
-                require_once $cfg;
-            }
-        }
-
-        if (!defined('DATABASE_HOSTNAME') || !defined('DATABASE_NAME')) {
-            return null;
-        }
-        try {
-            $dsn = 'mysql:host=' . DATABASE_HOSTNAME . ';port=' . DATABASE_PORT
-                 . ';dbname=' . DATABASE_NAME . ';charset=' . DATABASE_CHARSET;
-            $pdo = new PDO($dsn, DATABASE_USERNAME, DATABASE_PASSWORD, [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_TIMEOUT            => 5,
-            ]);
-        } catch (Throwable $e) {
-            $pdo = null;
-        }
-        return $pdo;
+        return \CRA1\Theme\Compatibility\Database::localConnection();
     }
 
     private function readJson(string $file)

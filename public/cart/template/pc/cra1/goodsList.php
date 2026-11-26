@@ -107,11 +107,12 @@
         <el-main>
           <!-- 自己的东西 -->
           <div class="main-card">
-            <div v-if="commonData.cart_instruction == 1 && commonData.cart_instruction_content" class="cart-des"
+            <div v-if="topDescriptionMode === 'none' && commonData.cart_instruction == 1 && commonData.cart_instruction_content" class="cart-des"
               v-html="commonData.cart_instruction_content">
             </div>
             <div class="main-title" data-cui-reveal v-else>{{ pageTitle || lang.new_goods }}</div>
             <div class="main-subtitle" data-cui-reveal v-if="pageSubtitle">{{ pageSubtitle }}</div>
+            <section class="cra1-cart-top-description cra1-content-document" aria-label="商品说明" data-cra1-cart-list-description hidden></section>
             <div class="main-content-box" :class="{'has-rail': isNormal && first_group_list.length && railState === 'bridged'}">
               <div class="cl-shop">
                 <div class="cl-shop-main">
@@ -124,13 +125,29 @@
                     <el-button v-if="productLinkRetry" size="small" @click="initData">重试此商品</el-button>
                   </div>
                   <!-- 顶部横排导航：搜索 + 一级/二级（层级标题读 v10 first/second_navigation，v6 统一蓝条标题样式） -->
-                  <div class="cl-shop-nav" v-if="(isNormal || productLinkNotice) && first_group_list.length" role="tablist" :aria-label="navFirstLabel || '商品分组导航'">
+                  <div class="cl-shop-nav" v-if="first_group_list.length && (isMobileCart || isNormal || productLinkNotice)">
                     <div v-if="isNormal" class="cl-nav-search">
                       <el-input :placeholder="lang.goods_search_placeholder" clearable
                         v-model="goodsParmas.keywords" @clear="searchGoods" @keyup.enter.native="searchGoods"></el-input>
                       <el-button type="primary" class="cl-nav-search-btn" @click="searchGoods"
                         :loading="searchLoading">{{lang.search}}</el-button>
                     </div>
+                    <div v-if="isMobileCart" class="cl-catalog-filters" role="group" aria-label="商品分类">
+                      <button type="button" v-for="(filter, kind) in catalogFilters" :key="kind" class="cl-catalog-trigger"
+                        :data-catalog-level="kind" :disabled="filter.disabled || selectionConfirmPending"
+                        aria-haspopup="dialog" aria-controls="cra1-cart-picker"
+                        :aria-expanded="String(cartPickerOpen && cartPickerKind === kind)" @click="openCartPicker(kind, $event)">
+                        <cra1-cart-heading-icon :label="filter.label" :icon-id="filter.icon"></cra1-cart-heading-icon>
+                        <span class="cl-catalog-field">
+                          <span class="cl-catalog-label">{{ filter.label }}</span>
+                          <strong class="cl-catalog-value" :title="filter.current && filter.current.name">
+                            {{ filter.current ? filter.current.name : filter.placeholder }}
+                          </strong>
+                        </span>
+                        <i class="el-icon-arrow-down" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <template v-else>
                     <div class="cl-nav-group">
                       <div class="cl-sec-tit cl-nav-title" v-if="navFirstLabel">
                         <cra1-cart-heading-icon label="一级产品分类" icon-id="category_primary"></cra1-cart-heading-icon><span class="cl-sec-tit-text">{{ navFirstLabel }}</span>
@@ -157,13 +174,14 @@
                         </nav>
                       </div>
                     </template>
+                    </template>
                   </div>
                   <div class="second-desc" v-if="showGroupDesc && select_second_obj.description">
                 <scroll-text mode="loop">
                   {{select_second_obj.description}}
                 </scroll-text>
               </div>
-              <div class="shopping-box" v-if="isNormal" v-loading="goodSLoading && goodsList.length > 0">
+              <div class="shopping-box" v-if="isNormal" v-loading="!isMobileCart && goodSLoading && goodsList.length > 0">
                 <!-- 普通商品列表 -->
                 <template v-if="isNormal">
                   <section class="cl-products-section" :aria-label="cardTitle || '产品型号'">
@@ -171,104 +189,29 @@
                   <div class="cl-sec-tit" v-if="cardTitle">
                     <cra1-cart-heading-icon label="产品型号" icon-id="product_model"></cra1-cart-heading-icon><span class="cl-sec-tit-text">{{ cardTitle }}</span>
                   </div>
-                  <!-- 首屏加载骨架屏 -->
-                  <div class="cl-skeleton" v-if="goodSLoading && goodsList.length === 0" aria-hidden="true">
-                    <div class="cl-skel-card" v-for="n in 8" :key="'sk'+n">
-                      <div class="cl-skel-media"></div>
-                      <div class="cl-skel-line cl-skel-title"></div>
-                      <div class="cl-skel-line cl-skel-price"></div>
+                    <cra1-catalog-card v-if="isMobileCart && modelSummary"
+                      :item="modelSummary" :sections="orderedSections" :currency="commonData"
+                      :selected="Number(selectedProductId) === Number(modelSummary.id)" summary
+                      :expanded="cartPickerOpen && cartPickerKind === 'model'" @choose="openCartPicker('model')"></cra1-catalog-card>
+                    <div v-else-if="goodSLoading && !catalogCards.length"
+                      class="cl-skeleton" :class="{'cl-skeleton--summary': isMobileCart}" aria-hidden="true">
+                      <div class="cl-skel-card" v-for="n in (isMobileCart ? 1 : 8)" :key="'sk'+n">
+                        <div class="cl-skel-media"></div>
+                        <div class="cl-skel-line cl-skel-title"></div>
+                        <div class="cl-skel-line cl-skel-price"></div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="no-goods" v-else-if="goodsList.length === 0 && !goodSLoading && !catalogError">
-                    <el-empty :description="lang.no_goods"></el-empty>
-                  </div>
-                  <div v-else ref="goodsGrid" class="cl-goods-grid" :style="gridStyle">
-                    <template v-for="(item,index) in goodsList">
-                      <div class="cl-goods-card"
-                        :class="{'is-sold-out': item.stock_control === 1 && item.qty <= 0, 'is-selected': selectedProductId === item.id}"
-                        role="button" tabindex="0"
-                        :aria-selected="selectedProductId === item.id ? 'true' : 'false'"
-                        :aria-disabled="item.stock_control === 1 && item.qty <= 0 ? 'true' : 'false'"
-                        @click="selectProduct(item)"
-                        @keydown.enter.prevent="selectProduct(item)"
-                        @keydown.space.prevent="selectProduct(item)"><div class="cui-card__clip">
-                        <div class="cl-card-ribbon" v-if="item.recommend === 1"
-                          :style="{background: item.recommend_color ? item.recommend_color : 'var(--primary)'}">
-                          <span>{{item.recommend_text}}</span>
-                        </div>
-                        <div class="cl-card-head">
-                          <span class="cl-card-head-name" :title="item.name">{{ item.name }}</span>
-                          <span class="cl-card-head-check" aria-hidden="true"><i class="el-icon-check"></i></span>
-                        </div>
-                        <!-- 描述区块：后台上「商品卡展示区块」里 desc 停用时隐藏（此前无条件渲染，开关点了没反应） -->
-                        <div class="cl-card-body">
-                          <template v-for="sec in orderedSections">
-                        <div class="cl-card-desc" v-if="sec === 'desc'">
-                          <div class="cl-card-desc-inner" :class="{'desc-expanded': item.descExpanded}"
-                            :style="item.descExpanded ? {} : { '-webkit-line-clamp': item.descLines || 2 }"
-                            v-html="item.safeDescription"></div>
-                          <button type="button" class="cl-desc-toggle"
-                            v-if="item.descOverflow" @click.stop="toggleDesc(item, index)">{{ item.descExpanded ? lang.template_text119 : lang.template_text120 }}</button>
-                        </div>
-                          <div class="cl-card-tags"
-                            v-else-if="sec === 'tags' && ((item.pay_ontrial && item.pay_ontrial?.status === 1) || item.aodun_firewall_product || (item.client_level_name && item.client_level_name !== ''))">
-                            <span class="cl-tag" v-if="item.client_level_name && item.client_level_name !== ''">
-                              {{lang.shoppingCar_tip_text15}}
-                            </span>
-                            <span class="cl-tag" v-if="item.pay_ontrial && item.pay_ontrial?.status === 1">
-                              {{lang.support_trial}}
-                            </span>
-                            <span class="cl-tag" v-if="item.aodun_firewall_product">
-                              {{lang.firewall_text1}}
-                            </span>
-                          </div>
-                          <div class="cl-card-name" v-else-if="sec === 'stock'" :title="item.name">
-                            <span class="cl-card-qty" v-if="item.stock_control === 1 && item.qty > 0">{{lang.stock}} {{item.qty}}</span>
-                            <span class="cl-card-soldout" v-if="item.stock_control === 1 && item.qty <= 0">
-                              <img src="/{$template_catalog_cart}/template/{$themes_cart}/img/sold_out.svg" alt="">
-                            </span>
-                          </div>
-                          <div class="cl-card-active" v-else-if="sec === 'promo'">
-                            <template v-if="item.activeList.length > 0 || item.addon_coin === 1">
-                              <span class="cl-active-name" v-if="item.addon_coin === 1">
-                                {{lang.coin_text10}}{{item.addon_coin_name}}
-                              </span>
-                              <template v-for="active in item.activeList">
-                                <el-popover placement="top-start" trigger="hover" :key="'ac'+index+active.name">
-                                  <div class="active-item">
-                                    <span v-if="active.type === 'percent'">{{lang.goods_text1}} {{active.value}}%</span>
-                                    <span v-if="active.type === 'reduce'"> {{lang.goods_text2}} {{active.full}}
-                                      {{lang.goods_text3}} {{active.value}}</span>
-                                  </div>
-                                  <span class="cl-active-name" slot="reference">
-                                    {{active.name}}
-                                  </span>
-                                </el-popover>
-                              </template>
-                            </template>
-                          </div>
-                          <div class="cl-card-foot" v-if="sec === 'price'">
-                            <div class="cl-card-price">
-                              <span class="cl-price" v-if="catalogPriceKnown(item)">
-                                <span class="cl-price-prefix">{{commonData.currency_prefix}}</span><span
-                                  class="cl-price-num">{{catalogPriceAmount(item)}}{{commonData.currency_suffix}}</span><span
-                                  class="cl-price-cycle" v-if="item.cycle">/{{item.cycle}}</span>
-                              </span>
-                              <span class="cl-price-pending" v-else>选择配置后报价</span>
-                              <span class="cl-price-origin"
-                                v-if="catalogPriceKnown(item) && item.price_discounted != null && item.price_discounted !== '' && item.price != item.price_discounted">
-                                <span class="cl-price-prefix">{{commonData.currency_prefix}}</span>{{item.price}}{{commonData.currency_suffix}}
-                              </span>
-                            </div>
-                          </div>
-                          </template>
-                        </div>
-                      </div></div>
-                    </template>
-                  </div>
-                  <p class="cl-goods-scroll-hint" v-if="goodsList.length > 1 && !goodSLoading">左右滑动查看更多型号</p>
-                  <!-- 底部加载提示 -->
-                  <p v-if="isNormal && goodSLoading && !catalogError && goodsList.length !== 0" class="cl-loadtip" role="status">{{lang.goods_loading}}</p>
+                    <div v-else-if="!catalogCards.length && !catalogError" class="no-goods">
+                      <el-empty :description="lang.no_goods"></el-empty>
+                    </div>
+                    <div v-else-if="!isMobileCart && catalogCards.length" class="cl-goods-grid" :style="gridStyle">
+                      <cra1-catalog-card v-for="item in catalogCards" :key="item.id"
+                        :item="item" :sections="orderedSections" :currency="commonData"
+                        :selected="Number(selectedProductId) === Number(item.id)"
+                        @choose="selectProduct"></cra1-catalog-card>
+                    </div>
+                    <p v-if="!isMobileCart && goodSLoading && !catalogError && goodsList.length"
+                      class="cl-loadtip" role="status">{{lang.goods_loading}}</p>
                   </section>
                   <!-- 选配区与导航、产品型号同级；保留模块原有选择控件、卡片与计价逻辑 -->
                   <div class="cl-config-panel" v-if="selectedProduct" ref="configPanel">
@@ -885,13 +828,120 @@
             </div>
           </el-dialog>
         </div>
-              <!-- 价格计算器（父页级右侧栏；数据经同源 iframe 桥接自模块计价，v6） -->
-            </div>
           </div>
         </el-main>
       </el-container>
     </el-container>
+    <el-drawer v-if="isMobileCart && first_group_list.length" id="cra1-cart-picker" :visible.sync="cartPickerOpen"
+      :custom-class="activeCatalogFilter ? 'cl-picker-sheet cl-catalog-sheet' : 'cl-picker-sheet cl-model-sheet'"
+      :title="cartPickerTitle" direction="btt" size="auto" destroy-on-close
+      :show-close="false" :wrapper-closable="!selectionConfirmPending" :close-on-press-escape="!selectionConfirmPending"
+      @opened="focusCartPicker" @keydown.native="keepCartPickerFocus">
+      <template v-slot:title>
+        <h2 id="cra1-cart-picker-title">{{ cartPickerTitle }}</h2>
+        <button type="button" ref="cartPickerClose" class="cl-picker-close"
+          :aria-label="activeCatalogFilter ? '关闭分类选择' : '关闭型号选择'"
+          :disabled="selectionConfirmPending" @click="cartPickerOpen = false"><i class="el-icon-close" aria-hidden="true"></i></button>
+      </template>
+      <template v-if="activeCatalogFilter">
+        <p v-if="cartPickerKind === 'second' && catalogFilters.first.current" class="cl-catalog-parent">
+          <span>{{ catalogFilters.first.label }}</span>
+          <i class="el-icon-arrow-right" aria-hidden="true"></i>
+          <strong>{{ catalogFilters.first.current.name }}</strong>
+        </p>
+        <div ref="catalogOptions" class="cl-catalog-options" role="group" :aria-label="activeCatalogFilter.label">
+          <button type="button" v-for="item in activeCatalogFilter.options" :key="item.id" class="cl-catalog-option"
+            :disabled="item.disabled" :aria-disabled="selectionConfirmPending ? 'true' : null"
+            :aria-pressed="String(item === activeCatalogFilter.current)" @click="chooseCatalogGroup(item)">
+            <span>{{ item.name }}</span><i class="el-icon-check" aria-hidden="true"></i>
+          </button>
+        </div>
+      </template>
+      <template v-else>
+        <div v-if="catalogError" class="cui-alert cui-alert--error cra1-cart-read-error" role="alert">
+          <span>{{ catalogError }}</span>
+          <el-button size="small" @click="retryCatalog">重新加载</el-button>
+        </div>
+        <div v-if="catalogCards.length" class="cl-model-choices" role="group" aria-label="可选型号">
+          <cra1-catalog-card v-for="item in catalogCards" :key="item.id"
+            :item="item" :sections="orderedSections" :currency="commonData"
+            :selected="Number(selectedProductId) === Number(item.id)"
+            @choose="selectProduct"></cra1-catalog-card>
+        </div>
+        <p v-if="goodSLoading && !catalogCards.length" class="cl-loadtip" role="status">{{lang.goods_loading}}</p>
+        <el-empty v-else-if="!catalogCards.length && !catalogError" :description="lang.no_goods"></el-empty>
+        <button v-if="goodsList.length && !scrollDisabled && !catalogError" type="button" class="cl-catalog-more"
+          :disabled="goodSLoading || selectionConfirmPending"
+          @click="loadMoreProducts">{{ goodSLoading ? '加载中…' : '加载更多型号' }}</button>
+      </template>
+    </el-drawer>
   </div>
+  <script type="text/x-template" id="cra1-catalog-card">
+    <div class="cl-goods-card" :class="{'cl-model-current': summary, 'is-sold-out': !sellable && !summary, 'is-selected': selected}">
+      <div class="cui-card__clip">
+        <button type="button" class="cl-card-pick"
+          :aria-label="summary ? (selected ? '更换产品型号，' : '选择产品型号，') + item.name : item.name"
+          :aria-haspopup="summary ? 'dialog' : null" :aria-controls="summary ? 'cra1-cart-picker' : null"
+          :aria-expanded="summary ? String(expanded) : null" :aria-pressed="summary ? null : String(selected)"
+          :aria-disabled="!summary && !sellable ? 'true' : null" @click="$emit('choose', item)"></button>
+        <div class="cl-card-ribbon" v-if="item.recommend === 1"
+          :style="{background: item.recommend_color || 'var(--primary)'}"><span>{{item.recommend_text}}</span></div>
+        <div class="cl-card-head">
+          <span class="cl-card-head-name" :title="item.name">{{ item.name }}</span>
+          <span v-if="summary" class="cl-model-switch" aria-hidden="true">
+            {{ selected ? '更换型号' : '选择型号' }}
+            <i :class="expanded ? 'el-icon-arrow-up' : 'el-icon-arrow-down'"></i>
+          </span>
+          <span v-else class="cl-card-head-check" aria-hidden="true"><i class="el-icon-check"></i></span>
+        </div>
+        <div class="cl-card-body">
+          <template v-for="section in sections">
+            <div class="cl-card-desc" v-if="section === 'desc' && item.safeDescription" @load.capture="measureDescription">
+              <div class="cl-card-desc-inner" :class="{'desc-expanded': descriptionExpanded}"
+                :style="descriptionExpanded ? {} : {'-webkit-line-clamp': item.descLines || 2}" v-html="item.safeDescription"></div>
+              <button type="button" class="cl-desc-toggle" v-if="descriptionOverflow" :aria-expanded="String(descriptionExpanded)"
+                @click="descriptionExpanded = !descriptionExpanded">{{ descriptionExpanded ? lang.template_text119 : lang.template_text120 }}</button>
+            </div>
+            <div class="cl-card-tags" v-else-if="section === 'tags' && ((item.pay_ontrial && item.pay_ontrial.status === 1) || item.aodun_firewall_product || item.client_level_name)">
+              <span class="cl-tag" v-if="item.client_level_name">{{lang.shoppingCar_tip_text15}}</span>
+              <span class="cl-tag" v-if="item.pay_ontrial && item.pay_ontrial.status === 1">{{lang.support_trial}}</span>
+              <span class="cl-tag" v-if="item.aodun_firewall_product">{{lang.firewall_text1}}</span>
+            </div>
+            <div class="cl-card-name" v-else-if="section === 'stock' && Number(item.stock_control) === 1" :title="item.name">
+              <span class="cl-card-qty" v-if="Number(item.stock_control) === 1 && item.qty > 0">{{lang.stock}} {{item.qty}}</span>
+              <span class="cl-card-soldout" v-else-if="!sellable">
+                <img src="/{$template_catalog_cart}/template/{$themes_cart}/img/sold_out.svg" alt="已售罄">
+              </span>
+            </div>
+            <div class="cl-card-active" v-else-if="section === 'promo' && (item.addon_coin === 1 || (item.activeList && item.activeList.length))">
+              <span class="cl-active-name" v-if="item.addon_coin === 1">{{lang.coin_text10}}{{item.addon_coin_name}}</span>
+              <el-popover v-for="(active, index) in item.activeList" :key="active.id || index" placement="top-start" trigger="hover">
+                <div class="active-item">
+                  <span v-if="active.type === 'percent'">{{lang.goods_text1}} {{active.value}}%</span>
+                  <span v-if="active.type === 'reduce'">{{lang.goods_text2}} {{active.full}} {{lang.goods_text3}} {{active.value}}</span>
+                </div>
+                <span class="cl-active-name" slot="reference">{{active.name}}</span>
+              </el-popover>
+            </div>
+            <div class="cl-card-foot" v-else-if="section === 'price'">
+              <div class="cl-card-price">
+                <span class="cl-price" v-if="priceKnown">
+                  <span class="cl-price-prefix">{{currency.currency_prefix}}</span><span
+                    class="cl-price-num">{{priceAmount}}{{currency.currency_suffix}}</span><span
+                    class="cl-price-cycle" v-if="item.cycle">/{{item.cycle}}</span>
+                </span>
+                <span class="cl-price-pending" v-else>选择配置后报价</span>
+                <span class="cl-price-origin"
+                  v-if="priceKnown && item.price_discounted != null && item.price_discounted !== '' && item.price != item.price_discounted">
+                  <span class="cl-price-prefix">{{currency.currency_prefix}}</span>{{item.price}}{{currency.currency_suffix}}
+                </span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </script>
   <!-- =======页面独有======= -->
   <script src="/{$template_catalog}/template/{$themes}/components/scrollText/scrollText.js"></script>
   <script src="{:cra1_theme_asset_url('native', 'components/payDialog/payDialog.js', '/clientarea/template/pc/cra1/releases/20261017-compat-v3/components/payDialog/payDialog.js')}"></script>

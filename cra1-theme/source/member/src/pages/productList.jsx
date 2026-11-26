@@ -29,11 +29,24 @@ const readCategoryKey = () => new URLSearchParams(location.search).get('cloud_me
 function useProductListConfig() {
   const [config, setConfig] = useState(null)
   useEffect(() => {
-    let alive = true
-    memberContentConfig().then(cfg => {
-      if (alive) setConfig(cfg?.product_list)
-    }).catch(() => { if (alive) setConfig(null) })
-    return () => { alive = false }
+    const controller = new AbortController()
+    let timer, fresh = false
+    async function read() {
+      try {
+        const request = memberContentConfig({ fresh, signal: controller.signal })
+        fresh = true
+        const content = await request
+        if (controller.signal.aborted) return
+        if (!content) throw new Error('Content unavailable')
+        setConfig(content.product_list)
+        const seconds = content.content_refresh_after
+        if (seconds > 0 && !window.__THEME_PREVIEW__) timer = setTimeout(read, Math.min(2147483647, seconds * 1000))
+      } catch (error) {
+        if (!controller.signal.aborted && !window.__THEME_PREVIEW__) timer = setTimeout(read, 30000)
+      }
+    }
+    read()
+    return () => { controller.abort(); clearTimeout(timer) }
   }, [])
   return config
 }
@@ -305,7 +318,7 @@ export default function ProductListPage() {
             <span className="cui-button-glow" aria-hidden="true" />
           </a>}
         </>} />
-      {intro?.html && <Card><CardContent className="cra1-rich-text p-4 text-[13px] leading-6 text-body" dangerouslySetInnerHTML={{ __html: intro.html }} /></Card>}
+      {intro?.html && <Card><CardContent className="cra1-rich-text cra1-content-document p-4 text-[13px] leading-6 text-body" dangerouslySetInnerHTML={{ __html: intro.html }} /></Card>}
       {categoryError && <Alert tone="warning">{categoryError}</Alert>}
       {missingCategory && !categoryError && <Alert tone="warning">该导航已不存在，请重新选择产品分类。</Alert>}
       <section className="cui-card cra1-products__filters" aria-label="产品筛选">

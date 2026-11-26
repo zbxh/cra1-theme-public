@@ -8645,7 +8645,7 @@
         },
         {
           "key": "article_sidebar_html",
-          "label": "模块内容（HTML）",
+          "label": "模块内容",
           "controlLabels": []
         }
       ],

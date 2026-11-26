@@ -110,7 +110,7 @@ function cra1_render_editor_preview(string $root): void
     require_once __DIR__.'/cart_store.php';
     if($domain==='member'){
         $store=new MemberCenterStore($root.'/runtime');
-        $snapshot=$store->snapshotProjection($raw);
+        $snapshot=$store->snapshotProjection($raw, time());
     }elseif($domain==='cart'){
         $store=new CartThemeStore($root.'/runtime');
         $snapshot['content']=$store->publicContent($raw);
@@ -151,7 +151,13 @@ function cra1_render_editor_preview(string $root): void
     if(!$source)throw new RuntimeException('对应主题模板缺失');
     $boot=['domain'=>$domain,'editorId'=>$name,'snapshot'=>$snapshot,'common'=>$common,'nonce'=>$doc['message_nonce'],'parent_origin'=>$origin,'resource_origin'=>$origin];
     if($domain==='member'&&in_array($name,['login','regist'],true)) $boot['authAppearance']=\CRA1\Theme\Storage\AuthAppearance::project($raw['content']['auth_'.$name]??[],$name);
-    if($domain==='cart'&&$name==='goodslist')$boot['moduleHtml']=file_get_contents($root.'/public/plugins/server/idcsmart_common/template/cart/pc/default/goods.html');
+    if ($domain === 'cart' && $name === 'goodslist') {
+        $moduleTemplate = $root.'/public/plugins/server/idcsmart_common/template/cart/pc/default/goods.html';
+        if (is_readable($moduleTemplate)) $boot['moduleHtml'] = file_get_contents($moduleTemplate);
+        $boot['cartDescription'] = \CRA1\Theme\Content\CartDescriptions::storefront(
+            $raw['content']['goodslist']['top_descriptions'] ?? [], $doc['cart_selection'] ?? [], time()
+        );
+    }
     $runtimeUrl=\CRA1\Theme\Release\Assets::url('shared','preview-runtime.js','/cra1-shared/preview-runtime.js',$root);
     $bootstrap='<script>window.__THEME_PREVIEW__='.json_encode($boot,15).';</script><script src="'.htmlspecialchars($runtimeUrl,ENT_QUOTES,'UTF-8').'"></script>';
     // Template PHP might use an uninitialized optional value; errors remain local
@@ -183,7 +189,7 @@ function cra1_render_editor_preview(string $root): void
     // Image requests must not provide a side channel to real business endpoints.
     // Permit exact external image paths already present in this draft; same-site
     // resources remain restricted to the public static prefixes above.
-    $images=cra1_preview_image_sources($html,$raw,$origin);
+    $images=cra1_preview_image_sources($html.($boot['cartDescription']['html']??''),$raw,$origin);
     $paths=['/web/cra1/releases/','/web/cra1/assets/','/clientarea/template/','/cart/template/','/home/template/','/upload/common/','/upload/cra1-theme/','/cra1-shared/releases/','/cra1-shared/icons/','/cra1-shared/preview-runtime.js'];
     // Include the plugin assets actually used by this draft, rather than every
     // installed plugin. Business API paths are never resource sources.

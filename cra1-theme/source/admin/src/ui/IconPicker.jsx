@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
 import { Pencil } from 'lucide-react'
 import { Button } from '@ui/button'
 import { Input, Label, Select } from '@ui/input'
@@ -24,7 +24,7 @@ function Colour({ label, value, onChange }) {
   useEffect(() => setRaw(value), [value])
   return <label className="ip-colour"><span>{label}</span><div><input aria-label={label+'取色'} type="color" value={value} onChange={e => onChange(e.target.value)} /><Input aria-label={label} value={raw} maxLength={7} onChange={e => { setRaw(e.target.value); if (/^#[0-9a-f]{6}$/i.test(e.target.value)) onChange(e.target.value.toLowerCase()) }} onBlur={() => setRaw(value)} /></div></label>
 }
-export default function IconPicker({ value = '', onChange, label = '图标', iconStyle = null, context = 'website', defaultKey = '', defaultPreview = '', tile = true, styledSelect = false, compact = false }) {
+export default function IconPicker({ value = '', onChange, label = '图标', iconStyle = null, context = 'website', defaultKey = '', defaultPreview = '', tile = true, styledSelect = false, compact = false, libraryOnly = false, openDialogRef, returnFocus }) {
   const Choice = styledSelect ? MenuSelect : Select
   const dialogRef=useRef(), dialogId=useId(), hadOpen=useRef(false)
   const [current, setCurrent] = useState(() => peekIcon(value, context, defaultKey)), [currentError, setCurrentError] = useState('')
@@ -40,8 +40,8 @@ export default function IconPicker({ value = '', onChange, label = '图标', ico
   useLayoutEffect(() => {
     const element=dialogRef.current
     if(open && element && !element.open){element.showModal();element.querySelector('[aria-label="搜索图标"]')?.focus({preventScroll:true});hadOpen.current=true}
-    else if(!open && element?.open){element.close();if(hadOpen.current)trigger.current?.focus({preventScroll:true})}
-  },[open])
+    else if(!open && element?.open){element.close();if(hadOpen.current)(trigger.current || returnFocus?.current)?.focus({preventScroll:true})}
+  },[open,returnFocus])
   useEffect(() => {
     if (!open || bodyReady) return
     // Paint the stable frame before mounting cold library controls. Requests
@@ -72,6 +72,7 @@ export default function IconPicker({ value = '', onChange, label = '图标', ico
     } else { loadSequence.current++; pageController.current?.abort(); validationController.current?.abort(); onlineController.current?.abort(); applyController.current?.abort() }
     setOpen(next)
   }
+  useImperativeHandle(openDialogRef, () => () => changeOpen(true))
   useEffect(() => {
     if (!open) return
     const controller = new AbortController(), seq = ++loadSequence.current
@@ -110,7 +111,7 @@ export default function IconPicker({ value = '', onChange, label = '图标', ico
     finally { if (seq === loadSequence.current) setPaging(false) }
   }
   function pick(it, nextValue = it.id) {
-    if (!it.available) return
+    if (!it.available || (libraryOnly && it.external)) return
     if(context==='member-quick'&&it.category==='builtin'&&!nextValue.startsWith('default:'))nextValue='builtin:'+nextValue
     setDraftValue(nextValue); setManual(nextValue); setSelected(it); setExternalLoaded(!it.external);setExternalApproved(false); setError('')
   }
@@ -202,7 +203,7 @@ export default function IconPicker({ value = '', onChange, label = '图标', ico
   const canApply = !applying && !manualBusy && (!draftValue || draftValue === value || (selected?.available && (!selected.external || externalLoaded)))
   const currentName = value ? (preview?.label || value) : '默认图标'
   return <div className="ip-field" data-icon-picker={label}>
-    {compact ? <>
+    {libraryOnly ? !openDialogRef && <Button type="button" size="sm" variant="outline" ref={trigger} aria-haspopup="dialog" onClick={() => changeOpen(true)}>{label}</Button> : compact ? <>
       <Label htmlFor={dialogId + '-trigger'}>{label}</Label>
       <Button
         ref={trigger}
@@ -224,20 +225,20 @@ export default function IconPicker({ value = '', onChange, label = '图标', ico
     {current && value && !current.available && <p className="ip-history-warning">历史图标当前不可用，原值已保留。可以重新选择图标。</p>}
     <dialog ref={dialogRef} className="ip-dialog" aria-labelledby={dialogId+'-title'} aria-describedby={dialogId+'-description'} style={{ width:'min(94vw, 960px)', maxWidth:'none', height:'min(88dvh, 800px)', maxHeight:'88dvh', padding:0 }} onCancel={e=>{e.preventDefault();if(!dialogRef.current?.querySelector('.admin-menu-select__popup'))changeOpen(false)}} onClose={()=>{if(open)changeOpen(false)}} onKeyDownCapture={e=>{if(e.key==='Escape'&&!e.target.closest('.admin-menu-select__popup')){e.preventDefault();e.stopPropagation();changeOpen(false)}}} onClick={e=>{if(e.target===dialogRef.current){const r=dialogRef.current.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)changeOpen(false)}}}>
       {open && <><button type="button" className="ip-close" aria-label="关闭图标设置" onClick={()=>changeOpen(false)}>×</button>
-      <div className="ip-heading"><div><h2 id={dialogId+'-title'}>{label.replace(/图标$/, '')} · 图标设置</h2></div><div className="ip-tabs" role="tablist" aria-label="图标设置" onKeyDown={tabKey}><button type="button" role="tab" className="cui-tabs__trigger" id={tabs.icons} tabIndex={tab==='icons'?0:-1} aria-selected={tab==='icons'} aria-controls={panels.icons} onClick={() => setTab('icons')}>选择图标</button><button type="button" role="tab" className="cui-tabs__trigger" id={tabs.style} tabIndex={tab==='style'?0:-1} aria-selected={tab==='style'} aria-controls={panels.style} onClick={() => setTab('style')}>{tile?'颜色与背景':'颜色'}</button></div></div>
+      <div className="ip-heading"><div><h2 id={dialogId+'-title'}>{label.replace(/图标$/, '')} · 图标设置</h2></div>{!libraryOnly && <div className="ip-tabs" role="tablist" aria-label="图标设置" onKeyDown={tabKey}><button type="button" role="tab" className="cui-tabs__trigger" id={tabs.icons} tabIndex={tab==='icons'?0:-1} aria-selected={tab==='icons'} aria-controls={panels.icons} onClick={() => setTab('icons')}>选择图标</button><button type="button" role="tab" className="cui-tabs__trigger" id={tabs.style} tabIndex={tab==='style'?0:-1} aria-selected={tab==='style'} aria-controls={panels.style} onClick={() => setTab('style')}>{tile?'颜色与背景':'颜色'}</button></div>}</div>
       <div className="ip-body">
         {!bodyReady ? <div className="ip-state" role="status">正在加载本地图标…</div> : tab === 'icons' ? <div id={panels.icons} role="tabpanel" aria-labelledby={tabs.icons} className="ip-icon-panel">
           <aside className="ip-categories" aria-label="图标分类">{catalog?.categories?.map(c => <button key={c.key} type="button" aria-pressed={category===c.key} onClick={() => { const data=peekIconPage(c.key);setIcons(data?.icons||[]);setPageData(data||null);setLoading(!data);setCategory(c.key); setQuery('') }}><span>{c.label}</span><small>{c.total}</small></button>) || <span className="ip-loading">加载分类…</span>}</aside>
-          <section className="ip-library"><div className="ip-search"><Choice {...(styledSelect ? { portalContainer: dialogRef.current } : {})} className="ip-mobile-category" aria-label="图标分类" value={category} onChange={e => { setCategory(e.target.value); setQuery('') }}>{catalog?.categories?.map(c => <option value={c.key} key={c.key}>{c.label} · {c.total}</option>)}</Choice><Input aria-label="搜索图标" value={query} placeholder="搜索：服务器、安全、客服…" onCompositionStart={() => setComposing(true)} onCompositionEnd={e => { setComposing(false);setLoading(!!e.currentTarget.value.trim()); setQuery(e.currentTarget.value) }} onChange={e => {setLoading(!!e.target.value.trim());setQuery(e.target.value)}}/><Button type="button" variant="outline" size="sm" disabled={!query.trim()||composing||onlineBusy} onClick={searchOnline}>{onlineBusy?'查询中…':'在线搜索'}</Button></div>
+          <section className="ip-library"><div className="ip-search"><Choice {...(styledSelect ? { portalContainer: dialogRef.current } : {})} className="ip-mobile-category" aria-label="图标分类" value={category} onChange={e => { setCategory(e.target.value); setQuery('') }}>{catalog?.categories?.map(c => <option value={c.key} key={c.key}>{c.label} · {c.total}</option>)}</Choice><Input aria-label="搜索图标" value={query} placeholder="搜索：服务器、安全、客服…" onCompositionStart={() => setComposing(true)} onCompositionEnd={e => { setComposing(false);setLoading(!!e.currentTarget.value.trim()); setQuery(e.currentTarget.value) }} onChange={e => {setLoading(!!e.target.value.trim());setQuery(e.target.value)}}/>{!libraryOnly && <Button type="button" variant="outline" size="sm" disabled={!query.trim()||composing||onlineBusy} onClick={searchOnline}>{onlineBusy?'查询中…':'在线搜索'}</Button>}</div>
             <div className="ip-library-top"><span>{query ? '本地搜索结果' : catalog?.categories?.find(c => c.key === category)?.label || '本地图标'}</span><span>{loading?'':pageData?`${icons.length} / ${pageData.total}`:`${icons.length} 个`}</span></div>
             <div className="ip-scroll" ref={scrollArea} aria-busy={loading}>
-              {loading ? <div className="ip-state" role="status">正在加载本地图标…</div> : loadError && !icons.length ? <div className="ip-state whitespace-pre-wrap [overflow-wrap:anywhere]" role="alert"><p>{loadError}</p></div> : !icons.length ? <div className="ip-state">没有匹配的本地图标，可以换一个名称或点击在线搜索。</div> : <ul className="ip-grid" aria-label="本地图标" onKeyDown={keyboardGrid}>{icons.map(it => cell(it))}</ul>}
+              {loading ? <div className="ip-state" role="status">正在加载本地图标…</div> : loadError && !icons.length ? <div className="ip-state whitespace-pre-wrap [overflow-wrap:anywhere]" role="alert"><p>{loadError}</p></div> : !icons.length ? <div className="ip-state">{libraryOnly ? '没有匹配的本地图标，可以换一个名称。' : '没有匹配的本地图标，可以换一个名称或点击在线搜索。'}</div> : <ul className="ip-grid" aria-label="本地图标" onKeyDown={keyboardGrid}>{icons.map(it => cell(it))}</ul>}
               {pageData?.hasMore && <div className="ip-load-more"><Button type="button" variant="outline" size="sm" disabled={paging} onClick={more}>{paging?'加载中…':'加载更多'}</Button></div>}
               {!!online.length && <><h4 className="ip-online-heading">在线图标</h4><ul className="ip-grid" aria-label="在线图标" onKeyDown={keyboardGrid}>{online.map(it => cell(it, true))}</ul></>}
               {onlineError && <p className="ip-history-warning" role="alert">{onlineError}</p>}
               {loadError && icons.length > 0 && <p role="alert" className="ip-history-warning">{loadError}</p>}
             </div>
-            <details className="ip-manual"><summary>使用名称或图片地址</summary><div><Input aria-label="图标名称或地址" value={manual} placeholder="lucide:server 或 /upload/example.svg" onChange={e => setManual(e.target.value)}/><Button type="button" variant="outline" size="sm" disabled={manualBusy} onClick={checkManual}>{manualBusy?'检查中…':'检查并预览'}</Button></div></details>
+            {!libraryOnly && <details className="ip-manual"><summary>使用名称或图片地址</summary><div><Input aria-label="图标名称或地址" value={manual} placeholder="lucide:server 或 /upload/example.svg" onChange={e => setManual(e.target.value)}/><Button type="button" variant="outline" size="sm" disabled={manualBusy} onClick={checkManual}>{manualBusy?'检查中…':'检查并预览'}</Button></div></details>}
           </section>
         </div> : <div id={panels.style} role="tabpanel" aria-labelledby={tabs.style} className="ip-style-panel">
           {styleEditable ? <>
@@ -253,7 +254,7 @@ export default function IconPicker({ value = '', onChange, label = '图标', ico
         </div>}
       </div>
       <div className="ip-preview-strip"><div className="ip-selected-copy"><strong title={selected?.label || draftValue}>{selected?.label || (draftValue ? draftValue : '默认图标')}</strong><small>{selected?.source || '当前位置默认图形'}{selected && !selected.colorable?' · 保留原色':!tile?' · 仅前景色':''}</small>{selected?.external && !externalApproved && <button type="button" className="ip-external-preview" onClick={()=>setExternalApproved(true)}>在线预览外链</button>}</div><div className="ip-samples"><div className="ip-sample-light"><Preview icon={selected} style={draftStyle} tile={tile} label={label} allowExternal={externalApproved} onLoad={() => setExternalLoaded(true)} onError={() => { setExternalLoaded(false); setError('图片预览加载失败，原值仍保留。') }}/><span>浅色</span></div><div className="ip-sample-dark"><Preview icon={selected} style={draftStyle} tile={tile} label={label} allowExternal={externalApproved}/><span>深色</span></div></div><Button type="button" variant="ghost" size="sm" onClick={async () => { setDraftValue(''); setManual(''); setExternalLoaded(true); setSelected(await resolveIcon('',context,defaultKey)) }}>恢复默认图标</Button></div>
-      <div className="ip-footer"><span className="ip-save-note" id={dialogId+'-description'}>应用后需保存页面</span>{error && <p role="alert">{error}</p>}<div><Button type="button" variant="outline" onClick={() => changeOpen(false)}>取消</Button><Button type="button" className="ip-apply" disabled={!canApply} onClick={apply}>{applying?'应用中…':'应用'}</Button></div></div>
+      <div className="ip-footer"><span className="ip-save-note" id={dialogId+'-description'}>应用后需保存页面</span>{error && <p role="alert">{error}</p>}<div><Button type="button" variant="outline" onClick={() => changeOpen(false)}>取消</Button><Button type="button" className="ip-apply" disabled={!canApply || (libraryOnly && (!draftValue || selected?.external))} onClick={apply}>{applying?'应用中…':'应用'}</Button></div></div>
       </>}
     </dialog>
   </div>

@@ -27304,12 +27304,10 @@
         },
         {
           "key": "article_sidebar_html",
-          "label": "模块内容（HTML）",
-          "type": "textarea",
+          "label": "模块内容",
+          "type": "content",
           "default": "",
-          "rows": 8,
-          "placeholder": "<h3>相关资源</h3>\n<p><a href=\"/document.html\">查看帮助文档</a></p>",
-          "hint": "",
+          "hint": "支持可视编辑、HTML、图片和内容组件。留空时隐藏模块。",
           "keys": [
             "article_sidebar_html"
           ],
@@ -37932,12 +37930,10 @@
     },
     "article_sidebar_html": {
       "key": "article_sidebar_html",
-      "label": "模块内容（HTML）",
-      "type": "textarea",
+      "label": "模块内容",
+      "type": "content",
       "default": "",
-      "rows": 8,
-      "placeholder": "<h3>相关资源</h3>\n<p><a href=\"/document.html\">查看帮助文档</a></p>",
-      "hint": "可填写文字和 HTML，支持标题、列表、链接和图片。留空时隐藏模块。",
+      "hint": "支持可视编辑、HTML、图片和内容组件。留空时隐藏模块。",
       "keys": [
         "article_sidebar_html"
       ]
@@ -60066,7 +60062,7 @@
       ]
     },
     "article_sidebar_html": {
-      "type": "textarea",
+      "type": "content",
       "storageFormat": "scalar",
       "keys": [
         "article_sidebar_html"
@@ -60094,7 +60090,7 @@
         },
         {
           "file": "public/web/cra1/controller/hooks.php",
-          "line": 1678,
+          "line": 1684,
           "kind": "literal"
         }
       ]
@@ -60346,6 +60342,40 @@
             "other": "icon-style",
             "option": "icon-style",
             "price": "icon-style"
+          },
+          "top_descriptions": {
+            "shared": {
+              "$map": {
+                "mode": "scalar",
+                "html": "scalar"
+              }
+            },
+            "global": {
+              "mode": "scalar",
+              "html": "scalar",
+              "ref": "scalar"
+            },
+            "first": {
+              "$map": {
+                "mode": "scalar",
+                "html": "scalar",
+                "ref": "scalar"
+              }
+            },
+            "second": {
+              "$map": {
+                "mode": "scalar",
+                "html": "scalar",
+                "ref": "scalar"
+              }
+            },
+            "product": {
+              "$map": {
+                "mode": "scalar",
+                "html": "scalar",
+                "ref": "scalar"
+              }
+            }
           }
         },
         "shoppingcar": {

@@ -14,7 +14,7 @@ if os.environ.get('CRA1_ICON_CONTRACTS_ONLY') == '1':
  registry_path.write_text(json.dumps(registry,ensure_ascii=False,indent=2)+'\n')
  print('Registry: icon contracts updated; installed controls and copy retained')
  sys.exit(0)
-php="function add_hook($name,$callback) {} $root=getenv('CRA1_THEME_SOURCE_ROOT'); require $root.'/public/web/cra1/controller/Cra1.php'; require $root.'/public/web/cra1/controller/hooks.php'; echo json_encode(['manifest'=>cra1_page_module_manifest(),'defaults'=>\\template\\cra1\\controller\\Cra1::defaults(),'shared'=>cra1_shared_module_keys()],JSON_UNESCAPED_UNICODE);"
+php="function add_hook($name,$callback) {} $root=getenv('CRA1_THEME_SOURCE_ROOT'); define('CRA1_THEME_BACKEND',$root.'/cra1-theme/backend'); define('CRA1_THEME_PREVIEW_DISPLAY_ONLY',true); require $root.'/public/web/cra1/controller/Cra1.php'; require $root.'/public/web/cra1/controller/hooks.php'; echo json_encode(['manifest'=>cra1_page_module_manifest(),'defaults'=>\\template\\cra1\\controller\\Cra1::defaults(),'shared'=>cra1_shared_module_keys()],JSON_UNESCAPED_UNICODE);"
 os.environ['CRA1_THEME_SOURCE_ROOT']=str(root)
 data=json.loads(subprocess.check_output([os.environ.get('CRA1_PHP','php'),'-r',php]))
 mf=data['manifest'];pages={k:v for k,v in mf.items() if not v.get('aliasOf')};shared=data['shared']
@@ -130,6 +130,10 @@ contracts['member']['sidebar']['nodes']={'$list':{'$ref':'menuNode'}}
 mc=contracts['member']['content']
 mc['home_quick_links']['items']={'$list':{**scalar('id label url icon enabled'),'icon_style':'icon-style'}}
 contracts['cart']['content']['goodslist']['heading_icon_styles']={key:'icon-style' for key in domain_defaults['cart']['content']['goodslist']['heading_icons']}
+description_rule=scalar('mode html')
+contracts['cart']['content']['goodslist']['top_descriptions']={
+    'global':description_rule,**{scope:{'$map':description_rule} for scope in ('first','second','product')}
+}
 mc['product_list']['overrides']={'$map':mc['product_list']['default']}
 mc['home_banner']['items']={'$list':scalar('id title description link image enabled')}
 mc['ticket_assist']['categories']={'$list':{'$ref':'ticketNode'}}

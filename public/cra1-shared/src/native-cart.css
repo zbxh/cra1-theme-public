@@ -30,6 +30,141 @@ html[data-cra1-native-cart] .goods > .el-container > .el-container > .el-main {
 html:is([data-cra1-native-cart],[data-cra1-native-panel]) .cra1-header { font-size: 13px; line-height: 1.5; }
 html:is([data-cra1-native-cart],[data-cra1-native-panel]) .cra1-aside { font-size: 13px; line-height: 1.5; }
 html:is([data-cra1-native-cart],[data-cra1-native-panel]) .cra1-notices-host { flex: 0 0 auto; }
+
+/* Prevent the unmounted Vue template from stretching the page while it loads. */
+html[data-cra1-native-cart] .goods .config-box > el-popover { display: none; }
+
+/* Align the outer shell with the CRA1 cart. Leave native children and their layout rules alone. */
+html[data-cra1-native-cart] :is(.goods > .el-container > .el-container > .el-main, :where(#template)):has(> .cra1-native-cart-categories) {
+  --cra1-cart-gutter: clamp(8px, 1.6vw, 24px);
+  box-sizing: border-box;
+  width: calc(100% - 2 * var(--cra1-cart-gutter));
+  max-width: 1440px;
+  min-width: 0;
+  margin: 16px auto 24px;
+  padding: clamp(8px, 1.4vw, 20px);
+  border: 1px solid var(--cui-edge);
+  border-radius: var(--cui-radius-card);
+  background: var(--cui-surface);
+}
+@media (max-width: 560px) {
+  html[data-cra1-native-cart] :is(.goods > .el-container > .el-container > .el-main, :where(#template)):has(> .cra1-native-cart-categories) {
+    margin-block: 8px 16px;
+  }
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories {
+  font: 400 14px/1.5 var(--cui-font);
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories :is([hidden], dialog:not([open])) {
+  display: none;
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-catalog-filters {
+  display: none;
+}
+@media (max-width: 1024px) {
+  html[data-cra1-native-cart] .cl-native-catalog-has-picker .cl-native-catalog-desktop { display: none; }
+  html[data-cra1-native-cart] .cra1-native-cart-categories .cl-catalog-filters { display: grid; }
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-nav-group {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--cui-edge);
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-nav-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 8px;
+  color: var(--cui-title);
+  font: 600 15px/24px var(--cui-font);
+  overflow-wrap: anywhere;
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-nav-item {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 6px 14px;
+  border-radius: var(--cui-radius-control);
+  color: var(--cui-muted);
+  font: inherit;
+  line-height: 20px;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-nav-item-sub {
+  padding: 4px 12px;
+  font-size: 13px;
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-nav-item[aria-current] {
+  background: var(--cui-selected);
+  color: var(--cui-ink);
+  font-weight: 600;
+}
+@media (hover: hover) {
+  html[data-cra1-native-cart] .cra1-native-cart-categories a.cl-nav-item:hover {
+    background: var(--cui-hover);
+    color: var(--cui-ink);
+  }
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-nav-item:focus-visible {
+  outline: 2px solid var(--cui-focus);
+  outline-offset: 2px;
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-native-catalog-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--cui-radius-card);
+  background: var(--cui-selected);
+  color: var(--cui-selection-mark);
+  font-size: 18px;
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-native-catalog-sheet[open] {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  inset: auto 0 0;
+  box-sizing: border-box;
+  width: min(100%, 560px);
+  max-width: none;
+  max-height: 80vh;
+  max-height: min(80dvh, 720px);
+  margin: 0 auto;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: var(--cui-radius-card) var(--cui-radius-card) 0 0;
+  background: var(--cui-surface);
+  color: var(--cui-body);
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-native-catalog-sheet::backdrop {
+  background: color-mix(in srgb, var(--cui-night) 30%, transparent);
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-native-catalog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  gap: 12px;
+  padding: 0 8px 0 16px;
+  border-bottom: 1px solid var(--cui-edge);
+}
+html[data-cra1-native-cart] .cra1-native-cart-categories .cl-native-catalog-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+html[data-cra1-native-cart]:has(.cl-native-catalog-sheet[open]) { overflow: hidden; }
+
 /* The common native desktop fallback has a fixed sidebar at top:0. Put those
    same nodes in two columns so it cannot cover the header or page notices. */
 html[data-cra1-native-cart] .config-box .content .common-box:has(> .l-config + .order-right) {

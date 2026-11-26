@@ -3,6 +3,13 @@ declare(strict_types=1);
 namespace CRA1\Theme\Storage;
 
 use CRA1\Theme\Files;
+use CRA1\Theme\Content\ContentDocument;
+
+// An older updater can load this store from the candidate's backend before
+// switching the active release. Reuse a class already loaded by that request.
+if (!class_exists(ContentDocument::class, false)) {
+    require_once dirname(__DIR__).'/Content/ContentDocument.php';
+}
 use CRA1\Theme\Announcements\PageCatalog;
 use CRA1\Theme\Announcements\LegacyMigration;
 
@@ -67,10 +74,8 @@ final class AnnouncementStore
         if (!is_int($values['interval'])||$values['interval']<3||$values['interval']>300) throw new \InvalidArgumentException('轮播间隔需要在 3 至 300 秒之间');
         if (!is_array($values['items'])||count($values['items'])>self::MAX_ITEMS||($values['items']&&array_keys($values['items'])!==range(0,count($values['items'])-1))) throw new \InvalidArgumentException('通知条目必须为列表，最多 '.self::MAX_ITEMS.' 条');
         $old=array_column($previous['items']??[],null,'id'); $seen=[]; $items=[];
-        if (!class_exists(MemberCenterStore::class,false)) require_once __DIR__.'/member_store.php';
         $icons=$this->root.'/public/cra1-shared/icons.php';
         if (is_file($icons)) require_once $icons;
-        $sanitizer=new MemberCenterStore($this->root.'/runtime');
         foreach ($values['items'] as $index=>$row) {
             if (!is_array($row)) throw new \InvalidArgumentException('通知条目格式不正确');
             self::keys($row,['id','title','label','icon','summary','detail','action','action_label','url','new_tab','targets','starts_at','ends_at','priority','dismissible','dismiss_for','enabled','extra_actions','revision','published_at']);
@@ -80,7 +85,7 @@ final class AnnouncementStore
             $item=['id'=>$id,'title'=>self::text($row['title']??'',160,'标题'),'label'=>self::text($row['label']??'',24,'分类文字'),'icon'=>self::text($row['icon']??'megaphone',300,'图标'),'summary'=>self::text($row['summary']??'',400,'简介')];
             if ($item['title']===''||$item['title']!==strip_tags($item['title'])||$item['label']!==strip_tags($item['label'])) throw new \InvalidArgumentException('请填写纯文字通知标题和分类');
             if ($validatePages && function_exists('cra1_icon_validate_change')) \cra1_icon_validate_change($item['icon'],$old[$id]['icon']??'');
-            $item['detail']=$sanitizer->sanitizeContentHtml(self::text($row['detail']??'',65536,'详情'),true);
+            $item['detail']=ContentDocument::normalize(self::text($row['detail']??'',65536,'详情'),$validatePages);
             $item['action']=(string)($row['action']??'detail');
             if (!in_array($item['action'],['detail','link','none'],true)) throw new \InvalidArgumentException('通知操作方式不存在');
             $item['action_label']=self::text($row['action_label']??'查看详情',20,'操作文字');
@@ -170,7 +175,7 @@ final class AnnouncementStore
     public function allPublicPayload(?int $now=null,bool $member=false): array
     {
         $out=$this->project(null,'',$now??time(),null,$member);
-        $fields=array_flip(['id','revision','title','label','summary','detail','action_label','url','new_tab','extra_actions','expires_in']);
+        $fields=array_flip(['id','revision','title','label','summary','detail','action_label','url','new_tab','extra_actions','expires_in','detail_text','detail_revision']);
         $out['items']=array_map(static function(array $item)use($fields):array{return array_intersect_key($item,$fields);},$out['items']);
         return $out;
     }
@@ -213,12 +218,13 @@ final class AnnouncementStore
             if ($end>$now) $out['refresh_after']=min($out['refresh_after'],max(1,$end-$now));
             $public=array_intersect_key($item,array_flip(['id','revision','title','label','icon','summary','detail','action','action_label','url','new_tab','dismissible','dismiss_for','extra_actions']));
             if ($public['label']==='公告') $public['label']='通知';
-            if (trim($public['summary'])==='') {
-                // Derive display text from sanitized content without changing the merchant's draft.
-                $text=preg_replace('~<(?:br\b[^>]*|/(?:p|div|li|h[1-6]|tr|blockquote)\s*)>~i',' ',$public['detail']);
-                $text=html_entity_decode(strip_tags($text),ENT_QUOTES|ENT_HTML5,'UTF-8');
-                $public['summary']=mb_substr(trim(preg_replace('/[\s\x{00a0}\x{200b}]+/u',' ',$text)),0,400,'UTF-8');
-            }
+            $content = ContentDocument::project($public['detail'], $now);
+            $public['detail'] = $content['html'];
+            // The reader indexes only content visible in the current projection.
+            $public['detail_text'] = $content['text'];
+            if ($public['summary'] === '') $public['summary'] = mb_substr($content['text'], 0, 400, 'UTF-8');
+            $public['detail_revision'] = self::revision([preg_replace('/ data-cra1-content-ttl="\d+"/', '', $public['detail'])]);
+            if ($content['next_change'] !== null) $out['refresh_after'] = min($out['refresh_after'], max(1, $content['next_change'] - $now));
             $public['revision']=$public['revision']??self::revision($item);
             $public['icon_html']=$page!==null&&function_exists('cra1_icon_art')?\cra1_icon_art($item['icon'],'website'):'';
             $public['expires_in']=$end?max(0,$end-$now):null;

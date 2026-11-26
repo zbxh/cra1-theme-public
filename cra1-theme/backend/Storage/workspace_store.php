@@ -374,6 +374,9 @@ final class ThemeWorkspaceStore
         if ($scope['domain']==='cart' && isset($patch['content']['goodslist']) && array_key_exists('heading_icons',$patch['content']['goodslist'])) {
             CartThemeStore::validateHeadingIcons($patch['content']['goodslist']['heading_icons'],$current['content']['goodslist']['heading_icons']??[]);
         }
+        if ($scope['domain'] === 'cart' && array_key_exists('top_descriptions', $patch['content']['goodslist'] ?? [])) {
+            $patch['content']['goodslist']['top_descriptions'] = \CRA1\Theme\Content\CartDescriptions::normalize($patch['content']['goodslist']['top_descriptions'], true);
+        }
         if ($scope['domain']==='cart' && isset($patch['content']['goodslist']['heading_icon_styles'])) CartThemeStore::validateHeadingIconStyles($patch['content']['goodslist']['heading_icon_styles']);
         if ($scope['domain']==='cart' && isset($patch['content']['shoppingcar']['empty']['button_target'])) {
             $target=trim((string)$patch['content']['shoppingcar']['empty']['button_target']);

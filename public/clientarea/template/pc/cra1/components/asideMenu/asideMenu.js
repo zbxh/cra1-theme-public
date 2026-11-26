@@ -201,41 +201,27 @@
       <div v-if="p.separator" :key="p.key" class="cra1-primary-separator"
            role="separator" aria-orientation="horizontal" :aria-label="p.name"></div>
       <component v-else
-        :is="p.href ? 'div' : 'button'"
+        :is="p.href ? 'a' : 'button'"
         :key="p.key"
         :type="p.href ? null : 'button'"
         class="cra1-primary-item"
-        :class="{ 'is-active': primaryKey === p.key, 'cra1-primary-item--link': p.href, 'cra1-primary-item--split': p.href && p.hasChildren }"
+        :class="{ 'is-active': primaryKey === p.key }"
+        :href="p.href || null"
+        :target="p.newTab ? '_blank' : null"
+        :rel="p.newTab ? 'noopener' : null"
+        :aria-label="p.name"
+        :aria-current="p.href && isPageActive(p) ? 'page' : null"
         :aria-expanded="p.href ? null : String(primaryExpanded(p))"
-        :title="p.href ? null : p.name"
-        @click="!p.href && selectPrimary(p.key)"
+        :title="p.name"
+        @click="p.href ? followMenuLink($event, p) : selectPrimary(p.key)"
       >
-        <component
-          :is="p.href ? 'a' : 'span'"
-          class="cra1-primary-item__entry"
-          :href="p.href || null"
-          :target="p.newTab ? '_blank' : null"
-          :rel="p.newTab ? 'noopener' : null"
-          :title="p.href ? p.name : null"
-          :aria-label="p.href ? p.name : null"
-          :aria-current="p.href && isPageActive(p) ? 'page' : null"
-          @click="p.href && openPrimaryLink($event, p)"
-        >
+        <span class="cra1-primary-item__entry">
           <span v-if="p.icon_resolved && p.icon_resolved.url" class="cra1-primary-item__icon cui-business-icon" :data-cui-icon-style="p.icon_style ? '1' : null" :style="iconVars(p.icon_style)" aria-hidden="true"><span v-if="p.icon_resolved.colorable" class="cui-icon-mask" :style="{'--cui-icon-url':'url('+p.icon_resolved.url+')'}"></span><img v-else :src="p.icon_resolved.url" width="20" height="20" alt=""></span><i v-else-if="p.icon" class="iconfont cra1-primary-item__icon" :class="p.icon" :data-cui-icon-style="p.icon_style ? '1' : null" :style="iconVars(p.icon_style)" aria-hidden="true"></i>
           <span class="cra1-primary-item__label">{{ p.name }}</span>
-        </component>
-        <component
-          v-if="!p.href || p.hasChildren"
-          :is="p.href ? 'button' : 'span'"
-          :class="p.href ? 'cra1-primary-item__toggle' : 'cra1-primary-item__indicator'"
-          :type="p.href ? 'button' : null"
-          :aria-hidden="p.href ? null : 'true'"
-          :aria-expanded="p.href ? String(primaryExpanded(p)) : null"
-          :aria-label="p.href ? '展开' + p.name + '菜单' : null"
-          @click="p.href && selectPrimary(p.key)"
-        >
+        </span>
+        <span v-if="!p.href" class="cra1-primary-item__indicator" aria-hidden="true">
           <svg class="cra1-primary-item__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
-        </component>
+        </span>
       </component>
       </template>
 
@@ -263,45 +249,41 @@
         <div class="cra1-panel-grid">
           <section
             v-for="g in activeGroups"
-            v-if="g.url || g.pages.length"
             :key="'grp:' + g.key"
             class="cra1-nav-group"
             :class="{ 'is-folded': !isGroupOpen(g) }"
           >
-            <!-- 二级：组标题（可点击直达该菜单自身地址） -->
-            <component
-              :is="g.url && !isExternal(g.url) ? 'a' : 'div'"
-              class="cra1-nav-l2"
-              :class="{ 'is-active': isPageActive({ url: g.url }), 'is-link': g.url && !isExternal(g.url) }"
-              :href="g.url && !isExternal(g.url) ? '/' + g.url : null"
-              onclick="return false"
-              @click.prevent="g.url && !isExternal(g.url) ? goPage({ url: g.url, sourceMenuId: g.key, second_reminder: g.second_reminder }) : null"
-            >
-              <span v-if="g.icon_resolved || g.icon_style" class="cra1-nav-configured-icon cui-business-icon" :data-cui-icon-style="g.icon_style ? '1' : null" :style="iconVars(g.icon_style)" aria-hidden="true"><span v-if="g.icon_resolved && g.icon_resolved.colorable" class="cui-icon-mask" :style="{'--cui-icon-url':'url('+g.icon_resolved.url+')'}"></span><img v-else-if="g.icon_resolved" :src="g.icon_resolved.url" width="16" height="16" alt=""><i v-else class="iconfont" :class="g.icon"></i></span><span class="cra1-nav-l2__name">{{ g.name }}</span>
-            <button
-              v-if="leafPagesOf(g).length"
-              type="button"
-              class="cra1-nav-group__toggle"
-              :class="{ 'is-open': isGroupOpen(g) }"
-              :aria-expanded="isGroupOpen(g) ? 'true' : 'false'"
-              :aria-label="(isGroupOpen(g) ? '收起' : '展开') + g.name"
-              @click.stop.prevent="toggleGroup(g)"
-            ><i class="cra1-nav-group__chev" aria-hidden="true"></i></button>
-            </component>
+            <div class="cra1-nav-l2" :class="{ 'is-active': isPageActive(g), 'is-link': g.href, 'cra1-nav-l2--expandable': isNarrow && g.leafPages.length }">
+              <component :is="g.href ? 'a' : 'span'" class="cra1-nav-l2__entry"
+                :href="g.href || null"
+                :target="g.newTab ? '_blank' : null"
+                :rel="g.newTab ? 'noopener' : null"
+                :aria-current="g.href && isPageActive(g) ? 'page' : null"
+                @click="g.href && followMenuLink($event, g)">
+                <span v-if="g.icon_resolved || g.icon_style" class="cra1-nav-configured-icon cui-business-icon" :data-cui-icon-style="g.icon_style ? '1' : null" :style="iconVars(g.icon_style)" aria-hidden="true"><span v-if="g.icon_resolved && g.icon_resolved.colorable" class="cui-icon-mask" :style="{'--cui-icon-url':'url('+g.icon_resolved.url+')'}"></span><img v-else-if="g.icon_resolved" :src="g.icon_resolved.url" width="16" height="16" alt=""><i v-else class="iconfont" :class="g.icon"></i></span><span class="cra1-nav-l2__name">{{ g.name }}</span>
+              </component>
+              <button v-if="isNarrow && g.leafPages.length" type="button" class="cra1-nav-group__toggle"
+                :class="{ 'is-open': isGroupOpen(g) }"
+                :aria-expanded="String(isGroupOpen(g))"
+                :aria-label="(isGroupOpen(g) ? '收起' : '展开') + g.name"
+                @click="toggleGroup(g)"
+              ><i class="cra1-nav-group__chev" aria-hidden="true"></i></button>
+            </div>
 
             <!-- 三级：组内全部页面（常驻） -->
             <div
-              v-for="pg in leafPagesOf(g)"
+              v-for="pg in g.leafPages"
               :key="g.key + ':' + pg.url"
               class="cra1-nav-l3"
               :class="{ 'is-active': isPageActive(pg) }"
             >
               <a
                 class="cra1-nav-l3__hit"
-                :href="'/' + pg.url"
+                :href="pg.href"
+                :target="pg.newTab ? '_blank' : null"
+                :rel="pg.newTab ? 'noopener' : null"
                 :aria-current="isPageActive(pg) ? 'page' : null"
-                onclick="return false"
-                @click.prevent="goPage(pg)"
+                @click="followMenuLink($event, pg)"
               >
                 <span v-if="pg.icon_resolved || pg.icon_style" class="cra1-nav-configured-icon cui-business-icon" :data-cui-icon-style="pg.icon_style ? '1' : null" :style="iconVars(pg.icon_style)" aria-hidden="true"><span v-if="pg.icon_resolved && pg.icon_resolved.colorable" class="cui-icon-mask" :style="{'--cui-icon-url':'url('+pg.icon_resolved.url+')'}"></span><img v-else-if="pg.icon_resolved" :src="pg.icon_resolved.url" width="16" height="16" alt=""><i v-else class="iconfont" :class="pg.icon"></i></span><span v-else class="cra1-nav-l3__dot" aria-hidden="true"></span>
                 <span class="cra1-nav-l3__name">{{ pg.name }}</span>
@@ -393,18 +375,14 @@
         }
         return (this.menu || []).map(function (n) {
           var separator = !!isMenuSeparator(n)
-          var url = !separator && !n.primaryLinkBlocked && n.url !== '#' ? this.tagCRA1Menu(n.url, n.id) : ''
-          var href = global.CRA1Shared.Navigation.href(url)
-          if (href && !global.CRA1Shared.Access.canUrl(href)) href = ''
+          var hasChildren = !separator && this.groupsOfNode(n).length > 0
+          var url = !separator && !hasChildren && !n.linkBlocked ? this.tagCRA1Menu(n.url, n.id) : ''
           var secondReminder = Number(n.second_reminder) === 1 ? 1 : 0
-          var external = /^https?:\/\//i.test(href) && this.isExternal(href)
-          return {
+          return Object.assign({
             key: n.id, name: n.name, icon: n.icon || FALLBACK_ICON[n.name] || 'icon-a-6',
             icon_style: n.icon_style, icon_resolved: n.icon_resolved, separator: separator,
-            url: url, href: external && secondReminder ? '/transfer.htm?target=' + encodeURIComponent(href) : href,
-            second_reminder: secondReminder, newTab: external && !secondReminder,
-            hasChildren: !separator && this.groupsOfNode(n).length > 0,
-          }
+            url: url, primaryKey: n.id, sourceMenuId: n.id, second_reminder: secondReminder,
+          }, this.menuLink(url, secondReminder))
         }, this)
       },
       /**
@@ -468,7 +446,7 @@
             //   1. url='/' 的纯容器（老数据里「测试」这种只当分组用的节点）；
             //   2. module/res_module —— 它们的 productList.htm 是导入时的兜底地址，
             //      不是真实页面，组内只放子级，避免与「魔方云」组重复整套产品标签页。
-            var ownUrl = String(item.url || '')
+            var ownUrl = item.linkBlocked ? '' : String(item.url || '')
             var isFallback = (item.type === 'module' || item.type === 'res_module')
             if (ownUrl && ownUrl !== '/' && !isFallback) {
               var own = self.pagesForUrl(ownUrl, item)
@@ -486,13 +464,13 @@
               }
             })
             if (pages.length) {
-              out.push({ key: item.id || item.name, name: item.name, icon:item.icon,icon_style:item.icon_style,icon_resolved:item.icon_resolved,url: item.url || '', pages: pages })
+              out.push({ key: item.id || item.name, name: item.name, icon:item.icon,icon_style:item.icon_style,icon_resolved:item.icon_resolved,url: ownUrl, second_reminder: item.second_reminder, pages: pages })
             }
           } else if (item.url) {
             out.push({
               key: item.id || item.url,
               name: item.name,icon:item.icon,icon_style:item.icon_style,icon_resolved:item.icon_resolved,
-              url: item.url,
+              url: item.url, second_reminder: item.second_reminder,
               pages: self.pagesForUrl(item.url, item) || self.withReminder([{ name: item.name, url: item.url }]),
             })
           }
@@ -505,8 +483,7 @@
           var root = (this.menu || []).find(function (n) { return n.id === this.primaryKey }, this)
           return root ? this.groupsOfNode(root) : []
         }
-        if (this.primaryKey === 'resource') return this.resourceSecondary
-        return this.serviceGroups
+        return this.visibleGroups(this.primaryKey === 'resource' ? this.resourceSecondary : this.serviceGroups)
       },
 
     },
@@ -580,11 +557,11 @@
         var self = this
         var out = []
         ;(root.child || []).forEach(function (c) {
-          if (c.name === '分隔符') return
+          if (isMenuSeparator(c)) return
           var grand = c.child || []
           var pages
           if (grand.length) {
-            pages = grand.map(function (g) {
+            pages = grand.filter(function (g) { return !isMenuSeparator(g) }).map(function (g) {
               return {
                 name: g.name,icon:g.icon,icon_style:g.icon_style,icon_resolved:g.icon_resolved,
                 url: self.tagCRA1Menu(g.url, g.id || c.id),
@@ -603,9 +580,35 @@
           } else {
             return   // 无页面也无链接：不展示
           }
-          out.push({ key: c.id || c.name, name: c.name, icon:c.icon,icon_style:c.icon_style,icon_resolved:c.icon_resolved,url: self.tagCRA1Menu(c.url, c.id), pages: pages })
+          out.push({ key: c.id || c.name, name: c.name, icon:c.icon,icon_style:c.icon_style,icon_resolved:c.icon_resolved,url: c.linkBlocked ? '' : self.tagCRA1Menu(c.url, c.id), second_reminder: c.second_reminder, pages: pages })
         })
-        return out
+        return this.visibleGroups(out)
+      },
+      visibleGroups(groups) {
+        return groups.map(function (group) {
+          var secondReminder = Number(group.second_reminder) === 1 ? 1 : 0
+          var link = this.menuLink(group.url, secondReminder)
+          var pages = group.pages.map(function (page) {
+            return Object.assign({}, page, this.menuLink(page.url, page.second_reminder))
+          }, this).filter(function (page) { return page.href })
+          // A group with a single link to its own address uses the heading as its entry.
+          var samePage = pages.length === 1 && link.href && this.stripCRA1Menu(pages[0].href) === this.stripCRA1Menu(link.href)
+          return Object.assign({}, group, link, {
+            sourceMenuId: group.key, second_reminder: secondReminder, pages: pages, leafPages: samePage ? [] : pages,
+          })
+        }, this).filter(function (group) { return group.href || group.leafPages.length })
+      },
+      menuHref(url) {
+        var href = global.CRA1Shared.Navigation.href(url)
+        return href && href !== '#' && global.CRA1Shared.Access.canUrl(href) ? href : ''
+      },
+      menuLink(url, reminder) {
+        var href = this.menuHref(url)
+        var external = /^https?:\/\//i.test(href) && this.isExternal(href)
+        return {
+          href: external && Number(reminder) === 1 ? '/transfer.htm?target=' + encodeURIComponent(href) : href,
+          newTab: external && Number(reminder) !== 1,
+        }
       },
 
       /** 产品列表链接附加稳定菜单 UUID（不使用会重建的 idcsmart_menu.id） */
@@ -678,14 +681,14 @@
       primaryExpanded(p) {
         return this.primaryKey === p.key && (this.isNarrow ? this.mobileDetail : !this.collapsed)
       },
-      openPrimaryLink(event, p) {
-        if (!global.CRA1Shared.Access.canUrl(p.url)) {
+      followMenuLink(event, entry) {
+        if (!this.menuHref(entry.url)) {
           event.preventDefault()
           return
         }
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
         event.preventDefault()
-        this.goPage({ url: p.url, sourceMenuId: p.key, primaryKey: p.key, second_reminder: p.second_reminder })
+        this.goPage(entry)
       },
       selectPrimary(key) {
         this.primaryKey = key
@@ -693,29 +696,8 @@
         else if (this.collapsed) this.toggleCollapse()
         this.initMobileGroups()
       },
-      /**
-       * 右栏二级标题点击：全部内容常驻展开（多列布局），这里只负责跳转。
-       */
-      selectGroup(g) {
-        if (g.url && !this.isExternal(g.url)) {
-          this.goPage({ url: g.url, sourceMenuId: g.key, second_reminder: g.second_reminder })
-        }
-      },
       backToPrimary() {
         this.mobileDetail = false
-      },
-      /**
-       * 组内叶子页面（三级行）。
-       * 组只指向自身一个地址时（模块产品分类菜单）不再重复渲染三级行 ——
-       * 二级组标题本身就是入口。
-       */
-      leafPagesOf(g) {
-        var pages = (g && g.pages) || []
-        if (pages.length === 1 && g.url
-            && this.stripCRA1Menu(pages[0].url) === this.stripCRA1Menu(g.url)) {
-          return []
-        }
-        return pages
       },
       isExternal(u) {
         try {
@@ -990,7 +972,7 @@
       /** v20：手机端二级分组折叠 —— 按档位初始化展开集合 */
       initMobileGroups() {
         var keys = this.activeGroups
-          .filter(function (g) { return g.url || (g.pages && g.pages.length) })
+          .filter(function (g) { return g.leafPages.length })
           .map(function (g) { return g.key })
         if (this.asideMobileExpand === 'all') {
           this.mobileOpenGroups = keys.slice()
@@ -1013,7 +995,7 @@
         var self = this
         var curKey = ''
         this.activeGroups.forEach(function (g) {
-          if (curKey) return
+          if (curKey || !g.leafPages.length) return
           var hit = (g.url && self.isPageActive({ url: g.url })) ||
             (g.pages || []).some(function (pg) { return self.isPageActive(pg) })
           if (hit) curKey = g.key
@@ -1232,7 +1214,7 @@
         var rules = []
         if (feat.ready && !feat.withdraw_open) rules.push(/withdrawal\.htm/i)
         if (feat.ready && !feat.recharge_open) rules.push(/recharge\.htm/i)
-        var walk = function (items, primary) {
+        var walk = function (items) {
           var out = []
           ;(items || []).forEach(function (it) {
             var u = String(it.url || '')
@@ -1242,7 +1224,7 @@
             var permitted = !global.CRA1Shared?.Access || global.CRA1Shared.Access.canUrl(u)
             if (!permitted && !(it.child && it.child.length)) return
             if (!permitted && it.child && it.child.length) {
-              if (primary) it.primaryLinkBlocked = true
+              it.linkBlocked = true
               it.url = it.child[0].url || ''
             }
             if (hadChildren && !it.child.length && (!u || u === '#')) return
@@ -1251,7 +1233,7 @@
           return out
         }
         // 三级页表由 SECONDARY_PAGES 渲染：pagesForUrl 里按同一特征位同步剔除
-        return walk(menu, true)
+        return walk(menu)
       },
       /** 回落：系统导航 */
       loadSystemMenu() {

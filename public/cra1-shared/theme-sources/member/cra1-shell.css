@@ -1719,6 +1719,7 @@ html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)
   font-weight: 500;
   line-height: 1.2;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition: background-color 150ms ease, color 150ms ease;
 }
@@ -1732,38 +1733,11 @@ html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)
   height: 100%;
 }
 
-.cra1-primary-item.cra1-primary-item--link {
-  gap: 0;
-  padding: 0;
-  cursor: default;
-}
-
-.cra1-primary-item a.cra1-primary-item__entry {
-  padding: 0 10px;
-  border-radius: inherit;
-  color: inherit;
-  text-decoration: none;
-}
-
-.cra1-primary-item__indicator,
-.cra1-primary-item__toggle {
+.cra1-primary-item__indicator {
   display: grid;
   flex: 0 0 auto;
   place-items: center;
 }
-
-.cra1-primary-item__toggle {
-  width: 36px;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  border-radius: var(--cui-radius-control);
-  background: transparent;
-  color: var(--muted-foreground);
-  cursor: pointer;
-}
-
-.cra1-primary-item__toggle .cra1-primary-item__chevron { opacity: 1; }
 
 .cra1-primary-item__icon {
   flex: 0 0 18px;
@@ -1939,6 +1913,24 @@ html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)
 /* 当前页所在的二级（或已展开的二级）：品牌色文字 */
 .cra1-nav-l2.is-active { color: var(--cui-ink); }
 .cra1-nav-l2.is-link.is-active { font-weight: 600; }
+.cra1-nav-group > .cra1-nav-l2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
+  cursor: default;
+}
+.cra1-nav-l2__entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: inherit;
+  padding: 4px 8px;
+  border-radius: inherit;
+  color: inherit;
+  text-decoration: none;
+}
 
 /* 三级行（页面链接） */
 .cra1-nav-l3 {
@@ -2041,7 +2033,6 @@ html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)
 /* hover 门控 */
 @media (hover: hover) and (pointer: fine) {
   .cra1-primary-item:hover { background: var(--sidebar-accent); color: var(--sidebar-accent-foreground); }
-  .cra1-primary-item__toggle:hover { background: var(--sidebar); color: var(--sidebar-accent-foreground); }
   .cra1-primary-item.is-active:hover {
     background: var(--cui-selected);
     color: var(--cui-ink);
@@ -2063,9 +2054,9 @@ html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)
 
 /* 焦点可见 */
 .cra1-primary-item:focus-visible,
-.cra1-primary-item__entry:focus-visible,
-.cra1-primary-item__toggle:focus-visible,
 .cra1-nav-l2:focus-visible,
+.cra1-nav-l2__entry:focus-visible,
+.cra1-nav-group__toggle:focus-visible,
 .cra1-nav-l3__hit:focus-visible,
 .cra1-aside__panel-close:focus-visible,
 .cra1-aside__panel-back:focus-visible {
@@ -2095,11 +2086,6 @@ html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)
 .cra1-aside.is-collapsed .cra1-primary-item__label,
 .cra1-aside.is-collapsed .cra1-primary-item__indicator { display: none; }
 .cra1-aside.is-collapsed .cra1-primary-item__entry { justify-content: center; padding: 0; }
-.cra1-aside.is-collapsed .cra1-primary-item--split {
-  flex-direction: column;
-  height: 58px;
-}
-.cra1-aside.is-collapsed .cra1-primary-item__toggle { width: 100%; height: 25px; }
 .cra1-aside.is-collapsed .cra1-aside__panel { display: none; }
 }
 
@@ -2125,7 +2111,11 @@ html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)
     width: var(--aside-w) !important;
   }
   .cra1-aside__overlay { top: 0; }
-  .cra1-aside__rail-col { display: flex; }
+  .cra1-aside__rail-col {
+    flex-basis: 100%;
+    width: 100%;
+    border-right: 0;
+  }
   .cra1-aside__panel { display: none; }
   .cra1-aside__rail { display: none; }
 
@@ -2149,8 +2139,8 @@ html[data-cra1-theme="member"] :is(.cra1-module-view,body:has(.cra1-module-view)
 
   /* 触屏目标 ≥44px */
   .cra1-primary-item { height: 44px; }
-  .cra1-primary-item__toggle { width: 44px; }
-  .cra1-nav-l2 { min-height: 40px; }
+  .cra1-primary-item__chevron { opacity: 1; }
+  .cra1-nav-l2 { min-height: 44px; }
   .cra1-nav-l3 { min-height: 40px; }
   .cra1-aside__panel-body { padding: 10px 8px 16px; }
 }
@@ -2906,10 +2896,7 @@ html:not([data-cra1-native-module]) .template .el-empty__description p { color: 
   }
 
   .cra1-aside.is-collapsed:not(.is-open) .cra1-aside__rail-col {
-    flex-basis: auto;
-    width: 100%;
     padding: calc(var(--header-h) + 12px) 10px 12px;
-    border-right: 1px solid var(--border);
   }
 
   .cra1-aside.is-collapsed:not(.is-open) .cra1-primary-item {
@@ -2957,32 +2944,43 @@ html:not([data-cra1-native-module]) .template .el-empty__description p { color: 
 }
 
 /* ==========================================================================
-   v20 手机端二级侧边菜单折叠（≤1024 抽屉内生效；PC 恒展开不受影响）
-   - 组标题行右侧折叠箭头（纯 CSS 三角，无图标字体依赖）
-   - .is-folded 隐藏组内三级行
+   手机端二级分组：整行是展开按钮，链接文字单独接收点击
    ========================================================================== */
-.cra1-nav-group__toggle {
-  display: none;
-}
-
 @media (max-width: 1024px) {
-  /* 组标题行改 flex，箭头靠右 */
-  .cra1-nav-group .cra1-nav-l2 {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+  .cra1-nav-group > .cra1-nav-l2--expandable {
+    grid-template-columns: minmax(0, 1fr) 44px;
+  }
+
+  .cra1-nav-l2--expandable .cra1-nav-l2__entry {
+    position: relative;
+    z-index: 1;
+    grid-area: 1 / 1;
+    justify-self: start;
+    max-width: 100%;
+    pointer-events: none;
+  }
+
+  .cra1-nav-l2--expandable a .cra1-nav-l2__name {
+    line-height: 24px;
+    pointer-events: auto;
+  }
+
+  .cra1-nav-l2--expandable .cra1-nav-l2__entry:focus-visible {
+    outline: 0;
+  }
+
+  .cra1-nav-l2--expandable .cra1-nav-l2__entry:focus-visible .cra1-nav-l2__name {
+    outline: 2px solid var(--sidebar-ring);
+    outline-offset: 2px;
   }
 
   .cra1-nav-group__toggle {
-    display: inline-flex;
+    grid-area: 1 / 1 / 2 / 3;
+    display: flex;
     align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    width: 30px;
-    height: 30px;
-    margin-right: -6px;
-    padding: 0;
+    justify-content: flex-end;
+    min-height: 44px;
+    padding: 0 17px 0 8px;
     border: none;
     border-radius: var(--radius-sm, 4px);
     background: transparent;

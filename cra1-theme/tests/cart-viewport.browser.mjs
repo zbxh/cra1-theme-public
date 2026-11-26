@@ -11,13 +11,24 @@ try{
  await page.addScriptTag({path:vue});
  await page.evaluate(()=>{window.NativeVue=window.Vue;window.Vue=function(options){window.cartOptions=options;return {$mount(){}};};window.Vue.prototype={};window.lang={};for(const name of ['asideMenu','topMenu','scrollText','discountCode','eventCode'])window[name]={};});
  await page.addScriptTag({path:source});
- await page.evaluate(()=>{window.Vue=window.NativeVue;const o=window.cartOptions;window.cartVm=new Vue({data:o.data,computed:{viewportW:o.computed.viewportW,currentColumns:o.computed.currentColumns,gridStyle:o.computed.gridStyle,limitFromGrid:o.computed.limitFromGrid},methods:{handleViewportChange:o.methods.handleViewportChange,scrollSelectedProduct:o.methods.scrollSelectedProduct}});window.cartVm.gridConf={desktop_columns:2,tablet_columns:3,mobile_columns:1,rows_per_load:2};window.addEventListener('resize',()=>window.cartVm.handleViewportChange());});
+ await page.evaluate(()=>{
+  window.Vue=window.NativeVue;
+  const o=window.cartOptions;
+  window.cartVm=new Vue({
+   data:o.data,
+   computed:{viewportW:o.computed.viewportW,isMobileCart:o.computed.isMobileCart,currentColumns:o.computed.currentColumns,gridStyle:o.computed.gridStyle,limitFromGrid:o.computed.limitFromGrid},
+   methods:{handleViewportChange:o.methods.handleViewportChange,needScroll(){}},
+  });
+  window.cartVm.gridConf={desktop_columns:2,tablet_columns:3,mobile_columns:1,rows_per_load:2};
+  window.addEventListener('resize',()=>window.cartVm.handleViewportChange());
+ });
+ page.on('pageerror',error=>{throw error;});
  const checks=[];
- for(const [width,columns]of [[1440,2],[900,3],[390,1],[1440,2]]){
+ for(const [width,columns]of [[1440,2],[1025,3],[1024,3],[390,1],[1440,2]]){
   await page.setViewportSize({width,height:900});await page.waitForFunction(w=>innerWidth===w,width);
   await page.evaluate(()=>{window.cartVm.handleViewportChange();return Vue.nextTick();});
-  const state=await page.evaluate(()=>({columns:cartVm.currentColumns,style:cartVm.gridStyle['--cart-cols'],limit:cartVm.limitFromGrid}));
-  assert.equal(state.columns,columns,'responsive columns at '+width);assert.equal(state.style,String(columns));assert.equal(state.limit,columns*2);checks.push({width,columns,limit:state.limit});
+  const state=await page.evaluate(()=>({mobile:cartVm.isMobileCart,columns:cartVm.currentColumns,style:cartVm.gridStyle['--cart-cols'],limit:cartVm.limitFromGrid}));
+  assert.equal(state.mobile,width<=1024,'cart layout breakpoint at '+width);assert.equal(state.columns,columns,'responsive columns at '+width);assert.equal(state.style,String(columns));assert.equal(state.limit,columns*2);checks.push({width,columns,limit:state.limit});
  }
  console.log(JSON.stringify({status:'passed',checks}));
 }finally{await browser.close();}

@@ -279,9 +279,9 @@
                 <div class="cra1-drawer-root" data-drawer-root="nav-{$ni}" data-drawer-title="{$nav.name|htmlspecialchars|raw}" data-drawer-depth="{$nav.layout_depth}" x-show="activeTop === null || activeTop === 'nav-{$ni}'">
                     {if ( count($nav.children) > 0 ) }
                     {php}$__cra1NavHasLink = !empty($nav['file_address']) && $nav['file_address'] !== '#';{/php}
-                    <div class="cra1-drawer-top-row" x-show="activeTop === null">
+                    <div{if $__cra1NavHasLink } class="cra1-drawer-top-row"{/if} x-show="activeTop === null">
                         {if $__cra1NavHasLink }
-                        <a class="cra1-drawer-top" href="{$nav.file_address|htmlspecialchars|raw}" {if $nav.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()">{$nav.name}</a>
+                        <a class="cra1-drawer-top-link" href="{$nav.file_address|htmlspecialchars|raw}" {if $nav.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()">{$nav.name}</a>
                         {/if}
                         <button type="button" class="{if $__cra1NavHasLink }cra1-drawer-group-toggle{else /}cra1-drawer-top{/if}" data-drawer-trigger
                                 @click="toggleTop('nav-{$ni}', {$nav.layout_depth})" :aria-expanded="activeTop === 'nav-{$ni}' || inlineTop === 'nav-{$ni}'"
@@ -299,15 +299,19 @@
                         </ul>
                         {else /}
                         {foreach $nav.children as $ci => $child}
+                        {php}$__cra1ChildHasLink = !empty($child['file_address']) && $child['file_address'] !== '#';{/php}
                         {if !empty($child.children) }
                         <div class="cra1-drawer-group" data-drawer-second="nav-{$ni}-second-{$ci}">
-                            <div class="cra1-drawer-group-row" :class="{ 'is-open': activeSecond === 'nav-{$ni}-second-{$ci}' }">
-                                {if $nav.layout_depth == 4 }
-                                <button type="button" class="cra1-drawer-group-title cra1-drawer-group-button" @click="toggleSecond('nav-{$ni}-second-{$ci}')" :aria-expanded="activeSecond === 'nav-{$ni}-second-{$ci}'" aria-controls="cra1-drawer-second-{$ni}-{$ci}"><span>{$child.name}</span><svg class="cra1-drawer-chevron" :class="{ 'is-open': activeSecond === 'nav-{$ni}-second-{$ci}' }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
-                                {else /}
-                                <a class="cra1-drawer-group-title" href="{$child.file_address|default='/'}" {if $child.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()">{$child.name}</a>
-                                <button type="button" class="cra1-drawer-group-toggle" @click="toggleSecond('nav-{$ni}-second-{$ci}')" :aria-expanded="activeSecond === 'nav-{$ni}-second-{$ci}'" aria-controls="cra1-drawer-second-{$ni}-{$ci}" aria-label="展开或收起{$child.name|htmlspecialchars|raw}"><svg class="cra1-drawer-chevron" :class="{ 'is-open': activeSecond === 'nav-{$ni}-second-{$ci}' }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+                            <div class="cra1-drawer-group-row{if $__cra1ChildHasLink } cra1-drawer-group-row--split{/if}" :class="{ 'is-open': activeSecond === 'nav-{$ni}-second-{$ci}' }">
+                                {if $__cra1ChildHasLink }
+                                <a class="cra1-drawer-group-link" href="{$child.file_address|htmlspecialchars|raw}" {if $child.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()">{$child.name}</a>
                                 {/if}
+                                <button type="button" class="{if $__cra1ChildHasLink }cra1-drawer-group-toggle{else /}cra1-drawer-group-title cra1-drawer-group-button{/if}"
+                                    @click="toggleSecond('nav-{$ni}-second-{$ci}')" :aria-expanded="activeSecond === 'nav-{$ni}-second-{$ci}'"
+                                    aria-controls="cra1-drawer-second-{$ni}-{$ci}" {if $__cra1ChildHasLink }aria-label="展开或收起{$child.name|htmlspecialchars|raw}"{/if}>
+                                    {if !$__cra1ChildHasLink }<span>{$child.name}</span>{/if}
+                                    <svg class="cra1-drawer-chevron" :class="{ 'is-open': activeSecond === 'nav-{$ni}-second-{$ci}' }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                                </button>
                             </div>
                             <div id="cra1-drawer-second-{$ni}-{$ci}" class="cra1-drawer-group-panel" x-cloak x-show="activeSecond === 'nav-{$ni}-second-{$ci}'">
                                 {foreach $child.children as $gi => $grand}
@@ -331,7 +335,7 @@
                             </div>
                         </div>
                         {else /}
-                        {if $nav.layout_depth == 4 }<span class="cra1-drawer-group-title">{$child.name}</span>{else /}<a class="cra1-drawer-link" href="{$child.file_address|default='/'}" {if $child.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()"><span>{$child.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>{/if}
+                        {if $__cra1ChildHasLink }<a class="cra1-drawer-link" href="{$child.file_address|htmlspecialchars|raw}" {if $child.blank == 1 }target="_blank" rel="noopener"{/if} @click="$store.ui.closeMenu()"><span>{$child.name}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>{else /}<span class="cra1-drawer-group-title">{$child.name}</span>{/if}
                         {/if}
                         {/foreach}
                         {/if}
@@ -353,7 +357,7 @@
                 <a href="/" class="cra1-drawer-top" @click="$store.ui.closeMenu()">首页</a>
                 <a href="/cart/goodsList.htm" class="cra1-drawer-top" @click="$store.ui.closeMenu()">产品服务</a>
                 <div class="cra1-drawer-top-row">
-                    <a href="/solution.html" class="cra1-drawer-top" @click="$store.ui.closeMenu()">解决方案</a>
+                    <a href="/solution.html" class="cra1-drawer-top-link" @click="$store.ui.closeMenu()">解决方案</a>
                     <button type="button" class="cra1-drawer-group-toggle" @click="toggleTop('fallback-solutions', 2)" :aria-expanded="inlineTop === 'fallback-solutions'" aria-controls="cra1-drawer-fallback-solutions" aria-label="展开或收起解决方案菜单"><svg class="cra1-drawer-chevron" :class="{ 'is-open': inlineTop === 'fallback-solutions' }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
                 </div>
                 <div id="cra1-drawer-fallback-solutions" class="cra1-drawer-panel" x-cloak x-show="inlineTop === 'fallback-solutions'"><ul class="cra1-drawer-flat-list"><li><a href="/solution.html" class="cra1-drawer-link" @click="$store.ui.closeMenu()">全部方案</a></li><li><a href="/solution/ecommerce.html" class="cra1-drawer-link" @click="$store.ui.closeMenu()">电商零售</a></li><li><a href="/solution/finance.html" class="cra1-drawer-link" @click="$store.ui.closeMenu()">金融科技</a></li></ul></div>

@@ -19,6 +19,8 @@ import { cartApi } from '../lib/api'
 import LinkPicker from './LinkPicker'
 import IconPicker from '../ui/IconPicker'
 import headingDefinitions from '../cart.headings.json'
+import CartDescriptionsEditor from './CartDescriptionsEditor'
+import './cart-descriptions.css'
 
 function HeadingIconsForm({ value, onChange }) {
   const icons = value?.icons || {}, styles = value?.styles || {}
@@ -158,7 +160,7 @@ function ProductSelect({ value, onChange, products }) {
   )
 }
 
-export default function CartContent({ workspace, scope = 'goodslist', block }) {
+export default function CartContent({ workspace, scope = 'goodslist', block, cartTarget, onCartTarget }) {
   const toast = useToast()
   const actionsRef = useRef(null)
   const [loading, setLoading] = useState(!workspace)
@@ -353,7 +355,9 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
     },
   ]
 
-
+  const inlineRecord = !['card_sections', 'recommendations'].includes(block)
+    ? RECORDS.find((rec) => rec.group === scope && rec.sub === block)
+    : undefined
 
   const openGroup = (rec) => { setGroupDraft(rec.sub==='heading_icons' ? {icons:clone(c.goodslist.heading_icons||{}),styles:clone(c.goodslist.heading_icon_styles||{})} : clone(c[rec.group][rec.sub])); setGroupEditing(rec) }
   const submitGroup = (next) => {
@@ -446,8 +450,14 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
       />
 
       {productError && <Alert tone="warning">{productError}</Alert>}
-      {block && !['card_sections','recommendations'].includes(block)?<Card><CardHeader><CardTitle>{RECORDS.find(r=>r.group===scope&&r.sub===block)?.label}</CardTitle></CardHeader><CardContent className="space-y-5">{GroupFormBody({group:scope,sub:block})}</CardContent></Card>:!block&&(<>
+      {inlineRecord && (
+        <Card>
+          <CardHeader><CardTitle>{inlineRecord.label}</CardTitle></CardHeader>
+          <CardContent className="space-y-5">{GroupFormBody(inlineRecord)}</CardContent>
+        </Card>
+      )}
       {/* 页面文案记录（一条记录 + 编辑弹窗） */}
+      {!block && (
       <Card>
         <CardHeader>
           <CardTitle>页面文案与布局</CardTitle>
@@ -464,8 +474,7 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
           ))}
         </CardContent>
       </Card>
-
-      </>)}
+      )}
       {/* 商品卡展示区块 rows（三件套） */}
       {scope === 'goodslist' && (!block||block==='card_sections') && (
       <Card>
@@ -502,6 +511,17 @@ export default function CartContent({ workspace, scope = 'goodslist', block }) {
         </CardContent>
       </Card>
       )}
+
+      {scope === 'goodslist' && (!block || block === 'top_descriptions') && <Card>
+        <CardHeader><CardTitle>商品顶部说明</CardTitle></CardHeader>
+        <CardContent>
+          <CartDescriptionsEditor selected={cartTarget} onSelect={onCartTarget} rules={c.goodslist.top_descriptions || {}} onChange={rules =>
+            setConfig(previous => ({ ...previous, content: { ...previous.content, goodslist: {
+              ...previous.content.goodslist, top_descriptions: rules,
+            } } }))
+          } />
+        </CardContent>
+      </Card>}
 
       {/* 空态推荐位（rows：真实商品选择器） */}
       {scope === 'shoppingcar' && (!block||block==='recommendations') && (

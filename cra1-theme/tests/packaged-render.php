@@ -66,10 +66,10 @@ $renderedNav = packagedRender($headerBase.'/public/header.html', ['data'=>[
     'cra1'=>['header_support'=>[], 'header_copy'=>[]],
     'header_nav'=>$navigation,
 ]], $headerBase, 'html');
-packagedCheck(preg_match_all('~<a class="(?:nav-link cra1-nav-primary-link|cra1-drawer-top)" href="/#pricing"[^>]*>Open current</a>~', $renderedNav)===2, 'desktop and mobile primary labels preserve same-tab links and anchors');
+packagedCheck(preg_match_all('~<a class="(?:nav-link cra1-nav-primary-link|cra1-drawer-top-link)" href="/#pricing"[^>]*>Open current</a>~', $renderedNav)===2, 'desktop and mobile primary labels preserve same-tab links and anchors');
 packagedCheck(substr_count($renderedNav, 'href="/news.html?a=1&amp;b=2" target="_blank" rel="noopener"')>=2, 'both navigation layouts escape the address and preserve new-tab targets');
 foreach (['Blank group', 'Hash group'] as $label) {
-    packagedCheck(!preg_match('~<a class="(?:nav-link cra1-nav-primary-link|cra1-drawer-top)"[^>]*>'.preg_quote($label, '~').'</a>~', $renderedNav), 'placeholder primary link remains an expand-only group: '.$label);
+    packagedCheck(!preg_match('~<a class="(?:nav-link cra1-nav-primary-link|cra1-drawer-top(?:-link)?)"[^>]*>'.preg_quote($label, '~').'</a>~', $renderedNav), 'placeholder primary link remains an expand-only group: '.$label);
 }
 $websitePages=cra1_page_module_manifest();
 $websitePages['notifications']=['route'=>'/notifications.html'];
@@ -88,11 +88,11 @@ foreach (['document-details', 'document-view', 'news-details', 'announce-details
         'article_sidebar_html'=>'<h3>相关资源</h3><p><a href="/document.html">打开帮助文档</a></p>',
     ]);
     $reading = cra1_render_page_modules($route, $readingConfig);
-    packagedCheck(substr_count($reading, 'class="reading-sidebar-extra"')===1, 'one enabled reading sidebar module on '.$route);
+    packagedCheck(substr_count($reading, ' data-cra1-article-content ')===1, 'one enabled reading sidebar module on '.$route);
     packagedCheck(strpos($reading,'<h3>相关资源</h3>')!==false && strpos($reading,'href="/document.html"')!==false, 'reading sidebar renders configured markup on '.$route);
     $readingConfig['article_sidebar_enabled']='0';
     $reading = cra1_render_page_modules($route, $readingConfig);
-    packagedCheck(strpos($reading,'reading-sidebar-extra')===false, 'disabled reading sidebar emits no custom content on '.$route);
+    packagedCheck(strpos($reading,'data-cra1-article-content')===false, 'disabled reading sidebar emits no custom content on '.$route);
 }
 $data['cra1']['show_footer_bottom']=0;
 $hidden=packagedRender($headerBase.'/footer.html',['data'=>$data],$headerBase,'html');
@@ -152,6 +152,17 @@ foreach(['pc','mobile'] as $device){
             packagedCheck(strpos($html,'data-cra1-native-cart')!==false&&strpos($html,'__CRA1_RUNTIME__')!==false,'standalone cart supplies navigation context without changing native common data '.$themes);
             packagedCheck(strpos($html,$manifest['asset_bases']['native'].'/components/asideMenu/asideMenu.js')!==false&&strpos($html,$manifest['asset_bases']['native'].'/components/topMenu/topMenu.js')!==false,'standalone cart substitutes only the CRA1 navigation components '.$themes);
             packagedCheck(substr_count($html,'<aside-menu>')===1&&substr_count($html,'<top-menu ')===1,'native standalone cart has one original navigation shell '.$themes);
+            $mobile = $device === 'mobile';
+            $nativeDocument = CRA1\Theme\Presentation\OfficialCart::cartDocument($vars, $mobile, true, 501);
+            packagedCheck($nativeDocument !== null && preg_match('~data-cra1-cart-categories="501"[^>]*></section><section\b[^>]*data-cra1-cart-description="501"[^>]*></section><div class="config-box">~', $nativeDocument) === 1,
+                'mobile classification slot stays outside official configuration '.$themes);
+            $official = CRA1\Theme\Presentation\OfficialCart::cartDocument($vars, $mobile, false, 501);
+            packagedCheck($official !== null && strpos($official, 'data-cra1-cart-categories') === false, 'full official mode excludes theme classification '.$themes);
+            $_GET['embed'] = '1';
+            $embedded = CRA1\Theme\Presentation\OfficialCart::cartDocument($vars, $mobile, true, 501);
+            unset($_GET['embed']);
+            packagedCheck($embedded !== null && strpos($embedded, 'data-cra1-cart-categories') === false, 'embedded configuration excludes theme classification '.$themes);
+            if ($device === 'pc' && !empty($argv[3])) file_put_contents($argv[3], $nativeDocument);
         }
     }
 }

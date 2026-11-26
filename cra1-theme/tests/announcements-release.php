@@ -4,6 +4,7 @@ declare(strict_types=1);
 define('CRA1_THEME_BACKEND',dirname(__DIR__).'/backend');
 require CRA1_THEME_BACKEND.'/bootstrap.php';
 use CRA1\Theme\Files;
+use CRA1\Theme\Content\ContentDocument;
 use CRA1\Theme\Release\Updater;
 use CRA1\Theme\Storage\AnnouncementStore;
 $base=sys_get_temp_dir().'/cra1-notice-release-'.bin2hex(random_bytes(6));mkdir($base,0700);$checks=0;
@@ -11,7 +12,7 @@ function check($ok,string $label):void{if(!$ok)throw new RuntimeException($label
 function removeFixture(string $dir):void{if(is_file($dir)||is_link($dir)){unlink($dir);return;}foreach(scandir($dir)as$name)if($name!=='.'&&$name!=='..')removeFixture($dir.'/'.$name);rmdir($dir);}
 try{
  $backend='cra1-theme/backend/releases/fixture-notices-v1';$files=['public/web/cra1/update-probe.js'=>'new UI'];
- foreach(['Announcements/PageCatalog.php','Announcements/LegacyMigration.php','Storage/AnnouncementStore.php','Storage/member_store.php','Storage/workspace_schema.json']as$path)$files[$backend.'/'.$path]=file_get_contents(CRA1_THEME_BACKEND.'/'.$path);
+ foreach(['Announcements/PageCatalog.php','Announcements/LegacyMigration.php','Content/ContentDocument.php','Storage/AnnouncementStore.php','Storage/member_store.php','Storage/workspace_schema.json']as$path)$files[$backend.'/'.$path]=file_get_contents(CRA1_THEME_BACKEND.'/'.$path);
  $rows=[];foreach($files as$name=>$bytes)$rows[$name]=['sha256'=>hash('sha256',$bytes),'bytes'=>strlen($bytes)];
  $manifest=['format'=>1,'product'=>'cra1-theme','release'=>'fixture-notices-v1','backend_root'=>$backend,'files'=>$rows,'verified_combinations'=>[['system'=>'10.7.4','modules'=>[],'evidence'=>'isolated test only']],'release_blockers'=>[]];
  $archive=$base.'/update.zip';$zip=new ZipArchive();$zip->open($archive,ZipArchive::CREATE);$zip->addFromString('manifest.json',json_encode($manifest));foreach($files as$name=>$bytes)$zip->addFromString('payload/'.$name,$bytes);$zip->close();
@@ -26,6 +27,7 @@ try{
  $failed=false;try{$interrupted->apply($archive,hash_file('sha256',$archive));}catch(RuntimeException $e){$failed=true;}
  check($failed&&file_get_contents($site.'/public/web/cra1/update-probe.js')==='old UI','interrupted update restores UI files');
  check(!is_file($site.'/runtime/cra1_theme/distribution/pending.json')&&!is_file($site.'/runtime/cra1_theme/announcements.json'),'interrupted writes leave no migration or pending selection');
+ check(class_exists(ContentDocument::class),'active backend may load the shared editor format before the update transaction');
  $applied=$updater->apply($archive,hash_file('sha256',$archive));$store=new AnnouncementStore($site);
  check($store->publicPayload('member','/home.htm')['items'][0]['title']==='迁移前的公告','successful update migrates old content');
  check(!isset(Files::json($site.'/runtime/cra1_theme/member_center_public.json')['content']['notices']),'update removes old public announcement content');

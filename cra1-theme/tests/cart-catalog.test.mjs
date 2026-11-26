@@ -85,14 +85,89 @@ test('clearing catalogue search restores the active category without changing se
  assert.deepEqual(f.reads.map(read=>[read.args[0].id,read.args[0].keywords]),[['','other'],[2,'']])
  assert.equal(f.page.selectedProductId,7)
 })
+test('an off-page selection appears as one card and stays out of unrelated search results', async () => {
+ const {page, handlers} = fixture()
+ const linked = {id: 7, module: 'mf_cloud'}
+ page.select_second_obj = {id: 2, type: 'normal'}
+ page.urlProductId = linked.id
+ page.cartConfigReady = true
+ page.goodsList = [{id: 8, module: 'mf_cloud'}]
+ handlers.products = params => response({list: params['product_ids[0]'] === linked.id ? [linked] : []})
+
+ await page.applyDefaultSelection(page.goodsList)
+ assert.equal(page.selectedProductId, linked.id)
+ assert.deepEqual(Array.from(page.catalogCards, card => card.id), [7, 8])
+
+ page.goodsParmas.keywords = 'different model'
+ assert.deepEqual(Array.from(page.catalogCards, card => card.id), [8])
+
+ page.goodsParmas.keywords = ''
+ page.goodsList.push({...linked, id: '7'})
+ assert.deepEqual(Array.from(page.catalogCards, card => Number(card.id)), [8, 7])
+})
+test('domain and SSL descriptions track the current list through category changes and retries', async () => {
+ for (const type of ['domain', 'ssl']) {
+  const { page, handlers } = fixture()
+  const getSelection = () => Array.from(page.cartDescriptionSelection)
+  page.getSuffix = () => {}
+  page.getSslBrands = () => {}
+  page.select_first_obj.id = 1
+  page.select_second_obj = { id: 2, type }
+  page.second_group_list = [{ id: 2, type }, { id: 3, type }]
+  page.goodsParmas.id = 2
+  handlers.products = () => response({ list: [{ id: 7 }] })
+  await page.getProductGoodList()
+  assert.deepEqual(getSelection(), [1, 2, 7])
+  assert.equal(page.product_id, 7)
+
+  const oldRequest = later()
+  const newRequest = later()
+  handlers.products = params => params.id === 2 ? oldRequest.promise : newRequest.promise
+  const beforeSwitch = page.getProductGoodList()
+  const afterSwitch = page.selectSecondType(3)
+  assert.deepEqual(getSelection(), [1, 3, 0])
+  assert.equal(page.product_id, 7, 'description does not reset the native business field')
+  oldRequest.resolve(response({ list: [{ id: 11 }] }))
+  await beforeSwitch
+  assert.deepEqual(getSelection(), [1, 3, 0])
+  newRequest.resolve(response({ list: [] }))
+  await afterSwitch
+  assert.deepEqual(getSelection(), [1, 3, 0])
+
+  handlers.products = () => Promise.reject(new Error('Catalogue unavailable'))
+  await page.getProductGoodList()
+  assert.equal(page.catalogRetry, 'products')
+  assert.deepEqual(getSelection(), [1, 3, 0])
+  handlers.products = () => response({ list: [{ id: 15 }] })
+  await page.retryCatalog()
+  assert.deepEqual(getSelection(), [1, 3, 15])
+  assert.equal(page.product_id, 15)
+ }
+})
 test('catalog zero placeholders differ from explicit free products and zero discounts',()=>{
- const f=fixture()
- for(const module of [{module:'mf_cloud'},{module:null,res_module:'cloud_service'}])assert.equal(f.page.catalogPriceKnown({...module,price:'0.00',pay_type:'recurring_prepayment'}),false)
- assert.equal(f.page.catalogPriceKnown({res_module:'cloud_service',pay_type:'free',price:'0.00'}),true)
- assert.equal(f.page.catalogPriceKnown({res_module:'cloud_service',price:'41.00'}),true)
- assert.equal(f.page.catalogPriceKnown({module:'mf_cloud',price:'41.00',price_discounted:0}),true)
- assert.equal(f.page.catalogPriceAmount({price:'41.00',price_discounted:0}),0)
- for(const price of ['',null,undefined,'bad',-1])assert.equal(f.page.catalogPriceKnown({price}),false)
+ const {priceKnown,priceAmount}=fixture().options.components['cra1-catalog-card'].computed
+ for(const module of [{module:'mf_cloud'},{module:null,res_module:'cloud_service'}]){
+  assert.equal(priceKnown.call({item:{...module,price:'0.00',pay_type:'recurring_prepayment'}}),false)
+ }
+ assert.equal(priceKnown.call({item:{res_module:'cloud_service',pay_type:'free',price:'0.00'}}),true)
+ assert.equal(priceKnown.call({item:{res_module:'cloud_service',price:'41.00'}}),true)
+ const discounted={module:'mf_cloud',price:'41.00',price_discounted:0}
+ assert.equal(priceKnown.call({item:discounted}),true)
+ assert.equal(priceAmount.call({item:discounted}),0)
+ for(const price of ['',null,undefined,'bad',-1])assert.equal(priceKnown.call({item:{price}}),false)
+})
+test('the mobile summary prefers current catalogue data and remains available when no option can be selected',()=>{
+ const {page}=fixture()
+ const soldOut={id:9,stock_control:'1',qty:0}, preview={id:8,module:'direct_admin'}
+ page.goodsList=[soldOut,preview]
+ assert.equal(page.modelSummary,preview)
+ page.goodsList=[soldOut]
+ assert.equal(page.modelSummary,soldOut)
+ page.selectedProduct={id:6,module:'mf_cloud'}
+ assert.equal(page.modelSummary,page.selectedProduct)
+ const liveCopy={id:'6',module:'mf_cloud',price:30}
+ page.goodsList=[soldOut,liveCopy]
+ assert.equal(page.modelSummary,liveCopy)
 })
 test('only integrated products create a configuration frame regardless of viewport',()=>{
  const f=fixture();f.page.selectedProductId=7;f.page.selectedProduct={id:7,module:'mf_cloud'};f.page.configState='loading';f.page.embedNonce='test-frame'

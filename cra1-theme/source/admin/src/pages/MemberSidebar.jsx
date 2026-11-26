@@ -681,7 +681,8 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
           {(pickedNav || currentUrl) && (
             <p className="mt-1.5 break-all text-xs leading-5 text-muted-foreground">
               {pickedNav?.name && <>来源页面：{pickedNav.name}<br/></>}
-              将跳转：<code className="rounded bg-muted-bg px-1 font-mono">{currentUrl || '（该导航无链接）'}</code>
+              来源链接：<code className="rounded bg-muted-bg px-1 font-mono">{currentUrl || '（该导航无链接）'}</code>
+              {depth===1 && <><br/>有可见下级时，点击此分组会展开菜单。</>}
             </p>
           )}
         </div>
@@ -694,7 +695,7 @@ function NodeForm({ value, catalog, nodes, onChange, onSubmit, onCancel }) {
           </Label>
           <LinkPicker label="菜单跳转链接" value={value.url} onChange={v=>set('url',v)}/>
           <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
-            可选择站内页面、商品和联系方式，也可以填写外部网址。一级分组设置链接后，点击名称即可跳转，有下级菜单时可用右侧箭头展开。
+            可选择站内页面、商品和联系方式，也可以填写外部网址。一级分组有可见下级时，整行用于展开下级。没有下级时，点击整行打开所填链接。
           </p>
         </div>
       ) : null}

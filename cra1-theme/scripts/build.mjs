@@ -101,6 +101,8 @@ for (const [source,target] of [
   ['cart-theme.css','20261012-icon-suite-v1/css/cart-theme.css'],
   ['goods_embed.css','20261011-titanium-v1/css/goods_embed.css'],
 ]) fs.copyFileSync(path.join(root,'public/cra1-shared/theme-sources/cart',source),path.join(cartRelease,target))
+fs.appendFileSync(path.join(cartRelease,'20261012-icon-suite-v1/css/cart-theme.css'),
+  '\n'+fs.readFileSync(path.join(root,'public/cra1-shared/src/cart-categories.css'),'utf8'))
 // Purchase pages replace their existing stylesheet with one combined resource.
 // Other cart pages keep their original CSS; no extra first-screen request.
 const purchaseTheme=path.join(cartRelease,'20261017-compat-v3/css/purchase-theme.css')

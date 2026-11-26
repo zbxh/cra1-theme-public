@@ -181,8 +181,15 @@ function read_body(): array
     }
     $body = [];
     $raw = file_get_contents('php://input');
-    $transferRequest=strpos((string)($_GET['r']??''),'api.menu.')===0;
-    if(is_string($raw)&&strlen($raw)>=($transferRequest?4194304:262144))throw new InvalidArgumentException('请求内容过大，请缩小导入内容后重试');
+    $route = (string) ($_GET['r'] ?? '');
+    $large = strpos($route, 'api.menu.') === 0 || in_array($route, [
+        'api.content.preview', 'api.announcements.save', 'api.member.content.save', 'api.cart.save',
+        'api.workspace.save', 'api.workspace.editor.save', 'api.workspace.preview',
+    ], true);
+    $limit = $route === 'api.cart.descriptions.impact' ? 8388608 : ($large ? 4194304 : 262144);
+    if (is_string($raw) && strlen($raw) >= $limit) {
+        throw new InvalidArgumentException('请求内容过大，请减少单次保存或导入的内容');
+    }
     if (is_string($raw) && $raw !== '') {
         $decoded = json_decode($raw, true);
         if (is_array($decoded)) {
@@ -1315,6 +1322,36 @@ if (strpos($r,'api.')===0) {
         throw new InvalidArgumentException('未知配置传输操作');
     }
 
+    if ($action === 'content.preview') {
+        if (!is_string($body['html'] ?? null)) throw new InvalidArgumentException('内容格式不正确');
+        header('Cache-Control: private, no-store');
+        $now = time();
+        $preview = \CRA1\Theme\Content\ContentDocument::preview($body['html'], $now);
+        if (isset($body['cart'])) {
+            $cart = $body['cart'];
+            if (!is_array($cart) || !is_array($cart['rules'] ?? null) || !is_array($cart['selection'] ?? null)
+                || !in_array($cart['scope'] ?? '', \CRA1\Theme\Content\CartDescriptions::SCOPES, true)) {
+                throw new InvalidArgumentException('购物车说明预览格式不正确');
+            }
+            $rules = $cart['rules'];
+            $selection = $cart['selection'];
+            $scope = $cart['scope'];
+            $mode = $cart['mode'] ?? 'custom';
+            $id = $scope === 'global' ? 0
+                : \CRA1\Theme\Content\CartDescriptions::id($cart['id'] ?? $selection[$scope] ?? 0);
+            if (!in_array($mode, ['custom', 'hide'], true) || ($scope !== 'global' && (!$id
+                || (isset($rules[$scope]) && !is_array($rules[$scope]))))
+                || (isset($rules['shared']) && !is_array($rules['shared']))) {
+                throw new InvalidArgumentException('请选择要预览的商品或分组');
+            }
+            $rules = \CRA1\Theme\Content\CartDescriptions::withPreview($rules, $scope, $id, $mode, $preview['source']);
+            $effective = \CRA1\Theme\Content\CartDescriptions::project($rules, $selection, $now);
+            $preview = array_replace($preview, ['html'=>$effective['html'], 'next_change'=>$effective['next_change'],
+                'effective'=>array_intersect_key($effective, ['mode'=>true,'scope'=>true,'id'=>true])]);
+        }
+        json_out(['status'=>200,'msg'=>'预览已更新','data'=>$preview]);
+    }
+
     if ($action==='announcements.legacy-draft') {
         $store=new \CRA1\Theme\Storage\AnnouncementStore($ROOT);
         $source=$body['source']??'';
@@ -1358,8 +1395,10 @@ if (strpos($r,'api.')===0) {
             audit('editor.save',$partial?'partial':($result['status']===200?'ok':'fail'),$domain.':'.(string)($body['editorId']??'').($partial?' snapshot=failed':''));json_out($result);
         }
         if ($sub === 'preview') {
-            if(!is_array($body['patch']??[])||!is_array($body['related']??[]))throw new InvalidArgumentException('预览草稿格式不正确');
-            json_out($workspace->preview($domain,(string)($body['editorId']??''),$body['patch']??[],$body['related']??[]));
+            if (!is_array($body['patch']??[]) || !is_array($body['related']??[]) || !is_array($body['cartSelection']??[])) {
+                throw new InvalidArgumentException('预览草稿格式不正确');
+            }
+            json_out($workspace->preview($domain,(string)($body['editorId']??''),$body['patch']??[],$body['related']??[],$body['cartSelection']??[]));
         }
         if ($sub === 'snapshot.rebuild') {
             $result = $workspace->rebuild($domain);
@@ -1733,6 +1772,32 @@ if (strpos($r,'api.')===0) {
         json_out(['status' => 200, 'msg' => 'success', 'data' => [
             'catalog' => cra1_menu_catalog_tree($rows['groups'], $rows['products']), 'error' => $rows['error'],
         ]]);
+    }
+
+    if ($action === 'cart.descriptions.impact') {
+        if (!is_array($body['before'] ?? null) || !is_array($body['after'] ?? null)) {
+            throw new InvalidArgumentException('购物车说明应用范围格式不正确');
+        }
+        header('Cache-Control: private, no-store');
+        try {
+            $selections = (new \CRA1\Theme\Compatibility\CartCatalog())->visibleProductSelections();
+        } catch (Throwable $error) {
+            json_out(['status'=>503, 'msg'=>'V10 商品目录暂时无法读取，请稍后重试'], 503);
+        }
+        $before = \CRA1\Theme\Content\CartDescriptions::normalize($body['before']);
+        $after = \CRA1\Theme\Content\CartDescriptions::normalize($body['after']);
+        $affected = \CRA1\Theme\Content\CartDescriptions::affectedProducts($before, $after, $selections, time());
+        json_out(['status'=>200, 'data'=>['affected'=>$affected]]);
+    }
+
+    if ($action === 'cart.descriptions.catalog') {
+        header('Cache-Control: private, no-store');
+        try {
+            $catalog = (new \CRA1\Theme\Compatibility\CartCatalog())->directory();
+        } catch (Throwable $error) {
+            json_out(['status'=>503, 'msg'=>'V10 商品目录暂时无法读取，请稍后重试'], 503);
+        }
+        json_out(['status'=>200, 'data'=>$catalog]);
     }
 
     /* ---------- v10 商品分组与商品（供菜单链接选择器「快速选择商品」） ---------- */

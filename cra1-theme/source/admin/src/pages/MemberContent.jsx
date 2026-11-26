@@ -1,6 +1,6 @@
 import IconPicker from '../ui/IconPicker'
 import { useScopedState } from '../lib/workspace'
-import RichText from '../components/RichText'
+import ContentEditor from '../components/ContentEditor'
 import MediaPicker from '../components/MediaPicker'
 import LinkPicker from './LinkPicker'
 import { useState, useEffect, useMemo, useRef } from 'react'
@@ -54,7 +54,7 @@ function ProductForm({ title, value, fallback, purchaseFallback, canInherit, sav
   const purchase = { enabled: 0, text: '', url: '', target: 'self', ...(form.purchase ?? purchaseFallback.value) }
   const setPurchase = patch => set({ purchase: { ...purchase, ...patch } })
   return (
-    <Dialog open onOpenChange={(open) => !open && onCancel()}><DialogContent className="max-w-[640px]"><DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>应用到草稿后，点击页面顶部的「{saveLabel}」即可生效。</DialogDescription></DialogHeader>
+    <Dialog open onOpenChange={(open) => !open && onCancel()}><DialogContent className="max-w-[940px]"><DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>应用到草稿后，点击页面顶部的「{saveLabel}」即可生效。</DialogDescription></DialogHeader>
       <form
         className="w-full space-y-4"
         onSubmit={(e) => {
@@ -84,11 +84,7 @@ function ProductForm({ title, value, fallback, purchaseFallback, canInherit, sav
                    onChange={(e) => set({ description: e.target.value })} />
           </div>
         </div>
-        <div>
-          <Label className="mb-1.5 block">顶部介绍内容</Label>
-          <RichText label="顶部介绍内容" value={form.html} onChange={v=>set({html:v})}/>
-
-        </div>
+        <ContentEditor label="顶部介绍内容" value={form.html} onChange={html => set({ html })} />
 
         <section aria-labelledby="product-purchase-title" className="space-y-3 border-t border-line pt-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
